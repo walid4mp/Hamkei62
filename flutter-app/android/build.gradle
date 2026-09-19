@@ -1,0 +1,19 @@
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+    id 'org.jetbrains.kotlin.android' version '2.1.0' apply false
+}
+
+
+// Redirect Gradle output to ../build (Flutter standard layout) so the Flutter
+// tool can find build/app/outputs/flutter-apk/app-release.apk.
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

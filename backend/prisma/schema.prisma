@@ -1,0 +1,657 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  VIDEO
+  MUSIC
+}
+
+enum Visibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MESSAGE
+  GROUP
+  LIVE
+  VERIFICATION
+  GIFT
+  WALLET
+}
+
+enum VerificationTier {
+  NONE
+  NORMAL
+  PRO
+}
+
+model User {
+  id                  String                @id @default(cuid())
+  username            String                @unique
+  email               String                @unique
+  passwordHash        String
+  displayName         String
+  role                String                @default("USER")
+  bio                 String                @default("")
+  website             String                @default("")
+  location            String                @default("")
+  gender              String                @default("")
+  birthDate           DateTime?
+  avatarUrl           String                @default("")
+  coverUrl            String                @default("")
+  isVerified          Boolean               @default(false)
+  isBanned            Boolean               @default(false)
+  verificationTier    VerificationTier      @default(NONE)
+  verificationExpiresAt DateTime?
+  isPrivate           Boolean               @default(false)
+  hideFollowersCount  Boolean               @default(false)
+  hideFollowingCount  Boolean               @default(false)
+  hideFromSearch      Boolean               @default(false)
+  hideFromSuggestions Boolean               @default(false)
+  preventProfileScreenshots Boolean          @default(false)
+  showOnlineStatus    Boolean               @default(true)
+  allowMessageRequests Boolean              @default(true)
+  pushNotifications   Boolean               @default(true)
+  lastSeen            DateTime              @default(now())
+  createdAt           DateTime              @default(now())
+  posts               Post[]                @relation("UserPosts")
+  comments            Comment[]             @relation("UserComments")
+  likes               Like[]                @relation("UserLikes")
+  followers           Follow[]              @relation("following")
+  following           Follow[]              @relation("followers")
+  memberships         GroupMember[]         @relation("UserMemberships")
+  groups              Group[]               @relation("ownerGroups")
+  groupMessagesSent   GroupMessage[]        @relation("GroupMessageSender")
+  messagesSent        Message[]             @relation("sent")
+  messagesReceived    Message[]             @relation("received")
+  notifications       Notification[]        @relation("UserNotifications")
+  stories             Story[]               @relation("UserStories")
+  reels               Reel[]                @relation("UserReels")
+  reelLikes           ReelLike[]            @relation("UserReelLikes")
+  reelComments        ReelComment[]         @relation("UserReelComments")
+  reelShares          ReelShare[]           @relation("UserReelShares")
+  reelReposts         ReelRepost[]          @relation("UserReelReposts")
+  liveRooms           LiveRoom[]            @relation("host")
+  verificationRequests VerificationRequest[] @relation("UserVerificationRequests")
+  wallet              Wallet?
+  walletTransactions  WalletTransaction[]   @relation("WalletUserTransactions")
+  sentGifts           GiftTransaction[]     @relation("GiftSender")
+  receivedGifts      GiftTransaction[]     @relation("GiftReceiver")
+  withdrawalRequests WithdrawalRequest[]   @relation("WithdrawalUser")
+  purchaseOrders     PurchaseOrder[]
+  storeOrdersBought  StoreOrder[] @relation("StoreOrderBuyer")
+  storeListings       StoreListing[]        @relation("SellerStoreListings")
+  storeReviewsGiven   StoreReview[]         @relation("StoreReviewAuthor")
+  storeReviewsReceived StoreReview[]        @relation("StoreReviewSeller")
+  bookmarks          Bookmark[]           @relation("UserBookmarks")
+  reposts            Repost[]             @relation("UserReposts")
+  postShares         PostShare[]          @relation("UserPostShares")
+  storyReplies       StoryReply[]         @relation("StoryReplyAuthor")
+  storyReactions     StoryReaction[]      @relation("StoryReactionUser")
+  demoFollowersCount Int?
+  demoFollowingCount Int?
+  digitalCardTheme     String @default("midnight")
+  digitalCardShape     String @default("rounded")
+  digitalCardVisibility String @default("PUBLIC")
+  digitalCardShowFollowers Boolean @default(true)
+  digitalCardShowPosts Boolean @default(true)
+  digitalCardShowStories Boolean @default(true)
+  digitalCardShowActivity Boolean @default(true)
+  digitalCardShowGender Boolean @default(false)
+  digitalCardShowBirthDate Boolean @default(false)
+  digitalCardGroupId String?
+  commissionLedgerEntries CommissionLedger[] @relation("CommissionRecipient")
+  affiliateReferralsSent AffiliateReferral[] @relation("AffiliateReferrer")
+  affiliateReferralsBought AffiliateReferral[] @relation("AffiliateBuyer")
+  affiliateOrderUsers StoreOrder[] @relation("AffiliateOrderUser")
+
+  @@index([createdAt])
+}
+
+model VerificationRequest {
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation("UserVerificationRequests", fields: [userId], references: [id], onDelete: Cascade)
+  tier       VerificationTier
+  method     String           @default("CARD")
+  amount     Int              @default(0)
+  currency   String           @default("USD")
+  reference  String           @unique
+  status     String           @default("PENDING")
+  createdAt  DateTime         @default(now())
+  reviewedAt DateTime?
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@index([followerId])
+}
+
+model Post {
+  id         String       @id @default(cuid())
+  authorId   String
+  author     User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  caption    String       @default("")
+  mediaUrl   String       @default("")
+  type       PostType     @default(TEXT)
+  visibility Visibility   @default(PUBLIC)
+  musicTitle String       @default("")
+  title      String       @default("")
+  rotationDegrees Int     @default(0)
+  overlayText String      @default("")
+  overlayEmoji String     @default("")
+  overlayImageUrl String  @default("")
+  createdAt  DateTime     @default(now())
+  comments   Comment[]    @relation("PostComments")
+  likes      Like[]       @relation("PostLikes")
+  bookmarks  Bookmark[]   @relation("PostBookmarks")
+  reposts    Repost[]     @relation("PostReposts")
+  shares     PostShare[]  @relation("PostShares")
+
+  @@index([createdAt])
+  @@index([authorId, createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+  editedAt DateTime?
+  editCount Int @default(0)
+  post      Post     @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+}
+
+model Like {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation("PostLikes", fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+}
+
+model Bookmark {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation("PostBookmarks", fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model Repost {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation("PostReposts", fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserReposts", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model PostShare {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation("PostShares", fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserPostShares", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  description String        @default("")
+  avatarUrl   String        @default("")
+  coverUrl    String        @default("")
+  privacy     String        @default("PUBLIC")
+  rules       String        @default("")
+  ownerId     String
+  owner       User          @relation("ownerGroups", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+  messages    GroupMessage[]
+  createdAt   DateTime      @default(now())
+}
+
+model GroupMember {
+  groupId  String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  body       String
+  secret     Boolean  @default(false)
+  selfDestruct Boolean @default(false)
+  expiresAt  DateTime?
+  storyId    String?
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  deletedForSender Boolean @default(false)
+  deletedForReceiver Boolean @default(false)
+  viewLimit Int @default(0)
+  viewCount Int @default(0)
+  sender     User     @relation("sent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("received", fields: [receiverId], references: [id], onDelete: Cascade)
+  story      Story?   @relation("StoryMessages", fields: [storyId], references: [id], onDelete: SetNull)
+
+  @@index([senderId, receiverId, createdAt])
+}
+
+model StoryReply {
+  id        String   @id @default(cuid())
+  storyId   String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+  story     Story    @relation("StoryReplies", fields: [storyId], references: [id], onDelete: Cascade)
+  author    User     @relation("StoryReplyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  @@index([storyId, createdAt])
+}
+
+model StoryReaction {
+  storyId   String
+  userId    String
+  emoji     String   @default("❤️")
+  createdAt DateTime @default(now())
+  story     Story    @relation("StoryReactions", fields: [storyId], references: [id], onDelete: Cascade)
+  user      User     @relation("StoryReactionUser", fields: [userId], references: [id], onDelete: Cascade)
+  @@id([storyId, userId])
+  @@index([storyId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  text      String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Story {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    User     @relation("UserStories", fields: [authorId], references: [id], onDelete: Cascade)
+  mediaUrl  String
+  type      String   @default("IMAGE")
+  caption   String   @default("")
+  rotationDegrees Int @default(0)
+  overlayText String @default("")
+  overlayEmoji String @default("")
+  overlayImageUrl String  @default("")
+  musicUrl String @default("")
+  musicTitle String @default("")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  messages  Message[]       @relation("StoryMessages")
+  replies   StoryReply[]    @relation("StoryReplies")
+  reactions StoryReaction[] @relation("StoryReactions")
+
+  @@index([expiresAt])
+}
+
+model Reel {
+  id         String   @id @default(cuid())
+  authorId   String
+  author     User     @relation("UserReels", fields: [authorId], references: [id], onDelete: Cascade)
+  videoUrl   String
+  caption    String   @default("")
+  musicTitle String   @default("")
+  musicUrl   String   @default("")
+  title      String   @default("")
+  rotationDegrees Int @default(0)
+  overlayText String @default("")
+  overlayEmoji String @default("")
+  overlayImageUrl String @default("")
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  likes      ReelLike[]    @relation("ReelLikes")
+  comments   ReelComment[] @relation("ReelComments")
+  shares     ReelShare[]   @relation("ReelShares")
+  reposts    ReelRepost[]  @relation("ReelReposts")
+
+  @@index([createdAt])
+}
+
+
+model MusicTrack {
+  id          String   @id @default(cuid())
+  title       String
+  artist      String
+  album       String   @default("")
+  coverUrl    String   @default("")
+  audioUrl    String   @default("")
+  category    String   @default("")
+  durationSec Int      @default(0)
+  licensed    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([artist])
+  @@index([category])
+  @@index([licensed, createdAt])
+}
+
+model ReelLike {
+  reelId String
+  userId String
+  createdAt DateTime @default(now())
+  reel Reel @relation("ReelLikes", fields:[reelId], references:[id], onDelete:Cascade)
+  user User @relation("UserReelLikes", fields:[userId], references:[id], onDelete:Cascade)
+  @@id([reelId,userId])
+}
+
+model ReelComment {
+  id String @id @default(cuid())
+  reelId String
+  authorId String
+  body String
+  createdAt DateTime @default(now())
+  editedAt DateTime?
+  editCount Int @default(0)
+  reel Reel @relation("ReelComments", fields:[reelId], references:[id], onDelete:Cascade)
+  author User @relation("UserReelComments", fields:[authorId], references:[id], onDelete:Cascade)
+  @@index([reelId,createdAt])
+}
+
+model ReelShare {
+  reelId String
+  userId String
+  createdAt DateTime @default(now())
+  reel Reel @relation("ReelShares", fields:[reelId], references:[id], onDelete:Cascade)
+  user User @relation("UserReelShares", fields:[userId], references:[id], onDelete:Cascade)
+  @@unique([reelId,userId])
+  @@index([reelId,createdAt])
+}
+
+model ReelRepost {
+  reelId String
+  userId String
+  createdAt DateTime @default(now())
+  reel Reel @relation("ReelReposts", fields:[reelId], references:[id], onDelete:Cascade)
+  user User @relation("UserReelReposts", fields:[userId], references:[id], onDelete:Cascade)
+  @@id([reelId,userId])
+}
+
+model LiveRoom {
+  id          String    @id @default(cuid())
+  hostId      String
+  host        User      @relation("host", fields: [hostId], references: [id], onDelete: Cascade)
+  title       String
+  roomName    String    @unique
+  status      String    @default("LIVE")
+  viewerCount Int       @default(0)
+  createdAt   DateTime  @default(now())
+  endedAt     DateTime?
+}
+
+model GroupMessage {
+  id        String   @id @default(cuid())
+  groupId   String
+  senderId  String
+  body      String
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender    User     @relation("GroupMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt])
+}
+
+
+model Wallet {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  coinBalance       Int      @default(0)
+  bonusCoins        Int      @default(0)
+  purchasedCoins    Int      @default(0)
+  withdrawableCoins Int      @default(0)
+  welcomeBonusGranted Boolean @default(false)
+  lifetimePurchased Int      @default(0)
+  lifetimeReceived  Int      @default(0)
+  lifetimeSpent     Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      WalletTransaction[]
+}
+
+model WalletTransaction {
+  id            String   @id @default(cuid())
+  userId        String
+  type          String
+  coins         Int
+  balanceAfter  Int
+  withdrawableAfter Int
+  reference     String   @unique
+  description   String   @default("")
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  user          User     @relation("WalletUserTransactions", fields: [userId], references: [id], onDelete: Cascade)
+  wallet        Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId      String
+
+  @@index([userId, createdAt])
+  @@index([walletId, createdAt])
+}
+
+model Gift {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  emoji       String
+  priceCoins  Int
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  transactions GiftTransaction[]
+}
+
+model GiftTransaction {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  giftId      String
+  coins       Int
+  context     String
+  contextId   String   @default("")
+  message     String   @default("")
+  fundingType String   @default("PURCHASED")
+  reference   String   @unique
+  createdAt   DateTime @default(now())
+  sender      User     @relation("GiftSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("GiftReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  gift        Gift     @relation(fields: [giftId], references: [id], onDelete: Restrict)
+
+  @@index([receiverId, createdAt])
+  @@index([senderId, createdAt])
+  @@index([context, contextId, createdAt])
+}
+
+model StoreListing {
+  id          String   @id @default(cuid())
+  sellerId    String
+  seller      User     @relation("SellerStoreListings", fields: [sellerId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  category    String
+  priceCents  Int
+  currency    String   @default("USD")
+  location    String   @default("")
+  imageUrl    String   @default("")
+  stock       Int      @default(1)
+  views       Int      @default(0)
+  purchases   Int      @default(0)
+  active      Boolean  @default(true)
+  couponCode  String   @default("")
+  discountPct Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      StoreOrder[]
+  reviews     StoreReview[] @relation("StoreReviewListing")
+  affiliateReferrals AffiliateReferral[]
+  @@index([category, createdAt])
+  @@index([priceCents])
+  @@index([location])
+  @@index([views, purchases])
+}
+
+model StoreOrder {
+  id          String   @id @default(cuid())
+  listingId   String
+  buyerId     String
+  quantity    Int      @default(1)
+  amountCents Int
+  currency    String   @default("USD")
+  status      String   @default("REQUESTED")
+  commissionCents Int  @default(0)
+  affiliateCommissionCents Int @default(0)
+  affiliateUserId String?
+  createdAt   DateTime @default(now())
+  listing     StoreListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer       User     @relation("StoreOrderBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  affiliateUser User? @relation("AffiliateOrderUser", fields: [affiliateUserId], references: [id], onDelete: SetNull)
+  commissionLedger CommissionLedger?
+  affiliateReferral AffiliateReferral?
+  @@index([listingId, createdAt])
+  @@index([buyerId, createdAt])
+}
+
+model StoreReview {
+  id        String   @id @default(cuid())
+  listingId String
+  sellerId  String
+  authorId  String
+  rating    Int
+  comment   String   @default("")
+  createdAt DateTime @default(now())
+  listing   StoreListing @relation("StoreReviewListing", fields: [listingId], references: [id], onDelete: Cascade)
+  seller    User     @relation("StoreReviewSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  author    User     @relation("StoreReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  @@unique([listingId, authorId])
+  @@index([sellerId, createdAt])
+}
+
+model CommissionSetting {
+  id                String   @id @default(cuid())
+  saleRatePct       Int      @default(5)
+  serviceRatePct    Int      @default(5)
+  subscriptionRatePct Int    @default(10)
+  affiliateRatePct  Int      @default(2)
+  updatedAt         DateTime @updatedAt
+}
+
+model CommissionLedger {
+  id             String   @id @default(cuid())
+  orderId        String?  @unique
+  recipientId    String
+  source         String
+  grossCents     Int
+  commissionCents Int
+  netCents       Int
+  currency       String   @default("USD")
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  order          StoreOrder? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  recipient      User     @relation("CommissionRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  @@index([recipientId, createdAt])
+  @@index([source, createdAt])
+}
+
+model AffiliateReferral {
+  id          String   @id @default(cuid())
+  referrerId  String
+  buyerId     String
+  listingId   String
+  orderId     String?  @unique
+  clicks      Int      @default(0)
+  commissionCents Int  @default(0)
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  referrer    User     @relation("AffiliateReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  buyer       User     @relation("AffiliateBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  listing     StoreListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  order       StoreOrder? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  @@index([referrerId, createdAt])
+  @@index([listingId, createdAt])
+}
+
+model PurchaseOrder {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  coins       Int
+  amountCents Int
+  currency    String   @default("USD")
+  platform    String
+  transactionId String  @unique
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  verifiedAt  DateTime?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model WithdrawalRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  coins         Int
+  feeCoins      Int
+  cashCents     Int
+  currency      String   @default("USD")
+  method        String
+  destination   String
+  status        String   @default("PENDING")
+  reference     String   @unique
+  createdAt     DateTime @default(now())
+  reviewedAt    DateTime?
+  user          User     @relation("WithdrawalUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
