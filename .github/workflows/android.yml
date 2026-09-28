@@ -38,6 +38,14 @@ jobs:
     defaults:
       run:
         working-directory: flutter-app
+    # V93: the `secrets` context is NOT available inside a step `if:` — that
+    # made the whole workflow a startup_failure (no jobs, instant red run).
+    # Secrets are mapped to job-level env and the condition reads `env.*`.
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
     steps:
       - name: Checkout
@@ -80,12 +88,7 @@ jobs:
       # are absent the build falls back to debug signing (still a valid APK for
       # testing). Secrets are NEVER written into the repository.
       - name: Configure release signing (optional)
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
           cat > android/key.properties <<EOF
