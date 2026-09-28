@@ -556,6 +556,14 @@ class Api {
   static Future<Map<String,dynamic>> updateLiveChallenge(String id,{required int scoreA,required int scoreB}) async => Map<String,dynamic>.from(await req('PATCH','/api/live/challenges/$id',body:{'scoreA':scoreA,'scoreB':scoreB}));
   static Future<Map<String,dynamic>> finishLiveChallenge(String id,String winnerId) async => Map<String,dynamic>.from(await req('POST','/api/live/challenges/$id/finish',body:{'winnerId':winnerId}));
 
+  // ---------------- V93 live join requests ----------------
+  static Future<Map<String, dynamic>> liveJoinRequests(String roomId) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/live/$roomId/join-requests'));
+  static Future<Map<String, dynamic>> requestJoinLive(String roomId, {String message = ''}) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/live/$roomId/join-requests', body: {'message': message}));
+  static Future<Map<String, dynamic>> decideJoinRequest(String roomId, String requestId, String status) async =>
+      Map<String, dynamic>.from(await req('PATCH', '/api/live/$roomId/join-requests/$requestId', body: {'status': status}));
+
   // ---------------- V93 admin console ----------------
   static Future<Map<String, dynamic>> adminGifts({String q = ''}) async =>
       Map<String, dynamic>.from(await req('GET', '/api/admin/gifts${q.isEmpty ? '' : '?q=$q'}'));
@@ -671,13 +679,23 @@ class Api {
         'platform': platform,
         'purchaseToken': purchaseToken,
       }));
-  static Future<Map<String, dynamic>> sendGift({required String receiverId, required String giftId, required String context, String contextId = '', String message = ''}) async =>
+  static Future<Map<String, dynamic>> sendGift({
+    required String receiverId,
+    required String giftId,
+    required String context,
+    String contextId = '',
+    String message = '',
+    int quantity = 1,
+    String idempotencyKey = '',
+  }) async =>
       Map<String, dynamic>.from(await req('POST', '/api/wallet/gifts/send', body: {
         'receiverId': receiverId,
         'giftId': giftId,
         'context': context,
         'contextId': contextId,
         'message': message,
+        'quantity': quantity,
+        if (idempotencyKey.isNotEmpty) 'idempotencyKey': idempotencyKey,
       }));
   static Future<Map<String, dynamic>> withdraw({required int coins, required String method, required String destination}) async =>
       Map<String, dynamic>.from(await req('POST', '/api/wallet/withdraw', body: {

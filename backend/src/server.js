@@ -700,6 +700,10 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "Series" ADD COLUMN IF NOT EXISTS "rating" DOUBLE PRECISION NOT NULL DEFAULT 0`,
     `ALTER TABLE "Episode" ADD COLUMN IF NOT EXISTS "releaseDate" TIMESTAMP(3)`,
     `ALTER TABLE "Episode" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'PUBLISHED'`,
+    `CREATE TABLE IF NOT EXISTS "LiveJoinRequest" ("id" TEXT PRIMARY KEY,"roomId" TEXT NOT NULL,"userId" TEXT NOT NULL,"status" TEXT NOT NULL DEFAULT 'PENDING',"message" TEXT NOT NULL DEFAULT '',"decidedBy" TEXT NOT NULL DEFAULT '',"decidedAt" TIMESTAMP(3),"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "LiveJoinRequest_roomId_userId_key" ON "LiveJoinRequest"("roomId","userId")`,
+    `CREATE INDEX IF NOT EXISTS "LiveJoinRequest_roomId_status_idx" ON "LiveJoinRequest"("roomId","status")`,
+    `CREATE INDEX IF NOT EXISTS "LiveJoinRequest_userId_createdAt_idx" ON "LiveJoinRequest"("userId","createdAt")`,
     `CREATE TABLE IF NOT EXISTS "CreatorMilestoneReward" ("id" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"milestoneId" TEXT NOT NULL,"grantedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"payload" TEXT NOT NULL DEFAULT '{}')`,
     `CREATE UNIQUE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_milestoneId_key" ON "CreatorMilestoneReward"("userId","milestoneId")`,
     `CREATE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_grantedAt_idx" ON "CreatorMilestoneReward"("userId","grantedAt")`,
@@ -2244,6 +2248,50 @@ app.post('/api/live/:roomId/comments',auth,async(req,res)=>{
   const c=await prisma.liveComment.create({data:{roomId:room.id,authorId:req.user.id,body,replyToId:replyToId||null,replyToName},include:{author:true}});
   const payload={...c,author:safe(c.author)};io.to(`live:${room.roomName}`).emit('live:comment',payload);res.status(201).json(payload);
 });
+/// V93: guest/co-host requests. A viewer asks, the host (or a moderator with
+/// MANAGE_MODERATORS) approves or rejects; both sides see the same status.
+app.post('/api/live/:roomId/join-requests',auth,async(req,res)=>{
+  const room=await prisma.liveRoom.findUnique({where:{id:req.params.roomId}});
+  if(!room||!['LIVE','PAUSED'].includes(room.status))return res.status(404).json({error:'LIVE_NOT_FOUND'});
+  if(room.hostId===req.user.id)return res.status(400).json({error:'HOST_ALREADY_IN'});
+  const row=await prisma.liveJoinRequest.upsert({
+    where:{roomId_userId:{roomId:room.id,userId:req.user.id}},
+    create:{roomId:room.id,userId:req.user.id,message:String(req.body?.message||'').slice(0,200)},
+    update:{status:'PENDING',message:String(req.body?.message||'').slice(0,200),decidedBy:'',decidedAt:null},
+  });
+  io.to(`live:${room.roomName}`).emit('live:join-request',{requestId:row.id,userId:req.user.id,username:req.user.displayName||req.user.username,status:row.status});
+  res.status(201).json(row);
+});
+app.get('/api/live/:roomId/join-requests',auth,async(req,res)=>{
+  const room=await prisma.liveRoom.findUnique({where:{id:req.params.roomId}});
+  if(!room)return res.status(404).json({error:'LIVE_NOT_FOUND'});
+  const isStaff=room.hostId===req.user.id||!!(await liveStaff(room.id,req.user.id));
+  if(!isStaff){
+    const own=await prisma.liveJoinRequest.findUnique({where:{roomId_userId:{roomId:room.id,userId:req.user.id}}});
+    return res.json({mine:own,requests:[]});
+  }
+  const rows=await prisma.liveJoinRequest.findMany({where:{roomId:room.id},orderBy:{createdAt:'desc'},take:100,include:{}});
+  const users=await prisma.user.findMany({where:{id:{in:rows.map(r=>r.userId)}}});
+  const byId=new Map(users.map(u=>[u.id,safe(u)]));
+  res.json({requests:rows.map(r=>({...r,user:byId.get(r.userId)||null})),pending:rows.filter(r=>r.status==='PENDING').length});
+});
+app.patch('/api/live/:roomId/join-requests/:id',auth,async(req,res)=>{
+  const room=await prisma.liveRoom.findUnique({where:{id:req.params.roomId}});
+  if(!room)return res.status(404).json({error:'LIVE_NOT_FOUND'});
+  const staff=await liveCan(req,room.id,'PIN_COMMENT');
+  const can=room.hostId===req.user.id||staff.ok;
+  const row=await prisma.liveJoinRequest.findUnique({where:{id:req.params.id}});
+  if(!row||row.roomId!==room.id)return res.status(404).json({error:'REQUEST_NOT_FOUND'});
+  const status=String(req.body?.status||'').toUpperCase();
+  if(!['APPROVED','REJECTED','CANCELLED'].includes(status))return res.status(400).json({error:'INVALID_STATUS'});
+  if(!can&&!(status==='CANCELLED'&&row.userId===req.user.id))return res.status(403).json({error:'MODERATOR_ONLY'});
+  const updated=await prisma.liveJoinRequest.update({where:{id:row.id},data:{status,decidedBy:req.user.id,decidedAt:new Date()}});
+  io.to(`live:${room.roomName}`).emit('live:join-request',{requestId:updated.id,userId:updated.userId,status,by:req.user.displayName||req.user.username});
+  io.to(`user:${updated.userId}`).emit('live:join-request',{requestId:updated.id,roomId:room.id,roomName:room.roomName,status});
+  await prisma.notification.create({data:{userId:updated.userId,type:'LIVE',text:status==='APPROVED'?'تمت الموافقة على طلب الصعود':'تم رفض طلب الصعود'}}).catch(()=>{});
+  res.json(updated);
+});
+
 app.post('/api/live/:roomId/moderators',auth,async(req,res)=>{
   const room=await prisma.liveRoom.findUnique({where:{id:req.params.roomId}}); if(!room||room.hostId!==req.user.id)return res.status(403).json({error:'HOST_ONLY'});
   const userId=String(req.body?.userId||'').trim(); const role=String(req.body?.role||'MODERATOR').toUpperCase()==='ASSISTANT'?'ASSISTANT':'MODERATOR';

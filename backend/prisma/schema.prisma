@@ -1335,6 +1335,23 @@ model LiveTapCount {
   @@index([roomName, taps])
 }
 
+/// A viewer asking to join the host's live (guest / co-host request).
+model LiveJoinRequest {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  status    String   @default("PENDING") // PENDING | APPROVED | REJECTED | CANCELLED
+  message   String   @default("")
+  decidedBy String   @default("")
+  decidedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([roomId, userId])
+  @@index([roomId, status])
+  @@index([userId, createdAt])
+}
+
 /// Who saw a story, when, and how many times. Required for story insights and
 /// for the "viewed" state of the status circles.
 model StoryView {

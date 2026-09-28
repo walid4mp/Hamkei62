@@ -49,6 +49,7 @@ class NovaGift {
     this.imageUrl = '',
     this.previewUrl = '',
     this.premium = false,
+    this.serverId = '',
   });
 
   final String slug;
@@ -67,6 +68,9 @@ class NovaGift {
   final String imageUrl;
   final String previewUrl;
   final bool premium;
+  /// The database id when the row came from the server (empty for the bundled
+  /// offline catalog, where the slug is used instead).
+  final String serverId;
 
   String get tierKey => tier.key;
   bool get hasArtwork => imageUrl.trim().isNotEmpty;
@@ -94,10 +98,28 @@ class NovaGift {
       imageUrl: '${m['imageUrl'] ?? ''}',
       previewUrl: '${m['previewUrl'] ?? ''}',
       premium: m['premium'] == true,
+      serverId: '${m['id'] ?? ''}',
     );
   }
 
   NovaMotion get motion => NovaGiftCatalog.motionFor(effectKey);
+
+  /// Plain map for callers that need to hand a gift back (e.g. the store).
+  Map<String, dynamic> toMap() => {
+        'id': serverId,
+        'slug': slug,
+        'name': name,
+        'emoji': emoji,
+        'priceCoins': price,
+        'rarity': rarity.key,
+        'category': category,
+        'effectKey': effectKey,
+        'effectMs': durationMs,
+        'soundKey': soundKey,
+        'imageUrl': imageUrl,
+        'previewUrl': previewUrl,
+        'premium': premium,
+      };
 }
 
 /// Canonical fallback catalog (mirrors the first 26 engine entries) so the UI
@@ -248,6 +270,7 @@ class NovaGiftEffect extends StatefulWidget {
     this.rarity = NovaGiftRarity.common,
     this.senderName = '',
     this.coins = 0,
+    this.quantity = 1,
     this.hostName = '',
     this.duration = const Duration(milliseconds: 2600),
     this.gift,
@@ -261,6 +284,8 @@ class NovaGiftEffect extends StatefulWidget {
   final NovaGiftRarity rarity;
   final String senderName;
   final int coins;
+  /// Combo count — identical gifts merge into one animation shown as xN.
+  final int quantity;
   final String hostName;
   final Duration duration;
   /// When provided, the effect renders the gift's real artwork instead of the
@@ -479,7 +504,7 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(color: Colors.black.withValues(alpha: .55), borderRadius: BorderRadius.circular(20), border: Border.all(color: _accent.withValues(alpha: .5))),
                 child: Text(
-                  '${widget.senderName.isEmpty ? '' : '${widget.senderName}  •  '}+${widget.coins} NVC',
+                  '${widget.senderName.isEmpty ? '' : '${widget.senderName}  •  '}+${widget.coins} NVC${widget.quantity > 1 ? '  ×${widget.quantity}' : ''}',
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
                 ),
               ),

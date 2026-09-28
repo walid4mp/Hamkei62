@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import '../core/localization.dart';
 import 'call_history.dart';
+import '../features/gifts/gift_store.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -14,7 +15,6 @@ import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:livekit_client/livekit_client.dart' hide ConnectionState;
 
-import 'wallet.dart';
 
 import '../core/api.dart';
 import '../core/chat_bubbles.dart';
@@ -1088,7 +1088,7 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
             ListTile(leading: Icon(Icons.photo_library_outlined, color: SN.violet), title: Text('إرسال صورة من المعرض'), onTap: () { Navigator.pop(ctx); _sendMedia(source: ImageSource.gallery); }),
             ListTile(leading: Icon(Icons.camera_alt_outlined, color: SN.violet), title: Text('التقاط صورة'), onTap: () { Navigator.pop(ctx); _sendMedia(source: ImageSource.camera); }),
             ListTile(leading: Icon(Icons.videocam_outlined, color: SN.violet), title: Text('إرسال فيديو'), onTap: () { Navigator.pop(ctx); _sendVideo(); }),
-            ListTile(leading: Icon(Icons.card_giftcard_outlined, color: SN.cyan), title: Text('إرسال هدية'), onTap: () { Navigator.pop(ctx); showGiftPicker(context, receiverId: widget.userId, receiverName: widget.name, contextType: 'MESSAGE'); }),
+            ListTile(leading: Icon(Icons.card_giftcard_outlined, color: SN.cyan), title: Text('إرسال هدية'), onTap: () { Navigator.pop(ctx); showGiftStore(context, receiverId: widget.userId, receiverName: widget.name, contextType: 'MESSAGE'); }),
           ],
         ),
       ),
@@ -2350,6 +2350,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   /// Bumped for every gift so the effect widget is rebuilt fresh (and its
   /// animation restarts) even when the same gift arrives twice in a combo.
   int _giftFxSeq = 0;
+  int _giftCombo = 1;
   /// Viewer count persisted on the server, merged with the LiveKit estimate.
   int _serverViewers = 0;
   /// Drives the rising-hearts layer; a burst counter keeps the painter cheap.
@@ -3158,6 +3159,137 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     );
   }
 
+  /// V93: guest/co-host requests. The host (or a moderator) sees the queue and
+  /// approves or rejects; a viewer sees the status of their own request.
+  Future<void> _showJoinRequests() async {
+    final roomId = widget.roomId;
+    if (roomId == null || roomId.isEmpty) return;
+    Map<String, dynamic> data = const {};
+    try {
+      data = await Api.liveJoinRequests(roomId);
+    } catch (e) {
+      if (mounted) toast(context, e.toString().replaceFirst('Exception: ', ''));
+      return;
+    }
+    if (!mounted) return;
+    final rows = (data['requests'] as List?) ?? const [];
+    final mine = data['mine'] is Map ? Map<String, dynamic>.from(data['mine'] as Map) : null;
+    final isStaff = _isHost || rows.isNotEmpty;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: SN.bg1,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.of(ctx).size.height * .62,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(18, 2, 18, 8),
+                child: Text('طلبات الصعود', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              ),
+              if (!isStaff)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        mine == null
+                            ? 'لم ترسل طلبًا بعد.'
+                            : switch ('${mine['status']}') {
+                                'APPROVED' => 'تمت الموافقة على طلبك ✅',
+                                'REJECTED' => 'تم رفض طلبك',
+                                'CANCELLED' => 'تم إلغاء طلبك',
+                                _ => 'طلبك قيد المراجعة ⏳',
+                              },
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 10),
+                      FilledButton.icon(
+                        onPressed: mine != null && '${mine['status']}' == 'PENDING'
+                            ? null
+                            : () async {
+                                Navigator.pop(ctx);
+                                try {
+                                  await Api.requestJoinLive(roomId);
+                                  if (mounted) toast(context, 'أُرسل طلب الصعود إلى صاحب البث');
+                                } catch (e) {
+                                  if (mounted) toast(context, e.toString().replaceFirst('Exception: ', ''));
+                                }
+                              },
+                        icon: const Icon(Icons.person_add_alt_1_rounded),
+                        label: const Text('طلب الصعود على البث'),
+                      ),
+                    ],
+                  ),
+                )
+              else if (rows.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('لا توجد طلبات صعود حالياً', style: TextStyle(color: Colors.white70)),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    itemCount: rows.length,
+                    itemBuilder: (_, i) {
+                      final r = Map<String, dynamic>.from(rows[i] as Map);
+                      final user = r['user'] is Map ? Map<String, dynamic>.from(r['user'] as Map) : <String, dynamic>{};
+                      final pending = '${r['status']}' == 'PENDING';
+                      return Card(
+                        child: ListTile(
+                          leading: SNav(
+                            url: '${user['avatarUrl'] ?? ''}',
+                            name: '${user['displayName'] ?? user['username'] ?? ''}',
+                            size: 40,
+                          ),
+                          title: Text('${user['displayName'] ?? user['username'] ?? 'مستخدم'}'),
+                          subtitle: Text('${r['status']}${'${r['message']}'.isEmpty ? '' : ' — ${r['message']}'}'),
+                          trailing: pending
+                              ? Row(mainAxisSize: MainAxisSize.min, children: [
+                                  IconButton(
+                                    tooltip: 'رفض',
+                                    icon: const Icon(Icons.close_rounded, color: SN.red),
+                                    onPressed: () async {
+                                      try {
+                                        await Api.decideJoinRequest(roomId, '${r['id']}', 'REJECTED');
+                                        if (ctx.mounted) Navigator.pop(ctx);
+                                        if (mounted) _showJoinRequests();
+                                      } catch (_) {}
+                                    },
+                                  ),
+                                  IconButton(
+                                    tooltip: 'قبول',
+                                    icon: const Icon(Icons.check_rounded, color: SN.green),
+                                    onPressed: () async {
+                                      try {
+                                        await Api.decideJoinRequest(roomId, '${r['id']}', 'APPROVED');
+                                        if (ctx.mounted) Navigator.pop(ctx);
+                                        if (mounted) {
+                                          toast(context, 'تمت الموافقة — سيتمكن من الانضمام للبث');
+                                        }
+                                      } catch (_) {}
+                                    },
+                                  ),
+                                ])
+                              : Text('${r['status']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _bottomBar() {
     return Positioned(
       left: 12,
@@ -3206,7 +3338,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             onTap: _sendScreenTap,
           ),
           const SizedBox(width: 5),
-          _glassButton(icon: Icons.card_giftcard_rounded, onTap: widget.hostId == null || widget.hostId!.isEmpty ? () {} : () => showGiftPicker(context, receiverId: widget.hostId!, receiverName: widget.title, contextType: 'LIVE', contextId: widget.roomName)),
+          _glassButton(icon: Icons.person_add_alt_1_rounded, onTap: _showJoinRequests),
+          const SizedBox(width: 5),
+          _glassButton(icon: Icons.card_giftcard_rounded, onTap: widget.hostId == null || widget.hostId!.isEmpty ? () {} : () => showGiftStore(context, receiverId: widget.hostId!, receiverName: widget.title, contextType: 'LIVE', contextId: widget.roomName, title: 'هدايا البث')),
           if (_isHost) ...[
             const SizedBox(width: 5),
             _glassButton(icon: micOn ? Icons.mic_rounded : Icons.mic_off_rounded, active: micOn, onTap: _toggleMic),
@@ -3310,6 +3444,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       rarity: gift.rarity,
       senderName: '${g['sender'] ?? ''}',
       coins: coins.toInt(),
+      quantity: _giftCombo,
       hostName: widget.title,
       duration: Duration(milliseconds: (g['effectMs'] as num?)?.toInt() ?? 2600),
       onDone: _advanceGift,
@@ -3318,13 +3453,31 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   /// Gift Animation Manager: one effect plays at a time; the rest wait in a
   /// queue so a burst of gifts never overlaps or drops an animation.
+  /// V93: identical gifts arriving back-to-back merge into one animation with
+  /// an xN badge instead of playing N separate animations (the spec's x5/x10/x50
+  /// behaviour) — the ledger still records every transaction separately.
   void _enqueueGift(Map<String, dynamic> fx) {
+    final slug = '${fx['slug'] ?? ''}';
     if (_giftFx == null) {
-      setState(() { _giftFx = fx; _giftFxSeq++; });
+      setState(() { _giftFx = fx; _giftCombo = 1; _giftFxSeq++; });
       _armGiftTimer(fx);
-    } else {
-      _giftQueue.add(fx);
+      return;
     }
+    if (slug.isNotEmpty && '${_giftFx!['slug'] ?? ''}' == slug) {
+      setState(() => _giftCombo++);
+      _armGiftTimer(fx);
+      return;
+    }
+    // merge with an identical gift already waiting in the queue
+    final at = _giftQueue.indexWhere((e) => '${e['slug'] ?? ''}' == slug);
+    if (slug.isNotEmpty && at >= 0) {
+      final row = Map<String, dynamic>.from(_giftQueue[at]);
+      row['combo'] = ((row['combo'] as int?) ?? 1) + 1;
+      row['coins'] = ((row['coins'] as num?) ?? 0) + ((fx['coins'] as num?) ?? 0);
+      _giftQueue[at] = row;
+      return;
+    }
+    _giftQueue.add(fx);
   }
 
   void _armGiftTimer(Map<String, dynamic> fx) {
@@ -3337,10 +3490,10 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     if (!mounted) return;
     if (_giftQueue.isNotEmpty) {
       final next = _giftQueue.removeAt(0);
-      setState(() { _giftFx = next; _giftFxSeq++; });
+      setState(() { _giftFx = next; _giftCombo = (next['combo'] as int?) ?? 1; _giftFxSeq++; });
       _armGiftTimer(next);
     } else if (_giftFx != null) {
-      setState(() => _giftFx = null);
+      setState(() { _giftFx = null; _giftCombo = 1; });
     }
   }
 

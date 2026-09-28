@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import '../features/gifts/gift_store.dart';
 import '../core/localization.dart';
 
 import '../core/api.dart';
@@ -1348,7 +1349,7 @@ class _ReelsPageState extends State<ReelsPage> {
               final m = RegExp(r'@([^\s@]*)$').firstMatch(value); if (m == null || m.group(1)!.isEmpty) { setSheet(() { suggestions = []; mentionQuery = ''; }); return; }
               final q = m.group(1)!; if (q == mentionQuery) return; mentionQuery = q; try { final rows = await Api.searchUsers(q); if (mentionQuery == q) setSheet(() => suggestions = rows.take(8).toList()); } catch (_) {}
             })),
-            IconButton(tooltip:'إرسال هدية', onPressed: () => showGiftPicker(ctx, receiverId:r.author.id, receiverName:r.author.displayName, contextType:'COMMENT', contextId:r.id), icon: const Icon(Icons.card_giftcard_rounded, color: Colors.amberAccent)),
+            IconButton(tooltip:'إرسال هدية', onPressed: () => showGiftStore(ctx, receiverId:r.author.id, receiverName:r.author.displayName, contextType:'COMMENT', contextId:r.id), icon: const Icon(Icons.card_giftcard_rounded, color: Colors.amberAccent)),
             const SizedBox(width: 2), IconButton(onPressed: busy ? null : () async { final t = ctrl.text.trim(); if (t.isEmpty) return; setSheet(() => busy = true); try { final x = await Api.commentReel(r.id, t, parentId: replyToId); comments = [x, ...comments]; ctrl.clear(); suggestions = []; setSheet(() { replyToId = null; replyToName = ''; }); } catch (e) { toast(ctx, e.toString().replaceFirst('Exception: ', '')); } setSheet(() => busy = false); }, icon: const Icon(Icons.send_rounded, color: Colors.white)),
           ])),
         ])),

@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../core/api.dart';
-import '../core/nova_audio.dart';
-import '../core/nova_gifts.dart';
 import '../core/theme.dart';
 import '../core/widgets.dart';
+import '../features/gifts/gift_store.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
@@ -278,72 +277,15 @@ Future<void> showGiftPicker(
   required String contextType,
   String contextId = '',
   String? receiverName,
-}) async {
-  try {
-    final results = await Future.wait([Api.gifts(), Api.wallet()]);
-    final rawGifts = List<dynamic>.from(results[0] as List);
-    final wallet = Map<String, dynamic>.from(results[1] as Map);
-    // Server catalog wins; the bundled catalog is the offline fallback so the
-    // sheet is never an empty grid.
-    final gifts = rawGifts.isNotEmpty
-        ? rawGifts.map((e) => NovaGiftCatalog.resolve(Map<String, dynamic>.from(e as Map))).toList()
-        : List<NovaGift>.from(NovaGiftCatalog.all);
-    // Keep the original server ids for the send call, aligned by index.
-    final ids = rawGifts.isNotEmpty
-        ? rawGifts.map((e) => '${(e as Map)['id'] ?? ''}').toList()
-        : List<String>.from(NovaGiftCatalog.all.map((g) => g.slug));
-    if (!context.mounted) return;
-    var selected = -1;
-    var sending = false;
-    var categoryFilter = ''; // '' = all categories
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
-        final categories = <String>['', ...{for (final g in gifts) if (g.category.isNotEmpty) g.category}];
-        final visible = <int>[
-          for (var i = 0; i < gifts.length; i++)
-            if (categoryFilter.isEmpty || gifts[i].category == categoryFilter) i
-        ];
-        final selectedGift = selected >= 0 && selected < gifts.length ? gifts[selected] : null;
-        return Container(
-          height: MediaQuery.of(ctx).size.height * .78,
-          decoration: const BoxDecoration(
-            color: Color(0xFF0A0B12),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-          ),
-          child: SafeArea(child: Column(children: [
-            Container(width: 44, height: 4, margin: const EdgeInsets.only(top: 10, bottom: 8), decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(8))),
-            Padding(padding: const EdgeInsets.fromLTRB(18, 6, 18, 10), child: Row(children: [
-              Container(width: 44, height: 44, decoration: BoxDecoration(gradient: SN.grad, borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.card_giftcard_rounded, color: Colors.white)),
-              const SizedBox(width: 11),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('إرسال هدية${receiverName == null ? '' : ' إلى $receiverName'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900)),
-                Text('رصيدك ${wallet['coinBalance'] ?? 0} NovaCoins', style: const TextStyle(color: Colors.white60, fontSize: 11)),
-              ])),
-              IconButton(onPressed: () { Navigator.pop(ctx); Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())); }, icon: const Icon(Icons.add_circle_outline, color: SN.cyan)),
-            ])),
-            if (selectedGift != null) Container(margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9), decoration: BoxDecoration(gradient: LinearGradient(colors: [SN.violet.withValues(alpha: .28), SN.cyan.withValues(alpha: .12)]), borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)), child: Row(children: [NovaGiftArt(gift: selectedGift, size: 34), const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(selectedGift.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)), Text('${selectedGift.rarity.label} • ${selectedGift.price} NVC', style: const TextStyle(color: Colors.white60, fontSize: 11))])), FilledButton(onPressed: sending ? null : () async { setSheet(() => sending = true); try { await Api.sendGift(receiverId: receiverId, giftId: ids[selected], context: contextType, contextId: contextId); playGiftSound(selectedGift.soundKey, selectedGift.tier); if (ctx.mounted) { Navigator.pop(ctx); toast(context, 'تم إرسال ${selectedGift.emoji} ${selectedGift.name} ✨'); } } catch (e) { if (ctx.mounted) { setSheet(() => sending = false); toast(ctx, e.toString().replaceFirst('Exception: ', '')); } } }, child: Text(sending ? '...' : 'إرسال'))])),
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                children: [
-                  for (final c in categories)
-                    Padding(padding: const EdgeInsets.only(left: 6), child: ChoiceChip(label: Text(c.isEmpty ? 'الكل' : NovaGiftCatalog.categoryLabel(c)), selected: categoryFilter == c, onSelected: (_) => setSheet(() => categoryFilter = c))),
-                ],
-              ),
-            ),
-            const Padding(padding: EdgeInsets.fromLTRB(18, 6, 18, 6), child: Align(alignment: AlignmentDirectional.centerStart, child: Text('الهدايا', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)))),
-            Expanded(child: GridView.builder(padding: const EdgeInsets.fromLTRB(14, 0, 14, 18), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: .82), itemCount: visible.length, itemBuilder: (_, vi) { final i = visible[vi]; final g = gifts[i]; final active = i == selected; final accent = NovaGiftCatalog.rarityColor(g.rarity); return GestureDetector(onTap: () { setSheet(() => selected = active ? -1 : i); NovaAudio.i.playGiftSfx(g.tier.key); }, child: AnimatedContainer(duration: const Duration(milliseconds: 160), decoration: BoxDecoration(gradient: active ? LinearGradient(colors: [accent.withValues(alpha: .40), SN.pink.withValues(alpha: .18)]) : null, color: active ? null : const Color(0xFF12141D), borderRadius: BorderRadius.circular(18), border: Border.all(color: active ? accent.withValues(alpha: .85) : Colors.white10), boxShadow: active ? [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16)] : null), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [NovaGiftArt(gift: g, size: active ? 40 : 34), const SizedBox(height: 4), Text(g.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)), const SizedBox(height: 3), Text('${g.price}', style: TextStyle(color: active ? accent : Colors.white54, fontSize: 9, fontWeight: FontWeight.w800)), Text(g.rarity.label, style: TextStyle(color: accent.withValues(alpha: .9), fontSize: 8, fontWeight: FontWeight.w800))]))); })),
-          ])),
-        );
-      }),
-    );
-  } catch (e) {
-    if (context.mounted) toast(context, e.toString().replaceFirst('Exception: ', ''));
-  }
+}) {
+  // V93: there is one gift UI. The old emoji grid was replaced by the neon
+  // gift store (features/gifts/gift_store.dart); this entry point is kept so
+  // older call sites keep working.
+  return showGiftStore(
+    context,
+    receiverId: receiverId,
+    receiverName: receiverName ?? '',
+    contextType: contextType,
+    contextId: contextId,
+  );
 }
-
