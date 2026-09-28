@@ -22,9 +22,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
       - name: Syntax check
         run: node --check src/server.js
-      - name: Unit tests (gifts + permissions)
+      - name: Prisma schema validation
+        run: npx prisma validate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/socialnova?schema=public
+      - name: Unit tests (gifts + permissions + catalog)
         run: npm test
 
   build-apk:
