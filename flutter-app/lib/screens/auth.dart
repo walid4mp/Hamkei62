@@ -89,9 +89,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     final now = DateTime.now();
     final maxDate = DateTime(now.year - 13, now.month, now.day);
     final initial = birth ?? DateTime(now.year - 20, now.month, now.day);
-    var selectedYear = initial.year.clamp(1930, maxDate.year) as int;
+    var selectedYear = initial.year.clamp(1930, maxDate.year);
     var selectedMonth = initial.month;
-    var selectedDay = initial.day.clamp(1, DateUtils.getDaysInMonth(selectedYear, selectedMonth)) as int;
+    var selectedDay = initial.day.clamp(1, DateUtils.getDaysInMonth(selectedYear, selectedMonth));
     final dayController = FixedExtentScrollController(initialItem: selectedDay - 1);
     final monthController = FixedExtentScrollController(initialItem: selectedMonth - 1);
     final yearController = FixedExtentScrollController(initialItem: selectedYear - 1930);

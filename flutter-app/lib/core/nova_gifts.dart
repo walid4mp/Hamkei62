@@ -268,10 +268,13 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
     return Center(
       child: Opacity(
         opacity: opacity,
-        child: SizedBox(
-          width: 220,
-          height: 220,
-          child: CustomPaint(painter: _BurstPainter(v, _seed, _tierColor)),
+        child: Transform.scale(
+          scale: scale,
+          child: SizedBox(
+            width: 220,
+            height: 220,
+            child: CustomPaint(painter: _BurstPainter(v, _seed, _tierColor)),
+          ),
         ),
       ),
     );

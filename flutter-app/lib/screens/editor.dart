@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'music_picker.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
-import '../core/widgets.dart';
 import 'content_studio.dart';
 import '../core/localization.dart';
 

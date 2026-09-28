@@ -538,6 +538,10 @@ class Api {
   static Future<void> pauseLive(String id) async => req('POST', '/api/live/$id/pause');
   static Future<void> resumeLive(String id) async => req('POST', '/api/live/$id/resume');
   static Future<void> endLive(String id) async => req('POST', '/api/live/$id/end');
+  static Future<Map<String, dynamic>> liveStats(String roomName) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/live/stats/$roomName'));
+  static Future<Map<String, dynamic>> liveTop(String roomName) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/live/top/$roomName'));
   static Future<Map<String,dynamic>> createLiveChallenge(String roomName,String opponentId,{String title='جولة تحدي'}) async => Map<String,dynamic>.from(await req('POST','/api/live/challenges',body:{'roomName':roomName,'opponentId':opponentId,'title':title}));
   static Future<Map<String,dynamic>> updateLiveChallenge(String id,{required int scoreA,required int scoreB}) async => Map<String,dynamic>.from(await req('PATCH','/api/live/challenges/$id',body:{'scoreA':scoreA,'scoreB':scoreB}));
   static Future<Map<String,dynamic>> finishLiveChallenge(String id,String winnerId) async => Map<String,dynamic>.from(await req('POST','/api/live/challenges/$id/finish',body:{'winnerId':winnerId}));

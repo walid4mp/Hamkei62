@@ -29,7 +29,7 @@ class _WomenHubPageState extends State<WomenHubPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), gradient: LinearGradient(colors: [SN.violet.withOpacity(.9), SN.cyan.withOpacity(.72)])),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), gradient: LinearGradient(colors: [SN.violet.withValues(alpha: .9), SN.cyan.withValues(alpha: .72)])),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(L10n.t('مساحة آمنة ومجتمعية 🌸'), style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
               SizedBox(height: 8),
@@ -47,7 +47,7 @@ class _WomenHubPageState extends State<WomenHubPage> {
             margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              leading: CircleAvatar(backgroundColor: SN.violet.withOpacity(.12), child: Icon(c.$2, color: SN.violet)),
+              leading: CircleAvatar(backgroundColor: SN.violet.withValues(alpha: .12), child: Icon(c.$2, color: SN.violet)),
               title: Text(c.$1, style: const TextStyle(fontWeight: FontWeight.w700)),
               subtitle: Text(c.$3),
               trailing: const Icon(Icons.chevron_left_rounded),

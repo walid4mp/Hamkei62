@@ -63,7 +63,7 @@ class _MaximumPrivacyPageState extends State<MaximumPrivacyPage> {
       body: loading ? const LoadingBox() : ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Container(padding: EdgeInsets.all(18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), gradient: LinearGradient(colors: [SN.violet.withOpacity(.18), SN.cyan.withOpacity(.10)]), border: Border.all(color: SN.strokeSoft)), child: Row(children: [
+          Container(padding: EdgeInsets.all(18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), gradient: LinearGradient(colors: [SN.violet.withValues(alpha: .18), SN.cyan.withValues(alpha: .10)]), border: Border.all(color: SN.strokeSoft)), child: Row(children: [
             Icon(Icons.shield_rounded, size: 42, color: SN.violet), SizedBox(width: 14),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('وضع الخصوصية القصوى', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900)), SizedBox(height: 5), Text(enabled ? 'الحماية مفعّلة' : 'فعّلها لتطبيق إعدادات الخصوصية المتقدمة', style: TextStyle(color: SN.textMut))])),
             Switch.adaptive(value: enabled, onChanged: _toggle),

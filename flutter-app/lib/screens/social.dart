@@ -35,7 +35,6 @@ void openProfile(BuildContext context, String userId) {
   );
 }
 
-
 Future<void> openMentionProfile(BuildContext context, String username) async {
   final q = username.trim().replaceFirst(RegExp(r'^@'), '');
   if (q.isEmpty) return;
@@ -844,7 +843,7 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
       'animated:hearts':[const Color(0xFF3B0A2E),const Color(0xFF831843)],
       'animated:particles':[const Color(0xFF111827),const Color(0xFF0F766E)],
     }[_chatTheme] ?? [SN.bg1,SN.bg2];
-    return BoxDecoration(gradient:LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:map!));
+    return BoxDecoration(gradient:LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:map));
   }
 
   Widget _chatBackgroundWidget() {
@@ -1134,7 +1133,7 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
       final mm = (seconds ~/ 60).toString().padLeft(2, '0');
       final ss = (seconds % 60).toString().padLeft(2, '0');
       return Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 42, height: 42, decoration: BoxDecoration(color: mine ? Colors.white.withOpacity(.16) : SN.violet.withOpacity(.14), shape: BoxShape.circle), child: Icon(video ? Icons.videocam_rounded : Icons.call_rounded, color: mine ? Colors.white : SN.violet)),
+        Container(width: 42, height: 42, decoration: BoxDecoration(color: mine ? Colors.white.withValues(alpha: .16) : SN.violet.withValues(alpha: .14), shape: BoxShape.circle), child: Icon(video ? Icons.videocam_rounded : Icons.call_rounded, color: mine ? Colors.white : SN.violet)),
         const SizedBox(width: 9),
         Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text(video ? 'مكالمة فيديو' : 'مكالمة صوتية', style: TextStyle(color: mine ? Colors.white : SN.textPri, fontWeight: FontWeight.w900)),
@@ -1400,7 +1399,7 @@ class _GroupsPageState extends State<GroupsPage> {
           Expanded(child: ListView(padding: const EdgeInsets.fromLTRB(18, 8, 18, 24), children: [
             Container(height: 132, decoration: BoxDecoration(gradient: SN.grad, borderRadius: BorderRadius.circular(24)), child: Stack(children: [
               const Positioned(right: 20, top: 18, child: Icon(Icons.auto_awesome_rounded, color: Colors.white24, size: 64)),
-              Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white.withOpacity(.18), shape: BoxShape.circle), child: const Icon(Icons.add_photo_alternate_outlined, color: Colors.white, size: 26)), const SizedBox(height: 8), const Text('صورة غلاف المجموعة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12))]))
+              Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .18), shape: BoxShape.circle), child: const Icon(Icons.add_photo_alternate_outlined, color: Colors.white, size: 26)), const SizedBox(height: 8), const Text('صورة غلاف المجموعة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12))]))
             ])),
             const SizedBox(height: 18),
             TextField(controller: name, decoration: const InputDecoration(labelText: 'اسم المجموعة', prefixIcon: Icon(Icons.title_rounded))),
@@ -1418,7 +1417,7 @@ class _GroupsPageState extends State<GroupsPage> {
             TextField(controller: rules, maxLines: 3, decoration: const InputDecoration(labelText: 'قواعد المجتمع', hintText: 'الاحترام، عدم الإزعاج، المحتوى المسموح... ', prefixIcon: Icon(Icons.rule_rounded))),
             const SizedBox(height: 12),
             Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: SN.bg2, borderRadius: BorderRadius.circular(18), border: Border.all(color: SN.strokeSoft)), child: Row(children: [
-              Container(width: 38, height: 38, decoration: BoxDecoration(color: SN.violet.withOpacity(.14), borderRadius: BorderRadius.circular(12)), child: Icon(Icons.forum_outlined, color: SN.violet)),
+              Container(width: 38, height: 38, decoration: BoxDecoration(color: SN.violet.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)), child: Icon(Icons.forum_outlined, color: SN.violet)),
               const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('مساحة نقاش جاهزة', style: TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 2), Text('يمكن للأعضاء نشر الرسائل والوسائط داخل المجموعة', style: TextStyle(color: SN.textMut, fontSize: 11))])),
               Switch(value: comments, onChanged: (v) => setSheet(() => comments = v)),
             ])),
@@ -1436,7 +1435,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
   Widget _choiceCard(String title, String sub, IconData icon, bool selected, VoidCallback onTap) => InkWell(
     onTap: onTap, borderRadius: BorderRadius.circular(18), child: AnimatedContainer(duration: const Duration(milliseconds: 180), padding: const EdgeInsets.all(12), decoration: BoxDecoration(
-      color: selected ? SN.violet.withOpacity(.12) : SN.bg2, borderRadius: BorderRadius.circular(18), border: Border.all(color: selected ? SN.violet : SN.strokeSoft, width: selected ? 1.4 : 1),
+      color: selected ? SN.violet.withValues(alpha: .12) : SN.bg2, borderRadius: BorderRadius.circular(18), border: Border.all(color: selected ? SN.violet : SN.strokeSoft, width: selected ? 1.4 : 1),
     ), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(icon, color: selected ? SN.violet : SN.textMut), const SizedBox(height: 8), Text(title, style: const TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 2), Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: SN.textMut, fontSize: 10))]))
   );
 
@@ -1572,7 +1571,7 @@ class _GroupsPageState extends State<GroupsPage> {
                           gradient: SN.grad,
                           borderRadius: BorderRadius.circular(26),
                           boxShadow: [
-                            BoxShadow(color: SN.violet.withOpacity(.18), blurRadius: 24),
+                            BoxShadow(color: SN.violet.withValues(alpha: .18), blurRadius: 24),
                           ],
                         ),
                         child: Row(
@@ -1581,7 +1580,7 @@ class _GroupsPageState extends State<GroupsPage> {
                               width: 52,
                               height: 52,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(.16),
+                                color: Colors.white.withValues(alpha: .16),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.auto_awesome_rounded, color: Colors.white),
@@ -1598,7 +1597,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                   const SizedBox(height: 3),
                                   Text(
                                     'ابحث عن مجتمع يناسبك أو ابدأ واحدًا من الصفر.',
-                                    style: TextStyle(color: Colors.white.withOpacity(.78), fontSize: 12),
+                                    style: TextStyle(color: Colors.white.withValues(alpha: .78), fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -1806,7 +1805,7 @@ class _CallRoomPageState extends State<CallRoomPage> {
     if (url.isEmpty || !mounted) return;
     await showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(.92),
+      barrierColor: Colors.black.withValues(alpha: .92),
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 36),
@@ -1848,7 +1847,7 @@ class _CallRoomPageState extends State<CallRoomPage> {
     for(final pub in p.videoTrackPublications){if(pub.track is VideoTrack&&!pub.muted&&!pub.isScreenShare){t=pub.track as VideoTrack;break;}}
     return t==null?Container(color:Colors.black,alignment:Alignment.center,child:CircleAvatar(radius:42,child:Text(p.name.isNotEmpty?p.name[0].toUpperCase():'S',style:const TextStyle(fontSize:32)))):ClipRRect(borderRadius:BorderRadius.circular(18),child:VideoTrackRenderer(t));
   }
-  Widget _callButton({required IconData icon, required VoidCallback onTap, bool danger=false, bool active=true, String? label}) => Column(mainAxisSize:MainAxisSize.min,children:[Material(color:danger?Colors.redAccent.withOpacity(.95):Colors.white.withOpacity(active ? .14 : .07),shape:const CircleBorder(),child:InkWell(customBorder:const CircleBorder(),onTap:onTap,child:SizedBox(width:58,height:58,child:Icon(icon,color:Colors.white,size:24)))),if(label!=null)Padding(padding:const EdgeInsets.only(top:6),child:Text(label,style:const TextStyle(color:Colors.white70,fontSize:10,fontWeight:FontWeight.w700)))]);
+  Widget _callButton({required IconData icon, required VoidCallback onTap, bool danger=false, bool active=true, String? label}) => Column(mainAxisSize:MainAxisSize.min,children:[Material(color:danger?Colors.redAccent.withValues(alpha: .95):Colors.white.withValues(alpha: active ? .14 : .07),shape:const CircleBorder(),child:InkWell(customBorder:const CircleBorder(),onTap:onTap,child:SizedBox(width:58,height:58,child:Icon(icon,color:Colors.white,size:24)))),if(label!=null)Padding(padding:const EdgeInsets.only(top:6),child:Text(label,style:const TextStyle(color:Colors.white70,fontSize:10,fontWeight:FontWeight.w700)))]);
 
   @override Widget build(BuildContext context){
     final rem=room.remoteParticipants.values.toList(); final local=room.localParticipant;
@@ -1856,9 +1855,9 @@ class _CallRoomPageState extends State<CallRoomPage> {
       backgroundColor:Colors.black,
       body:error!=null?Center(child:Container(margin:const EdgeInsets.all(24),padding:const EdgeInsets.all(22),decoration:BoxDecoration(color:Colors.white10,borderRadius:BorderRadius.circular(24)),child:Column(mainAxisSize:MainAxisSize.min,children:[const Icon(Icons.call_end_rounded,color:Colors.white70,size:48),const SizedBox(height:12),Text(error!,textAlign:TextAlign.center,style:const TextStyle(color:Colors.white)),const SizedBox(height:16),FilledButton(onPressed:_connect,child:const Text('إعادة الاتصال'))]))):Stack(children:[
         Positioned.fill(child:rem.isNotEmpty?_video(rem.first):Container(decoration:const BoxDecoration(gradient:LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors:[Color(0xFF151A2A),Color(0xFF05060A)])),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Container(width:112,height:112,decoration:BoxDecoration(shape:BoxShape.circle,gradient:SN.grad,boxShadow:const [BoxShadow(color:Colors.black54,blurRadius:35,spreadRadius:6)]),padding:const EdgeInsets.all(4),child:CircleAvatar(backgroundColor:Colors.black,child:Text(widget.title.isNotEmpty?widget.title[0].toUpperCase():'S',style:const TextStyle(color:Colors.white,fontSize:42,fontWeight:FontWeight.w900)))),const SizedBox(height:18),Text(widget.title,style:const TextStyle(color:Colors.white,fontSize:22,fontWeight:FontWeight.w900)),const SizedBox(height:6),Text(connected?'في انتظار اتصال الطرف الآخر…':'جاري الاتصال…',style:const TextStyle(color:Colors.white60))]))),
-        Positioned(top:MediaQuery.of(context).padding.top+12,left:16,right:16,child:Row(children:[Material(color:Colors.black.withOpacity(.38),shape:const CircleBorder(),child:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back_rounded,color:Colors.white))),const SizedBox(width:10),Expanded(child:Container(padding:const EdgeInsets.symmetric(horizontal:14,vertical:10),decoration:BoxDecoration(color:Colors.black.withOpacity(.35),borderRadius:BorderRadius.circular(20)),child:Row(children:[const Icon(Icons.lock_rounded,color:Colors.white54,size:14),const SizedBox(width:7),Expanded(child:Text(widget.videoCall?'مكالمة فيديو مشفرة':'مكالمة صوتية',style:const TextStyle(color:Colors.white,fontWeight:FontWeight.w800)))])))])),
+        Positioned(top:MediaQuery.of(context).padding.top+12,left:16,right:16,child:Row(children:[Material(color:Colors.black.withValues(alpha: .38),shape:const CircleBorder(),child:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back_rounded,color:Colors.white))),const SizedBox(width:10),Expanded(child:Container(padding:const EdgeInsets.symmetric(horizontal:14,vertical:10),decoration:BoxDecoration(color:Colors.black.withValues(alpha: .35),borderRadius:BorderRadius.circular(20)),child:Row(children:[const Icon(Icons.lock_rounded,color:Colors.white54,size:14),const SizedBox(width:7),Expanded(child:Text(widget.videoCall?'مكالمة فيديو مشفرة':'مكالمة صوتية',style:const TextStyle(color:Colors.white,fontWeight:FontWeight.w800)))])))])),
         if(widget.videoCall&&local!=null)Positioned(right:16,top:MediaQuery.of(context).padding.top+78,width:112,height:158,child:Container(decoration:BoxDecoration(borderRadius:BorderRadius.circular(20),border:Border.all(color:Colors.white24),boxShadow:const [BoxShadow(color:Colors.black54,blurRadius:18)]),clipBehavior:Clip.antiAlias,child:_video(local))),
-        Positioned(left:16,right:16,bottom:MediaQuery.of(context).padding.bottom+18,child:Container(padding:const EdgeInsets.fromLTRB(12,14,12,12),decoration:BoxDecoration(color:Colors.black.withOpacity(.62),borderRadius:BorderRadius.circular(30),border:Border.all(color:Colors.white12)),child:Row(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children:[_callButton(icon:micOn?Icons.mic_rounded:Icons.mic_off_rounded,onTap:_mic,active:micOn,label:micOn?'صوت':'مكتوم'),_callButton(icon:speakerOn?Icons.volume_up_rounded:Icons.volume_off_rounded,onTap:_speaker,active:speakerOn,label:'مكبر'),_callButton(icon:Icons.movie_filter_rounded,onTap:_watchReelTogether,label:'Reels معًا'),if(widget.videoCall)_callButton(icon:cameraOn?Icons.videocam_rounded:Icons.videocam_off_rounded,onTap:_camera,active:cameraOn,label:'كاميرا'),_callButton(icon:Icons.call_end_rounded,onTap:()=>Navigator.pop(context),danger:true,label:'إنهاء')]))),
+        Positioned(left:16,right:16,bottom:MediaQuery.of(context).padding.bottom+18,child:Container(padding:const EdgeInsets.fromLTRB(12,14,12,12),decoration:BoxDecoration(color:Colors.black.withValues(alpha: .62),borderRadius:BorderRadius.circular(30),border:Border.all(color:Colors.white12)),child:Row(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children:[_callButton(icon:micOn?Icons.mic_rounded:Icons.mic_off_rounded,onTap:_mic,active:micOn,label:micOn?'صوت':'مكتوم'),_callButton(icon:speakerOn?Icons.volume_up_rounded:Icons.volume_off_rounded,onTap:_speaker,active:speakerOn,label:'مكبر'),_callButton(icon:Icons.movie_filter_rounded,onTap:_watchReelTogether,label:'Reels معًا'),if(widget.videoCall)_callButton(icon:cameraOn?Icons.videocam_rounded:Icons.videocam_off_rounded,onTap:_camera,active:cameraOn,label:'كاميرا'),_callButton(icon:Icons.call_end_rounded,onTap:()=>Navigator.pop(context),danger:true,label:'إنهاء')]))),
       ]),
     );
   }
@@ -1900,7 +1899,7 @@ class _LivePageState extends State<LivePage> {
     t.dispose();
   }
 
-  Widget _liveOption(String title,String sub,IconData icon,bool selected,VoidCallback tap)=>InkWell(onTap:tap,borderRadius:BorderRadius.circular(17),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.all(12),decoration:BoxDecoration(color:selected?SN.red.withOpacity(.10):SN.bg2,borderRadius:BorderRadius.circular(17),border:Border.all(color:selected?SN.red:SN.strokeSoft)),child:Row(children:[Icon(icon,color:selected?SN.red:SN.textMut),const SizedBox(width:8),Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(title,style:const TextStyle(fontWeight:FontWeight.w800)),Text(sub,style:TextStyle(color:SN.textMut,fontSize:10))])])));
+  Widget _liveOption(String title,String sub,IconData icon,bool selected,VoidCallback tap)=>InkWell(onTap:tap,borderRadius:BorderRadius.circular(17),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.all(12),decoration:BoxDecoration(color:selected?SN.red.withValues(alpha: .10):SN.bg2,borderRadius:BorderRadius.circular(17),border:Border.all(color:selected?SN.red:SN.strokeSoft)),child:Row(children:[Icon(icon,color:selected?SN.red:SN.textMut),const SizedBox(width:8),Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(title,style:const TextStyle(fontWeight:FontWeight.w800)),Text(sub,style:TextStyle(color:SN.textMut,fontSize:10))])])));
 
   @override
   Widget build(BuildContext context) {
@@ -2262,10 +2261,11 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   int _scoreB = 0;
   Timer? _giftFxTimer;
   Map<String,dynamic>? _hostProfile;
-  bool _giftShake = false;
   /// Bumped for every gift so the effect widget is rebuilt fresh (and its
   /// animation restarts) even when the same gift arrives twice in a combo.
   int _giftFxSeq = 0;
+  /// Viewer count persisted on the server, merged with the LiveKit estimate.
+  int _serverViewers = 0;
   /// Drives the rising-hearts layer; a burst counter keeps the painter cheap.
   final ValueNotifier<int> _hearts = ValueNotifier<int>(0);
   Map<String, dynamic>? _replyingTo;
@@ -2294,7 +2294,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     );
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -2313,6 +2312,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     _liveModeratorSub = SocketService.i.liveModerators.listen((m) { if (!mounted) return; final id='${m['userId'] ?? ''}'; setState(() { if ('${m['action']}' == 'removed') _moderatorIds.remove(id); else _moderatorIds.add(id); }); });
     _loadLiveComments();
     _loadLiveModerators();
+    _loadLiveStats();
     _tapSub = SocketService.i.liveTaps.listen((m) { if (!mounted) return; if ('${m['userId']}' == '${Api.me?['id']}') return; setState(() => _tapCount++); });
     _giftSub = SocketService.i.liveGifts.listen((m) {
       if (!mounted) return;
@@ -2320,10 +2320,10 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       final effect='${gift['effectKey'] ?? 'pulse'}';
       final resolved = NovaGiftCatalog.resolve(gift);
       playGiftSound(gift['soundKey'] == null ? '' : '${gift['soundKey']}', resolved.tier);
-      setState(() { final value = m['coins'] is num ? (m['coins'] as num).toInt() : (gift['priceCoins'] is num ? (gift['priceCoins'] as num).toInt() : 0); _giftCount++; _giftScore += value; if (_challengeId != null) _scoreA += value; chat.add({'body': '🎁 ${gift['emoji'] ?? '🎁'} ${gift['name'] ?? 'هدية'}', 'displayName': '${m['username'] ?? ''}'}); _giftFx = {...gift, 'sender': '${m['username'] ?? ''}', 'coins': value, 'effectKey': effect}; _giftShake = effect == 'lion' || effect == 'roar' || effect == 'car'; _giftFxSeq++; });
+      setState(() { final value = m['coins'] is num ? (m['coins'] as num).toInt() : (gift['priceCoins'] is num ? (gift['priceCoins'] as num).toInt() : 0); _giftCount++; _giftScore += value; if (_challengeId != null) _scoreA += value; chat.add({'body': '🎁 ${gift['emoji'] ?? '🎁'} ${gift['name'] ?? 'هدية'}', 'displayName': '${m['username'] ?? ''}'}); _giftFx = {...gift, 'sender': '${m['username'] ?? ''}', 'coins': value, 'effectKey': effect}; _giftFxSeq++; });
       _giftFxTimer?.cancel();
       final ms = (gift['effectMs'] is num ? (gift['effectMs'] as num).toInt() : 2200).clamp(1200, 6000);
-      _giftFxTimer = Timer(Duration(milliseconds: ms + 200), () { if (mounted) setState(() { _giftFx = null; _giftShake = false; }); });
+      _giftFxTimer = Timer(Duration(milliseconds: ms + 200), () { if (mounted) setState(() => _giftFx = null); });
     });
     if (widget.hostId != null && widget.hostId!.isNotEmpty) {
       Api.profile(widget.hostId!).then((v) { if (mounted) setState(() => _hostProfile = v); }).catchError((_) {});
@@ -2335,6 +2335,53 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     if (widget.roomId == null || widget.roomId!.isEmpty) return;
     try { final rows = await Api.liveComments(widget.roomId!); if (mounted) setState(() { chat.clear(); chat.addAll(rows.map((e) => Map<String,dynamic>.from(e as Map))); final pinned = chat.where((x) => x['pinned'] == true).map((x) => '${x['id']}').toList(); _pinnedCommentId = pinned.isEmpty ? null : pinned.first; }); } catch (_) {}
   }
+  /// Restores the room's tap/gift totals so leaving and re-entering does not
+  /// reset them.
+  Future<void> _loadLiveStats() async {
+    try {
+      final s = await Api.liveStats(widget.roomName);
+      if (!mounted) return;
+      setState(() {
+        _tapCount = (s['tapCount'] as num?)?.toInt() ?? _tapCount;
+        _giftCount = (s['giftCount'] as num?)?.toInt() ?? _giftCount;
+        _giftScore = (s['giftScore'] as num?)?.toInt() ?? _giftScore;
+        _serverViewers = (s['viewerCount'] as num?)?.toInt() ?? _serverViewers;
+      });
+    } catch (_) {}
+  }
+
+  /// Top supporters (gifters) and top tappers for this room, in order.
+  Future<void> _showTopSheet() async {
+    Map<String, dynamic> data = const {};
+    try { data = await Api.liveTop(widget.roomName); } catch (_) {}
+    if (!mounted) return;
+    final gifters = (data['topGifters'] as List?) ?? const [];
+    final tappers = (data['topTappers'] as List?) ?? const [];
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: SN.bg1,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * .7,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Padding(padding: EdgeInsets.fromLTRB(18, 4, 18, 8), child: Text('لوحة الدعم', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900))),
+            Expanded(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 12), children: [
+              const _BoardTitle(icon: Icons.card_giftcard_rounded, color: Colors.amberAccent, text: 'أفضل الداعمين بالهدايا'),
+              if (gifters.isEmpty) const _BoardEmpty(text: 'لا توجد هدايا بعد'),
+              for (var i = 0; i < gifters.length; i++) _BoardRow(index: i, row: Map<String, dynamic>.from(gifters[i] as Map), trailing: '${(gifters[i] as Map)['coins'] ?? 0} NVC'),
+              const SizedBox(height: 10),
+              const _BoardTitle(icon: Icons.touch_app_rounded, color: SN.pink, text: 'أكثر المكبّسين'),
+              if (tappers.isEmpty) const _BoardEmpty(text: 'لا يوجد تكبيس بعد'),
+              for (var i = 0; i < tappers.length; i++) _BoardRow(index: i, row: Map<String, dynamic>.from(tappers[i] as Map), trailing: '${(tappers[i] as Map)['taps'] ?? 0} ❤'),
+            ])),
+          ]),
+        ),
+      ),
+    );
+  }
+
   Future<void> _loadLiveModerators() async {
     if (widget.roomId == null || widget.roomId!.isEmpty) return;
     try { final rows = await Api.liveModerators(widget.roomId!); if (mounted) setState(() { _moderatorIds..clear()..addAll(rows.map((e) => '${(e as Map)['userId']}')); final me=rows.cast<dynamic>().map((e)=>Map<String,dynamic>.from(e as Map)).where((e)=>'${e['userId']}'=='${Api.me?['id']}').toList(); _moderatorRole = me.isEmpty ? '' : '${me.first['role'] ?? ''}'; }); } catch (_) {}
@@ -2418,9 +2465,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   Future<void> _challengeScore(bool host) async {
     if(_challengeId==null)return;
     try{if(host)_scoreA++;else _scoreB++;await Api.updateLiveChallenge(_challengeId!,scoreA:_scoreA,scoreB:_scoreB);if(mounted)setState((){});}catch(_){}
-  }
-  Future<void> _finishChallenge(bool hostWinner) async {
-    if(_challengeId==null)return;try{final winner=hostWinner?'${Api.me?['id']}':'${_remoteParticipants.isNotEmpty?_remoteParticipants.first.identity:''}';final r=await Api.finishLiveChallenge(_challengeId!,winner);if(mounted){setState(()=>_challengeId=null);toast(context,'الفائز: ${hostWinner?'أنت':'المشارك'} • انتصارات متتالية: ${r['liveWinStreak']??0}');}}catch(e){if(mounted)toast(context,'تعذّر إنهاء الجولة');}
   }
 
   Future<void> _toggleLivePause() async {
@@ -2567,7 +2611,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                       final id = '${u['id'] ?? ''}';
                       final selected = _moderatorIds.contains(id);
                       return Card(
-                        color: Colors.white.withOpacity(.04),
+                        color: Colors.white.withValues(alpha: .04),
                         child: ListTile(
                           leading: SNav(url: '${u['avatarUrl'] ?? ''}', name: '${u['displayName'] ?? u['username'] ?? ''}', size: 44, ring: selected),
                           title: Text('${u['displayName'] ?? u['username'] ?? ''}'),
@@ -2686,7 +2730,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black.withOpacity(.62)],
+                colors: [Colors.transparent, Colors.black.withValues(alpha: .62)],
                 stops: const [.52, 1],
               ),
             ),
@@ -2716,7 +2760,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                decoration: BoxDecoration(color: Colors.black.withOpacity(.48), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: .48), borderRadius: BorderRadius.circular(12)),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(isLocal && micOn ? Icons.mic_rounded : Icons.mic_off_rounded, color: Colors.white70, size: 13),
                   const SizedBox(width: 3),
@@ -2738,14 +2782,24 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     participants.addAll(remotes.take(3));
 
     if (participants.isEmpty) {
+      // When the host has uploaded a stage cover image, show it behind the
+      // "waiting" state instead of a plain black screen.
+      final cover = (_liveCoverImage ?? '').trim();
       return Positioned.fill(
         child: Container(
           color: Colors.black,
           alignment: Alignment.center,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
+          child: Stack(fit: StackFit.expand, children: [
+            if (cover.isNotEmpty)
+              ColorFiltered(
+                colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
+                child: Image.network(cover, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+              ),
+            Column(mainAxisSize: MainAxisSize.min, children: [
             CircleAvatar(radius: 56, backgroundColor: Colors.white10, child: SNav(url: '${_hostProfile?['avatarUrl'] ?? ''}', name: '${_hostProfile?['displayName'] ?? widget.title}', size: 104)),
             const SizedBox(height: 14),
             const Text('جاري انتظار الفيديو…', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
+            ]),
           ]),
         ),
       );
@@ -2843,9 +2897,14 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         ),
         const SizedBox(width: 6),
         const NovaLiveBadge(),
-        if (viewers > 0) ...[
+        ...[
           const SizedBox(width: 6),
-          NovaStatPill(icon: Icons.visibility_rounded, text: '$viewers', iconColor: Colors.white70),
+          NovaStatPill(
+            icon: Icons.visibility_rounded,
+            text: '${math.max(viewers, _serverViewers) > 0 ? math.max(viewers, _serverViewers) : viewers}',
+            iconColor: Colors.white70,
+            onTap: _showTopSheet,
+          ),
         ],
         const Spacer(),
         NovaGlassIcon(
@@ -2882,7 +2941,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         ),
         child: Row(children: [
           Expanded(child: Container(alignment: Alignment.centerLeft, padding: const EdgeInsets.symmetric(horizontal: 14), child: Text('${_scoreA}', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)))),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), decoration: BoxDecoration(color: Colors.black.withOpacity(.35), borderRadius: BorderRadius.circular(18)), child: const Text('تحدي', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), decoration: BoxDecoration(color: Colors.black.withValues(alpha: .35), borderRadius: BorderRadius.circular(18)), child: const Text('تحدي', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11))),
           Expanded(child: Container(alignment: Alignment.centerRight, padding: const EdgeInsets.symmetric(horizontal: 14), child: Text('${_scoreB}', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)))),
         ]),
       ),
@@ -2960,7 +3019,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(color: SN.violet.withOpacity(.24), borderRadius: const BorderRadius.vertical(top: Radius.circular(18))),
+                    decoration: BoxDecoration(color: SN.violet.withValues(alpha: .24), borderRadius: const BorderRadius.vertical(top: Radius.circular(18))),
                     child: Row(children: [
                       const Icon(Icons.reply_rounded, size: 14, color: SN.cyan),
                       const SizedBox(width: 6),
@@ -3052,8 +3111,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       backgroundColor: Colors.black,
       body: Stack(children: [
         _buildVideoStage(),
-        if (_liveEffect != 'none') Positioned.fill(child: IgnorePointer(child: Container(color: _liveEffect == 'noir' ? Colors.black.withOpacity(.24) : _liveEffect == 'cinema' ? Colors.amber.withOpacity(.07) : _liveEffect == 'dream' ? Colors.purple.withOpacity(.10) : _liveEffect == 'warm' ? Colors.orange.withOpacity(.10) : Colors.blue.withOpacity(.08)))),
-        if (_paused) Positioned.fill(child: Container(color: Colors.black.withOpacity(.76), alignment: Alignment.center, child: const Column(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.pause_circle_filled_rounded, color: Colors.white, size: 72), SizedBox(height: 12), Text('البث متوقف مؤقتًا', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)), SizedBox(height: 5), Text('سيعود البث عند استئناف المضيف', style: TextStyle(color: Colors.white70))]))),
+        if (_liveEffect != 'none') Positioned.fill(child: IgnorePointer(child: Container(color: _liveEffect == 'noir' ? Colors.black.withValues(alpha: .24) : _liveEffect == 'cinema' ? Colors.amber.withValues(alpha: .07) : _liveEffect == 'dream' ? Colors.purple.withValues(alpha: .10) : _liveEffect == 'warm' ? Colors.orange.withValues(alpha: .10) : Colors.blue.withValues(alpha: .08)))),
+        if (_paused) Positioned.fill(child: Container(color: Colors.black.withValues(alpha: .76), alignment: Alignment.center, child: const Column(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.pause_circle_filled_rounded, color: Colors.white, size: 72), SizedBox(height: 12), Text('البث متوقف مؤقتًا', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)), SizedBox(height: 5), Text('سيعود البث عند استئناف المضيف', style: TextStyle(color: Colors.white70))]))),
         IgnorePointer(child: NovaHeartsOverlay(burst: _hearts)),
         _hostHeader(),
         _battleBar(),
@@ -3062,9 +3121,58 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
           Positioned.fill(child: ColoredBox(color: Colors.black54, child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: SN.cyan), const SizedBox(height: 14), const Text('جاري فتح البث بجودة عالية...', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))])))),
         if (_giftFx != null) _giftOverlay(),
         if (error != null && !connecting)
-          Positioned(left: 20, right: 20, top: MediaQuery.of(context).size.height * .38, child: Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Colors.black.withOpacity(.76), borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white12)), child: Column(children: [const Icon(Icons.cloud_off_rounded, color: Colors.white70, size: 42), const SizedBox(height: 10), const Text('تعذّر الاتصال بالبث', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900)), const SizedBox(height: 6), Text(error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12)), const SizedBox(height: 12), FilledButton(onPressed: () { setState(() { connecting = true; error = null; }); _connectLiveKit(); }, child: const Text('إعادة المحاولة'))]))),
+          Positioned(left: 20, right: 20, top: MediaQuery.of(context).size.height * .38, child: Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Colors.black.withValues(alpha: .76), borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white12)), child: Column(children: [const Icon(Icons.cloud_off_rounded, color: Colors.white70, size: 42), const SizedBox(height: 10), const Text('تعذّر الاتصال بالبث', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900)), const SizedBox(height: 6), Text(error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12)), const SizedBox(height: 12), FilledButton(onPressed: () { setState(() { connecting = true; error = null; }); _connectLiveKit(); }, child: const Text('إعادة المحاولة'))]))),
         _commentRail(),
         _bottomBar(),
+      ]),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Live support leaderboard widgets (top gifters / top tappers).
+// ---------------------------------------------------------------------------
+class _BoardTitle extends StatelessWidget {
+  const _BoardTitle({required this.icon, required this.color, required this.text});
+  final IconData icon; final Color color; final String text;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(6, 10, 6, 6),
+        child: Row(children: [
+          Icon(icon, color: color, size: 18),
+          const SizedBox(width: 8),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w900)),
+        ]),
+      );
+}
+
+class _BoardEmpty extends StatelessWidget {
+  const _BoardEmpty({required this.text});
+  final String text;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        child: Text(text, style: TextStyle(color: SN.textMut, fontSize: 12)),
+      );
+}
+
+class _BoardRow extends StatelessWidget {
+  const _BoardRow({required this.index, required this.row, required this.trailing});
+  final int index; final Map<String, dynamic> row; final String trailing;
+  @override
+  Widget build(BuildContext context) {
+    final name = '${row['displayName'] ?? row['username'] ?? 'مستخدم'}';
+    final medal = index == 0 ? '🥇' : index == 1 ? '🥈' : index == 2 ? '🥉' : '${index + 1}';
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(color: SN.bg2, borderRadius: BorderRadius.circular(14), border: Border.all(color: SN.strokeSoft)),
+      child: Row(children: [
+        SizedBox(width: 28, child: Text(medal, style: const TextStyle(fontWeight: FontWeight.w900))),
+        SNav(url: '${row['avatarUrl'] ?? ''}', name: name, size: 34),
+        const SizedBox(width: 10),
+        Expanded(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800))),
+        Text(trailing, style: const TextStyle(color: SN.cyan, fontWeight: FontWeight.w900, fontSize: 12)),
       ]),
     );
   }

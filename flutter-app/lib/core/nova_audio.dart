@@ -29,7 +29,6 @@ class NovaAudio {
   };
 
   AudioPlayer? _music;
-  AudioPlayer? _musicB;
   AudioPlayer? _active;
   bool _muted = false;
   String _currentUrl = '';

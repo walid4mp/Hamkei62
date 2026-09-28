@@ -4,6 +4,17 @@ plugins {
     id 'dev.flutter.flutter-gradle-plugin'
 }
 
+// Release signing. Secrets live in android/key.properties (git-ignored) and the
+// keystore file is never committed. When key.properties is absent (local dev,
+// CI without secrets) we fall back to the debug signing config so the release
+// APK still builds; store builds must provide the keystore.
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+def hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace 'com.socialnova.app'
     compileSdk 36
@@ -27,11 +38,23 @@ android {
         versionName '3.7.0'
     }
 
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
     // Required so the release variant really emits an APK at
     // build/app/outputs/flutter-apk/app-release.apk (the path Flutter expects).
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            // Real keystore when configured, debug signing otherwise.
+            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
             shrinkResources false
         }

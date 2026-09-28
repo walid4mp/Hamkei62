@@ -16,7 +16,6 @@ import 'social.dart';
 import 'wallet.dart';
 import 'max_privacy.dart';
 import 'content_studio.dart';
-import '../core/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/localization.dart';
 
@@ -891,54 +890,6 @@ class _ProfileBodyState extends State<_ProfileBody> with SingleTickerProviderSta
       _ => 'أعزب',
     };
     return L10n.t(key);
-  }
-
-  String _sinceText(dynamic raw) {
-    final d = DateTime.tryParse('${raw ?? ''}')?.toLocal();
-    if (d == null) return '';
-    return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
-  }
-
-  Widget _relationshipCard(UserM u) {
-    final rel = u.relationship;
-    final type = u.relationshipType;
-    final status = '${rel?['status'] ?? 'NONE'}';
-    final partner = rel?['partner'] is Map ? UserM(Map<String, dynamic>.from(rel!['partner'] as Map)) : null;
-    final label = _relationshipLabel(type, u.gender);
-    if (status == 'PENDING') {
-      final incoming = rel?['isIncoming'] == true;
-      return GlassCard(
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Icon(Icons.favorite_rounded, color: Colors.pinkAccent, size: 20), const SizedBox(width: 8), Expanded(child: Text(L10n.t('طلب ارتباط'), style: const TextStyle(fontWeight: FontWeight.w800))),]),
-          const SizedBox(height: 8),
-          if (partner != null) Row(children: [SNav(url: partner.avatarUrl, name: partner.displayName, size: 42), const SizedBox(width: 10), Expanded(child: Text('${partner.displayName}\n$label', style: const TextStyle(fontWeight: FontWeight.w700)))]),
-          if (!incoming) Padding(padding: const EdgeInsets.only(top: 8), child: Text(L10n.t('طلب العلاقة قيد الانتظار'), style: TextStyle(color: SN.textMut, fontSize: 12))),
-          if (incoming) ...[
-            const SizedBox(height: 10),
-            Row(children: [
-              Expanded(child: FilledButton(onPressed: () async { try { await Api.acceptRelationship('${rel?['id']}'); if(mounted){toast(context,'تم قبول العلاقة ❤️'); widget.onRefresh(); setState((){});} } catch(e){ if(mounted) toast(context,e.toString().replaceFirst('Exception: ','')); } }, child: Text(L10n.t('قبول')))),
-              const SizedBox(width: 8),
-              Expanded(child: OutlinedButton(onPressed: () async { try { await Api.rejectRelationship('${rel?['id']}'); if(mounted){toast(context,'تم رفض الطلب'); widget.onRefresh(); setState((){});} } catch(e){ if(mounted) toast(context,e.toString().replaceFirst('Exception: ','')); } }, child: Text(L10n.t('رفض')))),
-            ]),
-          ],
-        ]),
-      );
-    }
-    return GlassCard(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(children: [
-        Container(width: 42, height: 42, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pink.withValues(alpha: .12)), child: const Icon(Icons.favorite_rounded, color: Colors.pinkAccent, size: 21)),
-        const SizedBox(width: 10),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('${L10n.t('حالة العلاقة')} · $label', style: const TextStyle(fontWeight: FontWeight.w800)),
-          if (partner != null) Padding(padding: const EdgeInsets.only(top: 3), child: Row(children: [SNav(url: partner.avatarUrl, name: partner.displayName, size: 25), const SizedBox(width: 7), Flexible(child: Text('${L10n.t('مرتبط بـ')} ${partner.displayName}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: SN.textSec, fontSize: 12.5, fontWeight: FontWeight.w600)))])),
-          if (rel?['since'] != null) Padding(padding: const EdgeInsets.only(top: 3), child: Text('${L10n.t('منذ')}: ${_sinceText(rel?['since'])}', style: TextStyle(color: SN.textMut, fontSize: 11.5))),
-        ])),
-      ]),
-    );
   }
 
   Future<void> _showContactActions(BuildContext context, UserM u) async {

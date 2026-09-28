@@ -478,6 +478,12 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "targetId" TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "result" TEXT NOT NULL DEFAULT 'OK'`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "ipAddress" TEXT NOT NULL DEFAULT ''`,
+    // Persistent live counters so taps/gifts survive leaving and re-entering.
+    `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "tapCount" INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "giftCount" INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "giftScore" INTEGER NOT NULL DEFAULT 0`,
+    `CREATE TABLE IF NOT EXISTS "LiveTapCount" ("roomName" TEXT NOT NULL,"userId" TEXT NOT NULL,"taps" INTEGER NOT NULL DEFAULT 0,"updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("roomName","userId"))`,
+    `CREATE INDEX IF NOT EXISTS "LiveTapCount_room_taps_idx" ON "LiveTapCount"("roomName","taps")`,
     // Idempotency for money/content mutations (Idempotency-Key header).
     `CREATE TABLE IF NOT EXISTS "IdempotencyRecord" ("key" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"path" TEXT NOT NULL,"method" TEXT NOT NULL,"statusCode" INTEGER NOT NULL DEFAULT 0,"response" TEXT,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE INDEX IF NOT EXISTS "IdempotencyRecord_user_created_idx" ON "IdempotencyRecord"("userId","createdAt")`,
@@ -1194,6 +1200,24 @@ app.post('/api/live/:id/end',auth,async(req,res)=>{
   io.to(`live:${room.roomName}`).emit('live:ended',{roomId:room.id});
   res.json({ok:true,room:updated});
 });
+// Persistent live counters + leaderboards. Totals are stored on the room so
+// they do not reset when a viewer leaves and comes back.
+app.get('/api/live/stats/:roomName',auth,async(req,res)=>{
+  const room=await prisma.liveRoom.findUnique({where:{roomName:String(req.params.roomName)}});
+  if(!room)return res.status(404).json({error:'NOT_FOUND'});
+  res.json({tapCount:room.tapCount||0,giftCount:room.giftCount||0,giftScore:room.giftScore||0,viewerCount:room.viewerCount||0});
+});
+app.get('/api/live/top/:roomName',auth,async(req,res)=>{
+  const roomName=String(req.params.roomName);
+  let topGifters=[],topTappers=[];
+  try{
+    topGifters=await prisma.$queryRawUnsafe(`SELECT gt."senderId" AS id, u."username", u."displayName", u."avatarUrl", SUM(gt."coins")::int AS coins, COUNT(*)::int AS gifts FROM "GiftTransaction" gt JOIN "User" u ON u.id=gt."senderId" WHERE gt."context"='LIVE' AND gt."contextId"=$1 GROUP BY gt."senderId", u."username", u."displayName", u."avatarUrl" ORDER BY coins DESC LIMIT 10`,roomName);
+  }catch{}
+  try{
+    topTappers=await prisma.$queryRawUnsafe(`SELECT t."userId" AS id, u."username", u."displayName", u."avatarUrl", t."taps"::int AS taps FROM "LiveTapCount" t JOIN "User" u ON u.id=t."userId" WHERE t."roomName"=$1 ORDER BY t."taps" DESC LIMIT 10`,roomName);
+  }catch{}
+  res.json({topGifters,topTappers});
+});
 app.get('/api/live/challenges',auth,async(req,res)=>res.json(await prisma.liveChallenge.findMany({where:{roomName:String(req.query.roomName||''),status:'LIVE'},orderBy:{createdAt:'desc'}})));
 app.post('/api/live/challenges',auth,async(req,res)=>{
   const roomName=String(req.body?.roomName||'').trim(), opponentId=String(req.body?.opponentId||'').trim();
@@ -1261,7 +1285,8 @@ app.post('/api/wallet/gifts/send',auth,async(req,res)=>{
     await tx.walletTransaction.create({data:{userId:req.user.id,walletId:w.id,type:'GIFT_SENT',coins:-gift.priceCoins,balanceAfter:senderNext,withdrawableAfter:w.withdrawableCoins,reference:ref,description:`إرسال ${gift.name}`}});
     await tx.walletTransaction.create({data:{userId:receiverId,walletId:rw.id,type:'GIFT_RECEIVED',coins:receiverGain,balanceAfter:receiverNext,withdrawableAfter:withdrawNext,reference:`${ref}-R`,description:`استلام ${gift.name}`}});
     const created=await tx.giftTransaction.create({data:{senderId:req.user.id,receiverId,giftId,coins:gift.priceCoins,context,contextId,message,reference:ref,fundingType:'PURCHASED'},include:{gift:true}});
-    if(context==='LIVE'&&contextId){io.to(`live:${contextId}`).emit('live:gift',{gift:created.gift,coins:created.coins,userId:req.user.id,username:req.user.username||''});}
+    if(context==='LIVE'&&contextId){io.to(`live:${contextId}`).emit('live:gift',{gift:created.gift,coins:created.coins,userId:req.user.id,username:req.user.username||''});
+      prisma.$executeRawUnsafe('UPDATE "LiveRoom" SET "giftCount"="giftCount"+1,"giftScore"="giftScore"+$2 WHERE "roomName"=$1',contextId,created.coins).catch(()=>{});}
     return created;
   }).catch(e=>{if(e.message==='INSUFFICIENT_COINS')return null;throw e;});
   if(!result)return res.status(400).json({error:'INSUFFICIENT_COINS'});
@@ -1535,7 +1560,10 @@ io.on('connection',socket=>{
   socket.on('typing',payload=>{const u=me();if(!u)return;const to=String(payload?.to||'').trim();if(!to||to===u.id)return;socket.to(`user:${to}`).emit('typing',{from:u.id,fromId:u.id,username:u.username,displayName:u.displayName,typing:payload?.typing!==false});});
   socket.on('live:join',async payload=>{const u=me();if(!u)return;const room=String(payload?.room||'').trim();if(!room)return;const live=await prisma.liveRoom.findUnique({where:{roomName:room}});if(!live||!['LIVE','PAUSED'].includes(live.status))return;if(live.status==='PAUSED'&&live.hostId!==u.id)return;socket.join(`live:${room}`);socket.data.liveRoom=room;io.to(`live:${room}`).emit('live:user-joined',{userId:u.id,username:u.username,displayName:u.displayName});});
   socket.on('live:leave',payload=>{const room=String(payload?.room||socket.data.liveRoom||'').trim();if(room){socket.leave(`live:${room}`);io.to(`live:${room}`).emit('live:user-left',{userId:me()?.id||''});}});
-  socket.on('live:tap',payload=>{const u=me();if(!u)return;const room=String(payload?.room||'').trim();if(!room)return;io.to(`live:${room}`).emit('live:tap',{userId:u.id,username:u.username,createdAt:new Date().toISOString()});});
+  socket.on('live:tap',payload=>{const u=me();if(!u)return;const room=String(payload?.room||'').trim();if(!room)return;io.to(`live:${room}`).emit('live:tap',{userId:u.id,username:u.username,createdAt:new Date().toISOString()});
+    // Persist the tap so totals survive leaving the room (best-effort).
+    prisma.$executeRawUnsafe('INSERT INTO "LiveTapCount" ("roomName","userId","taps","updatedAt") VALUES ($1,$2,1,CURRENT_TIMESTAMP) ON CONFLICT ("roomName","userId") DO UPDATE SET "taps"="LiveTapCount"."taps"+1,"updatedAt"=CURRENT_TIMESTAMP',room,u.id).catch(()=>{});
+    prisma.$executeRawUnsafe('UPDATE "LiveRoom" SET "tapCount"="tapCount"+1 WHERE "roomName"=$1',room).catch(()=>{});});
   socket.on('live:chat',async payload=>{try{const u=me();if(!u)return;const roomName=String(payload?.room||'').trim(),body=String(payload?.body||'').trim();if(!roomName||!body)return;const room=await prisma.liveRoom.findUnique({where:{roomName:roomName}});if(!room)return;const replyToId=String(payload?.replyToId||'').trim();let replyToName='';if(replyToId){const parent=await prisma.liveComment.findUnique({where:{id:replyToId},include:{author:true}});if(parent&&parent.roomId===room.id&&!parent.deleted)replyToName=parent.author.displayName||parent.author.username||'';}const c=await prisma.liveComment.create({data:{roomId:room.id,authorId:u.id,body:body.slice(0,1000),replyToId:replyToId||null,replyToName},include:{author:true}});io.to(`live:${roomName}`).emit('live:comment',{...c,author:safe(c.author)});}catch(e){console.warn('[live comment]',e.message);}});
   socket.on('live:comment:pin',async payload=>{try{const u=me();if(!u)return;const roomName=String(payload?.room||'').trim(),commentId=String(payload?.commentId||'').trim();const room=await prisma.liveRoom.findUnique({where:{roomName:roomName}});if(!room)return;const can=room.hostId===u.id||!!(await liveStaff(room.id,u.id));if(!can)return;await prisma.liveComment.updateMany({where:{roomId:room.id,pinned:true},data:{pinned:false}});await prisma.liveComment.update({where:{id:commentId},data:{pinned:true}});io.to(`live:${roomName}`).emit('live:comment:pin',{commentId,pinned:true});}catch{}});
   socket.on('live:comment:delete',async payload=>{try{const u=me();if(!u)return;const roomName=String(payload?.room||'').trim(),commentId=String(payload?.commentId||'').trim();const room=await prisma.liveRoom.findUnique({where:{roomName:roomName}});if(!room)return;const c=await prisma.liveComment.findUnique({where:{id:commentId}});if(!c)return;const can=room.hostId===u.id||c.authorId===u.id||!!(await liveStaff(room.id,u.id));if(!can)return;await prisma.liveComment.update({where:{id:commentId},data:{deleted:true}});io.to(`live:${roomName}`).emit('live:comment:delete',{commentId});}catch{}});

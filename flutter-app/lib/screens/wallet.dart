@@ -1,5 +1,4 @@
 import 'dart:async';
-import '../core/localization.dart';
 
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -348,10 +347,3 @@ Future<void> showGiftPicker(
   }
 }
 
-class _GiftTile extends StatelessWidget {
-  const _GiftTile({required this.gift, required this.onTap});
-  final Map<String, dynamic> gift;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(16), child: Container(margin: EdgeInsets.all(5), decoration: BoxDecoration(color: SN.bg2, borderRadius: BorderRadius.circular(16), border: Border.all(color: SN.strokeSoft)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text('${gift['emoji']}', style: TextStyle(fontSize: 30)), SizedBox(height: 4), Text('${gift['name']}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)), Text('${gift['priceCoins']} NVC', style: TextStyle(fontSize: 10, color: SN.cyan))])));
-}

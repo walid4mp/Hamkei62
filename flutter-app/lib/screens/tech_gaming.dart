@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
-import '../core/widgets.dart';
 import '../core/localization.dart';
 
 class TechGamingPage extends StatefulWidget {

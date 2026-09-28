@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:share_plus/share_plus.dart';
 import '../core/localization.dart';
 
@@ -17,7 +16,6 @@ import 'social.dart';
 import 'editor.dart';
 import 'secret_diary.dart';
 import 'max_privacy.dart';
-import 'women_hub.dart';
 import 'achievements.dart';
 import 'tech_gaming.dart';
 import 'fitness_challenges.dart';
@@ -25,7 +23,6 @@ import 'music_picker.dart';
 import 'content_studio.dart';
 import 'store.dart';
 import 'media_hub.dart';
-
 
 /// Opens the most relevant live/content surface directly from the profile ring.
 /// This is used from Home/Post/Reels so a LIVE or STORY badge is actionable
@@ -617,12 +614,6 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
     }
   }
 
-  Future<void> _manageStory() async {
-    final result = await ContentStudio.showOwnerSettings(context, type: 'story', id: _story.id, initial: _story.j);
-    if (!mounted) return;
-    if (result?['deleted'] == true) Navigator.pop(context);
-  }
-
   /// Progress bars for the whole author sequence: completed segments are full,
   /// the active one tracks the animation, the rest stay empty.
   Widget _progressBars() {
@@ -652,99 +643,6 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
           ),
       ],
     );
-  }
-
-  Future<List<String>?> _pickHiddenUsers() async {
-    final selected = <String>{};
-    final q = TextEditingController();
-    try {
-      return await showDialog<List<String>>(
-        context: context,
-        builder: (dialogContext) {
-          return StatefulBuilder(
-            builder: (dialogContext, setDialogState) {
-              return AlertDialog(
-                title: const Text('إخفاء القصة عن'),
-                content: SizedBox(
-                  width: 420,
-                  height: 420,
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: q,
-                        onChanged: (_) => setDialogState(() {}),
-                        onSubmitted: (_) => setDialogState(() {}),
-                        decoration: const InputDecoration(
-                          hintText: 'ابحث عن شخص',
-                          prefixIcon: Icon(Icons.search_rounded),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: FutureBuilder<List<dynamic>>(
-                          future: q.text.trim().length < 2
-                              ? Future.value(<dynamic>[])
-                              : Api.searchUsers(q.text.trim()),
-                          builder: (context, snap) {
-                            if (q.text.trim().length < 2) {
-                              return Center(child: Text(L10n.t('اكتب حرفين على الأقل')));
-                            }
-                            if (snap.connectionState == ConnectionState.waiting) {
-                              return const LoadingBox();
-                            }
-                            final rows = snap.data ?? <dynamic>[];
-                            if (rows.isEmpty) {
-                              return Center(child: Text(L10n.t('لا يوجد أشخاص')));
-                            }
-                            return ListView(
-                              children: rows.map((raw) {
-                                final u = Map<String, dynamic>.from(raw as Map);
-                                final id = '${u['id'] ?? ''}';
-                                final checked = selected.contains(id);
-                                final name = '${u['displayName'] ?? u['username'] ?? ''}';
-                                return CheckboxListTile(
-                                  value: checked,
-                                  onChanged: (v) => setDialogState(() {
-                                    if (v == true) {
-                                      selected.add(id);
-                                    } else {
-                                      selected.remove(id);
-                                    }
-                                  }),
-                                  secondary: SNav(
-                                    url: '${u['avatarUrl'] ?? ''}',
-                                    name: name,
-                                    size: 42,
-                                  ),
-                                  title: Text(name),
-                                  subtitle: Text('@${u['username'] ?? ''}'),
-                                );
-                              }).toList(),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    child: const Text('إلغاء'),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(dialogContext, selected.toList()),
-                    child: Text('حفظ (${selected.length})'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-    } finally {
-      q.dispose();
-    }
   }
 
   String _remaining(String raw) { final d=DateTime.tryParse(raw)?.toLocal(); if(d==null)return 'غير معروف'; final m=d.difference(DateTime.now()).inMinutes; if(m<=0)return 'انتهت'; if(m<60)return '$m د'; final h=m~/60; if(h<24)return '$h س'; return '${h~/24} يوم'; }
@@ -1395,17 +1293,6 @@ class _ReelsPageState extends State<ReelsPage> {
     setState(() { _showFollowing = following; _future = following ? Api.followingReels() : Api.reels(); });
   }
 
-  Future<void> _upload() async {
-    final picker=ImagePicker();
-    try {
-      final f=await picker.pickVideo(source:ImageSource.gallery,maxDuration:const Duration(minutes:3));
-      if(f==null)return;
-      final result=await openPublishEditor(context,mediaPath:f.path,mediaType:'VIDEO',reel:true);
-      if(!mounted)return;
-      if(result!=null){toast(context,'تم نشر الريل 🎬');setState(()=>_future=Api.reels());}
-    }catch(e){if(mounted)toast(context,e.toString().replaceFirst('Exception: ',''));}
-  }
-
   Future<void> _comments(ReelM r) async {
     final ctrl = TextEditingController();
     var comments = <Map<String, dynamic>>[];
@@ -1538,7 +1425,7 @@ class _ReelCardState extends State<_ReelCard>{
   @override void dispose(){_muted.dispose();super.dispose();}
   @override Widget build(BuildContext context){final r=widget.r;return Stack(fit:StackFit.expand,children:[
     Positioned.fill(child:GestureDetector(onDoubleTap:widget.onDoubleTap,child:Transform.rotate(angle:r.rotationDegrees*3.141592653589793/180,child:VideoBox(url:r.videoUrl,autoPlay:true,playbackActive:widget.active,radius:0,musicUrl:r.musicUrl,muteNotifier:_muted,onTap:_tapVideo)))),
-    Positioned.fill(child:IgnorePointer(child:DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors:[Colors.transparent,Colors.black.withOpacity(.75)]))))),
+    Positioned.fill(child:IgnorePointer(child:DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors:[Colors.transparent,Colors.black.withValues(alpha: .75)]))))),
     if (_showMute && widget.active)
       Positioned(
         left: 24,
@@ -1585,7 +1472,7 @@ class _ReelAction extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(28),
         child: Column(children: [
-          Container(width: 34, height: 34, decoration: BoxDecoration(color: Colors.black.withOpacity(.3), shape: BoxShape.circle), child: Icon(icon, color: color, size: 19)),
+          Container(width: 34, height: 34, decoration: BoxDecoration(color: Colors.black.withValues(alpha: .3), shape: BoxShape.circle), child: Icon(icon, color: color, size: 19)),
           const SizedBox(height: 2),
           Text(label ?? '$count', style: TextStyle(color: label != null ? color : Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
         ]),
@@ -1657,7 +1544,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _title(String icon,String title,int count)=>Padding(
     padding:const EdgeInsets.fromLTRB(4,16,4,9),
-    child:Row(children:[Text(icon,style:const TextStyle(fontSize:18)),const SizedBox(width:8),Text(title,style:const TextStyle(fontWeight:FontWeight.w900,fontSize:16)),const SizedBox(width:7),Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:3),decoration:BoxDecoration(color:SN.violet.withOpacity(.14),borderRadius:BorderRadius.circular(9)),child:Text('$count',style:TextStyle(color:SN.cyan,fontSize:10,fontWeight:FontWeight.w800))),const Spacer()]),
+    child:Row(children:[Text(icon,style:const TextStyle(fontSize:18)),const SizedBox(width:8),Text(title,style:const TextStyle(fontWeight:FontWeight.w900,fontSize:16)),const SizedBox(width:7),Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:3),decoration:BoxDecoration(color:SN.violet.withValues(alpha: .14),borderRadius:BorderRadius.circular(9)),child:Text('$count',style:TextStyle(color:SN.cyan,fontSize:10,fontWeight:FontWeight.w800))),const Spacer()]),
   );
 
   Widget _userCard(Map<String,dynamic> u)=>GlassCard(padding:const EdgeInsets.all(11),child:Row(children:[

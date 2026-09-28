@@ -62,7 +62,7 @@ class _SecretDiaryPageState extends State<SecretDiaryPage> {
       return Scaffold(
         appBar: AppBar(title: const Text('المذكرات السرية')),
         body: Center(child: Padding(padding: const EdgeInsets.all(28), child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(padding: EdgeInsets.all(24), decoration: BoxDecoration(color: SN.violet.withOpacity(.1), shape: BoxShape.circle), child: Icon(Icons.lock_rounded, size: 58, color: SN.violet)),
+          Container(padding: EdgeInsets.all(24), decoration: BoxDecoration(color: SN.violet.withValues(alpha: .1), shape: BoxShape.circle), child: Icon(Icons.lock_rounded, size: 58, color: SN.violet)),
           const SizedBox(height: 18), const Text('مذكراتك خاصة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)), const SizedBox(height: 8),
           Text(L10n.t('تُخزن محليًا في التخزين الآمن ولا تُرسل إلى مستخدمين آخرين.'), textAlign: TextAlign.center, style: TextStyle(color: SN.textMut)),
           const SizedBox(height: 20), FilledButton.icon(onPressed: _unlock, icon: const Icon(Icons.lock_open_rounded), label: const Text('فتح المذكرات')),
@@ -88,7 +88,7 @@ class _SecretDiaryPageState extends State<SecretDiaryPage> {
                 }
                 return Card(child: ListTile(
                   onTap: () => _open(e),
-                  leading: CircleAvatar(backgroundColor: SN.violet.withOpacity(.12), child: Text('${e['mood'] ?? '🙂'}')),
+                  leading: CircleAvatar(backgroundColor: SN.violet.withValues(alpha: .12), child: Text('${e['mood'] ?? '🙂'}')),
                   title: Text('${e['title']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)),
                   subtitle: Text('${e['body']}', maxLines: 2, overflow: TextOverflow.ellipsis),
                   trailing: IconButton(onPressed: () => _delete(e), icon: const Icon(Icons.delete_outline)),
