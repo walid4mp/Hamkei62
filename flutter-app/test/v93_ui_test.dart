@@ -5,6 +5,7 @@ import 'package:socialnova/core/nova_gifts.dart';
 import 'package:socialnova/features/admin/admin_console_page.dart';
 import 'package:socialnova/features/gifts/gift_store.dart';
 import 'package:socialnova/screens/call_history.dart';
+import 'package:socialnova/screens/creator_rewards.dart';
 
 /// These tests actually build the new V93 screens. They run without a server,
 /// so every screen must degrade to a real state (loading / offline / empty)
@@ -118,5 +119,18 @@ void main() {
     expect(find.textContaining('×5'), findsOneWidget);
     await tester.pump(const Duration(seconds: 3));
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the creator rewards screen renders its header and degrades without network', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: CreatorRewardsPage(userId: 'user-1', displayName: 'خالد'),
+    ));
+    await tester.pump();
+    expect(find.text('مكافآت المبدع'), findsOneWidget);
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+    expect(tester.takeException(), isNull);
+    expect(find.byType(CreatorRewardsPage), findsOneWidget);
   });
 }

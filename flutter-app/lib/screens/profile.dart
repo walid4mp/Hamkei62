@@ -1,3 +1,4 @@
+import 'creator_rewards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1295,7 +1296,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         backgroundColor: SN.bg1,
         title: const Text('تعديل الملف الشخصي'),
-        actions: [IconButton(tooltip: 'بطاقة الهوية الرقمية', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DigitalIdPage())), icon: Icon(Icons.badge_rounded, color: SN.cyan)),TextButton(onPressed: busy ? null : _save, child: Text('حفظ'))],
+        actions: [IconButton(tooltip: 'مكافآت المبدع', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CreatorRewardsPage(userId: widget.user.id, displayName: widget.user.displayName))), icon: const Icon(Icons.emoji_events_rounded, color: SN.gold)),IconButton(tooltip: 'بطاقة الهوية الرقمية', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DigitalIdPage())), icon: const Icon(Icons.badge_rounded, color: SN.cyan)),TextButton(onPressed: busy ? null : _save, child: const Text('حفظ'))],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
