@@ -493,8 +493,8 @@ class Api {
       List<dynamic>.from(await req('GET', '/api/conversations'));
   static Future<List<dynamic>> messages(String userId) async =>
       List<dynamic>.from(await req('GET', '/api/messages/$userId'));
-  static Future<Map<String, dynamic>> sendMessage(String userId, String body, {bool secret = false, bool selfDestruct = false, int ttlMinutes = 60, int viewLimit = 0}) async =>
-      Map<String, dynamic>.from(await req('POST', '/api/messages/$userId', body: {'body': body, 'secret': secret, 'selfDestruct': selfDestruct, 'ttlMinutes': ttlMinutes, 'viewLimit': viewLimit}));
+  static Future<Map<String, dynamic>> sendMessage(String userId, String body, {bool secret = false, bool selfDestruct = false, int ttlMinutes = 60, int viewLimit = 0, String effect = ''}) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/messages/$userId', body: {'body': body, 'secret': secret, 'selfDestruct': selfDestruct, 'ttlMinutes': ttlMinutes, 'viewLimit': viewLimit, if (effect.isNotEmpty) 'effect': effect}));
   static Future<void> viewMessage(String id) async => req('POST','/api/messages/$id/view');
   static Future<Map<String,dynamic>> chatTheme(String userId) async => Map<String,dynamic>.from(await req('GET','/api/chat/$userId/theme'));
   static Future<void> savePushToken(String token) async => req('POST','/api/push/token',body:{'token':token});

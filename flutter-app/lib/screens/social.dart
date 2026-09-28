@@ -17,6 +17,7 @@ import 'wallet.dart';
 
 import '../core/api.dart';
 import '../core/chat_bubbles.dart';
+import '../core/message_effects.dart';
 import '../core/nova_audio.dart';
 import '../core/nova_gifts.dart';
 import '../core/nova_ui.dart';
@@ -612,6 +613,8 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
   bool muted = false;
   bool blocked = false;
   String _chatTheme = 'gradient:midnight';
+  /// Effect attached to the next outgoing message (see message_effects.dart).
+  String _pendingEffect = '';
 
   bool secretMode = false;
   bool selfDestruct = false;
@@ -662,6 +665,8 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
       if (mine || '${m['senderId']}' == widget.userId) {
         if (!msgs.any((x) => '${x['id']}' == '${m['id']}')) {
           setState(() => msgs.add(m));
+          final fx = '${m['effect'] ?? ''}';
+          if (fx.isNotEmpty && mounted) showMessageEffect(context, fx);
           if (!mine && '${m['receiverId']}' == '${Api.me?['id']}') {
             Api.markMessageDelivered('${m['id']}').catchError((_) {});
             Api.markMessageRead('${m['id']}').catchError((_) {});
@@ -769,18 +774,21 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _chooseChatTheme() async {
+    // Ten named themes (static/animated) + three premium animated ones.
     final choices = <Map<String,String>>[
-      {'id':'gradient:midnight','name':'ليلي','a':'#0B1020','b':'#24113F'},
-      {'id':'gradient:ocean','name':'محيط','a':'#061826','b':'#0D5261'},
-      {'id':'gradient:violet','name':'بنفسجي','a':'#180D2E','b':'#5B21B6'},
-      {'id':'gradient:sunset','name':'غروب','a':'#32111A','b':'#7C2D12'},
-      {'id':'gradient:forest','name':'غابة','a':'#071A14','b':'#14532D'},
-      {'id':'gradient:love','name':'حب ❤️','a':'#3B0A2E','b':'#BE185D'},
-      {'id':'gradient:friends','name':'أصدقاء ✨','a':'#052E3A','b':'#2563EB'},
-      {'id':'animated:aurora','name':'سينمائي — شفق متحرك'},
-      {'id':'animated:stars','name':'سينمائي — نجوم متحركة'},
-      {'id':'animated:hearts','name':'سينمائي — قلوب متحركة'},
-      {'id':'animated:particles','name':'سينمائي — جزيئات'},
+      {'id':'animated:stars','name':'🌌 فضاء'},
+      {'id':'gradient:ocean','name':'🌊 محيط'},
+      {'id':'animated:sakura','name':'🌸 ساكورا'},
+      {'id':'animated:fire','name':'🔥 نار'},
+      {'id':'gradient:neon','name':'💜 نيون'},
+      {'id':'gradient:midnight','name':'🌙 ليل'},
+      {'id':'animated:particles','name':'🎮 ألعاب'},
+      {'id':'gradient:diamond','name':'💎 ألماس'},
+      {'id':'gradient:love','name':'❤️ حب'},
+      {'id':'gradient:dark','name':'🖤 داكن'},
+      {'id':'animated:aurora','name':'✨ شفق (مميز)'},
+      {'id':'animated:hearts','name':'💗 قلوب (مميز)'},
+      {'id':'animated:snow','name':'❄️ ثلج (مميز)'},
     ];
     final picked = await showModalBottomSheet<String>(
       context: context,
@@ -838,6 +846,12 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
       'gradient:forest':[const Color(0xFF071A14),const Color(0xFF14532D)],
       'gradient:love':[const Color(0xFF3B0A2E),const Color(0xFFBE185D)],
       'gradient:friends':[const Color(0xFF052E3A),const Color(0xFF2563EB)],
+      'gradient:neon':[const Color(0xFF12002E),const Color(0xFF7C3AED)],
+      'gradient:diamond':[const Color(0xFF06202A),const Color(0xFF0E7490)],
+      'gradient:dark':[const Color(0xFF0A0A0A),const Color(0xFF1F1F24)],
+      'animated:sakura':[const Color(0xFF2B1020),const Color(0xFF9D174D)],
+      'animated:fire':[const Color(0xFF2A0A05),const Color(0xFFB91C1C)],
+      'animated:snow':[const Color(0xFF0B1220),const Color(0xFF334155)],
       'animated:aurora':[const Color(0xFF071A2B),const Color(0xFF4C1D95)],
       'animated:stars':[const Color(0xFF030712),const Color(0xFF172554)],
       'animated:hearts':[const Color(0xFF3B0A2E),const Color(0xFF831843)],
@@ -936,6 +950,29 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
     ).whenComplete(() => _callDialogOpen = false);
   }
 
+  /// Picks the effect (celebration/hearts/fire/stars/snow/fireworks) attached
+  /// to the next message.
+  Future<void> _pickMessageEffect() async {
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: SN.bg1,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(child: Wrap(children: [
+        const Padding(padding: EdgeInsets.fromLTRB(16, 6, 16, 2), child: Align(alignment: AlignmentDirectional.centerStart, child: Text('تأثير الرسالة', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)))),
+        ListTile(leading: const Icon(Icons.block, color: SN.textSec), title: const Text('بدون تأثير'), trailing: _pendingEffect.isEmpty ? const Icon(Icons.check_circle, color: SN.violet) : null, onTap: () => Navigator.pop(ctx, '')),
+        for (final e in kMessageEffects)
+          ListTile(
+            leading: Text(e.emoji, style: const TextStyle(fontSize: 24)),
+            title: Text(e.label),
+            trailing: _pendingEffect == e.id ? const Icon(Icons.check_circle, color: SN.violet) : null,
+            onTap: () { Navigator.pop(ctx, e.id); showMessageEffect(context, e.id); },
+          ),
+      ])),
+    );
+    if (picked == null) return;
+    if (mounted) setState(() => _pendingEffect = picked);
+  }
+
   Future<void> _send() async {
     final text = ctrl.text.trim();
     if (text.isEmpty || sending) return;
@@ -947,7 +984,12 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
     }
     try {
       // REST write guarantees persistence; Socket.IO mirrors it in realtime.
-      await Api.sendMessage(widget.userId, text, secret: secretMode, selfDestruct: selfDestruct, ttlMinutes: secretTtl, viewLimit: viewLimit);
+      final effect = _pendingEffect;
+      await Api.sendMessage(widget.userId, text, secret: secretMode, selfDestruct: selfDestruct, ttlMinutes: secretTtl, viewLimit: viewLimit, effect: effect);
+      if (effect.isNotEmpty && mounted) {
+        showMessageEffect(context, effect);
+        setState(() => _pendingEffect = '');
+      }
       ctrl.clear();
       await _load();
     } catch (e) {
@@ -1319,6 +1361,7 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
               ),
             ),
             leading: [
+              IconButton(tooltip: 'تأثيرات الرسالة', onPressed: _pickMessageEffect, icon: Icon(_pendingEffect.isEmpty ? Icons.auto_awesome_outlined : Icons.auto_awesome, size: 26, color: _pendingEffect.isEmpty ? SN.textSec : SN.violet)),
               IconButton(tooltip: 'المزيد', onPressed: _moreActions, icon: const Icon(Icons.add_circle_outline, size: 26, color: SN.textSec)),
               IconButton(tooltip: 'صورة', onPressed: () => _sendMedia(source: ImageSource.gallery), icon: const Icon(Icons.image_outlined, size: 26, color: SN.textSec)),
               IconButton(tooltip: 'تفاعل', onPressed: _emojiPicker, icon: const Icon(Icons.emoji_emotions_outlined, size: 26, color: SN.textSec)),
@@ -1347,6 +1390,14 @@ class _ChatFxPainter extends CustomPainter {
     if(mode=='hearts') {
       p.color=Colors.pinkAccent.withValues(alpha:.18);
       for(int i=0;i<18;i++){final x=(r.nextDouble()*size.width + math.sin(t*math.pi*2+i)*28)%size.width;final y=((r.nextDouble()+t*0.12+i*.037)%1)*size.height;canvas.drawCircle(Offset(x,y),6+r.nextDouble()*10,p);}
+    } else if(mode=='sakura') {
+      // Soft falling petals.
+      for(int i=0;i<22;i++){final x=(r.nextDouble()*size.width + math.sin(t*math.pi*2+i)*30)%size.width;final y=((r.nextDouble()+t*0.09+i*.041)%1)*size.height;p.color=const Color(0xFFF9A8D4).withValues(alpha:.35);canvas.drawOval(Rect.fromCenter(center:Offset(x,y),width:8+r.nextDouble()*7,height:5+r.nextDouble()*5),p);}
+    } else if(mode=='fire') {
+      // Rising embers.
+      for(int i=0;i<26;i++){final x=(r.nextDouble()*size.width + math.sin(t*math.pi*2+i)*18)%size.width;final y=(1-((r.nextDouble()+t*0.22+i*.031)%1))*size.height;p.color=(i.isEven?const Color(0xFFFF7A18):const Color(0xFFFFC53D)).withValues(alpha:.30);canvas.drawCircle(Offset(x,y),3+r.nextDouble()*9,p);}
+    } else if(mode=='snow') {
+      for(int i=0;i<40;i++){final x=(r.nextDouble()*size.width + math.sin(t*math.pi*2+i)*22)%size.width;final y=((r.nextDouble()+t*0.07+i*.023)%1)*size.height;p.color=Colors.white.withValues(alpha:.28);canvas.drawCircle(Offset(x,y),1.5+r.nextDouble()*3,p);}
     } else if(mode=='stars') {
       p.color=Colors.white.withValues(alpha:.22);
       for(int i=0;i<45;i++){final x=r.nextDouble()*size.width;final y=r.nextDouble()*size.height;final a=.3+.7*math.sin((t+i*.13)*math.pi*2).abs();p.color=Colors.white.withValues(alpha:a*.35);canvas.drawCircle(Offset(x,y),1+r.nextDouble()*2,p);}

@@ -112,8 +112,8 @@ class SocketService {
   void sendCallReject(String to) { _s?.emit('call:reject', {'to':to}); }
   void sendCallReel({required String to, required String url, String title = ''}) { _s?.emit('call:reel', {'to': to, 'url': url, 'title': title}); }
 
-  void sendMessage(String to, String body) {
-    _s?.emit('message', {'to': to, 'body': body});
+  void sendMessage(String to, String body, {String effect = ''}) {
+    _s?.emit('message', {'to': to, 'body': body, if (effect.isNotEmpty) 'effect': effect});
   }
 
   /// Typing presence is best-effort: it is emitted only while the socket is
