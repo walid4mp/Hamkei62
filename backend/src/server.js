@@ -492,6 +492,8 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "targetId" TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "result" TEXT NOT NULL DEFAULT 'OK'`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "ipAddress" TEXT NOT NULL DEFAULT ''`,
+    // Creator levels (admin-editable thresholds).
+    `CREATE TABLE IF NOT EXISTS "CreatorLevel" ("key" TEXT PRIMARY KEY,"label" TEXT NOT NULL,"minFollowers" INTEGER NOT NULL,"tier" INTEGER NOT NULL DEFAULT 0,"color" TEXT NOT NULL DEFAULT '#9CA3AF","enabled" BOOLEAN NOT NULL DEFAULT true)`,
     // Message effects (celebration/hearts/fire/stars/snow/fireworks).
     `ALTER TABLE "Message" ADD COLUMN IF NOT EXISTS "effect" TEXT NOT NULL DEFAULT ''`,
     // Trust & safety: report notifications to staff accounts.
@@ -749,7 +751,7 @@ app.get('/api/admin/profile-assignments',auth,superAdmin,async(req,res)=>{const 
 app.put('/api/admin/profile-assignments',auth,superAdmin,async(req,res)=>{try{const d=z.object({actorId:z.string().min(1),targetUserId:z.string().min(1),permissions:z.array(z.string()).min(1).max(30)}).parse(req.body||{});const [actor,target]=await Promise.all([prisma.user.findUnique({where:{id:d.actorId}}),prisma.user.findUnique({where:{id:d.targetUserId}})]);if(!actor||!target)return res.status(404).json({error:'USER_NOT_FOUND'});const allowed=new Set(['ASSIGNED_PROFILE_BAN','ASSIGNED_PROFILE_VERIFY','ASSIGNED_PROFILE_FEATURE','ASSIGNED_PROFILE_COINS','ASSIGNED_PROFILE_EFFECTS','ASSIGNED_PROFILE_SPECIALS','ASSIGNED_PROFILE_SUBSCRIPTIONS','*']);const permissions=[...new Set(d.permissions.filter(x=>allowed.has(x)))];if(!permissions.length)return res.status(400).json({error:'NO_VALID_PERMISSIONS'});const rows=await prisma.$queryRawUnsafe('SELECT "id" FROM "AdminProfileAssignment" WHERE "actorId"=$1 AND "targetUserId"=$2 LIMIT 1',d.actorId,d.targetUserId);if(rows?.[0])await prisma.$executeRawUnsafe('UPDATE "AdminProfileAssignment" SET "permissions"=$1,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2',JSON.stringify(permissions),rows[0].id);else await prisma.$executeRawUnsafe('INSERT INTO "AdminProfileAssignment" ("id","actorId","targetUserId","permissions") VALUES ($1,$2,$3,$4)',crypto.randomUUID(),d.actorId,d.targetUserId,JSON.stringify(permissions));await prisma.auditLog.create({data:{actorId:req.user.id,action:'PROFILE_ASSIGNMENT_UPDATE',targetUserId:d.targetUserId,metadata:JSON.stringify({actorId:d.actorId,permissions})}}).catch(()=>{});res.json({ok:true,actorId:d.actorId,targetUserId:d.targetUserId,permissions});}catch(e){res.status(400).json({error:'VALIDATION_ERROR',details:String(e?.message||'')});}});
 app.delete('/api/admin/profile-assignments/:actorId/:targetUserId',auth,superAdmin,async(req,res)=>{await prisma.$executeRawUnsafe('DELETE FROM "AdminProfileAssignment" WHERE "actorId"=$1 AND "targetUserId"=$2',req.params.actorId,req.params.targetUserId);res.json({ok:true})});
 app.get('/api/admin/users/:id/profile-effects',auth,admin,async(req,res)=>{const u=await prisma.user.findUnique({where:{id:req.params.id},select:{id:true,specialFeatures:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});const f=jsonObject(u.specialFeatures);res.json({profileOpenEffect:f.profileOpenEffect||'',profileOpenVideoUrl:f.profileOpenVideoUrl||'',profileOpenEnabled:f.profileOpenEnabled===true,profileOpenDurationMs:Number(f.profileOpenDurationMs||4500)})});
-app.patch('/api/admin/users/:id/profile-effects',auth,async(req,res)=>{const id=req.params.id;if(!(await canManageAssigned(req,id,'ASSIGNED_PROFILE_EFFECTS')))return res.status(403).json({error:'ASSIGNED_PROFILE_PERMISSION_DENIED',permission:'ASSIGNED_PROFILE_EFFECTS'});const u=await prisma.user.findUnique({where:{id},select:{id:true,specialFeatures:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});const d=z.object({profileOpenEffect:z.enum(['NONE','GOLDEN_AURA','NEON_PORTAL','HEART_BURST','SPARKLES']).optional(),profileOpenVideoUrl:z.string().max(5000).optional(),profileOpenEnabled:z.boolean().optional(),profileOpenDurationMs:z.number().int().min(1000).max(15000).optional()}).parse(req.body||{});const f=jsonObject(u.specialFeatures);const next={...f,...d};if(next.profileOpenEffect==='NONE')next.profileOpenEffect='';const out=await prisma.user.update({where:{id},data:{specialFeatures:next}});await prisma.auditLog.create({data:{actorId:req.user.id,action:'PROFILE_OPEN_EFFECT_UPDATE',targetUserId:id,metadata:JSON.stringify(d)}}).catch(()=>{});res.json({user:safe(out),effects:{profileOpenEffect:next.profileOpenEffect||'',profileOpenVideoUrl:next.profileOpenVideoUrl||'',profileOpenEnabled:next.profileOpenEnabled===true,profileOpenDurationMs:Number(next.profileOpenDurationMs||4500)}})});
+app.patch('/api/admin/users/:id/profile-effects',auth,async(req,res)=>{const id=req.params.id;if(!(await canManageAssigned(req,id,'ASSIGNED_PROFILE_EFFECTS')))return res.status(403).json({error:'ASSIGNED_PROFILE_PERMISSION_DENIED',permission:'ASSIGNED_PROFILE_EFFECTS'});const u=await prisma.user.findUnique({where:{id},select:{id:true,specialFeatures:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});const d=z.object({profileOpenEffect:z.enum(['NONE','GOLDEN_AURA','NEON_PORTAL','HEART_BURST','SPARKLES','FIRE','GALAXY','CROWN','DIAMOND','STARS','LIGHTNING','SAKURA']).optional(),profileOpenVideoUrl:z.string().max(5000).optional(),profileOpenEnabled:z.boolean().optional(),profileOpenDurationMs:z.number().int().min(1000).max(15000).optional()}).parse(req.body||{});const f=jsonObject(u.specialFeatures);const next={...f,...d};if(next.profileOpenEffect==='NONE')next.profileOpenEffect='';const out=await prisma.user.update({where:{id},data:{specialFeatures:next}});await prisma.auditLog.create({data:{actorId:req.user.id,action:'PROFILE_OPEN_EFFECT_UPDATE',targetUserId:id,metadata:JSON.stringify(d)}}).catch(()=>{});res.json({user:safe(out),effects:{profileOpenEffect:next.profileOpenEffect||'',profileOpenVideoUrl:next.profileOpenVideoUrl||'',profileOpenEnabled:next.profileOpenEnabled===true,profileOpenDurationMs:Number(next.profileOpenDurationMs||4500)}})});
 app.post('/api/admin/managed-users/:id/action',auth,async(req,res)=>{const id=req.params.id;const action=String(req.body?.action||'').toUpperCase();const map={BAN:'ASSIGNED_PROFILE_BAN',VERIFY:'ASSIGNED_PROFILE_VERIFY',FEATURE:'ASSIGNED_PROFILE_FEATURE',COINS:'ASSIGNED_PROFILE_COINS',SPECIALS:'ASSIGNED_PROFILE_SPECIALS',SUBSCRIPTION:'ASSIGNED_PROFILE_SUBSCRIPTIONS'};if(!map[action])return res.status(400).json({error:'INVALID_ACTION'});if(!(await canManageAssigned(req,id,map[action])))return res.status(403).json({error:'ASSIGNED_PROFILE_PERMISSION_DENIED',permission:map[action]});const u=await prisma.user.findUnique({where:{id},include:{wallet:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});let out=u;if(action==='BAN')out=await prisma.user.update({where:{id},data:{isBanned:Boolean(req.body?.value)}});if(action==='VERIFY')out=await prisma.user.update({where:{id},data:{isVerified:Boolean(req.body?.value),verificationTier:String(req.body?.tier||'NORMAL')}});if(action==='FEATURE')out=await prisma.user.update({where:{id},data:{featuredAccount:Boolean(req.body?.value),featuredPriority:Math.max(0,Math.min(10000,Number(req.body?.priority||100)))}});if(action==='COINS'){const coins=Number(req.body?.coins||0);if(!Number.isInteger(coins)||coins===0)return res.status(400).json({error:'INVALID_COINS'});const wallet=u.wallet||await prisma.wallet.create({data:{userId:id}});const next=Math.max(0,wallet.coinBalance+coins);await prisma.wallet.update({where:{id:wallet.id},data:{coinBalance:next}});await prisma.walletTransaction.create({data:{userId:id,walletId:wallet.id,type:coins>0?'ADMIN_GRANT':'ADMIN_DEBIT',coins,balanceAfter:next,withdrawableAfter:wallet.withdrawableCoins,reference:`ASSIGNED-${crypto.randomUUID()}`,description:'تعديل من مسؤول مفوض'}});out=await prisma.user.findUnique({where:{id}});}if(action==='SUBSCRIPTION'){const creatorId=String(req.body?.creatorId||id);const days=Math.max(1,Math.min(3650,Number(req.body?.days||30)));const creator=await prisma.user.findUnique({where:{id:creatorId}});if(!creator)return res.status(404).json({error:'CREATOR_NOT_FOUND'});const existing=await prisma.creatorSubscription.findFirst({where:{creatorId,subscriberId:id,status:'VERIFIED'}});const expires=new Date(Date.now()+days*86400000);if(existing)out=await prisma.user.update({where:{id},data:{specialFeatures:{...jsonObject(u.specialFeatures),subscriptionGrantedByAdmin:true,subscriptionExpiresAt:expires.toISOString()}}});else{await prisma.creatorSubscription.create({data:{creatorId,subscriberId:id,provider:'ADMIN',productId:`ADMIN-SUB-${crypto.randomUUID()}`,purchaseToken:`ADMIN-${crypto.randomUUID()}`,status:'VERIFIED',expiresAt:expires}});out=await prisma.user.findUnique({where:{id}});}}
   if(action==='SPECIALS'){const current=jsonObject(u.specialFeatures);const patch=req.body?.features;if(!patch||typeof patch!=='object'||Array.isArray(patch))return res.status(400).json({error:'INVALID_FEATURES'});out=await prisma.user.update({where:{id},data:{specialFeatures:{...current,...patch}}});}await prisma.auditLog.create({data:{actorId:req.user.id,action:`ASSIGNED_${action}`,targetUserId:id,metadata:JSON.stringify(req.body||{})}}).catch(()=>{});res.json({ok:true,user:safe(out)})});
 app.post('/api/admin/developer-accounts',auth,requirePermission('admins.create'),async(req,res)=>{
@@ -1298,6 +1300,37 @@ app.get('/api/wallet/gifts',auth,async(req,res)=>{
   }catch(e){res.status(500).json({error:'GIFTS_FAILED'});}
 });
 app.get('/api/gifts/categories',auth,async(req,res)=>res.json(GIFT_CATEGORIES));
+
+// ---- Creator levels -------------------------------------------------------
+const DEFAULT_CREATOR_LEVELS=[
+  ['beginner','مبتدئ',100,0,'#9CA3AF'],
+  ['rising','صاعد',500,1,'#4FC3F7'],
+  ['creator','مبدع',1000,2,'#66BB6A'],
+  ['creator_plus','مبدع+',5000,3,'#26C6DA'],
+  ['popular','مبدع مشهور',10000,4,'#AB47BC'],
+  ['elite','نخبة',50000,5,'#FFA726'],
+  ['legend','أسطورة',100000,6,'#FF7043'],
+  ['mega','عملاق',1000000,7,'#FFD54F'],
+];
+async function ensureCreatorLevels(){
+  for(const [key,label,minFollowers,tier,color] of DEFAULT_CREATOR_LEVELS){
+    await prisma.$executeRawUnsafe('INSERT INTO "CreatorLevel" ("key","label","minFollowers","tier","color","enabled") VALUES ($1,$2,$3,$4,$5,true) ON CONFLICT ("key") DO NOTHING',key,label,minFollowers,tier,color).catch(()=>{});
+  }
+}
+app.get('/api/creator/levels',auth,async(req,res)=>{
+  const rows=await prisma.$queryRawUnsafe('SELECT "key","label","minFollowers","tier","color","enabled" FROM "CreatorLevel" WHERE "enabled"=true ORDER BY "minFollowers" ASC').catch(()=>[]);
+  res.json(rows);
+});
+app.put('/api/admin/creator-levels',auth,requirePermission('creators.manage'),async(req,res)=>{
+  try{
+    const list=z.array(z.object({key:z.string().min(1).max(40),label:z.string().min(1).max(60),minFollowers:z.number().int().min(0).max(100000000),tier:z.number().int().min(0).max(50).default(0),color:z.string().max(20).default('#9CA3AF'),enabled:z.boolean().default(true)})).max(50).parse(req.body?.levels||[]);
+    for(const l of list){
+      await prisma.$executeRawUnsafe('INSERT INTO "CreatorLevel" ("key","label","minFollowers","tier","color","enabled") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("key") DO UPDATE SET "label"=EXCLUDED."label","minFollowers"=EXCLUDED."minFollowers","tier"=EXCLUDED."tier","color"=EXCLUDED."color","enabled"=EXCLUDED."enabled"',l.key,l.label,l.minFollowers,l.tier,l.color,l.enabled);
+    }
+    await auditAction(req,'CREATOR_LEVELS_UPDATE',{permission:'creators.manage',after:list});
+    res.json({ok:true,count:list.length});
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
+});
 app.get('/api/wallet/received-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{receiverId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{sender:true,gift:true}}).then(xs=>xs.map(x=>({...x,sender:safe(x.sender)})))));
 app.get('/api/wallet/sent-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{senderId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{receiver:true,gift:true}}).then(xs=>xs.map(x=>({...x,receiver:safe(x.receiver)})))));
 app.post('/api/wallet/gifts/send',auth,async(req,res)=>{
@@ -1631,6 +1664,7 @@ const PORT=Number(process.env.PORT||10000);
     await ensureDeviceBanTable();
     await ensureCatalog();
     await ensureSuperAdmin();
+    await ensureCreatorLevels();
     await ensureAdminLogin();
     http.listen(PORT,'0.0.0.0',()=>console.log(`[SocialNova] API listening on ${PORT}`));
   }catch(e){

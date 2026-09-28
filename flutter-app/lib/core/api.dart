@@ -332,6 +332,7 @@ class Api {
     return List<dynamic>.from(await req('GET', '/api/music${q.isEmpty ? '' : '?${q.join('&')}'}'));
   }
   static Future<List<dynamic>> live() async => List<dynamic>.from(await req('GET', '/api/live'));
+  static Future<List<dynamic>> creatorLevels() async => List<dynamic>.from(await req('GET', '/api/creator/levels'));
   static Future<List<dynamic>> groups() async => List<dynamic>.from(await req('GET', '/api/groups'));
   static Future<List<dynamic>> myGroups() async => List<dynamic>.from(await req('GET', '/api/me/groups'));
   static Future<List<dynamic>> notifications() async =>

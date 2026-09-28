@@ -9,7 +9,8 @@
     "prisma:push": "prisma db push",
     "seed": "node src/seed.js",
     "check": "node --check src/server.js",
-    "prisma:validate": "prisma validate"
+    "prisma:validate": "prisma validate",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

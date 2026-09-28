@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:video_player/video_player.dart';
 
 import '../core/api.dart';
+import '../core/creator_levels.dart';
 import '../core/theme.dart';
 import '../core/widgets.dart';
 import 'digital_id.dart';
@@ -53,11 +54,18 @@ class _ProfileOpenEffectDialogState extends State<_ProfileOpenEffectDialog> with
   @override
   Widget build(BuildContext context) {
     final video = _video;
-    final gradient = widget.effect == 'GOLDEN_AURA'
-        ? const RadialGradient(colors: [Color(0xFFFFF3A3), Color(0xFFFFB300), Color(0x00000000)])
-        : widget.effect == 'HEART_BURST'
-            ? const RadialGradient(colors: [Color(0xFFFF4D8D), Color(0xFF7C3AED), Color(0x00000000)])
-            : const RadialGradient(colors: [Color(0xFF22D3EE), Color(0xFF7C3AED), Color(0x00000000)]);
+    final gradient = switch (widget.effect) {
+      'GOLDEN_AURA' => const RadialGradient(colors: [Color(0xFFFFF3A3), Color(0xFFFFB300), Color(0x00000000)]),
+      'HEART_BURST' => const RadialGradient(colors: [Color(0xFFFF4D8D), Color(0xFF7C3AED), Color(0x00000000)]),
+      'FIRE' => const RadialGradient(colors: [Color(0xFFFFE082), Color(0xFFFF5722), Color(0x00000000)]),
+      'GALAXY' => const RadialGradient(colors: [Color(0xFFB388FF), Color(0xFF311B92), Color(0x00000000)]),
+      'CROWN' => const RadialGradient(colors: [Color(0xFFFFF59D), Color(0xFFF9A825), Color(0x00000000)]),
+      'DIAMOND' => const RadialGradient(colors: [Color(0xFFB2EBF2), Color(0xFF00838F), Color(0x00000000)]),
+      'STARS' => const RadialGradient(colors: [Color(0xFFFFFFFF), Color(0xFFFFD54F), Color(0x00000000)]),
+      'LIGHTNING' => const RadialGradient(colors: [Color(0xFFFFFF8A), Color(0xFF0288D1), Color(0x00000000)]),
+      'SAKURA' => const RadialGradient(colors: [Color(0xFFFFE4E9), Color(0xFFEC407A), Color(0x00000000)]),
+      _ => const RadialGradient(colors: [Color(0xFF22D3EE), Color(0xFF7C3AED), Color(0x00000000)]),
+    };
     return Center(child: Material(color: Colors.transparent, child: Stack(alignment: Alignment.center, children: [
       if (video != null && video.value.isInitialized)
         ClipRRect(borderRadius: BorderRadius.circular(28), child: AspectRatio(aspectRatio: video.value.aspectRatio, child: VideoPlayer(video)))
@@ -422,7 +430,7 @@ class _ProfileBodyState extends State<_ProfileBody> with SingleTickerProviderSta
               children: [
                 DropdownButtonFormField<String>(
                   value: effectController.text.isEmpty ? null : effectController.text,
-                  items: const ['NONE', 'GOLDEN_AURA', 'NEON_PORTAL', 'HEART_BURST', 'SPARKLES']
+                  items: const ['NONE', 'GOLDEN_AURA', 'NEON_PORTAL', 'HEART_BURST', 'SPARKLES', 'FIRE', 'GALAXY', 'CROWN', 'DIAMOND', 'STARS', 'LIGHTNING', 'SAKURA']
                       .map((x) => DropdownMenuItem(value: x, child: Text(x)))
                       .toList(),
                   onChanged: (v) => setDialog(() => effectController.text = v ?? ''),
@@ -644,7 +652,11 @@ class _ProfileBodyState extends State<_ProfileBody> with SingleTickerProviderSta
                     ],
                   ],
                 ),
-                Text('@${u.username}', style: TextStyle(color: SN.textMut, fontSize: 13)),
+                Row(children: [
+                  Text('@${u.username}', style: TextStyle(color: SN.textMut, fontSize: 13)),
+                  const SizedBox(width: 8),
+                  CreatorLevelBadge(followers: u.followers),
+                ]),
                 if (u.bio.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Text(u.bio, style: const TextStyle(height: 1.6, fontSize: 14)),
