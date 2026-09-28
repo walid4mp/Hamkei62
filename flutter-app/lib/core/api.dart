@@ -333,6 +333,13 @@ class Api {
   }
   static Future<List<dynamic>> live() async => List<dynamic>.from(await req('GET', '/api/live'));
   static Future<List<dynamic>> creatorLevels() async => List<dynamic>.from(await req('GET', '/api/creator/levels'));
+  static Future<Map<String, dynamic>> creatorMilestones() async => Map<String, dynamic>.from(await req('GET', '/api/creator/milestones/me'));
+  static Future<List<dynamic>> continueWatching() async => List<dynamic>.from(await req('GET', '/api/continue-watching'));
+  static Future<void> saveProgress({required String kind, required String contentId, String episodeId = '', required int positionSec, int durationSec = 0, bool completed = false}) async =>
+      req('PUT', '/api/continue-watching', body: {'kind': kind, 'contentId': contentId, 'episodeId': episodeId, 'positionSec': positionSec, 'durationSec': durationSec, 'completed': completed});
+  static Future<List<dynamic>> assets({String type = ''}) async => List<dynamic>.from(await req('GET', '/api/assets${type.isEmpty ? '' : '?type=$type'}'));
+  static Future<void> adminAddFollowers(String userId, int delta) async => req('POST', '/api/admin/users/$userId/followers', body: {'delta': delta});
+  static Future<void> adminBoostContent(String kind, String id, {int viewers = 0, int likes = 0}) async => req('POST', '/api/admin/content/$kind/$id/boost', body: {'viewers': viewers, 'likes': likes});
   static Future<List<dynamic>> groups() async => List<dynamic>.from(await req('GET', '/api/groups'));
   static Future<List<dynamic>> myGroups() async => List<dynamic>.from(await req('GET', '/api/me/groups'));
   static Future<List<dynamic>> notifications() async =>
@@ -507,6 +514,7 @@ class Api {
   static Future<List<dynamic>> series({String q=''}) async => List<dynamic>.from(await req('GET','/api/series${q.isEmpty?'':'?q=${Uri.encodeQueryComponent(q)}'}'));
   static Future<Map<String,dynamic>> movie(String id) async => Map<String,dynamic>.from(await req('GET','/api/movies/$id'));
   static Future<Map<String,dynamic>> seriesOne(String id) async => Map<String,dynamic>.from(await req('GET','/api/series/$id'));
+  static Future<Map<String,dynamic>> episode(String id) async => Map<String,dynamic>.from(await req('GET','/api/episodes/$id'));
   static Future<Map<String,dynamic>> contentAccess(String kind,String id) async => Map<String,dynamic>.from(await req('GET','/api/content/${kind.toUpperCase()}/$id/access'));
   static Future<Map<String,dynamic>> contentView(String kind,String id) async => Map<String,dynamic>.from(await req('POST','/api/content/${kind.toUpperCase()}/$id/view'));
   static Future<List<dynamic>> audioRooms() async => List<dynamic>.from(await req('GET','/api/audio-rooms'));

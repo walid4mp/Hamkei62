@@ -402,9 +402,36 @@ class _ProfileBodyState extends State<_ProfileBody> with SingleTickerProviderSta
             icon: Icon(isClosed ? Icons.person_add_alt_1_rounded : Icons.no_accounts_rounded, size: 17, color: Colors.orangeAccent),
             label: Text(isClosed ? 'إعادة تفعيل الحساب' : 'إغلاق الحساب'),
           ),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final n = await _askFollowers();
+              if (n == null || n == 0) return;
+              try { await Api.adminAddFollowers(u.id, n); toast(context, n > 0 ? 'تمت إضافة $n متابع' : 'تم حذف المتابعين'); widget.onRefresh(); }
+              catch (e) { toast(context, e.toString().replaceFirst('Exception: ', '')); }
+            },
+            icon: const Icon(Icons.group_add_rounded, size: 17, color: Colors.greenAccent),
+            label: const Text('زيادة متابعين'),
+          ),
         ]),
       ],
     ])));
+  }
+
+  Future<int?> _askFollowers() async {
+    final controller = TextEditingController(text: '1000');
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('زيادة المتابعين'),
+        content: TextField(controller: controller, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'العدد (سالب لحذف المتابعين)')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, int.tryParse(controller.text.trim())), child: const Text('تطبيق')),
+        ],
+      ),
+    );
+    controller.dispose();
+    return result;
   }
 
   Future<int?> _askAmount() async {
@@ -656,6 +683,8 @@ class _ProfileBodyState extends State<_ProfileBody> with SingleTickerProviderSta
                   Text('@${u.username}', style: TextStyle(color: SN.textMut, fontSize: 13)),
                   const SizedBox(width: 8),
                   CreatorLevelBadge(followers: u.followers),
+                  const SizedBox(width: 6),
+                  const CreatorMilestoneBadge(),
                 ]),
                 if (u.bio.isNotEmpty) ...[
                   const SizedBox(height: 10),

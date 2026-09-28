@@ -101,3 +101,47 @@ class _CreatorLevelBadgeState extends State<CreatorLevelBadge> {
     );
   }
 }
+
+/// Creator milestone badge (see CreatorMilestone on the server). Shows the
+/// highest milestone the account has already reached.
+class CreatorMilestoneBadge extends StatefulWidget {
+  const CreatorMilestoneBadge({super.key});
+  @override
+  State<CreatorMilestoneBadge> createState() => _CreatorMilestoneBadgeState();
+}
+
+class _CreatorMilestoneBadgeState extends State<CreatorMilestoneBadge> {
+  Map<String, dynamic>? _top;
+
+  @override
+  void initState() {
+    super.initState();
+    Api.creatorMilestones().then((r) {
+      final earned = (r['earned'] as List?) ?? const [];
+      if (!mounted || earned.isEmpty) return;
+      final top = Map<String, dynamic>.from(earned.last as Map);
+      setState(() => _top = top);
+    }).catchError((_) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final m = _top;
+    if (m == null) return const SizedBox.shrink();
+    final title = '${m['title'] ?? ''}';
+    if (title.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFFFFD54F), Color(0xFFFF8F00)]),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: const Color(0xFFFFB300).withValues(alpha: .35), blurRadius: 12)],
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.military_tech_rounded, size: 14, color: Colors.black87),
+        const SizedBox(width: 4),
+        Text(title, style: const TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.w900)),
+      ]),
+    );
+  }
+}

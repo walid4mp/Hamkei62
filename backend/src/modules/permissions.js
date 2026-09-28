@@ -34,7 +34,7 @@ export const PERMISSIONS = Object.freeze([
   'episodes.create', 'episodes.edit', 'episodes.delete',
   'creators.manage', 'rewards.manage',
   // appearance
-  'themes.manage', 'backgrounds.manage', 'effects.manage',
+  'themes.manage', 'backgrounds.manage', 'effects.manage', 'assets.manage',
   // trust & safety
   'reports.view', 'reports.resolve',
   // administration
@@ -91,7 +91,7 @@ export const ROLE_PERMISSIONS = Object.freeze({
     'gifts.manage', 'gifts.create', 'gifts.edit',
     'wallet.view', 'transactions.view', 'withdrawals.view', 'withdrawals.approve',
     'withdrawals.reject', 'movies.view', 'series.view', 'creators.manage',
-    'rewards.manage', 'themes.manage', 'backgrounds.manage', 'effects.manage',
+    'rewards.manage', 'themes.manage', 'backgrounds.manage', 'effects.manage', 'assets.manage',
     'reports.view', 'reports.resolve', 'admins.view', 'settings.view', 'audit.view',
   ],
   // Security accounts start with no permissions at all; a Super Admin grants
@@ -116,7 +116,7 @@ export const ROLE_PERMISSIONS = Object.freeze({
     'series.view', 'series.create', 'series.edit', 'series.delete',
     'episodes.create', 'episodes.edit', 'episodes.delete',
     'creators.manage', 'rewards.manage', 'themes.manage', 'backgrounds.manage',
-    'effects.manage', 'reports.view', 'reports.resolve',
+    'effects.manage', 'assets.manage', 'reports.view', 'reports.resolve',
     'admins.view', 'settings.view', 'settings.edit', 'audit.view',
   ],
   SUPER_ADMIN: ['*'],

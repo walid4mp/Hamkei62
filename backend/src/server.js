@@ -496,6 +496,16 @@ async function ensureSchemaCompatibility(){
     `CREATE TABLE IF NOT EXISTS "CreatorLevel" ("key" TEXT PRIMARY KEY,"label" TEXT NOT NULL,"minFollowers" INTEGER NOT NULL,"tier" INTEGER NOT NULL DEFAULT 0,"color" TEXT NOT NULL DEFAULT '#9CA3AF","enabled" BOOLEAN NOT NULL DEFAULT true)`,
     // Message effects (celebration/hearts/fire/stars/snow/fireworks).
     `ALTER TABLE "Message" ADD COLUMN IF NOT EXISTS "effect" TEXT NOT NULL DEFAULT ''`,
+    // Engagement counters used by admin boosts.
+    `ALTER TABLE "Story" ADD COLUMN IF NOT EXISTS "views" INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE "Post" ADD COLUMN IF NOT EXISTS "views" INTEGER NOT NULL DEFAULT 0`,
+    // Creator milestones (admin-editable reward tiers).
+    `CREATE TABLE IF NOT EXISTS "CreatorMilestone" ("id" TEXT PRIMARY KEY,"followersRequired" INTEGER NOT NULL,"title" TEXT NOT NULL,"badge" TEXT NOT NULL DEFAULT '',"profileFrame" TEXT NOT NULL DEFAULT '',"profileBackground" TEXT NOT NULL DEFAULT '',"entryEffect" TEXT NOT NULL DEFAULT '',"chatEffect" TEXT NOT NULL DEFAULT '',"rewardCoins" INTEGER NOT NULL DEFAULT 0,"rewardGiftSlug" TEXT NOT NULL DEFAULT '',"enabled" BOOLEAN NOT NULL DEFAULT true,"sortOrder" INTEGER NOT NULL DEFAULT 0)`,
+    // Continue-watching progress per user and title.
+    `CREATE TABLE IF NOT EXISTS "ContinueWatching" ("userId" TEXT NOT NULL,"kind" TEXT NOT NULL,"contentId" TEXT NOT NULL,"episodeId" TEXT NOT NULL DEFAULT '',"positionSec" INTEGER NOT NULL DEFAULT 0,"durationSec" INTEGER NOT NULL DEFAULT 0,"completed" BOOLEAN NOT NULL DEFAULT false,"updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("userId","kind","contentId"))`,
+    // Central asset library used by gifts, themes, backgrounds, frames and effects.
+    `CREATE TABLE IF NOT EXISTS "Asset" ("id" TEXT PRIMARY KEY,"type" TEXT NOT NULL,"name" TEXT NOT NULL,"previewUrl" TEXT NOT NULL DEFAULT '',"assetUrl" TEXT NOT NULL DEFAULT '',"animationUrl" TEXT NOT NULL DEFAULT '',"soundUrl" TEXT NOT NULL DEFAULT '',"priceCoins" INTEGER NOT NULL DEFAULT 0,"requiredFollowers" INTEGER NOT NULL DEFAULT 0,"requiredLevel" INTEGER NOT NULL DEFAULT 0,"premium" BOOLEAN NOT NULL DEFAULT false,"enabled" BOOLEAN NOT NULL DEFAULT true,"metadata" TEXT NOT NULL DEFAULT '{}',"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE INDEX IF NOT EXISTS "Asset_type_enabled_idx" ON "Asset"("type","enabled")`,
     // Trust & safety: report notifications to staff accounts.
     `ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'REPORT'`,
     // Live moderation: muted viewers per room.
@@ -1331,6 +1341,131 @@ app.put('/api/admin/creator-levels',auth,requirePermission('creators.manage'),as
     res.json({ok:true,count:list.length});
   }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
 });
+
+// ---- Creator milestones & rewards ----------------------------------------
+const DEFAULT_MILESTONES=[
+  [100,'مبتدئ','badge_beginner','frame_ice','bg_aurora','GOLDEN_AURA','',50,''],
+  [1000,'مبدع','badge_creator','frame_neon','bg_neon','NEON_PORTAL','hearts',250,'rose'],
+  [10000,'مبدع ذهبي','badge_gold','frame_gold','bg_gold','CROWN','fireworks',1500,'crown'],
+  [100000,'مبدع ماسي','badge_diamond','frame_diamond','bg_diamond','DIAMOND','stars',8000,'diamond'],
+  [1000000,'أسطورة Nova','badge_legend','frame_legend','bg_galaxy','GALAXY','celebration',40000,'lion'],
+];
+async function ensureCreatorMilestones(){
+  for(let i=0;i<DEFAULT_MILESTONES.length;i++){
+    const [followers,title,badge,frame,bg,entry,chat,coins,gift]=DEFAULT_MILESTONES[i];
+    await prisma.$executeRawUnsafe('INSERT INTO "CreatorMilestone" ("id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled","sortOrder") VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10) ON CONFLICT DO NOTHING',followers,title,badge,frame,bg,entry,chat,coins,gift,i).catch(()=>{});
+  }
+}
+app.get('/api/creator/milestones',auth,async(req,res)=>{
+  const rows=await prisma.$queryRawUnsafe('SELECT "id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled" FROM "CreatorMilestone" WHERE "enabled"=true ORDER BY "followersRequired" ASC').catch(()=>[]);
+  res.json(rows);
+});
+app.get('/api/creator/milestones/me',auth,async(req,res)=>{
+  const followers=await prisma.follow.count({where:{followingId:req.user.id}});
+  const rows=await prisma.$queryRawUnsafe('SELECT "id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled" FROM "CreatorMilestone" WHERE "enabled"=true AND "followersRequired"<=$1 ORDER BY "followersRequired" ASC',followers).catch(()=>[]);
+  res.json({followers,earned:rows});
+});
+app.put('/api/admin/creator-milestones',auth,requirePermission('creators.manage'),async(req,res)=>{
+  try{
+    const list=z.array(z.object({followersRequired:z.number().int().min(0).max(100000000),title:z.string().min(1).max(60),badge:z.string().max(60).default(''),profileFrame:z.string().max(60).default(''),profileBackground:z.string().max(60).default(''),entryEffect:z.string().max(60).default(''),chatEffect:z.string().max(60).default(''),rewardCoins:z.number().int().min(0).max(10000000).default(0),rewardGiftSlug:z.string().max(80).default(''),enabled:z.boolean().default(true)})).max(60).parse(req.body?.milestones||[]);
+    await prisma.$executeRawUnsafe('DELETE FROM "CreatorMilestone"');
+    for(let i=0;i<list.length;i++){
+      const m=list[i];
+      await prisma.$executeRawUnsafe('INSERT INTO "CreatorMilestone" ("id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled","sortOrder") VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',m.followersRequired,m.title,m.badge,m.profileFrame,m.profileBackground,m.entryEffect,m.chatEffect,m.rewardCoins,m.rewardGiftSlug,m.enabled,i);
+    }
+    await auditAction(req,'CREATOR_MILESTONES_UPDATE',{permission:'creators.manage',after:list});
+    res.json({ok:true,count:list.length});
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
+});
+
+// ---- Continue watching ----------------------------------------------------
+app.get('/api/continue-watching',auth,async(req,res)=>{
+  const rows=await prisma.$queryRawUnsafe('SELECT "kind","contentId","episodeId","positionSec","durationSec","completed","updatedAt" FROM "ContinueWatching" WHERE "userId"=$1 ORDER BY "updatedAt" DESC LIMIT 50',req.user.id).catch(()=>[]);
+  res.json(rows);
+});
+app.put('/api/continue-watching',auth,async(req,res)=>{
+  try{
+    const d=z.object({kind:z.enum(['MOVIE','EPISODE']),contentId:z.string().min(1).max(120),episodeId:z.string().max(120).default(''),positionSec:z.number().int().min(0).max(1000000),durationSec:z.number().int().min(0).max(1000000).default(0),completed:z.boolean().default(false)}).parse(req.body||{});
+    await prisma.$executeRawUnsafe('INSERT INTO "ContinueWatching" ("userId","kind","contentId","episodeId","positionSec","durationSec","completed","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,CURRENT_TIMESTAMP) ON CONFLICT ("userId","kind","contentId") DO UPDATE SET "episodeId"=EXCLUDED."episodeId","positionSec"=EXCLUDED."positionSec","durationSec"=EXCLUDED."durationSec","completed"=EXCLUDED."completed","updatedAt"=CURRENT_TIMESTAMP',req.user.id,d.kind,d.contentId,d.episodeId,d.positionSec,d.durationSec,d.completed);
+    res.json({ok:true});
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
+});
+
+// ---- Central asset library ------------------------------------------------
+app.get('/api/assets',auth,async(req,res)=>{
+  const type=String(req.query.type||'').trim().toUpperCase();
+  const rows=await prisma.$queryRawUnsafe('SELECT "id","type","name","previewUrl","assetUrl","animationUrl","soundUrl","priceCoins","requiredFollowers","requiredLevel","premium","enabled","metadata" FROM "Asset" WHERE "enabled"=true'+(type?' AND "type"=$1':'')+' ORDER BY "priceCoins" ASC',...(type?[type]:[])).catch(()=>[]);
+  res.json(rows.map(r=>({...r,metadata:(()=>{try{return JSON.parse(String(r.metadata||'{}'))}catch{return {}}})()})));
+});
+const AssetInput=z.object({type:z.string().min(2).max(40),name:z.string().min(1).max(80),previewUrl:z.string().max(5000).default(''),assetUrl:z.string().max(5000).default(''),animationUrl:z.string().max(5000).default(''),soundUrl:z.string().max(5000).default(''),priceCoins:z.number().int().min(0).max(10000000).default(0),requiredFollowers:z.number().int().min(0).max(100000000).default(0),requiredLevel:z.number().int().min(0).max(100).default(0),premium:z.boolean().default(false),enabled:z.boolean().default(true),metadata:z.record(z.any()).optional()});
+app.get('/api/admin/assets',auth,requirePermission('assets.manage'),async(req,res)=>{
+  const rows=await prisma.$queryRawUnsafe('SELECT * FROM "Asset" ORDER BY "createdAt" DESC LIMIT 500').catch(()=>[]);
+  res.json(rows.map(r=>({...r,metadata:(()=>{try{return JSON.parse(String(r.metadata||'{}'))}catch{return {}}})()})));
+});
+app.post('/api/admin/assets',auth,requirePermission('assets.manage'),async(req,res)=>{
+  try{ const d=AssetInput.parse(req.body||{});
+    const rows=await prisma.$queryRawUnsafe('INSERT INTO "Asset" ("id","type","name","previewUrl","assetUrl","animationUrl","soundUrl","priceCoins","requiredFollowers","requiredLevel","premium","enabled","metadata") VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING "id"',d.type.toUpperCase(),d.name,d.previewUrl,d.assetUrl,d.animationUrl,d.soundUrl,d.priceCoins,d.requiredFollowers,d.requiredLevel,d.premium,d.enabled,JSON.stringify(d.metadata||{}));
+    await auditAction(req,'ASSET_CREATED',{permission:'assets.manage',targetType:'ASSET',targetId:String(rows?.[0]?.id||''),after:d});
+    res.status(201).json({ok:true,id:rows?.[0]?.id||''});
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
+});
+app.patch('/api/admin/assets/:id',auth,requirePermission('assets.manage'),async(req,res)=>{
+  try{ const d=AssetInput.partial().parse(req.body||{});
+    const sets=[],vals=[];let i=1;
+    for(const [k,v] of Object.entries(d)){ sets.push(`"${k}"=$${i++}`); vals.push(k==='metadata'?JSON.stringify(v||{}):(k==='type'?String(v).toUpperCase():v)); }
+    if(!sets.length)return res.status(400).json({error:'NOTHING_TO_UPDATE'});
+    vals.push(req.params.id);
+    await prisma.$executeRawUnsafe(`UPDATE "Asset" SET ${sets.join(',')} WHERE "id"=$${i}`,...vals);
+    await auditAction(req,'ASSET_UPDATED',{permission:'assets.manage',targetType:'ASSET',targetId:req.params.id,after:d});
+    res.json({ok:true});
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
+});
+app.delete('/api/admin/assets/:id',auth,requirePermission('assets.manage'),async(req,res)=>{
+  await prisma.$executeRawUnsafe('DELETE FROM "Asset" WHERE "id"=$1',req.params.id);
+  await auditAction(req,'ASSET_DELETED',{permission:'assets.manage',targetType:'ASSET',targetId:req.params.id});
+  res.json({ok:true});
+});
+
+// ---- Admin growth tools: followers, view boosts ---------------------------
+// Add or remove N followers for a creator (creates/lifts real Follow rows so
+// the follower count and milestone logic both move).
+app.post('/api/admin/users/:id/followers',auth,requirePermission('users.edit'),async(req,res)=>{
+  try{
+    const delta=Math.max(-100000,Math.min(100000,Number(req.body?.delta||0)));
+    if(!delta)return res.status(400).json({error:'DELTA_REQUIRED'});
+    const target=await prisma.user.findUnique({where:{id:req.params.id},select:{id:true}});
+    if(!target)return res.status(404).json({error:'USER_NOT_FOUND'});
+    if(delta>0){
+      const pool=await prisma.user.findMany({where:{id:{not:target.id}},select:{id:true},take:Math.min(delta,3000)});
+      if(!pool.length)return res.status(400).json({error:'NO_USERS'});
+      let added=0;
+      for(let i=0;i<delta;i++){ const u=pool[i%pool.length]; try{ await prisma.follow.upsert({where:{followerId_followingId:{followerId:u.id,followingId:target.id}},create:{followerId:u.id,followingId:target.id},update:{}}); added++; }catch{} }
+      await auditAction(req,'ADMIN_FOLLOWERS_ADDED',{permission:'users.edit',targetUserId:target.id,after:{added}});
+      return res.json({ok:true,added});
+    }
+    const removed=await prisma.follow.deleteMany({where:{followingId:target.id}});
+    await auditAction(req,'ADMIN_FOLLOWERS_CLEARED',{permission:'users.edit',targetUserId:target.id,after:{removed:removed.count}});
+    res.json({ok:true,removed:removed.count});
+  }catch(e){res.status(400).json({error:'FOLLOWER_UPDATE_FAILED'});}
+});
+// Boost engagement counters for live / reels / stories / posts.
+app.post('/api/admin/content/:kind/:id/boost',auth,async(req,res)=>{
+  const kind=String(req.params.kind||'').toUpperCase();
+  const map={LIVE:'live.manage',REEL:'reels.moderate',STORY:'stories.moderate',POST:'posts.moderate'};
+  if(!map[kind])return res.status(400).json({error:'INVALID_KIND'});
+  const u=await currentAdmin(req);
+  if(!hasPermission(u,map[kind]))return res.status(403).json({error:'PERMISSION_DENIED',permission:map[kind]});
+  const viewers=Math.max(0,Math.min(1000000,Number(req.body?.viewers||req.body?.views||0)));
+  const likes=Math.max(0,Math.min(1000000,Number(req.body?.likes||0)));
+  try{
+    if(kind==='LIVE'){ const room=await prisma.liveRoom.findUnique({where:{id:req.params.id}}); if(!room)return res.status(404).json({error:'NOT_FOUND'}); await prisma.liveRoom.update({where:{id:room.id},data:{viewerCount:viewers||room.viewerCount}}); }
+    else if(kind==='REEL'){ const reel=await prisma.reel.findUnique({where:{id:req.params.id},select:{id:true}}); if(!reel)return res.status(404).json({error:'NOT_FOUND'}); await prisma.reel.update({where:{id:reel.id},data:{views:{increment:viewers}}}); }
+    else if(kind==='POST'){ const post=await prisma.post.findUnique({where:{id:req.params.id},select:{id:true}}); if(!post)return res.status(404).json({error:'NOT_FOUND'}); await prisma.$executeRawUnsafe('UPDATE "Post" SET "views"="views"+$2 WHERE "id"=$1',req.params.id,viewers); }
+    else if(kind==='STORY'){ const story=await prisma.story.findUnique({where:{id:req.params.id},select:{id:true}}); if(!story)return res.status(404).json({error:'NOT_FOUND'}); await prisma.$executeRawUnsafe('UPDATE "Story" SET "views"="views"+$2 WHERE "id"=$1',req.params.id,viewers); }
+    await auditAction(req,`CONTENT_BOOST_${kind}`,{permission:map[kind],targetType:kind,targetId:req.params.id,after:{viewers,likes}});
+    res.json({ok:true});
+  }catch(e){res.status(400).json({error:'BOOST_FAILED'});}
+});
 app.get('/api/wallet/received-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{receiverId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{sender:true,gift:true}}).then(xs=>xs.map(x=>({...x,sender:safe(x.sender)})))));
 app.get('/api/wallet/sent-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{senderId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{receiver:true,gift:true}}).then(xs=>xs.map(x=>({...x,receiver:safe(x.receiver)})))));
 app.post('/api/wallet/gifts/send',auth,async(req,res)=>{
@@ -1665,6 +1800,7 @@ const PORT=Number(process.env.PORT||10000);
     await ensureCatalog();
     await ensureSuperAdmin();
     await ensureCreatorLevels();
+    await ensureCreatorMilestones();
     await ensureAdminLogin();
     http.listen(PORT,'0.0.0.0',()=>console.log(`[SocialNova] API listening on ${PORT}`));
   }catch(e){

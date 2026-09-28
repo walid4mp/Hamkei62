@@ -21,6 +21,7 @@ import 'tech_gaming.dart';
 import 'fitness_challenges.dart';
 import 'music_picker.dart';
 import 'content_studio.dart';
+import 'nova_tv.dart';
 import 'store.dart';
 import 'media_hub.dart';
 
@@ -229,11 +230,13 @@ class _FeedPageState extends State<FeedPage> {
                       'store': const StorePage(),
                       'activity': const ActivityPage(),
                       'hub': const SocialNovaHubPage(),
+                      'nova_tv': const NovaTvPage(),
                     };
                     final page = routes[value];
                     if (page != null) Navigator.push(context, MaterialPageRoute(builder: (_) => page));
                   },
                   itemBuilder: (_) => [
+                    PopupMenuItem(value: 'nova_tv', child: Text(L10n.t('Nova TV'))),
                     PopupMenuItem(value: 'activity', child: Text(L10n.t('نشاطاتي'))),
                     PopupMenuItem(value: 'groups', child: Text(L10n.t('المجموعات'))),
                     PopupMenuItem(value: 'wallet', child: Text(L10n.t('محفظة NovaCoin'))),

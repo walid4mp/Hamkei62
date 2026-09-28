@@ -2316,6 +2316,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   Timer? _giftFxTimer;
   /// Pending gift animations, played one after another by the Gift Manager.
   final List<Map<String, dynamic>> _giftQueue = [];
+  /// Alert banner shown when a gift arrives: «خالد أرسل تاجاً ملكياً». 
+  Map<String, dynamic>? _giftAlert;
+  Timer? _giftAlertTimer;
   Map<String,dynamic>? _hostProfile;
   /// Bumped for every gift so the effect widget is rebuilt fresh (and its
   /// animation restarts) even when the same gift arrives twice in a combo.
@@ -2383,6 +2386,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       final value = m['coins'] is num ? (m['coins'] as num).toInt() : (gift['priceCoins'] is num ? (gift['priceCoins'] as num).toInt() : 0);
       setState(() { _giftCount++; _giftScore += value; if (_challengeId != null) _scoreA += value; chat.add({'body': '🎁 ${gift['emoji'] ?? '🎁'} ${gift['name'] ?? 'هدية'}', 'displayName': '${m['username'] ?? ''}'}); });
       _enqueueGift({...gift, 'sender': '${m['username'] ?? ''}', 'coins': value, 'effectKey': effect});
+      _showGiftAlert('${m['username'] ?? ''}', resolved.name, resolved.emoji);
     });
     if (widget.hostId != null && widget.hostId!.isNotEmpty) {
       Api.profile(widget.hostId!).then((v) { if (mounted) setState(() => _hostProfile = v); }).catchError((_) {});
@@ -2407,6 +2411,34 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         _serverViewers = (s['viewerCount'] as num?)?.toInt() ?? _serverViewers;
       });
     } catch (_) {}
+  }
+
+  /// Admin/live.manage growth tool: raise the room's viewer counter so it
+  /// ranks higher in discovery.
+  Future<void> _boostViewers() async {
+    final roomId = widget.roomId;
+    if (roomId == null || roomId.isEmpty) return;
+    final controller = TextEditingController(text: '1000');
+    final n = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('دعم المشاهدين'),
+        content: TextField(controller: controller, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'عدد المشاهدين')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, int.tryParse(controller.text.trim())), child: const Text('تطبيق')),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (n == null || n <= 0 || !mounted) return;
+    try {
+      await Api.adminBoostContent('LIVE', roomId, viewers: n);
+      if (mounted) setState(() => _serverViewers = n);
+      toast(context, 'تم رفع عدد المشاهدين إلى $n');
+    } catch (e) {
+      toast(context, e.toString().replaceFirst('Exception: ', ''));
+    }
   }
 
   /// Top supporters (gifters) and top tappers for this room, in order.
@@ -2761,6 +2793,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     _giftSub?.cancel();
     _tapSub?.cancel();
     _giftFxTimer?.cancel();
+    _giftAlertTimer?.cancel();
     ctrl.dispose();
     _hearts.dispose();
     room.removeListener(_onRoomChanged);
@@ -3167,6 +3200,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   ListTile(leading: Icon(screenOn ? Icons.stop_screen_share_rounded : Icons.screen_share_rounded), title: Text(screenOn ? 'إيقاف مشاركة الشاشة' : 'مشاركة الشاشة'), onTap: () { Navigator.pop(context); _toggleScreenShare(); }),
                   ListTile(leading: const Icon(Icons.shield_rounded, color: SN.cyan), title: const Text('المشرفون والمساعدون'), onTap: () { Navigator.pop(context); _manageModerators(); }),
                   ListTile(leading: const Icon(Icons.sports_esports_rounded), title: Text(_challengeId == null ? 'بدء تحدي' : 'إدارة التحدي'), onTap: () { Navigator.pop(context); if (_challengeId == null) { _startChallenge(); } else { _challengeScore(true); } }),
+                  if ((_isHost || Api.can('live.manage')) && widget.roomId != null)
+                    ListTile(leading: const Icon(Icons.trending_up_rounded, color: Colors.greenAccent), title: const Text('دعم المشاهدين (إشراف)'), onTap: () { Navigator.pop(context); _boostViewers(); }),
                 ])),
               ),
             ),
@@ -3176,6 +3211,59 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             _glassButton(icon: Icons.pan_tool_alt_rounded, onTap: () { SocketService.i.sendLiveChat(widget.roomName, '🙋 طلب الانضمام إلى البث'); toast(context, 'تم إرسال طلب الانضمام للمضيف'); }),
           ],
         ],
+      ),
+    );
+  }
+
+  void _showGiftAlert(String sender, String name, String emoji) {
+    if (!mounted) return;
+    setState(() => _giftAlert = {'sender': sender, 'name': name, 'emoji': emoji});
+    _giftAlertTimer?.cancel();
+    _giftAlertTimer = Timer(const Duration(milliseconds: 2600), () {
+      if (mounted) setState(() => _giftAlert = null);
+    });
+  }
+
+  /// «خالد أرسل تاجاً ملكياً» 👑 — appears top-centre on every gift.
+  Widget _giftAlertBanner() {
+    final a = _giftAlert;
+    if (a == null) return const SizedBox.shrink();
+    final sender = '${a['sender']}'.isEmpty ? 'مستخدم' : '${a['sender']}';
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 132,
+      left: 16,
+      right: 16,
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutBack,
+          builder: (context, t, child) => Opacity(opacity: t.clamp(0.0, 1.0), child: Transform.scale(scale: .9 + .1 * t, child: child)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF2B1B00), Color(0xFF4A2E00)]),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.amberAccent.withValues(alpha: .8), width: 1.4),
+              boxShadow: [BoxShadow(color: Colors.amberAccent.withValues(alpha: .28), blurRadius: 18)],
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('${a['emoji']}', style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 9),
+              Flexible(
+                child: Text.rich(
+                  TextSpan(children: [
+                    TextSpan(text: sender, style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.w900)),
+                    const TextSpan(text: ' أرسل ', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
+                    TextSpan(text: '${a['name']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ]),
+          ),
+        ),
       ),
     );
   }
@@ -3240,6 +3328,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         _hostHeader(),
         _battleBar(),
         _tapHud(),
+        _giftAlertBanner(),
         if (connecting)
           Positioned.fill(child: ColoredBox(color: Colors.black54, child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: SN.cyan), const SizedBox(height: 14), const Text('جاري فتح البث بجودة عالية...', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))])))),
         if (_giftFx != null) _giftOverlay(),
