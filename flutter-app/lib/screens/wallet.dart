@@ -295,15 +295,16 @@ Future<void> showGiftPicker(
     if (!context.mounted) return;
     var selected = -1;
     var sending = false;
-    var tierFilter = -1; // -1 = all tiers
+    var categoryFilter = ''; // '' = all categories
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(builder: (ctx, setSheet) {
+        final categories = <String>['', ...{for (final g in gifts) if (g.category.isNotEmpty) g.category}];
         final visible = <int>[
           for (var i = 0; i < gifts.length; i++)
-            if (tierFilter < 0 || gifts[i].tier.index == tierFilter) i
+            if (categoryFilter.isEmpty || gifts[i].category == categoryFilter) i
         ];
         final selectedGift = selected >= 0 && selected < gifts.length ? gifts[selected] : null;
         return Container(
@@ -323,21 +324,20 @@ Future<void> showGiftPicker(
               ])),
               IconButton(onPressed: () { Navigator.pop(ctx); Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())); }, icon: const Icon(Icons.add_circle_outline, color: SN.cyan)),
             ])),
-            if (selectedGift != null) Container(margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9), decoration: BoxDecoration(gradient: LinearGradient(colors: [SN.violet.withValues(alpha: .28), SN.cyan.withValues(alpha: .12)]), borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)), child: Row(children: [Text(selectedGift.emoji, style: const TextStyle(fontSize: 30)), const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(selectedGift.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)), Text('${selectedGift.tier.label} • ${selectedGift.price} NVC', style: const TextStyle(color: Colors.white60, fontSize: 11))])), FilledButton(onPressed: sending ? null : () async { setSheet(() => sending = true); try { await Api.sendGift(receiverId: receiverId, giftId: ids[selected], context: contextType, contextId: contextId); playGiftSound(selectedGift.soundKey, selectedGift.tier); if (ctx.mounted) { Navigator.pop(ctx); toast(context, 'تم إرسال ${selectedGift.emoji} ${selectedGift.name} ✨'); } } catch (e) { if (ctx.mounted) { setSheet(() => sending = false); toast(ctx, e.toString().replaceFirst('Exception: ', '')); } } }, child: Text(sending ? '...' : 'إرسال'))])),
+            if (selectedGift != null) Container(margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9), decoration: BoxDecoration(gradient: LinearGradient(colors: [SN.violet.withValues(alpha: .28), SN.cyan.withValues(alpha: .12)]), borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)), child: Row(children: [Text(selectedGift.emoji, style: const TextStyle(fontSize: 30)), const SizedBox(width: 10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(selectedGift.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)), Text('${selectedGift.rarity.label} • ${selectedGift.price} NVC', style: const TextStyle(color: Colors.white60, fontSize: 11))])), FilledButton(onPressed: sending ? null : () async { setSheet(() => sending = true); try { await Api.sendGift(receiverId: receiverId, giftId: ids[selected], context: contextType, contextId: contextId); playGiftSound(selectedGift.soundKey, selectedGift.tier); if (ctx.mounted) { Navigator.pop(ctx); toast(context, 'تم إرسال ${selectedGift.emoji} ${selectedGift.name} ✨'); } } catch (e) { if (ctx.mounted) { setSheet(() => sending = false); toast(ctx, e.toString().replaceFirst('Exception: ', '')); } } }, child: Text(sending ? '...' : 'إرسال'))])),
             SizedBox(
               height: 40,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 children: [
-                  Padding(padding: const EdgeInsets.only(left: 6), child: ChoiceChip(label: const Text('الكل'), selected: tierFilter < 0, onSelected: (_) => setSheet(() => tierFilter = -1))),
-                  for (final t in NovaGiftTier.values)
-                    Padding(padding: const EdgeInsets.only(left: 6), child: ChoiceChip(label: Text(t.label), selected: tierFilter == t.index, onSelected: (_) => setSheet(() => tierFilter = t.index))),
+                  for (final c in categories)
+                    Padding(padding: const EdgeInsets.only(left: 6), child: ChoiceChip(label: Text(c.isEmpty ? 'الكل' : NovaGiftCatalog.categoryLabel(c)), selected: categoryFilter == c, onSelected: (_) => setSheet(() => categoryFilter = c))),
                 ],
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(18, 6, 18, 6), child: Align(alignment: AlignmentDirectional.centerStart, child: Text('الهدايا', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)))),
-            Expanded(child: GridView.builder(padding: const EdgeInsets.fromLTRB(14, 0, 14, 18), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: .82), itemCount: visible.length, itemBuilder: (_, vi) { final i = visible[vi]; final g = gifts[i]; final active = i == selected; final accent = switch (g.tier) { NovaGiftTier.exclusive => const Color(0xFFFFD700), NovaGiftTier.luxury => const Color(0xFFFFB74D), NovaGiftTier.luck => SN.cyan, NovaGiftTier.common => SN.pink }; return GestureDetector(onTap: () { setSheet(() => selected = active ? -1 : i); NovaAudio.i.playGiftSfx(g.tier.key); }, child: AnimatedContainer(duration: const Duration(milliseconds: 160), decoration: BoxDecoration(gradient: active ? LinearGradient(colors: [accent.withValues(alpha: .40), SN.pink.withValues(alpha: .18)]) : null, color: active ? null : const Color(0xFF12141D), borderRadius: BorderRadius.circular(18), border: Border.all(color: active ? accent.withValues(alpha: .85) : Colors.white10), boxShadow: active ? [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16)] : null), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(g.emoji, style: TextStyle(fontSize: active ? 38 : 32)), const SizedBox(height: 5), Text(g.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)), const SizedBox(height: 3), Text('${g.price}', style: TextStyle(color: active ? accent : Colors.white54, fontSize: 9, fontWeight: FontWeight.w800)), Text(g.tier.label, style: TextStyle(color: accent.withValues(alpha: .85), fontSize: 8, fontWeight: FontWeight.w700))]))); })),
+            Expanded(child: GridView.builder(padding: const EdgeInsets.fromLTRB(14, 0, 14, 18), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: .82), itemCount: visible.length, itemBuilder: (_, vi) { final i = visible[vi]; final g = gifts[i]; final active = i == selected; final accent = NovaGiftCatalog.rarityColor(g.rarity); return GestureDetector(onTap: () { setSheet(() => selected = active ? -1 : i); NovaAudio.i.playGiftSfx(g.tier.key); }, child: AnimatedContainer(duration: const Duration(milliseconds: 160), decoration: BoxDecoration(gradient: active ? LinearGradient(colors: [accent.withValues(alpha: .40), SN.pink.withValues(alpha: .18)]) : null, color: active ? null : const Color(0xFF12141D), borderRadius: BorderRadius.circular(18), border: Border.all(color: active ? accent.withValues(alpha: .85) : Colors.white10), boxShadow: active ? [BoxShadow(color: accent.withValues(alpha: .20), blurRadius: 16)] : null), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(g.emoji, style: TextStyle(fontSize: active ? 38 : 32)), const SizedBox(height: 5), Text(g.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)), const SizedBox(height: 3), Text('${g.price}', style: TextStyle(color: active ? accent : Colors.white54, fontSize: 9, fontWeight: FontWeight.w800)), Text(g.rarity.label, style: TextStyle(color: accent.withValues(alpha: .9), fontSize: 8, fontWeight: FontWeight.w800))]))); })),
           ])),
         );
       }),

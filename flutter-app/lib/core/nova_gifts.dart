@@ -3,10 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'nova_audio.dart';
-import 'theme.dart';
 
-/// The four gift tiers used across the app. The Arabic labels are what the
-/// gift sheet shows; [key] is the ASCII id sent to / received from the API.
+/// The four price tiers used across the app (kept for legacy gift sheets).
 enum NovaGiftTier {
   common('common', 'شائعة'),
   luck('luck', 'حظ'),
@@ -18,9 +16,23 @@ enum NovaGiftTier {
   final String label;
 }
 
-/// One gift definition. [effectKey] drives the on-screen animation and
-/// [soundKey] drives the audio; both come from the server catalog so the
-/// client never hard-codes a single gift.
+/// Rarity drives the frame colour and the intensity of the animation.
+enum NovaGiftRarity {
+  common('COMMON', 'عادية'),
+  rare('RARE', 'نادرة'),
+  epic('EPIC', 'ملحمية'),
+  legendary('LEGENDARY', 'أسطورية'),
+  mythic('MYTHIC', 'خرافية');
+
+  const NovaGiftRarity(this.key, this.label);
+  final String key;
+  final String label;
+}
+
+/// Motion family — every gift maps to one, so no two categories move alike.
+enum NovaMotion { drop, rise, drive, fly, shake, bloom }
+
+/// One gift definition, exactly as the Gift Engine returns it.
 class NovaGift {
   const NovaGift({
     required this.slug,
@@ -30,6 +42,9 @@ class NovaGift {
     required this.tier,
     required this.effectKey,
     required this.soundKey,
+    this.rarity = NovaGiftRarity.common,
+    this.category = '',
+    this.durationMs = 1800,
   });
 
   final String slug;
@@ -39,6 +54,9 @@ class NovaGift {
   final NovaGiftTier tier;
   final String effectKey;
   final String soundKey;
+  final NovaGiftRarity rarity;
+  final String category;
+  final int durationMs;
 
   String get tierKey => tier.key;
 
@@ -52,18 +70,21 @@ class NovaGift {
       tier: NovaGiftCatalog.tierForPrice(price),
       effectKey: '${m['effectKey'] ?? 'pulse'}',
       soundKey: '${m['soundKey'] ?? ''}',
+      rarity: NovaGiftCatalog.rarityFor('${m['rarity'] ?? ''}'),
+      category: '${m['category'] ?? ''}',
+      durationMs: (m['effectMs'] as num?)?.toInt() ?? 1800,
     );
   }
+
+  NovaMotion get motion => NovaGiftCatalog.motionFor(effectKey);
 }
 
-/// Canonical client-side catalog. Mirrors the server `ensureCatalog()` list so
-/// the UI can render tiers even before the first network call returns, and so
-/// no two gifts ever share an emoji/name.
+/// Canonical fallback catalog (mirrors the first 26 engine entries) so the UI
+/// still renders before the first network call returns.
 class NovaGiftCatalog {
   NovaGiftCatalog._();
 
   static const List<NovaGift> all = [
-    // شائعة
     NovaGift(slug: 'rose', name: 'وردة', emoji: '🌹', price: 1, tier: NovaGiftTier.common, effectKey: 'rose', soundKey: 'rose'),
     NovaGift(slug: 'heart', name: 'قلب', emoji: '❤️', price: 5, tier: NovaGiftTier.common, effectKey: 'heart', soundKey: 'heart'),
     NovaGift(slug: 'coffee', name: 'قهوة', emoji: '☕', price: 9, tier: NovaGiftTier.common, effectKey: 'coffee', soundKey: 'coffee'),
@@ -72,27 +93,24 @@ class NovaGiftCatalog {
     NovaGift(slug: 'dumbbell', name: 'دمبل', emoji: '🏋️', price: 29, tier: NovaGiftTier.common, effectKey: 'dumbbell', soundKey: 'dumbbell'),
     NovaGift(slug: 'ball', name: 'كرة', emoji: '⚽', price: 35, tier: NovaGiftTier.common, effectKey: 'ball', soundKey: 'ball'),
     NovaGift(slug: 'lamp', name: 'مصباح', emoji: '💡', price: 49, tier: NovaGiftTier.common, effectKey: 'lamp', soundKey: 'lamp'),
-    // حظ
-    NovaGift(slug: 'diamond', name: 'ماسة', emoji: '💎', price: 99, tier: NovaGiftTier.luck, effectKey: 'diamond', soundKey: 'spark'),
-    NovaGift(slug: 'star', name: 'نجمة', emoji: '⭐', price: 149, tier: NovaGiftTier.luck, effectKey: 'star', soundKey: 'star'),
-    NovaGift(slug: 'clover', name: 'حظ', emoji: '🍀', price: 199, tier: NovaGiftTier.luck, effectKey: 'clover', soundKey: 'clover'),
-    NovaGift(slug: 'dice', name: 'نرد', emoji: '🎲', price: 299, tier: NovaGiftTier.luck, effectKey: 'dice', soundKey: 'dice'),
-    NovaGift(slug: 'rocket', name: 'صاروخ', emoji: '🚀', price: 399, tier: NovaGiftTier.luck, effectKey: 'rocket', soundKey: 'rocket'),
-    NovaGift(slug: 'balloon', name: 'بالون', emoji: '🎈', price: 499, tier: NovaGiftTier.luck, effectKey: 'balloon', soundKey: 'balloon'),
-    // فاخرة
-    NovaGift(slug: 'crown', name: 'تاج', emoji: '👑', price: 999, tier: NovaGiftTier.luxury, effectKey: 'crown', soundKey: 'crown'),
-    NovaGift(slug: 'ring', name: 'خاتم', emoji: '💍', price: 1299, tier: NovaGiftTier.luxury, effectKey: 'ring', soundKey: 'ring'),
-    NovaGift(slug: 'car', name: 'سيارة', emoji: '🏎️', price: 1799, tier: NovaGiftTier.luxury, effectKey: 'car', soundKey: 'engine'),
-    NovaGift(slug: 'yacht', name: 'يخت', emoji: '🛥️', price: 2199, tier: NovaGiftTier.luxury, effectKey: 'yacht', soundKey: 'yacht'),
-    NovaGift(slug: 'airplane', name: 'طائرة', emoji: '✈️', price: 2599, tier: NovaGiftTier.luxury, effectKey: 'airplane', soundKey: 'jet'),
-    NovaGift(slug: 'castle', name: 'قصر', emoji: '🏰', price: 2999, tier: NovaGiftTier.luxury, effectKey: 'castle', soundKey: 'castle'),
-    // حصرية
-    NovaGift(slug: 'galaxy', name: 'مجرة', emoji: '🌌', price: 4999, tier: NovaGiftTier.exclusive, effectKey: 'galaxy', soundKey: 'space'),
-    NovaGift(slug: 'dragon', name: 'تنين', emoji: '🐉', price: 5999, tier: NovaGiftTier.exclusive, effectKey: 'dragon', soundKey: 'dragon'),
-    NovaGift(slug: 'lion', name: 'أسد', emoji: '🦁', price: 6999, tier: NovaGiftTier.exclusive, effectKey: 'lion', soundKey: 'roar'),
-    NovaGift(slug: 'spaceship', name: 'سفينة فضاء', emoji: '🛸', price: 7999, tier: NovaGiftTier.exclusive, effectKey: 'spaceship', soundKey: 'warp'),
-    NovaGift(slug: 'crystal', name: 'كريستال', emoji: '🔮', price: 8999, tier: NovaGiftTier.exclusive, effectKey: 'crystal', soundKey: 'magic'),
-    NovaGift(slug: 'throne', name: 'عرش', emoji: '🪑', price: 9999, tier: NovaGiftTier.exclusive, effectKey: 'throne', soundKey: 'royal'),
+    NovaGift(slug: 'diamond', name: 'ماسة', emoji: '💎', price: 99, tier: NovaGiftTier.luck, effectKey: 'diamond', soundKey: 'spark', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'star', name: 'نجمة', emoji: '⭐', price: 149, tier: NovaGiftTier.luck, effectKey: 'star', soundKey: 'star', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'clover', name: 'حظ', emoji: '🍀', price: 199, tier: NovaGiftTier.luck, effectKey: 'clover', soundKey: 'clover', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'dice', name: 'نرد', emoji: '🎲', price: 299, tier: NovaGiftTier.luck, effectKey: 'dice', soundKey: 'dice', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'rocket', name: 'صاروخ', emoji: '🚀', price: 399, tier: NovaGiftTier.luck, effectKey: 'rocket', soundKey: 'rocket', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'balloon', name: 'بالون', emoji: '🎈', price: 499, tier: NovaGiftTier.luck, effectKey: 'balloon', soundKey: 'balloon', rarity: NovaGiftRarity.rare),
+    NovaGift(slug: 'crown', name: 'تاج', emoji: '👑', price: 999, tier: NovaGiftTier.luxury, effectKey: 'crown', soundKey: 'crown', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'ring', name: 'خاتم', emoji: '💍', price: 1299, tier: NovaGiftTier.luxury, effectKey: 'ring', soundKey: 'ring', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'car', name: 'سيارة', emoji: '🏎️', price: 1799, tier: NovaGiftTier.luxury, effectKey: 'car', soundKey: 'engine', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'yacht', name: 'يخت', emoji: '🛥️', price: 2199, tier: NovaGiftTier.luxury, effectKey: 'yacht', soundKey: 'yacht', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'airplane', name: 'طائرة', emoji: '✈️', price: 2599, tier: NovaGiftTier.luxury, effectKey: 'airplane', soundKey: 'jet', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'castle', name: 'قصر', emoji: '🏰', price: 2999, tier: NovaGiftTier.luxury, effectKey: 'castle', soundKey: 'castle', rarity: NovaGiftRarity.epic),
+    NovaGift(slug: 'galaxy', name: 'مجرة', emoji: '🌌', price: 4999, tier: NovaGiftTier.exclusive, effectKey: 'galaxy', soundKey: 'space', rarity: NovaGiftRarity.legendary),
+    NovaGift(slug: 'dragon', name: 'تنين', emoji: '🐉', price: 5999, tier: NovaGiftTier.exclusive, effectKey: 'dragon', soundKey: 'dragon', rarity: NovaGiftRarity.legendary),
+    NovaGift(slug: 'lion', name: 'أسد', emoji: '🦁', price: 6999, tier: NovaGiftTier.exclusive, effectKey: 'lion', soundKey: 'roar', rarity: NovaGiftRarity.legendary),
+    NovaGift(slug: 'spaceship', name: 'سفينة فضاء', emoji: '🛸', price: 7999, tier: NovaGiftTier.exclusive, effectKey: 'spaceship', soundKey: 'warp', rarity: NovaGiftRarity.legendary),
+    NovaGift(slug: 'crystal', name: 'كريستال', emoji: '🔮', price: 8999, tier: NovaGiftTier.exclusive, effectKey: 'crystal', soundKey: 'magic', rarity: NovaGiftRarity.legendary),
+    NovaGift(slug: 'throne', name: 'عرش', emoji: '🪑', price: 9999, tier: NovaGiftTier.exclusive, effectKey: 'throne', soundKey: 'royal', rarity: NovaGiftRarity.mythic),
   ];
 
   static NovaGiftTier tierForPrice(int price) {
@@ -102,8 +120,70 @@ class NovaGiftCatalog {
     return NovaGiftTier.common;
   }
 
-  /// Tries the slug first, then falls back to price tier. Returns null only
-  /// when the gift is completely unknown.
+  static NovaGiftRarity rarityFor(String raw) {
+    switch (raw.toUpperCase()) {
+      case 'MYTHIC': return NovaGiftRarity.mythic;
+      case 'LEGENDARY': return NovaGiftRarity.legendary;
+      case 'EPIC': return NovaGiftRarity.epic;
+      case 'RARE': return NovaGiftRarity.rare;
+      default: return NovaGiftRarity.common;
+    }
+  }
+
+  /// Maps the engine's animation key onto one of six motion families.
+  static NovaMotion motionFor(String effectKey) {
+    switch (effectKey) {
+      case 'crown':
+      case 'castle':
+      case 'trophy':
+      case 'diamond':
+      case 'crystal':
+      case 'coins':
+      case 'throne':
+      case 'ring':
+        return NovaMotion.drop;
+      case 'rocket':
+      case 'balloon':
+      case 'fireworks':
+        return NovaMotion.rise;
+      case 'car':
+      case 'yacht':
+        return NovaMotion.drive;
+      case 'plane':
+      case 'galaxy':
+      case 'dragon':
+      case 'spaceship':
+        return NovaMotion.fly;
+      case 'lion':
+      case 'fire':
+      case 'lightning':
+      case 'roar':
+        return NovaMotion.shake;
+      default:
+        return NovaMotion.bloom;
+    }
+  }
+
+  static Color rarityColor(NovaGiftRarity r) => switch (r) {
+        NovaGiftRarity.mythic => const Color(0xFFFF4D6D),
+        NovaGiftRarity.legendary => const Color(0xFFFFD54F),
+        NovaGiftRarity.epic => const Color(0xFFBA68C8),
+        NovaGiftRarity.rare => const Color(0xFF4FC3F7),
+        NovaGiftRarity.common => const Color(0xFF90A4AE),
+      };
+
+  static const Map<String, String> categoryLabels = {
+    'love': 'حب ومشاعر',
+    'luxury': 'فخامة',
+    'tech': 'تقنية وسيارات',
+    'nature': 'طبيعة',
+    'food': 'مأكولات',
+    'music': 'موسيقى وترفيه',
+    'sport': 'رياضة وقوة',
+  };
+
+  static String categoryLabel(String key) => categoryLabels[key] ?? key;
+
   static NovaGift? bySlug(String slug) {
     for (final g in all) {
       if (g.slug == slug) return g;
@@ -135,8 +215,8 @@ class NovaGiftCatalog {
   }
 }
 
-/// Full-screen animated gift effect. Distinct motion per [effectKey] so no two
-/// gifts look the same, with a single [AnimationController] per burst.
+/// Full-screen animated gift effect. Six motion families plus rarity-driven
+/// intensity (golden rain, white flash) so no two gifts feel the same.
 class NovaGiftEffect extends StatefulWidget {
   const NovaGiftEffect({
     super.key,
@@ -144,6 +224,7 @@ class NovaGiftEffect extends StatefulWidget {
     required this.name,
     required this.effectKey,
     required this.tier,
+    this.rarity = NovaGiftRarity.common,
     this.senderName = '',
     this.coins = 0,
     this.hostName = '',
@@ -155,6 +236,7 @@ class NovaGiftEffect extends StatefulWidget {
   final String name;
   final String effectKey;
   final NovaGiftTier tier;
+  final NovaGiftRarity rarity;
   final String senderName;
   final int coins;
   final String hostName;
@@ -169,7 +251,11 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c;
   final math.Random _rnd = math.Random();
-  late final List<double> _seed = List.generate(24, (_) => _rnd.nextDouble());
+  late final List<double> _seed = List.generate(28, (_) => _rnd.nextDouble());
+
+  NovaMotion get _motion => NovaGiftCatalog.motionFor(widget.effectKey);
+  Color get _accent => NovaGiftCatalog.rarityColor(widget.rarity);
+  bool get _fancy => widget.rarity == NovaGiftRarity.legendary || widget.rarity == NovaGiftRarity.mythic;
 
   @override
   void initState() {
@@ -187,24 +273,12 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
     super.dispose();
   }
 
-  bool get _isFlight => const {
-        'rocket', 'dragon', 'spaceship', 'airplane', 'car', 'yacht', 'galaxy', 'castle'
-      }.contains(widget.effectKey);
-
-  bool get _isRoyal => const {'crown', 'throne', 'royal', 'crystal'}.contains(widget.effectKey);
-
-  Color get _tierColor => switch (widget.tier) {
-        NovaGiftTier.exclusive => const Color(0xFFFFD700),
-        NovaGiftTier.luxury => const Color(0xFFFFB74D),
-        NovaGiftTier.luck => SN.cyan,
-        NovaGiftTier.common => SN.pink,
-      };
-
-  String get _caption => switch (widget.tier) {
-        NovaGiftTier.exclusive => widget.hostName.isEmpty ? 'هدية حصرية أسطورية 👑' : 'هدية أسطورية لـ ${widget.hostName} 👑',
-        NovaGiftTier.luxury => 'هدية فاخرة 🎁',
-        NovaGiftTier.luck => 'هدية حظ رائعة ✨',
-        NovaGiftTier.common => 'هدية وصلت 🎉',
+  String get _caption => switch (widget.rarity) {
+        NovaGiftRarity.mythic => 'هدية أسطورية خرافية 🔥',
+        NovaGiftRarity.legendary => widget.hostName.isEmpty ? 'هدية أسطورية 👑' : 'هدية أسطورية لـ ${widget.hostName} 👑',
+        NovaGiftRarity.epic => 'هدية ملحمية فاخرة 🎁',
+        NovaGiftRarity.rare => 'هدية نادرة ✨',
+        NovaGiftRarity.common => 'هدية وصلت 🎉',
       };
 
   @override
@@ -215,14 +289,22 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
           animation: _c,
           builder: (context, _) {
             final v = _c.value;
-            return Stack(
+            final content = Stack(
               children: [
-                if (_isRoyal) _goldenRain(v),
-                if (_isFlight) _flight(v),
-                if (!_isFlight) _burst(v),
+                if (_fancy) _goldenRain(v),
+                switch (_motion) {
+                  NovaMotion.drop => _drop(v),
+                  NovaMotion.rise => _rise(v),
+                  NovaMotion.drive => _drive(v),
+                  NovaMotion.fly => _fly(v),
+                  NovaMotion.shake => _shake(v),
+                  NovaMotion.bloom => _bloom(v),
+                },
                 _hero(v),
+                if (_fancy) _flash(v),
               ],
             );
+            return content;
           },
         ),
       ),
@@ -234,48 +316,119 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
     return Positioned.fill(
       child: Opacity(
         opacity: fade * .9,
-        child: CustomPaint(painter: _RainPainter(v, _seed, _tierColor)),
+        child: CustomPaint(painter: _RainPainter(v, _seed, _accent)),
       ),
     );
   }
 
-  Widget _flight(double v) {
-    final dx = (v * 1.25 - 0.15) * MediaQuery.of(context).size.width;
-    final dy = MediaQuery.of(context).size.height * (0.62 - 0.22 * math.sin(v * math.pi));
-    final angle = -0.5 + v * 0.9;
+  Widget _flash(double v) {
+    // A very short white flash at the start of legendary/mythic gifts.
+    final a = v < .12 ? (1 - v / .12) * .35 : 0.0;
+    return Positioned.fill(child: IgnorePointer(child: ColoredBox(color: Colors.white.withValues(alpha: a))));
+  }
+
+  Widget _drop(double v) {
+    // Falls from above the screen, bounces, then settles while glowing.
+    final t = Curves.bounceOut.transform((v / .45).clamp(0.0, 1.0));
+    final dy = -0.45 * MediaQuery.of(context).size.height * (1 - t);
+    return Align(
+      alignment: Alignment(0, -0.35),
+      child: Transform.translate(
+        offset: Offset(0, dy),
+        child: _glowDisc(120, 84),
+      ),
+    );
+  }
+
+  Widget _rise(double v) {
+    // Travels from the bottom of the screen to the top with a trail.
+    final dy = MediaQuery.of(context).size.height * (0.75 - 1.5 * v);
     return Positioned(
-      left: dx - 60,
-      top: dy - 60,
-      child: Transform.rotate(
-        angle: angle,
-        child: Container(
-          width: 120,
-          height: 120,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: _tierColor.withValues(alpha: .55), blurRadius: 60, spreadRadius: 14)],
-          ),
-          child: Text(widget.emoji, style: const TextStyle(fontSize: 82)),
-        ),
-      ),
+      left: MediaQuery.of(context).size.width / 2 - 70,
+      top: dy,
+      child: _glowDisc(140, 88),
     );
   }
 
-  Widget _burst(double v) {
-    final scale = v < .3 ? (v / .3) : 1.0 + (v - .3) * .25;
-    final opacity = (1 - v).clamp(0.0, 1.0);
-    return Center(
-      child: Opacity(
-        opacity: opacity,
-        child: Transform.scale(
-          scale: scale,
-          child: SizedBox(
-            width: 220,
-            height: 220,
-            child: CustomPaint(painter: _BurstPainter(v, _seed, _tierColor)),
+  Widget _drive(double v) {
+    // Crosses horizontally with speed lines and tire smoke.
+    final dx = -140 + (MediaQuery.of(context).size.width + 280) * v;
+    return Stack(children: [
+      Positioned(
+        left: 0, right: 0, top: MediaQuery.of(context).size.height * .52,
+        child: Opacity(
+          opacity: (1 - v).clamp(0.0, 1.0) * .6,
+          child: CustomPaint(painter: _SpeedPainter(v, _seed, _accent), child: const SizedBox(height: 160)),
+        ),
+      ),
+      Positioned(left: dx, top: MediaQuery.of(context).size.height * .42, child: _glowDisc(140, 84)),
+    ]);
+  }
+
+  Widget _fly(double v) {
+    final dx = (v * 1.25 - 0.15) * MediaQuery.of(context).size.width;
+    final dy = MediaQuery.of(context).size.height * (0.62 - 0.24 * math.sin(v * math.pi));
+    return Positioned(
+      left: dx - 70,
+      top: dy,
+      child: Transform.rotate(angle: -0.5 + v * 0.9, child: _glowDisc(140, 86)),
+    );
+  }
+
+  Widget _shake(double v) {
+    // Screen shake + radial glow + big text effect.
+    final amp = (1 - v) * 10;
+    final sx = math.sin(v * math.pi * 26) * amp;
+    final sy = math.cos(v * math.pi * 22) * amp * .6;
+    return Stack(children: [
+      Positioned.fill(
+        child: Transform.translate(
+          offset: Offset(sx, sy),
+          child: Opacity(
+            opacity: (1 - v).clamp(0.0, 1.0) * .85,
+            child: CustomPaint(painter: _BurstPainter(v, _seed, _accent)),
           ),
         ),
+      ),
+      Center(child: Transform.translate(offset: Offset(sx, sy), child: _glowDisc(190, 100))),
+    ]);
+  }
+
+  Widget _bloom(double v) {
+    final scale = v < .3 ? (v / .3) : 1.0 + (v - .3) * .25;
+    return Stack(children: [
+      Center(
+        child: Opacity(
+          opacity: (1 - v).clamp(0.0, 1.0),
+          child: Transform.scale(
+            scale: scale,
+            child: SizedBox(
+              width: 230,
+              height: 230,
+              child: CustomPaint(painter: _BurstPainter(v, _seed, _accent)),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _glowDisc(double size, double fontSize) {
+    final v = _c.value;
+    final pulse = 1 + math.sin(v * math.pi * 3) * .04;
+    return Transform.scale(
+      scale: pulse,
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.black.withValues(alpha: .42),
+          border: Border.all(color: _accent.withValues(alpha: .8), width: 2),
+          boxShadow: [BoxShadow(color: _accent.withValues(alpha: .6), blurRadius: 60, spreadRadius: 16)],
+        ),
+        child: Text(widget.emoji, style: TextStyle(fontSize: fontSize)),
       ),
     );
   }
@@ -285,7 +438,7 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
     final exit = ((v - .78) / .22).clamp(0.0, 1.0);
     final scale = 0.6 + 0.4 * Curves.elasticOut.transform(appear);
     return Align(
-      alignment: const Alignment(0, -0.15),
+      alignment: const Alignment(0, 0.42),
       child: Opacity(
         opacity: (1 - exit).clamp(0.0, 1.0),
         child: Transform.scale(
@@ -293,30 +446,18 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 178,
-                height: 178,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withValues(alpha: .5),
-                  border: Border.all(color: _tierColor.withValues(alpha: .75), width: 2),
-                  boxShadow: [BoxShadow(color: _tierColor.withValues(alpha: .55), blurRadius: 60, spreadRadius: 18)],
-                ),
-                child: Center(child: Text(widget.emoji, style: const TextStyle(fontSize: 92))),
-              ),
-              const SizedBox(height: 12),
-              Text(widget.name, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
+              Text(widget.name, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black54, blurRadius: 12)])),
               const SizedBox(height: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(color: Colors.black.withValues(alpha: .55), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: .55), borderRadius: BorderRadius.circular(20), border: Border.all(color: _accent.withValues(alpha: .5))),
                 child: Text(
                   '${widget.senderName.isEmpty ? '' : '${widget.senderName}  •  '}+${widget.coins} NVC',
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(_caption, style: TextStyle(color: _tierColor, fontWeight: FontWeight.w900, fontSize: 14)),
+              const SizedBox(height: 6),
+              Text(_caption, style: TextStyle(color: _accent, fontWeight: FontWeight.w900, fontSize: 14)),
             ],
           ),
         ),
@@ -368,8 +509,28 @@ class _BurstPainter extends CustomPainter {
   bool shouldRepaint(covariant _BurstPainter old) => old.v != v;
 }
 
-/// Convenience: speak the gift's sound. Kept here so any screen that shows a
-/// gift can trigger audio without importing NovaAudio directly.
+class _SpeedPainter extends CustomPainter {
+  _SpeedPainter(this.v, this.seed, this.color);
+  final double v;
+  final List<double> seed;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..strokeWidth = 2..color = color.withValues(alpha: (1 - v).clamp(0.0, 1.0) * .7);
+    for (var i = 0; i < 14; i++) {
+      final y = seed[i % seed.length] * size.height;
+      final len = 40 + seed[(i + 5) % seed.length] * 120;
+      final x = (size.width + 200) * v - len;
+      canvas.drawLine(Offset(x, y), Offset(x + len, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SpeedPainter old) => old.v != v;
+}
+
+/// Speaks the gift's sound. Kept here so any screen can trigger audio.
 void playGiftSound(String soundKey, NovaGiftTier tier) {
   NovaAudio.i.playSfx(NovaGiftCatalog.sfxKeyFor(soundKey, tier));
 }

@@ -2260,6 +2260,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   bool _pauseBusy = false;
   int _scoreB = 0;
   Timer? _giftFxTimer;
+  /// Pending gift animations, played one after another by the Gift Manager.
+  final List<Map<String, dynamic>> _giftQueue = [];
   Map<String,dynamic>? _hostProfile;
   /// Bumped for every gift so the effect widget is rebuilt fresh (and its
   /// animation restarts) even when the same gift arrives twice in a combo.
@@ -2320,10 +2322,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       final effect='${gift['effectKey'] ?? 'pulse'}';
       final resolved = NovaGiftCatalog.resolve(gift);
       playGiftSound(gift['soundKey'] == null ? '' : '${gift['soundKey']}', resolved.tier);
-      setState(() { final value = m['coins'] is num ? (m['coins'] as num).toInt() : (gift['priceCoins'] is num ? (gift['priceCoins'] as num).toInt() : 0); _giftCount++; _giftScore += value; if (_challengeId != null) _scoreA += value; chat.add({'body': '🎁 ${gift['emoji'] ?? '🎁'} ${gift['name'] ?? 'هدية'}', 'displayName': '${m['username'] ?? ''}'}); _giftFx = {...gift, 'sender': '${m['username'] ?? ''}', 'coins': value, 'effectKey': effect}; _giftFxSeq++; });
-      _giftFxTimer?.cancel();
-      final ms = (gift['effectMs'] is num ? (gift['effectMs'] as num).toInt() : 2200).clamp(1200, 6000);
-      _giftFxTimer = Timer(Duration(milliseconds: ms + 200), () { if (mounted) setState(() => _giftFx = null); });
+      final value = m['coins'] is num ? (m['coins'] as num).toInt() : (gift['priceCoins'] is num ? (gift['priceCoins'] as num).toInt() : 0);
+      setState(() { _giftCount++; _giftScore += value; if (_challengeId != null) _scoreA += value; chat.add({'body': '🎁 ${gift['emoji'] ?? '🎁'} ${gift['name'] ?? 'هدية'}', 'displayName': '${m['username'] ?? ''}'}); });
+      _enqueueGift({...gift, 'sender': '${m['username'] ?? ''}', 'coins': value, 'effectKey': effect});
     });
     if (widget.hostId != null && widget.hostId!.isNotEmpty) {
       Api.profile(widget.hostId!).then((v) { if (mounted) setState(() => _hostProfile = v); }).catchError((_) {});
@@ -3095,14 +3096,41 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       name: gift.name,
       effectKey: gift.effectKey,
       tier: gift.tier,
+      rarity: gift.rarity,
       senderName: '${g['sender'] ?? ''}',
       coins: coins.toInt(),
       hostName: widget.title,
       duration: Duration(milliseconds: (g['effectMs'] as num?)?.toInt() ?? 2600),
-      onDone: () {
-        if (mounted) setState(() => _giftFx = null);
-      },
+      onDone: _advanceGift,
     );
+  }
+
+  /// Gift Animation Manager: one effect plays at a time; the rest wait in a
+  /// queue so a burst of gifts never overlaps or drops an animation.
+  void _enqueueGift(Map<String, dynamic> fx) {
+    if (_giftFx == null) {
+      setState(() { _giftFx = fx; _giftFxSeq++; });
+      _armGiftTimer(fx);
+    } else {
+      _giftQueue.add(fx);
+    }
+  }
+
+  void _armGiftTimer(Map<String, dynamic> fx) {
+    _giftFxTimer?.cancel();
+    final ms = (fx['effectMs'] is num ? (fx['effectMs'] as num).toInt() : 2400).clamp(1200, 6000);
+    _giftFxTimer = Timer(Duration(milliseconds: ms + 500), _advanceGift);
+  }
+
+  void _advanceGift() {
+    if (!mounted) return;
+    if (_giftQueue.isNotEmpty) {
+      final next = _giftQueue.removeAt(0);
+      setState(() { _giftFx = next; _giftFxSeq++; });
+      _armGiftTimer(next);
+    } else if (_giftFx != null) {
+      setState(() => _giftFx = null);
+    }
   }
 
   @override

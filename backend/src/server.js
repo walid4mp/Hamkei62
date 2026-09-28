@@ -8,6 +8,7 @@ import {promisify} from 'util';
 import {execFile} from 'child_process';
 import https from 'https';
 import { AccessToken } from 'livekit-server-sdk';
+import { buildGiftCatalog, GIFT_CATEGORIES } from './modules/gifts.js';
 import { PERMISSIONS, ROLES, ROLE_PERMISSIONS, effectivePermissions, hasPermission, normalizeRole, expandLegacy, toArray, SUPER_ADMIN_ONLY_PERMISSIONS } from './modules/permissions.js';
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
@@ -478,6 +479,10 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "targetId" TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "result" TEXT NOT NULL DEFAULT 'OK'`,
     `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "ipAddress" TEXT NOT NULL DEFAULT ''`,
+    // Gift Engine columns.
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "rarity" TEXT NOT NULL DEFAULT 'COMMON'`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "category" TEXT NOT NULL DEFAULT 'love'`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "metadata" TEXT NOT NULL DEFAULT '{}'`,
     // Persistent live counters so taps/gifts survive leaving and re-entering.
     `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "tapCount" INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "giftCount" INTEGER NOT NULL DEFAULT 0`,
@@ -1266,7 +1271,13 @@ app.get('/api/wallet',auth,async(req,res)=>{
   const tx=await prisma.walletTransaction.findMany({where:{userId:req.user.id},orderBy:{createdAt:'desc'},take:50});
   const packages=[{productId:'nvc_100',label:'100 NovaCoins',coins:100,amountCents:99},{productId:'nvc_500',label:'500 NovaCoins',coins:500,amountCents:499},{productId:'nvc_1200',label:'1,200 NovaCoins',coins:1200,amountCents:999},{productId:'nvc_2500',label:'2,500 NovaCoins',coins:2500,amountCents:1999},{productId:'nvc_6000',label:'6,000 NovaCoins',coins:6000,amountCents:4999}];res.json({wallet,gifts,transactions:tx,packages,currency:{code:'USD',coinsPerDollar:100,minWithdrawCoins:Number(process.env.NOVA_COIN_MIN_WITHDRAW||1000),withdrawalFeeRate:Number(process.env.NOVA_COIN_WITHDRAWAL_FEE||0.10),creatorShare:Number(process.env.NOVA_COIN_CREATOR_SHARE||0.70)}});
 });
-app.get('/api/wallet/gifts',auth,async(req,res)=>res.json(await prisma.gift.findMany({where:{enabled:true},orderBy:{priceCoins:'asc'}})));
+app.get('/api/wallet/gifts',auth,async(req,res)=>{
+  try{
+    const rows=await prisma.$queryRawUnsafe('SELECT "id","slug","name","emoji","priceCoins","enabled","effectKey","effectMs","soundKey","rarity","category","metadata" FROM "Gift" WHERE "enabled"=true ORDER BY "priceCoins" ASC');
+    res.json(rows.map(r=>({...r,metadata:(()=>{try{return JSON.parse(String(r.metadata||'{}'))}catch{return {}}})()})));
+  }catch(e){res.status(500).json({error:'GIFTS_FAILED'});}
+});
+app.get('/api/gifts/categories',auth,async(req,res)=>res.json(GIFT_CATEGORIES));
 app.get('/api/wallet/received-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{receiverId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{sender:true,gift:true}}).then(xs=>xs.map(x=>({...x,sender:safe(x.sender)})))));
 app.get('/api/wallet/sent-gifts',auth,async(req,res)=>res.json(await prisma.giftTransaction.findMany({where:{senderId:req.user.id},orderBy:{createdAt:'desc'},take:100,include:{receiver:true,gift:true}}).then(xs=>xs.map(x=>({...x,receiver:safe(x.receiver)})))));
 app.post('/api/wallet/gifts/send',auth,async(req,res)=>{
@@ -1576,20 +1587,18 @@ io.on('connection',socket=>{
 });
 
 async function ensureCatalog(){
-  // Deterministic, curated gift catalog: 26 distinct gifts across four tiers.
-  // Every slug is stable ASCII, every emoji/name is unique, prices ascend 1..9999,
-  // and each gift carries its own effectKey + soundKey for the client.
-  const base=[
-    // شائعة (common) 1-49
-    ['rose','وردة','🌹',1,'rose',1200,'rose'],['heart','قلب','❤️',5,'heart',1200,'heart'],['coffee','قهوة','☕',9,'coffee',1200,'coffee'],['cake','كيكة','🎂',15,'cake',1300,'cake'],['mic','ميكروفون','🎤',22,'mic',1300,'mic'],['dumbbell','دمبل','🏋️',29,'dumbbell',1300,'dumbbell'],['ball','كرة','⚽',35,'ball',1300,'ball'],['lamp','مصباح','💡',49,'lamp',1300,'lamp'],
-    // حظ (luck) 99-499
-    ['diamond','ماسة','💎',99,'diamond',1500,'spark'],['star','نجمة','⭐',149,'star',1500,'star'],['clover','حظ','🍀',199,'clover',1500,'clover'],['dice','نرد','🎲',299,'dice',1600,'dice'],['rocket','صاروخ','🚀',399,'rocket',2200,'rocket'],['balloon','بالون','🎈',499,'balloon',1600,'balloon'],
-    // فاخرة (luxury) 999-2999
-    ['crown','تاج','👑',999,'crown',1800,'crown'],['ring','خاتم','💍',1299,'ring',2000,'ring'],['car','سيارة','🏎️',1799,'car',3000,'engine'],['yacht','يخت','🛥️',2199,'yacht',3000,'yacht'],['airplane','طائرة','✈️',2599,'airplane',3200,'jet'],['castle','قصر','🏰',2999,'castle',3000,'castle'],
-    // حصرية (exclusive) 4999-9999
-    ['galaxy','مجرة','🌌',4999,'galaxy',3000,'space'],['dragon','تنين','🐉',5999,'dragon',3200,'dragon'],['lion','أسد','🦁',6999,'lion',2200,'roar'],['spaceship','سفينة فضاء','🛸',7999,'spaceship',3200,'warp'],['crystal','كريستال','🔮',8999,'crystal',2400,'magic'],['throne','عرش','🪑',9999,'throne',3600,'royal']
-  ];
-  for(const [slug,name,emoji,price,effectKey,effectMs,soundKey] of base){await prisma.gift.upsert({where:{slug},create:{slug,name,emoji,priceCoins:price,enabled:true,effectKey,effectMs,soundKey},update:{name,emoji,priceCoins:price,enabled:true,effectKey,effectMs,soundKey}});}
+  // Gift Engine: a deterministic catalog of 200+ unique gifts generated in
+  // modules/gifts.js. Seeding is a raw upsert so the extra columns (rarity,
+  // category, metadata) work even before a Prisma client regeneration.
+  const catalog=buildGiftCatalog();
+  for(const g of catalog){
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "Gift" ("id","slug","name","emoji","priceCoins","enabled","effectKey","effectMs","soundKey","rarity","category","metadata","createdAt")
+       VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,CURRENT_TIMESTAMP)
+       ON CONFLICT ("slug") DO UPDATE SET "name"=EXCLUDED."name","emoji"=EXCLUDED."emoji","priceCoins"=EXCLUDED."priceCoins","enabled"=EXCLUDED."enabled","effectKey"=EXCLUDED."effectKey","effectMs"=EXCLUDED."effectMs","soundKey"=EXCLUDED."soundKey","rarity"=EXCLUDED."rarity","category"=EXCLUDED."category","metadata"=EXCLUDED."metadata"`,
+      g.slug,g.name,g.emoji,g.priceCoins,g.enabled,g.effectKey,g.effectMs,g.soundKey,g.rarity,g.category,JSON.stringify(g.metadata||{}),
+    );
+  }
   await prisma.commissionSetting.upsert({where:{id:'default'},create:{id:'default'},update:{}}).catch(async()=>{if(!(await prisma.commissionSetting.findFirst()))await prisma.commissionSetting.create({data:{}});});
 }
 

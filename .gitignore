@@ -27,3 +27,6 @@ npm-debug.log*
 *.iml
 .DS_Store
 *.log
+
+# Android NDK/CMake build cache
+**/.cxx/
