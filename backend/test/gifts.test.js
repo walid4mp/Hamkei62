@@ -63,3 +63,37 @@ test('permission catalog is complete and deduplicated', () => {
   }
   assert.ok(Object.keys(ROLE_PERMISSIONS).length >= 7);
 });
+
+// ── V93: the gift library contract the Flutter store now depends on ─────────
+test('every gift exposes the full V93 library contract', () => {
+  const catalog = buildGiftCatalog();
+  for (const g of catalog) {
+    for (const field of ['slug', 'name', 'nameEn', 'emoji', 'priceCoins', 'rarity', 'category',
+      'effectKey', 'effectMs', 'soundKey', 'assetKey', 'imageUrl', 'previewUrl',
+      'animationUrl', 'premium', 'sortOrder', 'metadata']) {
+      assert.ok(Object.prototype.hasOwnProperty.call(g, field), `${g.slug} is missing ${field}`);
+    }
+    assert.equal(typeof g.premium, 'boolean', `${g.slug} premium must be a boolean`);
+    assert.equal(typeof g.sortOrder, 'number', `${g.slug} sortOrder must be a number`);
+    assert.ok(g.assetKey.startsWith('gifts/'), `${g.slug} assetKey`);
+    // Artwork is uploaded later; until then the client falls back to the emoji.
+    assert.equal(typeof g.imageUrl, 'string');
+  }
+});
+
+test('premium gifts are the top two rarity bands only', () => {
+  const catalog = buildGiftCatalog();
+  for (const g of catalog) {
+    const expected = g.rarity === 'MYTHIC' || g.rarity === 'LEGENDARY';
+    assert.equal(g.premium, expected, `${g.slug} (${g.rarity}) premium mismatch`);
+  }
+  assert.ok(catalog.some((g) => g.premium), 'at least one premium gift');
+  assert.ok(catalog.some((g) => !g.premium), 'at least one free-tier gift');
+});
+
+test('nameEn is derived and never empty', () => {
+  for (const g of buildGiftCatalog()) {
+    assert.ok(g.nameEn.length > 0, `${g.slug} has no English name`);
+    assert.match(g.nameEn, /^[A-Za-z0-9 ]+$/, `${g.slug} nameEn: ${g.nameEn}`);
+  }
+});

@@ -29,6 +29,8 @@ class SocketService {
   final _callAccepted = StreamController<Map<String, dynamic>>.broadcast();
   final _callRejected = StreamController<Map<String, dynamic>>.broadcast();
   final _callReels = StreamController<Map<String, dynamic>>.broadcast();
+  final _callEnded = StreamController<Map<String, dynamic>>.broadcast();
+  final _callMissed = StreamController<Map<String, dynamic>>.broadcast();
   final _messageDelivered = StreamController<Map<String, dynamic>>.broadcast();
   final _messageRead = StreamController<Map<String, dynamic>>.broadcast();
   final _messageRequestAccepted = StreamController<Map<String, dynamic>>.broadcast();
@@ -37,6 +39,8 @@ class SocketService {
   Stream<Map<String, dynamic>> get callAccepted => _callAccepted.stream;
   Stream<Map<String, dynamic>> get callRejected => _callRejected.stream;
   Stream<Map<String, dynamic>> get callReels => _callReels.stream;
+  Stream<Map<String, dynamic>> get callEnded => _callEnded.stream;
+  Stream<Map<String, dynamic>> get callMissed => _callMissed.stream;
   Stream<Map<String, dynamic>> get messageDelivered => _messageDelivered.stream;
   Stream<Map<String, dynamic>> get messageRead => _messageRead.stream;
   Stream<Map<String, dynamic>> get messageRequestAccepted => _messageRequestAccepted.stream;
@@ -91,6 +95,8 @@ class SocketService {
       s.on('call:accept', (d) { if (d is Map) _callAccepted.add(Map<String, dynamic>.from(d)); });
       s.on('call:reject', (d) { if (d is Map) _callRejected.add(Map<String, dynamic>.from(d)); });
       s.on('call:reel', (d) { if (d is Map) _callReels.add(Map<String, dynamic>.from(d)); });
+      s.on('call:end', (d) { if (d is Map) _callEnded.add(Map<String, dynamic>.from(d)); });
+      s.on('call:missed', (d) { if (d is Map) _callMissed.add(Map<String, dynamic>.from(d)); });
       s.on('live:gift', (d) {
         if (d is Map) _liveGifts.add(Map<String, dynamic>.from(d));
       });
@@ -109,7 +115,9 @@ class SocketService {
 
   void sendCallInvite({required String to, required String roomName, required bool video, required String name, required String avatar}) { _s?.emit('call:invite', {'to':to,'roomName':roomName,'video':video,'name':name,'avatar':avatar}); }
   void sendCallAccept(String to, String roomName) { _s?.emit('call:accept', {'to':to,'roomName':roomName}); }
-  void sendCallReject(String to) { _s?.emit('call:reject', {'to':to}); }
+  void sendCallReject(String to, {String roomName = ''}) { _s?.emit('call:reject', {'to':to,'roomName':roomName}); }
+  /// V93: report the hang-up so the server can store the real duration.
+  void sendCallEnd({required String to, required String roomName}) { _s?.emit('call:end', {'to':to,'roomName':roomName}); }
   void sendCallReel({required String to, required String url, String title = ''}) { _s?.emit('call:reel', {'to': to, 'url': url, 'title': title}); }
 
   void sendMessage(String to, String body, {String effect = ''}) {

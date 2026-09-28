@@ -226,9 +226,13 @@ export function buildGiftCatalog() {
   return out.map((g, i) => {
     const value = valueFor(i);
     const rarity = rarityFor(value);
+    const slug = slugify(g.category, g.name, i);
     return {
-      slug: slugify(g.category, g.name, i),
+      slug,
       name: g.name,
+      // V93: the engine is the source of truth for the whole gift library
+      // contract, so the store can render it without a Flutter release.
+      nameEn: slug.replace(/_/g, ' ').replace(/\b([a-z])/g, (m) => m.toUpperCase()),
       emoji: g.emoji,
       priceCoins: value,
       rarity,
@@ -237,6 +241,14 @@ export function buildGiftCatalog() {
       effectMs: durationFor(rarity),
       soundKey: SOUND_BY_RARITY[rarity] || 'common',
       enabled: true,
+      // Real artwork is uploaded to the Asset library later; until an admin
+      // replaces it, the client falls back to the emoji + rarity frame.
+      imageUrl: '',
+      previewUrl: '',
+      animationUrl: '',
+      assetKey: `gifts/${g.category}/${slug}`,
+      premium: rarity === 'MYTHIC' || rarity === 'LEGENDARY',
+      sortOrder: i,
       metadata: { tier: rarity, order: i },
     };
   });

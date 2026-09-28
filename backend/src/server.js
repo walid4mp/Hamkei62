@@ -9,6 +9,7 @@ import {execFile} from 'child_process';
 import https from 'https';
 import { AccessToken } from 'livekit-server-sdk';
 import { buildGiftCatalog, GIFT_CATEGORIES } from './modules/gifts.js';
+import { CALL_STATUS, RING_TIMEOUT_MS, isTerminal, normalizeKind, makeCallRoomName, isValidRoomName, computeDurationSec, resolveEndStatus, resolveTimeoutStatus, canTransition, callNotificationText } from './modules/calls.js';
 import { liveStaffCan } from './modules/permissions.js';
 import { PERMISSIONS, ROLES, ROLE_PERMISSIONS, effectivePermissions, hasPermission, normalizeRole, expandLegacy, toArray, SUPER_ADMIN_ONLY_PERMISSIONS } from './modules/permissions.js';
 const __filename=fileURLToPath(import.meta.url);
@@ -68,7 +69,34 @@ if(!JWT_SECRET||JWT_SECRET==='change-me'){
   JWT_SECRET=crypto.randomBytes(48).toString('hex');
   console.warn('[security] JWT_SECRET is not set (or is the default) — using a random ephemeral secret. Set JWT_SECRET in production.');
 }
-const safe=u=>{if(!u)return null; const {passwordHash,...x}=u; return x}; const sign=u=>jwt.sign({id:u.id,username:u.username,email:u.email,role:u.role||'USER',tv:Number(u.tokenVersion||0)},JWT_SECRET,{expiresIn:'30d'});
+const safe=u=>{if(!u)return null; const {passwordHash,...x}=u; return x};
+// V93: dependency-free sliding-window rate limiter.
+// Login/register are brute-force targets, so they get a much smaller budget.
+const rateBuckets=new Map();
+function rateLimit({windowMs=60000,max=240,scope='global',identity}={}){
+  return function(req,res,next){
+    const who=(identity?identity(req):(req.ip||req.socket?.remoteAddress||'anon'));
+    const slot=Math.floor(Date.now()/windowMs);
+    const key=`${scope}:${who}:${slot}`;
+    const used=(rateBuckets.get(key)||0)+1;
+    rateBuckets.set(key,used);
+    res.setHeader('X-RateLimit-Limit',String(max));
+    res.setHeader('X-RateLimit-Remaining',String(Math.max(0,max-used)));
+    if(used>max){
+      res.setHeader('Retry-After',String(Math.ceil(windowMs/1000)));
+      return res.status(429).json({error:'RATE_LIMITED',retryAfterSec:Math.ceil(windowMs/1000)});
+    }
+    next();
+  };
+}
+// Drop buckets from finished windows so the map cannot grow without bound.
+setInterval(()=>{const now=Date.now();for(const k of rateBuckets.keys()){const slot=Number(k.split(':').pop());if(Number.isFinite(slot)&&slot*60000<now-120000)rateBuckets.delete(k);}},60000).unref?.();
+const authLimiter=rateLimit({windowMs:60000,max:12,scope:'auth'});
+const writeLimiter=rateLimit({windowMs:60000,max:180,scope:'write'});
+app.use('/api',rateLimit({windowMs:60000,max:600,scope:'api'}));
+// V93: JSON columns that pre-date the Prisma models are TEXT, so normalise them.
+const safeJson=(v,fallback={})=>{ if(v==null||v==='')return fallback; if(typeof v==='object')return v; try{return JSON.parse(String(v));}catch{return fallback;} };
+const sign=u=>jwt.sign({id:u.id,username:u.username,email:u.email,role:u.role||'USER',tv:Number(u.tokenVersion||0)},JWT_SECRET,{expiresIn:'30d'});
 const RELATIONSHIP_TYPES=new Set(['SINGLE','IN_RELATIONSHIP','ENGAGED','MARRIED','CIVIL_UNION','DOMESTIC_PARTNERSHIP','OPEN_RELATIONSHIP','COMPLICATED','SEPARATED','DIVORCED','WIDOWED']);
 async function relationshipFor(userId, viewerId){
   const user=await prisma.user.findUnique({where:{id:userId},select:{relationshipStatus:true,relationshipSince:true}});
@@ -514,6 +542,16 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "rarity" TEXT NOT NULL DEFAULT 'COMMON'`,
     `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "category" TEXT NOT NULL DEFAULT 'love'`,
     `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "metadata" TEXT NOT NULL DEFAULT '{}'`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "nameEn" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "previewUrl" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "animationUrl" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "assetKey" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "premium" BOOLEAN NOT NULL DEFAULT false`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "sortOrder" INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE "Gift" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `CREATE INDEX IF NOT EXISTS "Gift_enabled_category_idx" ON "Gift"("enabled","category")`,
+    `CREATE INDEX IF NOT EXISTS "Gift_enabled_rarity_idx" ON "Gift"("enabled","rarity")`,
     // Persistent live counters so taps/gifts survive leaving and re-entering.
     `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "tapCount" INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE "LiveRoom" ADD COLUMN IF NOT EXISTS "giftCount" INTEGER NOT NULL DEFAULT 0`,
@@ -640,7 +678,35 @@ async function ensureSchemaCompatibility(){
     `CREATE TABLE IF NOT EXISTS "AiCoachSession" ("id" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"goal" TEXT NOT NULL,"prompt" TEXT NOT NULL,"response" TEXT NOT NULL,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "AiCoachSession_userId_fkey" FOREIGN KEY("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE)`,
     `CREATE TABLE IF NOT EXISTS "AdminProfileAssignment" ("id" TEXT PRIMARY KEY,"actorId" TEXT NOT NULL,"targetUserId" TEXT NOT NULL,"permissions" TEXT NOT NULL DEFAULT '[]',"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "AdminProfileAssignment_actorId_fkey" FOREIGN KEY("actorId") REFERENCES "User"("id") ON DELETE CASCADE,CONSTRAINT "AdminProfileAssignment_targetUserId_fkey" FOREIGN KEY("targetUserId") REFERENCES "User"("id") ON DELETE CASCADE,CONSTRAINT "AdminProfileAssignment_actor_target_key" UNIQUE("actorId","targetUserId"))`,
     `CREATE INDEX IF NOT EXISTS "AdminProfileAssignment_targetUserId_idx" ON "AdminProfileAssignment"("targetUserId")`,
-    `CREATE INDEX IF NOT EXISTS "AdminProfileAssignment_actorId_idx" ON "AdminProfileAssignment"("actorId")`
+    `CREATE INDEX IF NOT EXISTS "AdminProfileAssignment_actorId_idx" ON "AdminProfileAssignment"("actorId")`,
+    // ---- V93: calls, story views, creator-milestone rewards (additive only) ----
+    `DO $$ BEGIN ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'CALL'; EXCEPTION WHEN undefined_object THEN NULL; END $$`,
+    `DO $$ BEGIN ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'STORY'; EXCEPTION WHEN undefined_object THEN NULL; END $$`,
+    `DO $$ BEGIN ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'REWARD'; EXCEPTION WHEN undefined_object THEN NULL; END $$`,
+    `DO $$ BEGIN ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'MILESTONE'; EXCEPTION WHEN undefined_object THEN NULL; END $$`,
+    `DO $$ BEGIN ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'ADMIN'; EXCEPTION WHEN undefined_object THEN NULL; END $$`,
+    `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "reward" TEXT NOT NULL DEFAULT '{}'`,
+    `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `CREATE TABLE IF NOT EXISTS "CreatorMilestoneReward" ("id" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"milestoneId" TEXT NOT NULL,"grantedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"payload" TEXT NOT NULL DEFAULT '{}')`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_milestoneId_key" ON "CreatorMilestoneReward"("userId","milestoneId")`,
+    `CREATE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_grantedAt_idx" ON "CreatorMilestoneReward"("userId","grantedAt")`,
+    `ALTER TABLE "Asset" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `CREATE INDEX IF NOT EXISTS "Asset_type_enabled_idx" ON "Asset"("type","enabled")`,
+    `CREATE INDEX IF NOT EXISTS "Asset_enabled_premium_idx" ON "Asset"("enabled","premium")`,
+    `CREATE TABLE IF NOT EXISTS "StoryView" ("id" TEXT PRIMARY KEY,"storyId" TEXT NOT NULL,"userId" TEXT NOT NULL,"views" INTEGER NOT NULL DEFAULT 1,"firstViewedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"lastViewedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "StoryView_storyId_fkey" FOREIGN KEY("storyId") REFERENCES "Story"("id") ON DELETE CASCADE ON UPDATE CASCADE,CONSTRAINT "StoryView_userId_fkey" FOREIGN KEY("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "StoryView_storyId_userId_key" ON "StoryView"("storyId","userId")`,
+    `CREATE INDEX IF NOT EXISTS "StoryView_storyId_lastViewedAt_idx" ON "StoryView"("storyId","lastViewedAt")`,
+    `CREATE INDEX IF NOT EXISTS "StoryView_userId_lastViewedAt_idx" ON "StoryView"("userId","lastViewedAt")`,
+    `CREATE TABLE IF NOT EXISTS "Call" ("id" TEXT PRIMARY KEY,"roomName" TEXT UNIQUE NOT NULL,"callerId" TEXT NOT NULL,"receiverId" TEXT NOT NULL,"kind" TEXT NOT NULL DEFAULT 'AUDIO',"status" TEXT NOT NULL DEFAULT 'RINGING',"startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"answeredAt" TIMESTAMP(3),"endedAt" TIMESTAMP(3),"durationSec" INTEGER NOT NULL DEFAULT 0,"endedById" TEXT NOT NULL DEFAULT '',"endReason" TEXT NOT NULL DEFAULT '',"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "Call_callerId_fkey" FOREIGN KEY("callerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,CONSTRAINT "Call_receiverId_fkey" FOREIGN KEY("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE)`,
+    `CREATE INDEX IF NOT EXISTS "Call_callerId_startedAt_idx" ON "Call"("callerId","startedAt")`,
+    `CREATE INDEX IF NOT EXISTS "Call_receiverId_startedAt_idx" ON "Call"("receiverId","startedAt")`,
+    `CREATE INDEX IF NOT EXISTS "Call_status_startedAt_idx" ON "Call"("status","startedAt")`,
+    `CREATE TABLE IF NOT EXISTS "CallParticipant" ("id" TEXT PRIMARY KEY,"callId" TEXT NOT NULL,"userId" TEXT NOT NULL,"role" TEXT NOT NULL DEFAULT 'MEMBER',"joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"leftAt" TIMESTAMP(3),CONSTRAINT "CallParticipant_callId_fkey" FOREIGN KEY("callId") REFERENCES "Call"("id") ON DELETE CASCADE ON UPDATE CASCADE,CONSTRAINT "CallParticipant_userId_fkey" FOREIGN KEY("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "CallParticipant_callId_userId_key" ON "CallParticipant"("callId","userId")`,
+    `CREATE INDEX IF NOT EXISTS "CallParticipant_userId_joinedAt_idx" ON "CallParticipant"("userId","joinedAt")`,
+    `CREATE TABLE IF NOT EXISTS "CallEvent" ("id" TEXT PRIMARY KEY,"callId" TEXT NOT NULL,"type" TEXT NOT NULL,"actorId" TEXT NOT NULL DEFAULT '',"payload" TEXT NOT NULL DEFAULT '{}',"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT "CallEvent_callId_fkey" FOREIGN KEY("callId") REFERENCES "Call"("id") ON DELETE CASCADE ON UPDATE CASCADE)`,
+    `CREATE INDEX IF NOT EXISTS "CallEvent_callId_createdAt_idx" ON "CallEvent"("callId","createdAt")`
   ];
   for(const sql of statements){
     try{ await prisma.$executeRawUnsafe(sql); }
@@ -907,8 +973,8 @@ app.post('/api/admin/device-bans/:id/revoke',auth,admin,async(req,res)=>{
   res.json({ok:true});
 });
 app.get('/api/health',(req,res)=>res.json({ok:true,service:'SocialNova API',version:'3.0.0',time:new Date().toISOString()}));
-app.post('/api/auth/register',requireAllowedDevice,async(req,res)=>{try{const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(6),displayName:z.string().min(2).max(60),deviceId:z.string().max(256).optional()}).parse(req.body);const deviceId=rawDeviceId(req,d);if(deviceId && await isDeviceBanned(deviceId))return res.status(403).json({error:'DEVICE_BANNED'});const exists=await prisma.user.findFirst({where:{OR:[{email:d.email},{username:d.username}]}});if(exists)return res.status(409).json({error:'EMAIL_OR_USERNAME_EXISTS'});const{password:pw,deviceId:_device,...rest}=d;const u=await prisma.user.create({data:{...rest,passwordHash:await bcrypt.hash(pw,12)}});await rememberDevice(u.id,deviceId);res.status(201).json({user:publicUser(u),token:sign(u)})}catch(e){res.status(400).json({error:e.message})}});
-app.post('/api/auth/login',requireAllowedDevice,async(req,res)=>{const d=req.body||{};if(rawDeviceId(req,d) && await isDeviceBanned(rawDeviceId(req,d)))return res.status(403).json({error:'DEVICE_BANNED'});const u=await prisma.user.findFirst({where:{OR:[{email:d.login},{username:d.login}]}});if(!u||u.isBanned||!(await bcrypt.compare(d.password||'',u.passwordHash)))return res.status(401).json({error:'INVALID_CREDENTIALS'});if(u.isDeactivated===true)return res.status(403).json({error:'ACCOUNT_CLOSED'});const isAdmin=effectiveFor(u).length>0;await rememberDevice(u.id,rawDeviceId(req,d));res.json({user:publicUser(u),isAdmin,token:sign(u)})});
+app.post('/api/auth/register',authLimiter,requireAllowedDevice,async(req,res)=>{try{const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(6),displayName:z.string().min(2).max(60),deviceId:z.string().max(256).optional()}).parse(req.body);const deviceId=rawDeviceId(req,d);if(deviceId && await isDeviceBanned(deviceId))return res.status(403).json({error:'DEVICE_BANNED'});const exists=await prisma.user.findFirst({where:{OR:[{email:d.email},{username:d.username}]}});if(exists)return res.status(409).json({error:'EMAIL_OR_USERNAME_EXISTS'});const{password:pw,deviceId:_device,...rest}=d;const u=await prisma.user.create({data:{...rest,passwordHash:await bcrypt.hash(pw,12)}});await rememberDevice(u.id,deviceId);res.status(201).json({user:publicUser(u),token:sign(u)})}catch(e){res.status(400).json({error:e.message})}});
+app.post('/api/auth/login',authLimiter,requireAllowedDevice,async(req,res)=>{const d=req.body||{};if(rawDeviceId(req,d) && await isDeviceBanned(rawDeviceId(req,d)))return res.status(403).json({error:'DEVICE_BANNED'});const u=await prisma.user.findFirst({where:{OR:[{email:d.login},{username:d.login}]}});if(!u||u.isBanned||!(await bcrypt.compare(d.password||'',u.passwordHash)))return res.status(401).json({error:'INVALID_CREDENTIALS'});if(u.isDeactivated===true)return res.status(403).json({error:'ACCOUNT_CLOSED'});const isAdmin=effectiveFor(u).length>0;await rememberDevice(u.id,rawDeviceId(req,d));res.json({user:publicUser(u),isAdmin,token:sign(u)})});
 app.get('/api/me',auth,async(req,res)=>{const u=await prisma.user.findUnique({where:{id:req.user.id}});if(!u)return res.status(404).json({error:'NOT_FOUND'});const [followers,following,posts,relationship]=await Promise.all([prisma.follow.count({where:{followingId:u.id}}),prisma.follow.count({where:{followerId:u.id}}),prisma.post.count({where:{authorId:u.id}}),relationshipFor(u.id,u.id)]);res.json({user:{...publicUser(u),followers,following,posts,relationshipType:relationship.type,relationship}})});
 app.post('/api/account/close',auth,async(req,res)=>{try{await prisma.user.update({where:{id:req.user.id},data:{isDeactivated:true,deactivatedAt:new Date()}});res.json({ok:true})}catch(e){res.status(500).json({error:'ACCOUNT_CLOSE_FAILED'})}});
 app.post('/api/account/reactivate',auth,async(req,res)=>{try{await prisma.user.update({where:{id:req.user.id},data:{isDeactivated:false,deactivatedAt:null}});res.json({ok:true})}catch(e){res.status(500).json({error:'ACCOUNT_REACTIVATE_FAILED'})}});
@@ -981,6 +1047,39 @@ app.post('/api/stories/:id/replies',auth,async(req,res)=>{try{const story=await 
 app.get('/api/stories/:id/replies',auth,async(req,res)=>{const rows=await prisma.storyReply.findMany({where:{storyId:req.params.id},orderBy:{createdAt:'asc'},take:100,include:{author:true}});res.json(rows.map(r=>({...r,author:safe(r.author)})))});
 app.patch('/api/stories/:id',auth,async(req,res)=>{try{const s=await prisma.story.findUnique({where:{id:req.params.id}});if(!s)return res.status(404).json({error:'NOT_FOUND'});if(s.authorId!==req.user.id)return res.status(403).json({error:'FORBIDDEN'});const d=z.object({caption:z.string().max(500).optional(),durationHours:z.number().min(1).max(48).optional(),audienceMode:z.enum(['EVERYONE','CLOSE_FRIENDS','HIDDEN']).optional(),hiddenUserIds:z.array(z.string()).max(200).optional(),rotationDegrees:z.number().int().min(0).max(359).optional(),overlayText:z.string().max(500).optional(),overlayEmoji:z.string().max(20).optional(),overlayImageUrl:z.string().max(5000).optional(),musicUrl:z.string().max(5000).optional(),musicTitle:z.string().max(200).optional()}).parse(req.body);const author=await prisma.user.findUnique({where:{id:req.user.id},select:{isVerified:true,verificationTier:true,verificationExpiresAt:true}});const verified=!!author?.isVerified&&author.verificationTier!=='NONE'&&(!author.verificationExpiresAt||author.verificationExpiresAt>new Date());if(d.durationHours!==undefined){const h=[6,12,24,48].includes(d.durationHours)?d.durationHours:24;if(h!==24&&!verified)return res.status(403).json({error:'VERIFIED_ONLY_DURATION'});d.durationHours=h;}const data={...d};if(d.hiddenUserIds)data.hiddenUserIds=d.hiddenUserIds.join(',');if(d.durationHours)data.expiresAt=new Date(s.createdAt.getTime()+d.durationHours*3600000);delete data.durationHours;res.json(await prisma.story.update({where:{id:s.id},data,include:{author:true}}))}catch(e){res.status(400).json({error:'VALIDATION_ERROR'})}});
 app.delete('/api/stories/:id',auth,async(req,res)=>{const s=await prisma.story.findUnique({where:{id:req.params.id}});if(!s)return res.status(404).json({error:'NOT_FOUND'});if(s.authorId!==req.user.id)return res.status(403).json({error:'FORBIDDEN'});await prisma.story.delete({where:{id:s.id}});res.json({ok:true})});
+
+// ---- V93 StoryView: who saw a story, when, and how many times --------------
+/// Records a view. Repeated views by the same user bump `views`/`lastViewedAt`
+/// instead of creating rows, so the counter stays honest.
+app.post('/api/stories/:id/view',auth,async(req,res)=>{
+  const story=await prisma.story.findUnique({where:{id:req.params.id}});
+  if(!story)return res.status(404).json({error:'NOT_FOUND'});
+  if(story.authorId===req.user.id){
+    const count=await prisma.storyView.count({where:{storyId:story.id}});
+    return res.json({ok:true,ownStory:true,viewers:count});
+  }
+  const now=new Date();
+  await prisma.storyView.upsert({where:{storyId_userId:{storyId:story.id,userId:req.user.id}},create:{storyId:story.id,userId:req.user.id,views:1,lastViewedAt:now},update:{views:{increment:1},lastViewedAt:now}});
+  const count=await prisma.storyView.count({where:{storyId:story.id}});
+  res.json({ok:true,viewers:count});
+});
+
+/// Author-only viewer list ("من شاهد ومتى").
+app.get('/api/stories/:id/viewers',auth,async(req,res)=>{
+  const story=await prisma.story.findUnique({where:{id:req.params.id}});
+  if(!story)return res.status(404).json({error:'NOT_FOUND'});
+  if(story.authorId!==req.user.id)return res.status(403).json({error:'FORBIDDEN'});
+  const rows=await prisma.storyView.findMany({where:{storyId:story.id},orderBy:{lastViewedAt:'desc'},take:500,include:{user:true}});
+  res.json({storyId:story.id,totalViews:rows.reduce((a,r)=>a+r.views,0),uniqueViewers:rows.length,viewers:rows.map(r=>({...r,user:safe(r.user)}))});
+});
+
+/// Which of these stories the caller has already seen (status-circle state).
+app.get('/api/stories/seen',auth,async(req,res)=>{
+  const ids=String(req.query.ids||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,300);
+  if(!ids.length)return res.json({seen:[]});
+  const rows=await prisma.storyView.findMany({where:{userId:req.user.id,storyId:{in:ids}},select:{storyId:true,views:true,lastViewedAt:true}});
+  res.json({seen:rows});
+});
 app.get('/api/users/:id/profile',auth,async(req,res)=>{
   const u=await prisma.user.findUnique({where:{id:req.params.id}});
   if(!u)return res.status(404).json({error:'NOT_FOUND'});
@@ -1051,9 +1150,9 @@ app.get('/api/search',auth,async(req,res)=>{
   }catch(e){console.error('[search] failed',e);res.status(500).json({error:'SEARCH_FAILED'});}
 });
 
-app.post('/api/users/:id/follow',auth,async(req,res)=>{if(req.params.id===req.user.id)return res.status(400).json({error:'SELF'});const target=await prisma.user.findUnique({where:{id:req.params.id}});if(!target)return res.status(404).json({error:'NOT_FOUND'});const key={followerId:req.user.id,followingId:target.id};const old=await prisma.follow.findUnique({where:{followerId_followingId:key}});if(old){await prisma.follow.delete({where:{followerId_followingId:key}});await prisma.followRequest.deleteMany({where:{senderId:req.user.id,targetId:target.id,status:'PENDING'}});return res.json({following:false,requested:false});}if(target.isPrivate){const reqq=await prisma.followRequest.upsert({where:{senderId_targetId:{senderId:req.user.id,targetId:target.id}},update:{status:'PENDING'},create:{senderId:req.user.id,targetId:target.id}});await prisma.notification.create({data:{userId:target.id,type:'FOLLOW',text:'لديك طلب متابعة جديد'}}).catch(()=>{});return res.json({following:false,requested:reqq.status==='PENDING'});}await prisma.follow.create({data:key});await prisma.notification.create({data:{userId:target.id,type:'FOLLOW',text:'بدأ شخص بمتابعتك'}});res.json({following:true,requested:false})});
+app.post('/api/users/:id/follow',auth,async(req,res)=>{if(req.params.id===req.user.id)return res.status(400).json({error:'SELF'});const target=await prisma.user.findUnique({where:{id:req.params.id}});if(!target)return res.status(404).json({error:'NOT_FOUND'});const key={followerId:req.user.id,followingId:target.id};const old=await prisma.follow.findUnique({where:{followerId_followingId:key}});if(old){await prisma.follow.delete({where:{followerId_followingId:key}});await prisma.followRequest.deleteMany({where:{senderId:req.user.id,targetId:target.id,status:'PENDING'}});return res.json({following:false,requested:false});}if(target.isPrivate){const reqq=await prisma.followRequest.upsert({where:{senderId_targetId:{senderId:req.user.id,targetId:target.id}},update:{status:'PENDING'},create:{senderId:req.user.id,targetId:target.id}});await prisma.notification.create({data:{userId:target.id,type:'FOLLOW',text:'لديك طلب متابعة جديد'}}).catch(()=>{});return res.json({following:false,requested:reqq.status==='PENDING'});}await prisma.follow.create({data:key});await prisma.notification.create({data:{userId:target.id,type:'FOLLOW',text:'بدأ شخص بمتابعتك'}});const unlocked=await grantCreatorMilestones(target.id).catch(()=>[]);res.json({following:true,requested:false,milestones:unlocked.map(m=>m.title)})});
 app.get('/api/follow-requests',auth,async(req,res)=>{const rows=await prisma.followRequest.findMany({where:{targetId:req.user.id,status:'PENDING'},orderBy:{createdAt:'desc'},include:{sender:true}});res.json(rows.map(x=>({...x,sender:safe(x.sender)})));});
-app.post('/api/follow-requests/:id/accept',auth,async(req,res)=>{const q=await prisma.followRequest.findUnique({where:{id:req.params.id}});if(!q||q.targetId!==req.user.id)return res.status(404).json({error:'NOT_FOUND'});await prisma.$transaction([prisma.follow.create({data:{followerId:q.senderId,followingId:q.targetId}}),prisma.followRequest.update({where:{id:q.id},data:{status:'ACCEPTED'}})]);res.json({ok:true});});
+app.post('/api/follow-requests/:id/accept',auth,async(req,res)=>{const q=await prisma.followRequest.findUnique({where:{id:req.params.id}});if(!q||q.targetId!==req.user.id)return res.status(404).json({error:'NOT_FOUND'});await prisma.$transaction([prisma.follow.create({data:{followerId:q.senderId,followingId:q.targetId}}),prisma.followRequest.update({where:{id:q.id},data:{status:'ACCEPTED'}})]);await grantCreatorMilestones(q.targetId).catch(()=>{});res.json({ok:true});});
 app.post('/api/follow-requests/:id/reject',auth,async(req,res)=>{const q=await prisma.followRequest.findUnique({where:{id:req.params.id}});if(!q||q.targetId!==req.user.id)return res.status(404).json({error:'NOT_FOUND'});await prisma.followRequest.update({where:{id:q.id},data:{status:'REJECTED'}});res.json({ok:true});});
 app.patch('/api/relationships/status',auth,async(req,res)=>{try{const d=z.object({type:z.string().min(1).max(40),since:z.string().datetime().nullable().optional()}).parse(req.body);if(!RELATIONSHIP_TYPES.has(d.type))return res.status(400).json({error:'INVALID_RELATIONSHIP_TYPE'});const active=await prisma.relationship.findFirst({where:{status:{in:['ACTIVE','PENDING']},OR:[{requesterId:req.user.id},{partnerId:req.user.id}]}});if(active)return res.status(409).json({error:'END_RELATIONSHIP_FIRST'});const u=await prisma.user.update({where:{id:req.user.id},data:{relationshipStatus:d.type,relationshipSince:d.since?new Date(d.since):null}});res.json({type:u.relationshipStatus,status:'NONE',since:u.relationshipSince,partner:null});}catch(e){res.status(400).json({error:'RELATIONSHIP_STATUS_FAILED'})}});
 app.get('/api/relationships/current',auth,async(req,res)=>res.json(await relationshipFor(req.user.id,req.user.id)));
@@ -1197,9 +1296,128 @@ app.post('/api/live',auth,async(req,res)=>{
 app.post('/api/calls/token',auth,async(req,res)=>{
   if(!livekitConfigured())return res.status(503).json({error:'LIVEKIT_NOT_CONFIGURED'});
   const roomName=String(req.body?.roomName||'').trim();
-  if(!/^call_[A-Za-z0-9_-]{3,180}$/.test(roomName))return res.status(400).json({error:'VALIDATION_ERROR'});
+  if(!isValidRoomName(roomName))return res.status(400).json({error:'VALIDATION_ERROR'});
+  // V93: a call token is only issued to a party of a real, non-terminal call.
+  const call=await prisma.call.findUnique({where:{roomName}}).catch(()=>null);
+  if(call){
+    if(call.callerId!==req.user.id&&call.receiverId!==req.user.id)return res.status(403).json({error:'NOT_A_CALL_PARTICIPANT'});
+    if(isTerminal(call.status))return res.status(409).json({error:'CALL_ENDED'});
+  }
   const token=await livekitToken(req.user.id,roomName,true);
   res.json({url:process.env.LIVEKIT_URL,token,roomName,canPublish:true});
+});
+
+// ---- V93 Calls: real records, not just signalling -------------------------
+const callPeers=(call)=>({callerId:call.callerId,receiverId:call.receiverId});
+
+async function callWithPeers(idOrRoom,by='id'){
+  const call=await prisma.call.findUnique({where:by==='room'?{roomName:idOrRoom}:{id:idOrRoom},include:{events:{orderBy:{createdAt:'asc'},take:100}}});
+  if(!call)return null;
+  const [caller,receiver]=await Promise.all([prisma.user.findUnique({where:{id:call.callerId}}),prisma.user.findUnique({where:{id:call.receiverId}})]);
+  return {...call,caller:caller?safe(caller):null,receiver:receiver?safe(receiver):null};
+}
+
+async function logCallEvent(callId,type,actorId='',payload={}){
+  await prisma.callEvent.create({data:{callId,type,actorId,payload:JSON.stringify(payload||{})}}).catch(()=>{});
+}
+
+/// Ring timeout sweeper: unanswered calls become MISSED and notify the receiver.
+async function expireStaleCalls(){
+  try{
+    const cutoff=new Date(Date.now()-RING_TIMEOUT_MS);
+    const stale=await prisma.call.findMany({where:{status:CALL_STATUS.RINGING,startedAt:{lt:cutoff}},take:50});
+    for(const call of stale){
+      const endedAt=new Date();
+      const updated=await prisma.call.update({where:{id:call.id},data:{status:CALL_STATUS.MISSED,endedAt,durationSec:0,endReason:'RING_TIMEOUT'}}).catch(()=>null);
+      if(!updated)continue;
+      await logCallEvent(call.id,CALL_STATUS.MISSED,'',{reason:'RING_TIMEOUT'});
+      io.to(`user:${call.receiverId}`).emit('call:missed',{callId:call.id,roomName:call.roomName,from:call.callerId,at:endedAt.toISOString()});
+      io.to(`user:${call.callerId}`).emit('call:missed',{callId:call.id,roomName:call.roomName,from:call.callerId,at:endedAt.toISOString()});
+      await prisma.notification.create({data:{userId:call.receiverId,type:'CALL',text:'لديك مكالمة فائتة'}}).catch(()=>{});
+    }
+  }catch(e){console.warn('[calls sweeper]',e.message);}
+}
+setInterval(expireStaleCalls,15000).unref?.();
+
+app.post('/api/calls/start',auth,async(req,res)=>{
+  const receiverId=String(req.body?.receiverId||'').trim();
+  const kind=normalizeKind(req.body?.kind);
+  if(!receiverId||receiverId===req.user.id)return res.status(400).json({error:'INVALID_RECEIVER'});
+  const receiver=await prisma.user.findUnique({where:{id:receiverId}});
+  if(!receiver||receiver.isBanned)return res.status(404).json({error:'USER_NOT_FOUND'});
+  const prior=await prisma.call.findFirst({where:{OR:[{callerId:req.user.id,receiverId},{callerId:receiverId,receiverId:req.user.id}],status:{in:[CALL_STATUS.RINGING,CALL_STATUS.ACCEPTED]}}});
+  if(prior)return res.status(409).json({error:'CALL_ALREADY_ACTIVE',call:await callWithPeers(prior.id)});
+  const roomName=makeCallRoomName(crypto.randomUUID());
+  const call=await prisma.call.create({data:{roomName,callerId:req.user.id,receiverId,kind,status:CALL_STATUS.RINGING,
+    participants:{create:[{userId:req.user.id,role:'CALLER'}]}}});
+  await logCallEvent(call.id,'INVITED',req.user.id,{kind,roomName});
+  io.to(`user:${receiverId}`).emit('call:invite',{callId:call.id,roomName,from:req.user.id,fromName:req.user.displayName||req.user.username,video:kind==='VIDEO',kind});
+  res.status(201).json(await callWithPeers(call.id));
+});
+
+app.post('/api/calls/:id/accept',auth,async(req,res)=>{
+  const call=await prisma.call.findUnique({where:{id:req.params.id}});
+  if(!call)return res.status(404).json({error:'CALL_NOT_FOUND'});
+  if(!canTransition({actorId:req.user.id,callerId:call.callerId,receiverId:call.receiverId,currentStatus:call.status,next:CALL_STATUS.ACCEPTED}))return res.status(403).json({error:'CALL_TRANSITION_NOT_ALLOWED'});
+  const answeredAt=new Date();
+  const updated=await prisma.call.update({where:{id:call.id},data:{status:CALL_STATUS.ACCEPTED,answeredAt}});
+  await prisma.callParticipant.upsert({where:{callId_userId:{callId:call.id,userId:req.user.id}},create:{callId:call.id,userId:req.user.id,role:req.user.id===call.callerId?'CALLER':'RECEIVER'},update:{joinedAt:new Date(),leftAt:null}});
+  await logCallEvent(call.id,CALL_STATUS.ACCEPTED,req.user.id);
+  io.to(`user:${call.callerId}`).emit('call:accept',{callId:call.id,roomName:call.roomName,from:req.user.id});
+  res.json(updated);
+});
+
+app.post('/api/calls/:id/reject',auth,async(req,res)=>{
+  const call=await prisma.call.findUnique({where:{id:req.params.id}});
+  if(!call)return res.status(404).json({error:'CALL_NOT_FOUND'});
+  if(!canTransition({actorId:req.user.id,callerId:call.callerId,receiverId:call.receiverId,currentStatus:call.status,next:CALL_STATUS.REJECTED}))return res.status(403).json({error:'CALL_TRANSITION_NOT_ALLOWED'});
+  const endedAt=new Date();
+  const updated=await prisma.call.update({where:{id:call.id},data:{status:CALL_STATUS.REJECTED,endedAt,durationSec:0,endedById:req.user.id,endReason:'REJECTED'}});
+  await logCallEvent(call.id,CALL_STATUS.REJECTED,req.user.id);
+  io.to(`user:${call.callerId}`).emit('call:reject',{callId:call.id,roomName:call.roomName,from:req.user.id});
+  res.json(updated);
+});
+
+app.post('/api/calls/:id/end',auth,async(req,res)=>{
+  const call=await prisma.call.findUnique({where:{id:req.params.id}});
+  if(!call)return res.status(404).json({error:'CALL_NOT_FOUND'});
+  if(!canTransition({actorId:req.user.id,callerId:call.callerId,receiverId:call.receiverId,currentStatus:call.status,next:CALL_STATUS.ENDED}))return res.status(403).json({error:'CALL_TRANSITION_NOT_ALLOWED'});
+  const endedAt=new Date();
+  const status=resolveEndStatus(call.status,call.answeredAt);
+  const durationSec=computeDurationSec(call.answeredAt,endedAt);
+  const updated=await prisma.call.update({where:{id:call.id},data:{status,endedAt,durationSec,endedById:req.user.id,endReason:String(req.body?.reason||'').slice(0,80)}});
+  await prisma.callParticipant.updateMany({where:{callId:call.id,leftAt:null},data:{leftAt:endedAt}});
+  await logCallEvent(call.id,status,req.user.id,{durationSec});
+  const peer=req.user.id===call.callerId?call.receiverId:call.callerId;
+  io.to(`user:${peer}`).emit('call:end',{callId:call.id,roomName:call.roomName,status,durationSec,from:req.user.id});
+  if(status===CALL_STATUS.MISSED){
+    await prisma.notification.create({data:{userId:call.receiverId,type:'CALL',text:callNotificationText({status:'MISSED',name:req.user.displayName||req.user.username,video:call.kind==='VIDEO'})}}).catch(()=>{});
+  }
+  res.json(updated);
+});
+
+app.get('/api/calls/history',auth,async(req,res)=>{
+  const limit=Math.max(1,Math.min(100,Number(req.query.limit||50)));
+  const rows=await prisma.call.findMany({where:{OR:[{callerId:req.user.id},{receiverId:req.user.id}]},orderBy:{startedAt:'desc'},take:limit});
+  const ids=[...new Set(rows.flatMap(r=>[r.callerId,r.receiverId]))];
+  const users=await prisma.user.findMany({where:{id:{in:ids}}});
+  const byId=new Map(users.map(u=>[u.id,safe(u)]));
+  res.json(rows.map(r=>({
+    ...r,
+    direction:r.callerId===req.user.id?'OUTGOING':'INCOMING',
+    missed:r.status===CALL_STATUS.MISSED&&r.receiverId===req.user.id,
+    peer:byId.get(r.callerId===req.user.id?r.receiverId:r.callerId)||null,
+    caller:byId.get(r.callerId)||null,
+    receiver:byId.get(r.receiverId)||null,
+  })));
+});
+
+app.get('/api/calls/:id',auth,async(req,res)=>{
+  const call=await callWithPeers(req.params.id);
+  if(!call)return res.status(404).json({error:'CALL_NOT_FOUND'});
+  if(call.callerId!==req.user.id&&call.receiverId!==req.user.id)return res.status(403).json({error:'NOT_A_CALL_PARTICIPANT'});
+  const participants=await prisma.callParticipant.findMany({where:{callId:call.id},include:{user:true},orderBy:{joinedAt:'asc'}});
+  res.json({...call,participants:participants.map(p=>({...p,user:safe(p.user)}))});
 });
 
 app.post('/api/live/token',auth,async(req,res)=>{
@@ -1305,11 +1523,91 @@ app.get('/api/wallet',auth,async(req,res)=>{
 });
 app.get('/api/wallet/gifts',auth,async(req,res)=>{
   try{
-    const rows=await prisma.$queryRawUnsafe('SELECT "id","slug","name","emoji","priceCoins","enabled","effectKey","effectMs","soundKey","rarity","category","metadata" FROM "Gift" WHERE "enabled"=true ORDER BY "priceCoins" ASC');
-    res.json(rows.map(r=>({...r,metadata:(()=>{try{return JSON.parse(String(r.metadata||'{}'))}catch{return {}}})()})));
+    const category=String(req.query.category||'').trim().toLowerCase();
+    const rarity=String(req.query.rarity||'').trim().toUpperCase();
+    const where={enabled:true,...(category?{category}:{}),...(rarity?{rarity}:{})};
+    const rows=await prisma.gift.findMany({where,orderBy:[{sortOrder:'asc'},{priceCoins:'asc'}]});
+    res.json(rows.map(r=>({...r,metadata:safeJson(r.metadata)})));
   }catch(e){res.status(500).json({error:'GIFTS_FAILED'});}
 });
 app.get('/api/gifts/categories',auth,async(req,res)=>res.json(GIFT_CATEGORIES));
+
+// ---- V93 Admin gift library: add/edit gifts without touching Flutter ------
+// The client renders whatever the server returns, so a new gift (or a replaced
+// image/animation/sound) appears in the sheet on the next fetch.
+const giftAdminSchema=z.object({
+  slug:z.string().min(2).max(60).regex(/^[a-z0-9_]+$/).optional(),
+  name:z.string().min(1).max(60),
+  nameEn:z.string().max(60).default(''),
+  emoji:z.string().max(16).default('🎁'),
+  priceCoins:z.number().int().min(1).max(100000000),
+  category:z.string().min(1).max(40).default('love'),
+  rarity:z.enum(['COMMON','RARE','EPIC','LEGENDARY','MYTHIC']).optional(),
+  effectKey:z.string().max(40).default('drop'),
+  animationFamily:z.string().max(40).default('drop'),
+  effectMs:z.number().int().min(300).max(15000).default(2200),
+  soundKey:z.string().max(60).default(''),
+  imageUrl:z.string().max(5000).default(''),
+  previewUrl:z.string().max(5000).default(''),
+  animationUrl:z.string().max(5000).default(''),
+  premium:z.boolean().default(false),
+  enabled:z.boolean().default(true),
+  sortOrder:z.number().int().min(0).max(100000).default(0),
+  metadata:z.string().max(8000).default('{}'),
+});
+
+app.get('/api/admin/gifts',auth,requirePermission('gifts.manage'),async(req,res)=>{
+  const q=String(req.query.q||'').trim();
+  const where=q?{OR:[{name:{contains:q,mode:'insensitive'}},{slug:{contains:q,mode:'insensitive'}}]}:{};
+  const rows=await prisma.gift.findMany({where,orderBy:[{category:'asc'},{priceCoins:'asc'}],take:500});
+  res.json({count:rows.length,gifts:rows,categories:GIFT_CATEGORIES});
+});
+
+app.post('/api/admin/gifts',auth,requirePermission('gifts.create'),async(req,res)=>{
+  try{
+    const d=giftAdminSchema.parse(req.body||{});
+    const slug=d.slug||`gift_${crypto.randomUUID().slice(0,8)}`;
+    const exists=await prisma.gift.findUnique({where:{slug}});
+    if(exists)return res.status(409).json({error:'GIFT_EXISTS'});
+    const row=await prisma.gift.create({data:{...d,slug,rarity:d.rarity||rarityForPrice(d.priceCoins),assetKey:d.imageUrl?'custom':`gifts/${d.category}/${slug}`}});
+    await auditAction(req,'GIFT_CREATE',{permission:'gifts.create',targetType:'Gift',targetId:row.id,after:row});
+    res.status(201).json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+
+app.patch('/api/admin/gifts/:id',auth,requirePermission('gifts.edit'),async(req,res)=>{
+  try{
+    const before=await prisma.gift.findUnique({where:{id:req.params.id}});
+    if(!before)return res.status(404).json({error:'GIFT_NOT_FOUND'});
+    const d=giftAdminSchema.partial().parse(req.body||{});
+    const row=await prisma.gift.update({where:{id:before.id},data:d});
+    await auditAction(req,'GIFT_UPDATE',{permission:'gifts.edit',targetType:'Gift',targetId:row.id,before,after:row});
+    res.json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+
+/// Deleting a gift is a soft delete: existing GiftTransaction rows reference it
+/// and must keep resolving (additive-only rule).
+app.delete('/api/admin/gifts/:id',auth,requirePermission('gifts.delete'),async(req,res)=>{
+  const before=await prisma.gift.findUnique({where:{id:req.params.id}});
+  if(!before)return res.status(404).json({error:'GIFT_NOT_FOUND'});
+  const row=await prisma.gift.update({where:{id:before.id},data:{enabled:false}});
+  await auditAction(req,'GIFT_DISABLE',{permission:'gifts.delete',targetType:'Gift',targetId:row.id,before,after:row});
+  res.json({ok:true,gift:row});
+});
+
+/// V93: the gift sheet needs the sender's XP/progress for the level bar.
+app.get('/api/gifts/xp',auth,async(req,res)=>{
+  const [spent,received]=await Promise.all([
+    prisma.walletTransaction.aggregate({where:{userId:req.user.id,type:'GIFT_SENT'},_sum:{coins:true}}),
+    prisma.walletTransaction.aggregate({where:{userId:req.user.id,type:'GIFT_RECEIVED'},_sum:{coins:true}}),
+  ]);
+  const xp=Math.max(0,Math.abs(spent._sum.coins||0));
+  const level=Math.max(1,Math.floor(Math.sqrt(xp/50))+1);
+  const floorXp=(level-1)*(level-1)*50;
+  const nextXp=level*level*50;
+  res.json({xp,level,levelFloorXp:floorXp,nextLevelXp:nextXp,progress:nextXp>floorXp?(xp-floorXp)/(nextXp-floorXp):0,coinsReceived:received._sum.coins||0});
+});
 
 // ---- Creator levels -------------------------------------------------------
 const DEFAULT_CREATOR_LEVELS=[
@@ -1351,28 +1649,89 @@ const DEFAULT_MILESTONES=[
   [1000000,'أسطورة Nova','badge_legend','frame_legend','bg_galaxy','GALAXY','celebration',40000,'lion'],
 ];
 async function ensureCreatorMilestones(){
+  // V93: seeded through Prisma (the table is a real model now). Existing rows
+  // are matched by followersRequired so milestone ids stay stable and already
+  // granted rewards keep pointing at the milestone that produced them.
   for(let i=0;i<DEFAULT_MILESTONES.length;i++){
     const [followers,title,badge,frame,bg,entry,chat,coins,gift]=DEFAULT_MILESTONES[i];
-    await prisma.$executeRawUnsafe('INSERT INTO "CreatorMilestone" ("id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled","sortOrder") VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10) ON CONFLICT DO NOTHING',followers,title,badge,frame,bg,entry,chat,coins,gift,i).catch(()=>{});
+    const existing=await prisma.creatorMilestone.findFirst({where:{followersRequired:followers}}).catch(()=>null);
+    if(existing)continue;
+    await prisma.creatorMilestone.create({data:{followersRequired:followers,title,badge,profileFrame:frame,profileBackground:bg,entryEffect:entry,chatEffect:chat,rewardCoins:coins,rewardGiftSlug:gift,enabled:true,sortOrder:i}}).catch(()=>{});
   }
 }
+
+/// V93: grants every enabled milestone the user has reached, exactly once.
+/// Returns the rewards granted by THIS call (empty when nothing new).
+async function grantCreatorMilestones(userId,{notify=true}={}){
+  const followers=await prisma.follow.count({where:{followingId:userId}});
+  const milestones=await prisma.creatorMilestone.findMany({where:{enabled:true,followersRequired:{lte:followers}},orderBy:{followersRequired:'asc'}});
+  if(!milestones.length)return [];
+  const granted=[];
+  for(const m of milestones){
+    const existing=await prisma.creatorMilestoneReward.findUnique({where:{userId_milestoneId:{userId,milestoneId:m.id}}}).catch(()=>null);
+    if(existing)continue;
+    const payload={
+      title:m.title,badge:m.badge,profileFrame:m.profileFrame,profileBackground:m.profileBackground,
+      entryEffect:m.entryEffect,chatEffect:m.chatEffect,rewardCoins:m.rewardCoins,rewardGiftSlug:m.rewardGiftSlug,
+      followersRequired:m.followersRequired,
+    };
+    const created=await prisma.creatorMilestoneReward.create({data:{userId,milestoneId:m.id,payload:JSON.stringify(payload)}}).catch(()=>null);
+    if(!created)continue;
+    if(m.rewardCoins>0){
+      const wallet=await prisma.wallet.upsert({where:{userId},create:{userId},update:{}});
+      await prisma.wallet.update({where:{id:wallet.id},data:{coinBalance:{increment:m.rewardCoins},bonusCoins:{increment:m.rewardCoins},lifetimeReceived:{increment:m.rewardCoins}}});
+      await prisma.walletTransaction.create({data:{userId,walletId:wallet.id,type:'CREATOR_MILESTONE',coins:m.rewardCoins,balanceAfter:wallet.coinBalance+m.rewardCoins,withdrawableAfter:wallet.withdrawableCoins,reference:`MS-${created.id}`,description:`مكافأة إنجاز ${m.title}`}}).catch(()=>{});
+    }
+    if(notify){
+      await prisma.notification.create({data:{userId,type:'MILESTONE',text:`مبروك! وصلت إلى ${m.followersRequired} متابع — حصلت على «${m.title}»`}}).catch(()=>{});
+    }
+    io.to(`user:${userId}`).emit('creator:milestone',{milestoneId:m.id,title:m.title,payload});
+    granted.push({...m,payload});
+  }
+  return granted;
+}
+
 app.get('/api/creator/milestones',auth,async(req,res)=>{
-  const rows=await prisma.$queryRawUnsafe('SELECT "id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled" FROM "CreatorMilestone" WHERE "enabled"=true ORDER BY "followersRequired" ASC').catch(()=>[]);
+  const rows=await prisma.creatorMilestone.findMany({where:{enabled:true},orderBy:{followersRequired:'asc'}});
   res.json(rows);
 });
 app.get('/api/creator/milestones/me',auth,async(req,res)=>{
   const followers=await prisma.follow.count({where:{followingId:req.user.id}});
-  const rows=await prisma.$queryRawUnsafe('SELECT "id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled" FROM "CreatorMilestone" WHERE "enabled"=true AND "followersRequired"<=$1 ORDER BY "followersRequired" ASC',followers).catch(()=>[]);
-  res.json({followers,earned:rows});
+  // V93: reaching a milestone grants it automatically (idempotent).
+  const newlyGranted=await grantCreatorMilestones(req.user.id).catch(()=>[]);
+  const [earned,all]=await Promise.all([
+    prisma.creatorMilestoneReward.findMany({where:{userId:req.user.id},orderBy:{grantedAt:'asc'}}),
+    prisma.creatorMilestone.findMany({where:{enabled:true},orderBy:{followersRequired:'asc'}}),
+  ]);
+  const earnedIds=new Set(earned.map(r=>r.milestoneId));
+  res.json({
+    followers,
+    earned:all.filter(m=>m.followersRequired<=followers),
+    rewards:earned.map(r=>({...r,payload:safeJson(r.payload)})),
+    next:all.find(m=>m.followersRequired>followers)||null,
+    newlyGranted:newlyGranted.map(m=>m.title),
+    earnedIds:[...earnedIds],
+  });
+});
+app.get('/api/creator/milestones/rewards',auth,async(req,res)=>{
+  const rows=await prisma.creatorMilestoneReward.findMany({where:{userId:req.user.id},orderBy:{grantedAt:'desc'},take:100});
+  res.json(rows.map(r=>({...r,payload:safeJson(r.payload)})));
 });
 app.put('/api/admin/creator-milestones',auth,requirePermission('creators.manage'),async(req,res)=>{
   try{
-    const list=z.array(z.object({followersRequired:z.number().int().min(0).max(100000000),title:z.string().min(1).max(60),badge:z.string().max(60).default(''),profileFrame:z.string().max(60).default(''),profileBackground:z.string().max(60).default(''),entryEffect:z.string().max(60).default(''),chatEffect:z.string().max(60).default(''),rewardCoins:z.number().int().min(0).max(10000000).default(0),rewardGiftSlug:z.string().max(80).default(''),enabled:z.boolean().default(true)})).max(60).parse(req.body?.milestones||[]);
-    await prisma.$executeRawUnsafe('DELETE FROM "CreatorMilestone"');
+    const list=z.array(z.object({followersRequired:z.number().int().min(0).max(100000000),title:z.string().min(1).max(60),badge:z.string().max(60).default(''),profileFrame:z.string().max(60).default(''),profileBackground:z.string().max(60).default(''),entryEffect:z.string().max(60).default(''),chatEffect:z.string().max(60).default(''),rewardCoins:z.number().int().min(0).max(10000000).default(0),rewardGiftSlug:z.string().max(80).default(''),reward:z.string().max(4000).default('{}'),enabled:z.boolean().default(true)})).max(60).parse(req.body?.milestones||[]);
+    const keep=[];
     for(let i=0;i<list.length;i++){
       const m=list[i];
-      await prisma.$executeRawUnsafe('INSERT INTO "CreatorMilestone" ("id","followersRequired","title","badge","profileFrame","profileBackground","entryEffect","chatEffect","rewardCoins","rewardGiftSlug","enabled","sortOrder") VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',m.followersRequired,m.title,m.badge,m.profileFrame,m.profileBackground,m.entryEffect,m.chatEffect,m.rewardCoins,m.rewardGiftSlug,m.enabled,i);
+      // Match by threshold so the row keeps its id: already-granted rewards stay valid.
+      const existing=await prisma.creatorMilestone.findFirst({where:{followersRequired:m.followersRequired}});
+      const data={...m,sortOrder:i};
+      const row=existing
+        ? await prisma.creatorMilestone.update({where:{id:existing.id},data})
+        : await prisma.creatorMilestone.create({data});
+      keep.push(row.id);
     }
+    await prisma.creatorMilestone.deleteMany({where:{id:{notIn:keep}}});
     await auditAction(req,'CREATOR_MILESTONES_UPDATE',{permission:'creators.manage',after:list});
     res.json({ok:true,count:list.length});
   }catch(e){res.status(400).json({error:'VALIDATION_ERROR'});}
@@ -1782,25 +2141,82 @@ io.on('connection',socket=>{
   });
   socket.on('live:mute',async payload=>{try{const u=me();if(!u)return;const roomName=String(payload?.room||'').trim(),target=String(payload?.userId||'').trim();if(!roomName||!target)return;const room=await prisma.liveRoom.findUnique({where:{roomName}});if(!room)return;const staff=await liveStaff(room.id,u.id);if(room.hostId!==u.id&&!liveStaffCan(staff,'live.mute'))return;const unmute=payload?.value===false;if(unmute){await prisma.$executeRawUnsafe('DELETE FROM "LiveMute" WHERE "roomName"=$1 AND "userId"=$2',roomName,target);}else{await prisma.$executeRawUnsafe('INSERT INTO "LiveMute" ("roomName","userId","reason","actorId") VALUES ($1,$2,$3,$4) ON CONFLICT ("roomName","userId") DO NOTHING',roomName,target,String(payload?.reason||'').slice(0,200),u.id);}io.to(`live:${roomName}`).emit('live:muted',{userId:target,value:!unmute});}catch{}});
   socket.on('live:remove',async payload=>{try{const u=me();if(!u)return;const roomName=String(payload?.room||'').trim(),target=String(payload?.userId||'').trim();if(!roomName||!target)return;const room=await prisma.liveRoom.findUnique({where:{roomName}});if(!room)return;const staff=await liveStaff(room.id,u.id);if(room.hostId!==u.id&&!liveStaffCan(staff,'live.remove'))return;io.to(`live:${roomName}`).emit('live:removed',{userId:target});}catch{}});
-  socket.on('call:invite',payload=>{const u=me();if(!u)return;const to=String(payload?.to||'');if(to)io.to(`user:${to}`).emit('call:invite',{...payload,from:u.id,fromName:u.displayName||u.username});});
-  socket.on('call:accept',payload=>{const u=me();const to=String(payload?.to||'');if(u&&to)io.to(`user:${to}`).emit('call:accept',{...payload,from:u.id});});
-  socket.on('call:reject',payload=>{const u=me();const to=String(payload?.to||'');if(u&&to)io.to(`user:${to}`).emit('call:reject',{...payload,from:u.id});});
+  // V93 calls: every signal is also persisted, so history/missed/duration exist.
+  const callSignal=async(type,payload,handler)=>{
+    try{
+      const u=me();if(!u)return;
+      const to=String(payload?.to||'').trim();
+      if(!to||to===u.id)return;
+      await handler(u,to,payload);
+    }catch(e){console.warn(`[socket ${type}]`,e.message);}
+  };
+  socket.on('call:invite',payload=>callSignal('call:invite',payload,async(u,to,p)=>{
+    const roomName=isValidRoomName(p?.roomName)?String(p.roomName):makeCallRoomName(crypto.randomUUID());
+    const kind=normalizeKind(p?.video===true||String(p?.kind||'').toUpperCase()==='VIDEO'?'VIDEO':'AUDIO');
+    let call=await prisma.call.findUnique({where:{roomName}});
+    if(!call){
+      call=await prisma.call.create({data:{roomName,callerId:u.id,receiverId:to,kind,status:CALL_STATUS.RINGING,participants:{create:[{userId:u.id,role:'CALLER'}]}}});
+      await logCallEvent(call.id,'INVITED',u.id,{kind,roomName});
+    }
+    io.to(`user:${to}`).emit('call:invite',{...p,callId:call.id,roomName,from:u.id,fromName:u.displayName||u.username});
+  }));
+  socket.on('call:accept',payload=>callSignal('call:accept',payload,async(u,to,p)=>{
+    const roomName=String(p?.roomName||'').trim();
+    const call=await prisma.call.findUnique({where:{roomName}});
+    if(call&&canTransition({actorId:u.id,callerId:call.callerId,receiverId:call.receiverId,currentStatus:call.status,next:CALL_STATUS.ACCEPTED})){
+      await prisma.call.update({where:{id:call.id},data:{status:CALL_STATUS.ACCEPTED,answeredAt:new Date()}});
+      await prisma.callParticipant.upsert({where:{callId_userId:{callId:call.id,userId:u.id}},create:{callId:call.id,userId:u.id,role:'RECEIVER'},update:{joinedAt:new Date(),leftAt:null}});
+      await logCallEvent(call.id,CALL_STATUS.ACCEPTED,u.id);
+    }
+    io.to(`user:${to}`).emit('call:accept',{...p,callId:call?.id||'',from:u.id});
+  }));
+  socket.on('call:reject',payload=>callSignal('call:reject',payload,async(u,to,p)=>{
+    const roomName=String(p?.roomName||'').trim();
+    const call=roomName?await prisma.call.findUnique({where:{roomName}}):null;
+    if(call&&canTransition({actorId:u.id,callerId:call.callerId,receiverId:call.receiverId,currentStatus:call.status,next:CALL_STATUS.REJECTED})){
+      await prisma.call.update({where:{id:call.id},data:{status:CALL_STATUS.REJECTED,endedAt:new Date(),durationSec:0,endedById:u.id,endReason:'REJECTED'}});
+      await logCallEvent(call.id,CALL_STATUS.REJECTED,u.id);
+    }
+    io.to(`user:${to}`).emit('call:reject',{...p,callId:call?.id||'',from:u.id});
+  }));
+  // New in V93: the client reports the hang-up so durationSec and MISSED are real.
+  socket.on('call:end',payload=>callSignal('call:end',payload,async(u,to,p)=>{
+    const roomName=String(p?.roomName||'').trim();
+    const call=roomName?await prisma.call.findUnique({where:{roomName}}):null;
+    if(!call||isTerminal(call.status))return;
+    const endedAt=new Date();
+    const status=resolveEndStatus(call.status,call.answeredAt);
+    const durationSec=computeDurationSec(call.answeredAt,endedAt);
+    await prisma.call.update({where:{id:call.id},data:{status,endedAt,durationSec,endedById:u.id,endReason:'HANGUP'}});
+    await prisma.callParticipant.updateMany({where:{callId:call.id,leftAt:null},data:{leftAt:endedAt}});
+    await logCallEvent(call.id,status,u.id,{durationSec});
+    io.to(`user:${to}`).emit('call:end',{callId:call.id,roomName,status,durationSec,from:u.id});
+    if(status===CALL_STATUS.MISSED)await prisma.notification.create({data:{userId:call.receiverId,type:'CALL',text:'لديك مكالمة فائتة'}}).catch(()=>{});
+  }));
   socket.on('call:reel',payload=>{const u=me();const to=String(payload?.to||'');const url=String(payload?.url||'').trim();if(u&&to&&url)io.to(`user:${to}`).emit('call:reel',{url,title:String(payload?.title||''),from:u.id,createdAt:new Date().toISOString()});});
   socket.on('disconnect',()=>{const u=me(),room=socket.data.liveRoom;if(u&&room)io.to(`live:${room}`).emit('live:user-left',{userId:u.id});});
 });
 
 async function ensureCatalog(){
   // Gift Engine: a deterministic catalog of 200+ unique gifts generated in
-  // modules/gifts.js. Seeding is a raw upsert so the extra columns (rarity,
-  // category, metadata) work even before a Prisma client regeneration.
+  // modules/gifts.js. V93 promoted every column into prisma/schema.prisma, so
+  // seeding is a normal, type-safe upsert. An admin-uploaded image/preview
+  // (imageUrl/previewUrl/animationUrl/premium) is never overwritten by a seed.
   const catalog=buildGiftCatalog();
+  const existing=new Set((await prisma.gift.findMany({select:{slug:true}}).catch(()=>[])).map(g=>g.slug));
   for(const g of catalog){
-    await prisma.$executeRawUnsafe(
-      `INSERT INTO "Gift" ("id","slug","name","emoji","priceCoins","enabled","effectKey","effectMs","soundKey","rarity","category","metadata","createdAt")
-       VALUES (gen_random_uuid()::text,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,CURRENT_TIMESTAMP)
-       ON CONFLICT ("slug") DO UPDATE SET "name"=EXCLUDED."name","emoji"=EXCLUDED."emoji","priceCoins"=EXCLUDED."priceCoins","enabled"=EXCLUDED."enabled","effectKey"=EXCLUDED."effectKey","effectMs"=EXCLUDED."effectMs","soundKey"=EXCLUDED."soundKey","rarity"=EXCLUDED."rarity","category"=EXCLUDED."category","metadata"=EXCLUDED."metadata"`,
-      g.slug,g.name,g.emoji,g.priceCoins,g.enabled,g.effectKey,g.effectMs,g.soundKey,g.rarity,g.category,JSON.stringify(g.metadata||{}),
-    );
+    const base={
+      name:g.name,nameEn:g.nameEn,emoji:g.emoji,priceCoins:g.priceCoins,enabled:true,
+      effectKey:g.effectKey,effectMs:g.effectMs,soundKey:g.soundKey,rarity:g.rarity,
+      category:g.category,metadata:JSON.stringify(g.metadata||{}),assetKey:g.assetKey,sortOrder:g.sortOrder,
+    };
+    if(existing.has(g.slug)){
+      // Keep admin-curated media/premium decisions on re-seed.
+      const cur=await prisma.gift.findUnique({where:{slug:g.slug},select:{imageUrl:true,previewUrl:true,animationUrl:true,premium:true}});
+      await prisma.gift.update({where:{slug:g.slug},data:{...base,imageUrl:cur?.imageUrl||'',previewUrl:cur?.previewUrl||'',animationUrl:cur?.animationUrl||'',premium:cur?.premium??g.premium}}).catch(()=>{});
+    }else{
+      await prisma.gift.create({data:{slug:g.slug,...base,imageUrl:g.imageUrl,previewUrl:g.previewUrl,animationUrl:g.animationUrl,premium:g.premium}}).catch(()=>{});
+    }
   }
   await prisma.commissionSetting.upsert({where:{id:'default'},create:{id:'default'},update:{}}).catch(async()=>{if(!(await prisma.commissionSetting.findFirst()))await prisma.commissionSetting.create({data:{}});});
 }

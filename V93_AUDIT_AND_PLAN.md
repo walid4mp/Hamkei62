@@ -65,3 +65,65 @@ Flutter toolchain; everything else is marked as unverified on purpose.
 - `.github/workflows/{v62-quality,v76-final-quality,v79-final-quality}.yml` — removed.
 - `backend/src/server.js` — socket `live:gift` now verifies the transaction;
   the LIVE gift broadcast carries `transactionId` so clients can use it.
+
+---
+
+## V93.2 — implemented (verified in this sandbox)
+
+Flutter SDK 3.29.2 and the Dart packages were installed locally, so the client
+side is now really verified, not assumed.
+
+### New systems
+- **Calls** — `Call`, `CallParticipant`, `CallEvent` models + `/api/calls/start`,
+  `/accept`, `/reject`, `/end`, `/history`, `/:id`; the socket signals persist
+  the same records, a ring-timeout sweeper marks unanswered calls `MISSED` and
+  notifies, duration is computed server-side from `answeredAt`→`endedAt`, and
+  `/api/calls/token` now refuses room names that are not an active call the
+  caller belongs to. Client: `SocketService.callEnded/callMissed`,
+  `sendCallEnd`, and six `Api` methods.
+- **StoryView** — who saw a story, when, how many times; `POST /api/stories/:id/view`
+  (the client was already calling this route — it used to 404),
+  `GET /api/stories/:id/viewers` (author only), `GET /api/stories/seen`.
+- **Creator milestones** — `CreatorMilestone` is a real Prisma model now, with
+  `CreatorMilestoneReward` recording what each creator actually earned.
+  Reaching a threshold grants the rewards once (coins + notification + socket
+  event) on follow and on `/api/creator/milestones/me`. Admin edits match rows
+  by `followersRequired` so granted rewards never point at a deleted row.
+- **Gift library** — the whole contract (`nameEn`, `imageUrl`, `previewUrl`,
+  `animationUrl`, `assetKey`, `premium`, `sortOrder`, `metadata`, `updatedAt`)
+  is now in `prisma/schema.prisma`; seeding is a type-safe upsert that never
+  overwrites admin-uploaded media, and `/api/wallet/gifts` supports
+  `?category=` / `?rarity=` filtering. New admin CRUD
+  (`GET/POST/PATCH/DELETE /api/admin/gifts`) lets gifts be added or disabled
+  without a Flutter release, and `GET /api/gifts/xp` feeds the XP bar.
+- **Rate limiting** — dependency-free sliding window: 600/min per IP for `/api`,
+  12/min for login/register, with `Retry-After` and automatic bucket cleanup.
+- **Notification types** — `CALL`, `STORY`, `REWARD`, `MILESTONE`, `ADMIN` added
+  to the enum and applied to the database with `ALTER TYPE ... ADD VALUE`.
+
+### Promoted from raw SQL into `prisma/schema.prisma`
+`CreatorLevel`, `CreatorMilestone`, `Asset`, `ContinueWatching`,
+`IdempotencyRecord`, `LiveMute`, `LiveTapCount` — these existed in the database
+but were invisible to Prisma. The raw `CREATE TABLE IF NOT EXISTS` statements
+stay, so existing Neon databases upgrade the same way.
+
+### Verification actually run
+| Command | Result |
+|---|---|
+| `node --check src/server.js` | OK |
+| `npx prisma validate` | valid |
+| `npx prisma generate` | OK (new models/fields present in the client) |
+| `npm test` (backend) | **18/18 pass** |
+| `flutter analyze` (whole project) | **No issues found** |
+| `flutter test` | **21/21 pass** |
+| `flutter test --coverage` | **42.6 % lines (594/1395)** |
+| `flutter build apk --release` | **NOT RUN** — no Android SDK in this sandbox |
+
+### Still open (honest list)
+- Admin **screens** (Nova TV content, gifts, rewards, assets) — the APIs exist;
+  the in-app screens do not.
+- Call **UI**: history list, incoming-call screen polish, duration display.
+- Gift **artwork**: real images are still absent; the pipeline (`Asset`,
+  `imageUrl/previewUrl/animationUrl`, admin CRUD) is ready for uploads.
+- Localization (`flutter_localizations` + ARB) — untouched.
+- Database-backed integration tests and any HTTP/DB verification — no Postgres here.

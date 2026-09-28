@@ -32,6 +32,11 @@ enum NotificationType {
   GIFT
   WALLET
   REPORT
+  CALL
+  STORY
+  REWARD
+  MILESTONE
+  ADMIN
 }
 
 enum VerificationTier {
@@ -110,6 +115,10 @@ model User {
   liveRooms           LiveRoom[]            @relation("host")
   liveModerations     LiveModerator[]       @relation("LiveModeratorUser")
   liveComments        LiveComment[]         @relation("LiveCommentAuthor")
+  storiesViewed       StoryView[]           @relation("StoryViewUser")
+  callsStarted        Call[]                @relation("CallCaller")
+  callsReceived       Call[]                @relation("CallReceiver")
+  callParticipations  CallParticipant[]     @relation("CallParticipantUser")
   verificationRequests VerificationRequest[] @relation("UserVerificationRequests")
   relationshipRequestsSent Relationship[] @relation("RelationshipRequester")
   relationshipRequestsReceived Relationship[] @relation("RelationshipPartner")
@@ -455,6 +464,7 @@ model Story {
   messages  Message[]       @relation("StoryMessages")
   replies   StoryReply[]    @relation("StoryReplies")
   reactions StoryReaction[] @relation("StoryReactions")
+  views     StoryView[]     @relation("StoryViewStory")
 
   @@index([expiresAt])
 }
@@ -700,14 +710,29 @@ model Gift {
   id          String   @id @default(cuid())
   slug        String   @unique
   name        String
+  nameEn      String   @default("")
   emoji       String
   priceCoins  Int
   enabled     Boolean  @default(true)
   effectKey   String   @default("pulse")
   effectMs    Int      @default(1800)
   soundKey    String   @default("")
+  // V93 gift-library columns (previously raw-SQL only).
+  rarity          String   @default("COMMON")
+  category        String   @default("love")
+  metadata        String   @default("{}")
+  imageUrl        String   @default("")
+  previewUrl      String   @default("")
+  animationUrl    String   @default("")
+  assetKey        String   @default("")
+  premium         Boolean  @default(false)
+  sortOrder       Int      @default(0)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
   transactions GiftTransaction[]
+
+  @@index([enabled, category])
+  @@index([enabled, rarity])
 }
 
 model GiftTransaction {
@@ -1178,4 +1203,191 @@ model AiCoachSession {
   createdAt DateTime @default(now())
   user      User @relation("AiCoachUser", fields:[userId], references:[id], onDelete:Cascade)
   @@index([userId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// V93 — promoted tables + new systems.
+// These tables were previously created by raw SQL in ensureSchemaCompatibility()
+// (Prisma could not see them). They are now first-class models; the raw SQL
+// statements stay in place so older databases upgrade identically.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CreatorLevel {
+  key          String   @id
+  label        String
+  minFollowers Int
+  tier         Int      @default(0)
+  color        String   @default("#9CA3AF")
+  enabled      Boolean  @default(true)
+}
+
+model CreatorMilestone {
+  id                 String   @id @default(cuid())
+  followersRequired  Int
+  title              String
+  badge              String   @default("")
+  profileFrame       String   @default("")
+  profileBackground  String   @default("")
+  entryEffect        String   @default("")
+  chatEffect         String   @default("")
+  rewardCoins        Int      @default(0)
+  rewardGiftSlug     String   @default("")
+  reward             String   @default("{}")
+  enabled            Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([enabled, followersRequired])
+  @@index([sortOrder])
+}
+
+/// A reward a creator has actually earned (granted once, when the milestone is
+/// reached). Kept separate from the milestone definition so admin edits to a
+/// milestone never retroactively change what a user already received.
+model CreatorMilestoneReward {
+  id          String   @id @default(cuid())
+  userId      String
+  milestoneId String
+  grantedAt   DateTime @default(now())
+  payload     String   @default("{}")
+
+  @@unique([userId, milestoneId])
+  @@index([userId, grantedAt])
+}
+
+model Asset {
+  id                String   @id @default(cuid())
+  type              String
+  name              String
+  previewUrl        String   @default("")
+  assetUrl          String   @default("")
+  animationUrl      String   @default("")
+  soundUrl          String   @default("")
+  priceCoins        Int      @default(0)
+  requiredFollowers Int      @default(0)
+  requiredLevel     Int      @default(0)
+  premium           Boolean  @default(false)
+  enabled           Boolean  @default(true)
+  metadata          String   @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([type, enabled])
+  @@index([enabled, premium])
+}
+
+model ContinueWatching {
+  userId      String
+  kind        String
+  contentId   String
+  episodeId   String   @default("")
+  positionSec Int      @default(0)
+  durationSec Int      @default(0)
+  completed   Boolean  @default(false)
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@id([userId, kind, contentId])
+  @@index([userId, updatedAt])
+}
+
+model IdempotencyRecord {
+  key        String   @id
+  userId     String
+  path       String
+  method     String
+  statusCode Int      @default(0)
+  response   String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model LiveMute {
+  roomName  String
+  userId    String
+  reason    String   @default("")
+  actorId   String   @default("")
+  createdAt DateTime @default(now())
+
+  @@id([roomName, userId])
+}
+
+model LiveTapCount {
+  roomName  String
+  userId    String
+  taps      Int      @default(0)
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@id([roomName, userId])
+  @@index([roomName, taps])
+}
+
+/// Who saw a story, when, and how many times. Required for story insights and
+/// for the "viewed" state of the status circles.
+model StoryView {
+  id           String   @id @default(cuid())
+  storyId      String
+  userId       String
+  views        Int      @default(1)
+  firstViewedAt DateTime @default(now())
+  lastViewedAt DateTime @default(now())
+  story        Story    @relation("StoryViewStory", fields: [storyId], references: [id], onDelete: Cascade)
+  user         User     @relation("StoryViewUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId])
+  @@index([storyId, lastViewedAt])
+  @@index([userId, lastViewedAt])
+}
+
+/// Real call records — not just socket signalling.
+model Call {
+  id          String   @id @default(cuid())
+  roomName    String   @unique
+  callerId    String
+  receiverId  String
+  kind        String   @default("AUDIO") // AUDIO | VIDEO
+  status      String   @default("RINGING") // RINGING | ACCEPTED | REJECTED | MISSED | ENDED | FAILED
+  startedAt   DateTime @default(now())
+  answeredAt  DateTime?
+  endedAt     DateTime?
+  durationSec Int      @default(0)
+  endedById   String   @default("")
+  endReason   String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  caller      User     @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("CallReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  participants CallParticipant[]
+  events      CallEvent[]
+
+  @@index([callerId, startedAt])
+  @@index([receiverId, startedAt])
+  @@index([status, startedAt])
+}
+
+model CallParticipant {
+  id       String   @id @default(cuid())
+  callId   String
+  userId   String
+  role     String   @default("MEMBER") // CALLER | RECEIVER | MEMBER
+  joinedAt DateTime @default(now())
+  leftAt   DateTime?
+  call     Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user     User     @relation("CallParticipantUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([callId, userId])
+  @@index([userId, joinedAt])
+}
+
+model CallEvent {
+  id        String   @id @default(cuid())
+  callId    String
+  type      String   // INVITED | RINGING | ACCEPTED | REJECTED | ENDED | MISSED | FAILED
+  actorId   String   @default("")
+  payload   String   @default("{}")
+  createdAt DateTime @default(now())
+  call      Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([callId, createdAt])
 }

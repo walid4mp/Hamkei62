@@ -556,6 +556,41 @@ class Api {
   static Future<Map<String,dynamic>> updateLiveChallenge(String id,{required int scoreA,required int scoreB}) async => Map<String,dynamic>.from(await req('PATCH','/api/live/challenges/$id',body:{'scoreA':scoreA,'scoreB':scoreB}));
   static Future<Map<String,dynamic>> finishLiveChallenge(String id,String winnerId) async => Map<String,dynamic>.from(await req('POST','/api/live/challenges/$id/finish',body:{'winnerId':winnerId}));
 
+  // ---------------- V93 calls ----------------
+  static Future<Map<String, dynamic>> startCall({required String receiverId, String kind = 'AUDIO'}) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/calls/start', body: {'receiverId': receiverId, 'kind': kind}));
+  static Future<Map<String, dynamic>> acceptCall(String callId) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/calls/$callId/accept'));
+  static Future<Map<String, dynamic>> rejectCall(String callId) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/calls/$callId/reject'));
+  static Future<Map<String, dynamic>> endCall(String callId, {String reason = ''}) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/calls/$callId/end', body: {'reason': reason}));
+  static Future<List<dynamic>> callHistory({int limit = 50}) async =>
+      List<dynamic>.from(await req('GET', '/api/calls/history?limit=$limit'));
+  static Future<Map<String, dynamic>> callDetail(String callId) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/calls/$callId'));
+
+  // ---------------- V93 gift library / XP ----------------
+  static Future<Map<String, dynamic>> giftXp() async =>
+      Map<String, dynamic>.from(await req('GET', '/api/gifts/xp'));
+  static Future<Map<String, dynamic>> giftCatalog() async =>
+      Map<String, dynamic>.from(await req('GET', '/api/gifts/catalog'));
+
+  // ---------------- V93 story views ----------------
+  // NOTE: the plain view ping already exists higher up as `viewStory(id)`;
+  // it used to call a route that did not exist on the server. V93 adds that
+  // route, so the call is now real instead of a silent 404.
+  static Future<Map<String, dynamic>> storyViewers(String storyId) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/stories/$storyId/viewers'));
+  static Future<List<dynamic>> storiesSeen(List<String> ids) async =>
+      List<dynamic>.from(await req('GET', '/api/stories/seen?ids=${ids.join(',')}'));
+
+  // ---------------- V93 creator rewards ----------------
+  static Future<Map<String, dynamic>> myMilestones() async =>
+      Map<String, dynamic>.from(await req('GET', '/api/creator/milestones/me'));
+  static Future<List<dynamic>> myMilestoneRewards() async =>
+      List<dynamic>.from(await req('GET', '/api/creator/milestones/rewards'));
+
   // ---------------- NovaCoins wallet ----------------
   static Future<Map<String, dynamic>> wallet() async =>
       Map<String, dynamic>.from(await req('GET', '/api/wallet'));
