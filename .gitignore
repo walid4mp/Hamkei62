@@ -30,3 +30,7 @@ npm-debug.log*
 
 # Android NDK/CMake build cache
 **/.cxx/
+
+# Generated coverage output
+coverage/
+**/coverage/
