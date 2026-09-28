@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>استوديو التصميم — Live + Messenger</title>
+<style>
+  :root{
+    --ui-bg:#08090d;
+    --ui-panel:#0d0f16;
+    --ui-text:#e9ebf2;
+    --ui-muted:#8b91a3;
+    --ui-line:rgba(255,255,255,.09);
+    --ui-accent:#7c5cff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:radial-gradient(1100px 560px at 12% -12%, rgba(124,92,255,.20), transparent 62%), var(--ui-bg);
+    color:var(--ui-text);
+    font-family:system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .layout{display:grid;grid-template-columns:352px minmax(0,1fr);min-height:100vh}
+
+  /* ---------- control panel ---------- */
+  .panel{
+    height:100vh;position:sticky;top:0;overflow:auto;
+    border-inline-end:1px solid var(--ui-line);
+    background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 40%);
+    padding:20px 16px 48px;
+  }
+  .panel-head{padding:2px 4px 16px;border-bottom:1px solid var(--ui-line);margin-bottom:16px}
+  .panel-head h1{margin:0 0 4px;font-size:16px;letter-spacing:.2px}
+  .panel-head p{margin:0;font-size:11.5px;color:var(--ui-muted);line-height:1.7}
+  .group{margin-bottom:18px}
+  .group > h3{
+    margin:0 0 9px;font-size:10.5px;font-weight:700;letter-spacing:.9px;
+    color:var(--ui-muted);text-transform:uppercase;
+  }
+  .grid-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .preset{
+    text-align:start;padding:9px 10px;border-radius:11px;cursor:pointer;
+    background:rgba(255,255,255,.045);border:1px solid var(--ui-line);
+    color:var(--ui-text);font:inherit;font-size:12px;transition:.15s;
+  }
+  .preset:hover{background:rgba(255,255,255,.08)}
+  .preset.on{border-color:var(--ui-accent);box-shadow:0 0 0 2px rgba(124,92,255,.18)}
+  .preset span{display:block;font-size:10px;color:var(--ui-muted);margin-top:2px}
+  .seg{display:flex;gap:4px;background:rgba(255,255,255,.045);border:1px solid var(--ui-line);padding:3px;border-radius:11px}
+  .seg button{
+    flex:1;padding:7px 6px;border:0;border-radius:8px;cursor:pointer;background:transparent;
+    color:var(--ui-muted);font:inherit;font-size:12px;transition:.15s;white-space:nowrap;
+  }
+  .seg button:hover{color:var(--ui-text)}
+  .seg button.on{background:var(--ui-accent);color:#fff;font-weight:600}
+  .ctl{margin-top:12px}
+  .ctl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-size:12px}
+  .ctl-head b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ui-accent)}
+  input[type=range]{
+    width:100%;height:22px;margin:0;background:transparent;appearance:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:rgba(255,255,255,.14)}
+  input[type=range]::-webkit-slider-thumb{
+    appearance:none;width:15px;height:15px;border-radius:50%;background:var(--ui-accent);
+    margin-top:-5.5px;border:2px solid #12141c;
+  }
+  input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:rgba(255,255,255,.14)}
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;border:2px solid #12141c;border-radius:50%;background:var(--ui-accent)}
+  .switch{display:flex;align-items:center;gap:9px;padding:6px 2px;cursor:pointer;font-size:12px;color:var(--ui-text)}
+  .switch input{position:absolute;opacity:0;pointer-events:none}
+  .switch .track{
+    width:34px;height:19px;border-radius:20px;background:rgba(255,255,255,.14);
+    position:relative;transition:.18s;flex:0 0 auto;
+  }
+  .switch .knob{
+    position:absolute;top:2.5px;inset-inline-start:2.5px;width:14px;height:14px;border-radius:50%;
+    background:#fff;opacity:.6;transition:.18s;
+  }
+  .switch input:checked + .track{background:var(--ui-accent)}
+  .switch input:checked + .track .knob{opacity:1;transform:translateX(0)}
+  .switch input:checked + .track .knob{inset-inline-start:calc(100% - 16.5px)}
+  details{margin-top:6px;border-top:1px solid var(--ui-line);padding-top:12px}
+  summary{cursor:pointer;font-size:12px;color:var(--ui-muted);list-style:none;display:flex;align-items:center;gap:6px}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+";font-family:ui-monospace,monospace;color:var(--ui-accent)}
+  details[open] summary::before{content:"–"}
+  .notes{margin:10px 2px 0;padding-inline-start:16px;font-size:11.5px;line-height:1.85;color:var(--ui-muted)}
+  .notes li{margin-bottom:3px}
+
+  /* ---------- stage ---------- */
+  .stage{padding:24px 24px 40px;min-width:0;display:flex;flex-direction:column;gap:20px}
+  .phones{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+  .device{display:flex;flex-direction:column;gap:10px;align-items:center}
+  .device-cap{font-size:11.5px;color:var(--ui-muted);letter-spacing:.2px}
+  .phone{
+    width:322px;height:664px;border-radius:46px;padding:9px;flex:0 0 auto;position:relative;
+    background:linear-gradient(160deg,rgba(255,255,255,.24),rgba(255,255,255,.05));
+    box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.05) inset;
+  }
+  .screen{
+    width:100%;height:100%;border-radius:38px;overflow:hidden;position:relative;
+    background:var(--bg);color:var(--text);font-size:14px;
+    display:flex;flex-direction:column;font-family:var(--ff);
+  }
+  .homebar{
+    position:absolute;bottom:7px;inset-inline-start:50%;transform:translateX(50%);
+    width:110px;height:4px;border-radius:4px;background:currentColor;opacity:.28;z-index:6;
+  }
+  .ic{width:20px;height:20px;display:block;flex:0 0 auto}
+  .ic.sm{width:16px;height:16px}
+
+  /* status bar */
+  .statusbar{
+    display:flex;justify-content:space-between;align-items:center;z-index:5;
+    padding:calc(8px * var(--d)) calc(18px * var(--d)) 0;font-size:11px;font-weight:600;color:var(--sb);
+  }
+  .statusbar.on-video{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55)}
+  .sb-right{display:flex;align-items:center;gap:4px}
+  .sb-bar{width:3px;border-radius:1px;background:currentColor;display:block}
+  .sb-batt{width:17px;height:9px;border:1.2px solid currentColor;border-radius:3px;position:relative;opacity:.9}
+  .sb-batt::after{content:"";position:absolute;inset:1.5px;width:8px;background:currentColor;border-radius:1px}
+
+  /* ---------- LIVE ---------- */
+  .video{
+    position:absolute;inset:0;z-index:0;overflow:hidden;
+    background:
+      radial-gradient(60% 45% at 70% 22%, var(--vid1), transparent 70%),
+      radial-gradient(55% 40% at 22% 62%, var(--vid2), transparent 72%),
+      linear-gradient(170deg, var(--vid3), #05060a 78%);
+  }
+  .video::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 32%,transparent 52%,rgba(0,0,0,.82))}
+  .blob{position:absolute;border-radius:50%;filter:blur(34px);opacity:.55;animation:float 11s ease-in-out infinite}
+  .blob.b1{width:180px;height:180px;top:12%;inset-inline-start:auto;inset-inline-end:8%;background:var(--vid1)}
+  .blob.b2{width:150px;height:150px;bottom:22%;inset-inline-start:6%;background:var(--vid2);animation-delay:-4s}
+  @keyframes float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-16px,0)}}
+  .screen[data-pulse="true"] .live-badge i{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+  .live-top{
+    display:flex;align-items:center;gap:calc(8px * var(--d));z-index:5;
+    padding:calc(10px * var(--d)) calc(14px * var(--d)) 0;
+  }
+  .host{display:flex;align-items:center;gap:calc(8px * var(--d));background:rgba(8,9,13,.42);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 10px 4px 5px;min-width:0}
+  .avatar{
+    width:32px;height:32px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+    font-size:12px;font-weight:700;color:#fff;background:var(--av, #444);position:relative;
+  }
+  .screen[data-avatar="squircle"] .avatar{border-radius:calc(var(--r) * 0.5)}
+  .avatar.ring{box-shadow:0 0 0 2px var(--accent)}
+  .avatar .dot{position:absolute;inset-block-end:-1px;inset-inline-end:-1px;width:10px;height:10px;border-radius:50%;background:#2fd07a;border:2px solid var(--bg)}
+  .host-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88px;color:#fff}
+  .host-sub{font-size:10px;color:rgba(255,255,255,.65)}
+  .follow{
+    font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;border:0;cursor:pointer;
+    background:var(--accent);color:#fff;flex:0 0 auto;
+  }
+  .live-badge{
+    display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;
+    background:#e0303c;border-radius:7px;padding:4px 7px;flex:0 0 auto;
+  }
+  .live-badge i{width:6px;height:6px;border-radius:50%;background:#fff;display:block}
+  .pill{
+    display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#fff;
+    background:rgba(8,9,13,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);
+    border-radius:999px;padding:4px 8px;flex:0 0 auto;
+  }
+  .icon-btn{
+    width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;cursor:pointer;
+    background:rgba(8,9,13,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);color:#fff;
+  }
+  .spacer{flex:1 1 auto}
+  .live-body{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-end;z-index:5;padding:0 calc(12px * var(--d)) 0;gap:calc(8px * var(--d));min-height:0}
+  .comments{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 22%);mask-image:linear-gradient(180deg,transparent,#000 22%)}
+  .cmt{
+    align-self:flex-start;max-width:88%;font-size:11.5px;line-height:1.5;color:#fff;
+    background:rgba(8,9,13,.42);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);
+    border-radius:calc(var(--r) * 0.7);padding:6px 10px;
+  }
+  .cmt b{background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+  .comments.panel{
+    align-self:stretch;background:rgba(8,9,13,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.1);border-radius:calc(var(--r) * 0.95);
+    padding:calc(10px * var(--d));max-height:none;-webkit-mask-image:none;mask-image:none;
+  }
+  .comments.panel .cmt{background:rgba(255,255,255,.06);border-color:transparent;max-width:94%}
+  .cmt-head{font-size:10.5px;color:rgba(255,255,255,.62);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+  .giftrow{
+    display:flex;align-items:center;gap:8px;align-self:stretch;
+    background:rgba(8,9,13,.42);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);
+    border-radius:999px;padding:5px 10px;
+  }
+  .giftrow .lbl{font-size:10.5px;color:rgba(255,255,255,.7);white-space:nowrap}
+  .gift-avatars{display:flex}
+  .gift-avatars .avatar{width:24px;height:24px;font-size:10px;margin-inline-start:-7px;border:2px solid rgba(8,9,13,.7)}
+  .gift-avatars .avatar:first-child{margin-inline-start:0}
+  .actionbar{
+    display:flex;align-items:center;gap:calc(7px * var(--d));padding:calc(4px * var(--d)) 0 calc(16px * var(--d));
+  }
+  .field{
+    flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;
+    background:rgba(8,9,13,.5);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);
+    border-radius:999px;padding:9px 14px;font-size:12px;color:rgba(255,255,255,.6);
+  }
+  .heart-btn{position:relative}
+  .heart-btn .ic{color:#ff5f7e}
+  .heart-btn .cnt{position:absolute;inset-block-end:-6px;inset-inline-end:-4px;font-size:9px;font-weight:700;color:#fff;background:#e0303c;border-radius:999px;padding:1px 4px}
+  .float-heart{position:absolute;bottom:64px;inset-inline-end:22px;width:22px;height:22px;color:#ff5f7e;opacity:0;animation:rise 3s ease-in-out infinite;z-index:4;will-change:transform,opacity}
+  .float-heart:nth-of-type(2){animation-delay:-1.1s;inset-inline-end:44px;width:17px;height:17px}
+  .float-heart:nth-of-type(3){animation-delay:-2.1s;inset-inline-end:66px;width:13px;height:13px}
+  @keyframes rise{0%{opacity:0;transform:translate3d(0,0,0) scale(.7)}18%{opacity:.95}100%{opacity:0;transform:translate3d(-14px,-230px,0) scale(1.15)}}
+
+  /* live explore */
+  .head{padding:calc(10px * var(--d)) calc(16px * var(--d)) calc(8px * var(--d));display:flex;align-items:center;gap:10px}
+  .head h2{margin:0;font-size:17px;font-weight:700;flex:1 1 auto}
+  .searchbar{
+    margin:0 calc(16px * var(--d)) calc(10px * var(--d));display:flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--r) * 0.6);
+    padding:9px 12px;color:var(--muted);font-size:12px;
+  }
+  .tabs{display:flex;gap:calc(6px * var(--d));padding:0 calc(16px * var(--d)) calc(10px * var(--d))}
+  .tab{font-size:11.5px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+  .tab.on{background:var(--accent);border-color:transparent;color:#fff;font-weight:600}
+  .scroll{flex:1 1 auto;overflow:hidden;padding:0 calc(16px * var(--d)) calc(14px * var(--d))}
+  .live-grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(10px * var(--d))}
+  .live-card{border-radius:calc(var(--r) * 0.85);overflow:hidden;position:relative;height:142px;cursor:pointer;border:1px solid var(--line)}
+  .live-card .thumb{position:absolute;inset:0;background:linear-gradient(150deg,var(--c1),var(--c2))}
+  .live-card .thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.78))}
+  .live-card .meta{position:absolute;inset-inline:9px;bottom:8px;color:#fff}
+  .live-card .meta strong{display:block;font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .live-card .meta span{font-size:10px;color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .live-card .live-badge{position:absolute;top:8px;inset-inline-start:8px;font-size:9.5px;padding:3px 6px}
+  .live-card .pill{position:absolute;top:8px;inset-inline-end:8px;font-size:9.5px;padding:3px 6px}
+  .rail-title{display:flex;align-items:center;justify-content:space-between;margin:calc(12px * var(--d)) 0 calc(8px * var(--d));font-size:12.5px;font-weight:700}
+  .rail-title span{font-size:10.5px;color:var(--accent);font-weight:600}
+  .rail{display:flex;gap:12px;overflow:hidden}
+  .rail .item{width:56px;text-align:center;flex:0 0 auto;cursor:pointer}
+  .rail .avatar{width:52px;height:52px;margin:0 auto 5px;font-size:15px;box-shadow:0 0 0 2px var(--accent), 0 0 0 4px var(--soft)}
+  .rail .item span{font-size:10px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- MESSENGER ---------- */
+  .list-head{padding:calc(10px * var(--d)) calc(16px * var(--d)) calc(6px * var(--d));display:flex;align-items:center;gap:8px}
+  .list-head h2{margin:0;font-size:19px;font-weight:800;flex:1 1 auto}
+  .icon-quiet{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--text);background:var(--surface);border:1px solid var(--line);cursor:pointer}
+  .rows{flex:1 1 auto;overflow:hidden;padding:0 calc(10px * var(--d))}
+  .chat-row{
+    display:flex;align-items:center;gap:calc(11px * var(--d));cursor:pointer;
+    padding:calc(10px * var(--d)) calc(8px * var(--d));border-radius:calc(var(--r) * 0.75);transition:.15s;
+  }
+  .chat-row:hover{background:var(--surface)}
+  .chat-row .avatar{width:46px;height:46px;font-size:15px}
+  .chat-row .body{flex:1 1 auto;min-width:0}
+  .chat-row .top{display:flex;align-items:baseline;gap:6px}
+  .chat-row .top strong{font-size:13.5px;font-weight:700;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chat-row .top time{font-size:10.5px;color:var(--muted);flex:0 0 auto}
+  .chat-row .bottom{display:flex;align-items:center;gap:6px;margin-top:3px}
+  .chat-row .bottom p{margin:0;font-size:11.5px;color:var(--muted);flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chat-row.unread .bottom p{color:var(--text);font-weight:600}
+  .chat-row .bottom p.typing{color:var(--accent);font-weight:600}
+  .unread{background:var(--accent);color:#fff;font-size:10px;font-weight:700;min-width:19px;height:19px;border-radius:999px;display:grid;place-items:center;padding:0 5px;flex:0 0 auto}
+  .tabbar{
+    display:flex;justify-content:space-around;align-items:center;z-index:5;
+    border-top:1px solid var(--line);background:var(--bar);padding:calc(9px * var(--d)) 0 calc(18px * var(--d));
+  }
+  .tabbar .tb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:var(--muted)}
+  .tabbar .tb.on{color:var(--accent)}
+  .tabbar .tb .badgewrap{position:relative}
+  .tabbar .tb .badgewrap i{position:absolute;top:-3px;inset-inline-end:-6px;width:15px;height:15px;border-radius:999px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;font-style:normal}
+
+  .conv-head{display:flex;align-items:center;gap:calc(9px * var(--d));padding:calc(10px * var(--d)) calc(14px * var(--d));border-bottom:1px solid var(--line);background:var(--bar);z-index:5}
+  .conv-head .who{flex:1 1 auto;min-width:0}
+  .conv-head .who strong{display:block;font-size:13.5px}
+  .conv-head .who span{font-size:10.5px;color:var(--accent)}
+  .msgs{flex:1 1 auto;overflow:hidden;padding:calc(12px * var(--d)) calc(14px * var(--d)) 0;display:flex;flex-direction:column;justify-content:flex-end;gap:calc(9px * var(--d))}
+  .divider{align-self:center;font-size:10px;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:3px 10px;border-radius:999px}
+  .msg-row{display:flex;gap:7px;align-items:flex-end;max-width:88%}
+  .msg-row.in{align-self:flex-start}
+  .msg-row.out{align-self:flex-end;flex-direction:row-reverse}
+  .msg-row .avatar{width:26px;height:26px;font-size:10px}
+  .bubble{
+    background:var(--bubble-in);border:1px solid var(--line);color:var(--text);
+    padding:calc(9px * var(--d)) calc(11px * var(--d));font-size:12.5px;line-height:1.6;
+    box-shadow:0 6px 18px rgba(0,0,0,.14);
+  }
+  .bubble .stamp{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:9.5px;color:var(--muted);margin-top:4px}
+  .screen[data-bubble="tail"] .msg-row.in .bubble{border-radius:calc(var(--r) * 0.8) calc(var(--r) * 0.8) calc(var(--r) * 0.8) 5px}
+  .screen[data-bubble="tail"] .msg-row.out .bubble{border-radius:calc(var(--r) * 0.8) calc(var(--r) * 0.8) 5px calc(var(--r) * 0.8)}
+  .screen[data-bubble="plain"] .bubble{border-radius:calc(var(--r) * 0.9)}
+  .screen[data-bubble="square"] .bubble{border-radius:7px}
+  .msg-row.out .bubble{background:var(--bubble-out);border-color:transparent;color:#fff}
+  .msg-row.out .bubble .stamp{color:rgba(255,255,255,.8)}
+  .msg-row.out .bubble .stamp .ic{color:rgba(255,255,255,.95)}
+  .bubble.media{padding:5px}
+  .bubble.media .thumb{width:172px;height:118px;border-radius:calc(var(--r) * 0.65);background:linear-gradient(140deg,var(--c1),var(--c2))}
+  .bubble.media .cap{font-size:11px;padding:5px 6px 2px;color:var(--muted)}
+  .bubble.voice{display:flex;align-items:center;gap:9px;min-width:186px}
+  .vbars{display:flex;align-items:center;gap:2.5px;height:22px}
+  .vbars i{width:2.5px;border-radius:2px;background:currentColor;opacity:.45;display:block}
+  .typing .dots{display:flex;gap:4px;padding:2px 0}
+  .typing .dots i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s ease-in-out infinite}
+  .typing .dots i:nth-child(2){animation-delay:.18s}
+  .typing .dots i:nth-child(3){animation-delay:.36s}
+  @keyframes blink{0%,100%{opacity:.28;transform:translateY(0)}45%{opacity:1;transform:translateY(-3px)}}
+  .composer{
+    display:flex;align-items:center;gap:calc(7px * var(--d));z-index:5;
+    padding:calc(9px * var(--d)) calc(12px * var(--d)) calc(18px * var(--d));
+    border-top:1px solid var(--line);background:var(--bar);
+  }
+  .composer .field{background:var(--surface);border-color:var(--line);color:var(--muted);border-radius:999px}
+  .send-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;flex:0 0 auto;cursor:pointer}
+  .icon-plain{color:var(--muted);cursor:pointer;display:grid;place-items:center;width:28px;height:28px;flex:0 0 auto}
+
+  /* ---------- prompt ---------- */
+  .promptbar{
+    border:1px solid var(--ui-line);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.028);
+  }
+  .prompt-head{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--ui-line)}
+  .prompt-head strong{font-size:12.5px;flex:1 1 auto}
+  .prompt-head small{font-size:10.5px;color:var(--ui-muted)}
+  #copy{
+    border:0;border-radius:9px;padding:8px 15px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;
+    background:var(--ui-accent);color:#fff;transition:.15s;flex:0 0 auto;
+  }
+  #copy.done{background:#2fd07a}
+  #prompt{
+    margin:0;padding:14px 16px;max-height:230px;overflow:auto;white-space:pre-wrap;line-height:1.85;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;color:#cfd3df;direction:rtl;text-align:start;
+  }
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr}
+    .panel{position:static;height:auto}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="panel">
+    <div class="panel-head">
+      <h1>استوديو التصميم — Live + Messenger</h1>
+      <p>غيّر أي عنصر وسترى الشاشتين تتحدّثان فورًا. المواصفات الجاهزة للنسخ تتحدّث معك في الأسفل.</p>
+    </div>
+
+    <div class="group">
+      <h3>أنماط جاهزة</h3>
+      <div class="grid-btns" id="presets">
+        <button class="preset" data-preset="midnight">Midnight<span>بنفسجي داكن</span></button>
+        <button class="preset" data-preset="softlight">Soft Light<span>فاتح هادئ</span></button>
+        <button class="preset" data-preset="neon">Neon Stream<span>بث حيوي</span></button>
+        <button class="preset" data-preset="sunset">Sunset<span>دافئ برتقالي</span></button>
+        <button class="preset" data-preset="mono">Minimal Mono<span>رمادي محايد</span></button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>الشاشات المعروضة</h3>
+      <div class="seg" data-seg="screen">
+        <button data-set="screen:both">الاثنتان</button>
+        <button data-set="screen:live">Live</button>
+        <button data-set="screen:messenger">Messenger</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>المظهر</h3>
+      <div class="seg" data-seg="mode">
+        <button data-set="mode:dark">داكن</button>
+        <button data-set="mode:light">فاتح</button>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>درجة اللون الأساسي</span><b id="v-hue">262</b></div>
+        <input type="range" data-range="hue" min="0" max="360" step="1" value="262">
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>تشبّع اللون</span><b id="v-sat">72</b></div>
+        <input type="range" data-range="sat" min="0" max="100" step="1" value="72">
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>نصف قطر العناصر</span><b id="v-radius">20px</b></div>
+        <input type="range" data-range="radius" min="0" max="28" step="1" value="20">
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>الكثافة</span><b id="v-density">1.00x</b></div>
+        <input type="range" data-range="density" min="0.85" max="1.3" step="0.05" value="1">
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>الاتجاه والشكل</h3>
+      <div class="seg" data-seg="dir">
+        <button data-set="dir:rtl">RTL</button>
+        <button data-set="dir:ltr">LTR</button>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>الخط</span></div>
+        <div class="seg" data-seg="font">
+          <button data-set="font:system">نظام</button>
+          <button data-set="font:rounded">مستدير</button>
+          <button data-set="font:mono">أحادي</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>الصور الرمزية</span></div>
+        <div class="seg" data-seg="avatar">
+          <button data-set="avatar:circle">دائري</button>
+          <button data-set="avatar:squircle">مربع ناعم</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>شاشة Live</h3>
+      <div class="seg" data-seg="liveView">
+        <button data-set="liveView:watch">مشاهدة البث</button>
+        <button data-set="liveView:explore">استكشاف</button>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>الدردشة</span></div>
+        <div class="seg" data-seg="comments">
+          <button data-set="comments:overlay">عائمة</button>
+          <button data-set="comments:panel">لوحة</button>
+        </div>
+      </div>
+      <label class="switch"><input type="checkbox" data-toggle="showViewers" checked><span class="track"><span class="knob"></span></span><span>عدد المشاهدين</span></label>
+      <label class="switch"><input type="checkbox" data-toggle="showGifts" checked><span class="track"><span class="knob"></span></span><span>صف الداعمين والهدايا</span></label>
+      <label class="switch"><input type="checkbox" data-toggle="hearts" checked><span class="track"><span class="knob"></span></span><span>حركة القلوب</span></label>
+    </div>
+
+    <div class="group">
+      <h3>شاشة Messenger</h3>
+      <div class="seg" data-seg="msgView">
+        <button data-set="msgView:list">قائمة المحادثات</button>
+        <button data-set="msgView:chat">داخل محادثة</button>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><span>شكل الفقاعات</span></div>
+        <div class="seg" data-seg="bubble">
+          <button data-set="bubble:tail">بذيل</button>
+          <button data-set="bubble:plain">موحّد</button>
+          <button data-set="bubble:square">حِدّي</button>
+        </div>
+      </div>
+      <label class="switch"><input type="checkbox" data-toggle="showTyping" checked><span class="track"><span class="knob"></span></span><span>مؤشر الكتابة</span></label>
+      <label class="switch"><input type="checkbox" data-toggle="showReceipts" checked><span class="track"><span class="knob"></span></span><span>علامات القراءة</span></label>
+      <label class="switch"><input type="checkbox" data-toggle="showVoice" checked><span class="track"><span class="knob"></span></span><span>فقاعة رسالة صوتية</span></label>
+      <label class="switch"><input type="checkbox" data-toggle="showAttach" checked><span class="track"><span class="knob"></span></span><span>أزرار المرفقات</span></label>
+    </div>
+
+    <details>
+      <summary>ملاحظات الأداء (مهمة عند التنفيذ)</summary>
+      <ul class="notes">
+        <li>قائمة المحادثات وتعليقات البث تُبنى على FlatList / ListView.builder / react-window مع حد أقصى 50 عنصرًا محفوظًا في الذاكرة.</li>
+        <li>تعليقات البث تُجمَّع على دفعات كل 100ms قبل الإضافة، وتُحمَّل الرسائل الأقدم بمؤشر (cursor) عند التمرير لأعلى.</li>
+        <li>كل الحركات transform/opacity فقط، ويُحترم إعداد تقليل الحركة في النظام.</li>
+        <li>لا تُعِد رسم الشاشة كاملة عند وصول رسالة: حدّث الصف المتأثر فقط.</li>
+      </ul>
+    </details>
+  </aside>
+
+  <main class="stage">
+    <div class="phones" id="phones"></div>
+    <section class="promptbar">
+      <div class="prompt-head">
+        <strong>المواصفات الجاهزة للنسخ إلى المطوّر أو إلى الأداة التي تبني بها التطبيق</strong>
+        <small id="hint">تُحدَّث تلقائيًا</small>
+        <button id="copy">نسخ المواصفات</button>
+      </div>
+      <pre id="prompt"></pre>
+    </section>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   state + presets
+   ========================================================= */
+const DEFAULTS = {
+  screen:'both', mode:'dark', hue:262, sat:72, radius:20, density:1,
+  dir:'rtl', font:'system', avatar:'circle',
+  liveView:'watch', comments:'overlay', showViewers:true, showGifts:true, hearts:true,
+  msgView:'list', bubble:'tail', showTyping:true, showReceipts:true, showVoice:true, showAttach:true
+};
+const PRESETS = {
+  midnight:{},
+  softlight:{mode:'light', hue:222, sat:64, radius:16, density:1.1, comments:'panel', bubble:'plain', avatar:'squircle'},
+  neon:{mode:'dark', hue:312, sat:88, radius:24, density:0.95, comments:'overlay', bubble:'tail', hearts:true, liveView:'watch'},
+  sunset:{mode:'dark', hue:26, sat:82, radius:14, density:1.05, comments:'panel', bubble:'tail', avatar:'circle', liveView:'explore'},
+  mono:{mode:'dark', hue:220, sat:6, radius:10, density:1, comments:'panel', bubble:'square', font:'mono', avatar:'squircle'}
+};
+let state = Object.assign({}, DEFAULTS);
+let chat = { name:'الفريق التقني', initial:'ف', color:'hsl(262, 60%, 52%)' };
+
+/* =========================================================
+   helpers
+   ========================================================= */
+const pct = n => Math.round(n);
+function hsl2hex(h, s, l){
+  s/=100; l/=100;
+  const k = n => (n + h/30) % 12;
+  const a = s * Math.min(l, 1-l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+  const to = n => Math.round(255*f(n)).toString(16).padStart(2,'0');
+  return '#' + to(0) + to(8) + to(4);
+}
+function pal(){
+  const dark = state.mode === 'dark';
+  const H = state.hue, S = state.sat;
+  const accentL = dark ? 62 : 50;
+  const accent = `hsl(${H}, ${S}%, ${accentL}%)`;
+  const accent2 = `hsl(${H}, ${Math.min(S+8,100)}%, ${dark ? 72 : 42}%)`;
+  return {
+    dark:dark,
+    accent:accent, accent2:accent2,
+    accentHex:hsl2hex(H, S, accentL),
+    soft:`hsla(${H}, ${S}%, ${accentL}%, ${dark ? .16 : .12})`,
+    bg: dark ? '#0a0b10' : '#f1f2f8',
+    bar: dark ? 'rgba(12,14,20,.92)' : '#ffffff',
+    surface: dark ? 'rgba(255,255,255,.055)' : 'rgba(15,17,26,.035)',
+    text: dark ? '#ecEEf4' : '#12141c',
+    muted: dark ? '#8b91a3' : '#6b7180',
+    line: dark ? 'rgba(255,255,255,.09)' : 'rgba(15,17,26,.09)',
+    bubbleIn: dark ? 'rgba(255,255,255,.075)' : '#ffffff',
+    bubbleOut: `hsl(${H}, ${S}%, ${dark ? 54 : 50}%)`,
+    sb: dark ? 'rgba(255,255,255,.9)' : '#12141c',
+    video: dark
+      ? { v1:`hsl(${H}, ${S}%, 42%)`, v2:`hsl(${(H+52)%360}, ${Math.max(S-10,20)}%, 34%)`, v3:`hsl(${(H+300)%360}, ${S}%, 16%)` }
+      : { v1:`hsl(${H}, ${Math.max(S-6,20)}%, 66%)`, v2:`hsl(${(H+48)%360}, ${Math.max(S-14,18)}%, 58%)`, v3:`hsl(${(H+300)%360}, ${S}%, 38%)` }
+  };
+}
+const FONTS = {
+  system:"system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif",
+  rounded:"ui-rounded,'SF Pro Rounded','Segoe UI',Tahoma,sans-serif",
+  mono:"ui-monospace,'SF Mono',Menlo,Consolas,monospace"
+};
+
+const IC = {
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  send:'<path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  heart:'<path d="M12 20s-7-4.4-7-9.4A4.1 4.1 0 0 1 12 7a4.1 4.1 0 0 1 7 3.6c0 5-7 9.4-7 9.4z"/>',
+  gift:'<rect x="3" y="8" width="18" height="12" rx="2.5"/><path d="M3 13h18M12 8v12"/><path d="M8.6 8a2.3 2.3 0 1 1 0-4.6c2 0 3.4 4.6 3.4 4.6"/><path d="M15.4 8a2.3 2.3 0 1 0 0-4.6c-2 0-3.4 4.6-3.4 4.6"/>',
+  share:'<path d="M12 16V4M8 8l4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',
+  eye:'<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/>',
+  camera:'<rect x="3" y="7" width="18" height="13" rx="3.5"/><circle cx="12" cy="13.5" r="3.4"/><path d="M9 7l1.3-2.4h3.4L15 7"/>',
+  image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l4.6-4.6 3 3L15 12.8l5 5.2"/>',
+  more:'<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>',
+  check2:'<path d="M2.5 13.5l3.6 3.6L13.6 9.6"/><path d="M10.4 16.2l1.4 1.4L21.5 8"/>',
+  chat:'<path d="M4.5 5h15v11h-10l-5 4z"/>',
+  users:'<circle cx="9" cy="9" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 6.6a3 3 0 0 1 0 5.5M18 20c0-2.2-.7-3.9-2-5"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/>',
+  flame:'<path d="M12 3.5s4.2 4.6 4.2 8.2a4.2 4.2 0 0 1-8.4 0c0-1.5.6-2.7 1.4-3.7"/><path d="M12 21a5.4 5.4 0 0 1-2.7-10"/>',
+  play:'<path d="M8 5.5l11 6.5-11 6.5z"/>',
+  image2:'<rect x="3" y="4" width="18" height="16" rx="3"/>'
+};
+const icon = (n, cls) => '<svg class="ic ' + (cls || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + IC[n] + '</svg>';
+
+const av = (initial, color, extra) => '<span class="avatar ' + (extra || '') + '" style="--av:' + color + '">' + initial + (extra === 'on' ? '<i class="dot"></i>' : '') + '</span>';
+
+function statusbar(p, overVideo){
+  return '<div class="statusbar' + (overVideo ? ' on-video' : '') + '"><span>9:41</span><span class="sb-right">'
+    + '<i class="sb-bar" style="height:5px"></i><i class="sb-bar" style="height:8px"></i><i class="sb-bar" style="height:11px"></i>'
+    + '<span class="sb-batt"></span></span></div>';
+}
+
+/* =========================================================
+   screen: LIVE
+   ========================================================= */
+const LIVE_HOSTS = [
+  {n:'سارة', i:'س', c:'hsl(340, 62%, 52%)', t:'جلسة تصميم مباشرة', v:'12.4K'},
+  {n:'يوسف', i:'ي', c:'hsl(210, 62%, 52%)', t:'لعب مع الجمهور', v:'6.1K'},
+  {n:'ليان', i:'ل', c:'hsl(28, 70%, 52%)', t:'أسئلة وأجوبة', v:'3.8K'},
+  {n:'كريم', i:'ك', c:'hsl(150, 55%, 45%)', t:'طبخ سريع', v:'1.9K'}
+];
+const COMMENTS = [
+  {n:'منى', t:'الجودة ممتازة اليوم'},
+  {n:'عمر', t:'أول مرة أحضر بثّك'},
+  {n:'هدى', t:'من أي مدينة تبث؟'}
+];
+
+function liveWatch(p){
+  const [h] = LIVE_HOSTS;
+  const comments = COMMENTS.map(c =>
+    '<div class="cmt"><b>' + c.n + '</b> ' + c.t + '</div>').join('');
+  const giftRow = state.showGifts ? (
+    '<div class="giftrow"><span class="lbl">الأكثر دعمًا</span><span class="gift-avatars">'
+    + av('ر', 'hsl(20, 65%, 52%)') + av('ن', 'hsl(280, 55%, 55%)') + av('س', 'hsl(170, 50%, 45%)') + av('م', 'hsl(45, 70%, 50%)')
+    + '</span><span class="spacer"></span>' + icon('gift', 'sm') + '</div>') : '';
+  const hearts = state.hearts
+    ? '<span class="float-heart">' + icon('heart') + '</span><span class="float-heart">' + icon('heart') + '</span><span class="float-heart">' + icon('heart') + '</span>'
+    : '';
+  return '<div class="video"><span class="blob b1"></span><span class="blob b2"></span></div>'
+    + statusbar(p, true)
+    + '<div class="live-top">'
+      + '<span class="host">' + av(h.i, h.c) + '<span><span class="host-name" style="display:block">' + h.n + '</span><span class="host-sub">' + h.t + '</span></span>'
+      + '<button class="follow">متابعة</button></span>'
+      + '<span class="live-badge"><i></i>مباشر</span>'
+      + (state.showViewers ? '<span class="pill">' + icon('eye','sm') + h.v + '</span>' : '')
+      + '<span class="spacer"></span>'
+      + '<span class="icon-btn">' + icon('share','sm') + '</span>'
+      + '<span class="icon-btn">' + icon('close','sm') + '</span>'
+    + '</div>'
+    + '<div class="live-body">'
+      + hearts
+      + '<div class="comments ' + (state.comments === 'panel' ? 'panel' : '') + '">'
+        + (state.comments === 'panel'
+            ? '<div class="cmt-head">' + icon('chat','sm') + ' الدردشة المباشرة · 214</div>'
+            : '')
+        + comments
+      + '</div>'
+      + giftRow
+      + '<div class="actionbar">'
+        + '<span class="field">اكتب تعليقًا…</span>'
+        + (state.showGifts ? '<span class="icon-btn">' + icon('gift','sm') + '</span>' : '')
+        + '<span class="icon-btn heart-btn">' + icon('heart','sm') + '<i class="cnt">1.2K</i></span>'
+      + '</div>'
+    + '</div>'
+    + '<span class="homebar"></span>';
+}
+
+function liveCard(h, i){
+  const c1 = `hsl(${(state.hue + i*46) % 360}, ${Math.min(state.sat+6,95)}%, ${state.dark ? 44 : 62}%)`;
+  const c2 = `hsl(${(state.hue + i*46 + 40) % 360}, ${Math.max(state.sat-16,18)}%, ${state.dark ? 20 : 42}%)`;
+  return '<div class="live-card" data-act="open-live"><span class="thumb" style="--c1:' + c1 + ';--c2:' + c2 + '"></span>'
+    + '<span class="live-badge"><i></i>مباشر</span>'
+    + '<span class="pill">' + icon('eye','sm') + h.v + '</span>'
+    + '<span class="meta"><strong>' + h.t + '</strong><span>' + h.n + '</span></span>'
+    + '</div>';
+}
+
+function liveExplore(p){
+  return statusbar(p)
+    + '<div class="head"><h2>البث المباشر</h2>'
+      + '<span class="icon-quiet">' + icon('search','sm') + '</span>'
+      + '<span class="icon-quiet">' + icon('flame','sm') + '</span></div>'
+    + '<div class="searchbar">' + icon('search','sm') + 'ابحث عن بث أو مذيع</div>'
+    + '<div class="tabs"><span class="tab on">رائج</span><span class="tab">متابَعون</span><span class="tab">قريب منك</span></div>'
+    + '<div class="scroll">'
+      + '<div class="live-grid">' + LIVE_HOSTS.map(liveCard).join('') + '</div>'
+      + '<div class="rail-title">مذيعون نشطون الآن <span>عرض الكل</span></div>'
+      + '<div class="rail">' + LIVE_HOSTS.map(h =>
+          '<span class="item" data-act="open-live">' + av(h.i, h.c, 'ring') + '<span>' + h.n + '</span></span>').join('') + '</div>'
+    + '</div>'
+    + '<span class="homebar"></span>';
+}
+
+/* =========================================================
+   screen: MESSENGER
+   ========================================================= */
+const CHATS = [
+  {n:'الفريق التقني', i:'ف', c:'hsl(262, 60%, 52%)', m:'باقي مراجعة شاشة الليف', t:'الآن', u:3, on:true, typing:true},
+  {n:'سارة أحمد', i:'س', c:'hsl(340, 62%, 52%)', m:'وصلني التحديث، شكرًا!', t:'12:04', u:0, on:true, typing:false},
+  {n:'أحمد منصور', i:'أ', c:'hsl(210, 62%, 52%)', m:'صورة', t:'11:20', u:1, on:false, typing:false},
+  {n:'مجموعة العمل', i:'م', c:'hsl(28, 70%, 52%)', m:'هدى: الاجتماع غدًا الساعة 10', t:'أمس', u:0, on:false, typing:false},
+  {n:'دعم التطبيق', i:'د', c:'hsl(150, 55%, 45%)', m:'تم فتح التذكرة رقم 4821', t:'أمس', u:0, on:false, typing:false}
+];
+
+function msgList(p){
+  const rows = CHATS.map(c =>
+    '<div class="chat-row ' + (c.u ? 'unread' : '') + '" data-act="open-chat" data-name="' + c.n + '" data-initial="' + c.i + '" data-color="' + c.c + '">'
+      + av(c.i, c.c, c.on ? 'on' : '')
+      + '<div class="body"><div class="top"><strong>' + c.n + '</strong><time>' + c.t + '</time></div>'
+      + '<div class="bottom">'
+        + (state.showTyping && c.typing ? '<p class="typing">يكتب الآن…</p>' : '<p>' + c.m + '</p>')
+        + (c.u ? '<span class="unread">' + c.u + '</span>' : '')
+      + '</div></div></div>').join('');
+  return statusbar(p)
+    + '<div class="list-head"><h2>المحادثات</h2>'
+    + '<span class="icon-quiet">' + icon('search','sm') + '</span>'
+    + '<span class="icon-quiet">' + icon('plus','sm') + '</span></div>'
+    + '<div class="tabs"><span class="tab on">الكل</span><span class="tab">غير مقروءة</span><span class="tab">مجموعات</span></div>'
+    + '<div class="rows">' + rows + '</div>'
+    + '<div class="tabbar">'
+      + '<span class="tb on"><span class="badgewrap">' + icon('chat','sm') + '<i>4</i></span>الرسائل</span>'
+      + '<span class="tb">' + icon('users','sm') + 'المجموعات</span>'
+      + '<span class="tb">' + icon('phone','sm') + 'المكالمات</span>'
+      + '<span class="tb">' + icon('gear','sm') + 'الإعدادات</span>'
+    + '</div>'
+    + '<span class="homebar"></span>';
+}
+
+function vbars(){
+  let out = '';
+  for (let i = 0; i < 16; i++){
+    const h = 5 + Math.round(Math.abs(Math.sin(i * 1.7)) * 15);
+    out += '<i style="height:' + h + 'px"></i>';
+  }
+  return out;
+}
+
+function msgChat(p){
+  const c1 = `hsl(${state.hue}, ${Math.min(state.sat+6,95)}%, ${state.dark ? 46 : 60}%)`;
+  const c2 = `hsl(${(state.hue+42)%360}, ${Math.max(state.sat-14,20)}%, ${state.dark ? 22 : 44}%)`;
+  const stamp = t => '<span class="stamp">' + t
+    + (state.showReceipts ? icon('check2','sm') : '') + '</span>';
+
+  const voice = state.showVoice ? (
+    '<div class="msg-row in">' + av('س','hsl(340, 62%, 52%)')
+    + '<div class="bubble voice"><span class="icon-quiet" style="width:22px;height:22px">' + icon('play','sm') + '</span>'
+    + '<span class="vbars">' + vbars() + '</span><span style="font-size:10.5px;opacity:.75">0:12</span></div></div>') : '';
+
+  const media = state.showAttach ? (
+    '<div class="msg-row out"><div class="bubble media"><div class="thumb" style="--c1:' + c1 + ';--c2:' + c2 + '"></div>'
+    + '<div class="cap">واجهة الليف — النسخة الثالثة</div>' + stamp('12:06') + '</div></div>') : '';
+
+  const typing = state.showTyping ? (
+    '<div class="msg-row in">' + av('س','hsl(340, 62%, 52%)')
+    + '<div class="bubble typing"><span class="dots"><i></i><i></i><i></i></span></div></div>') : '';
+
+  return statusbar(p)
+    + '<div class="conv-head">'
+      + '<span class="icon-quiet" data-act="back">' + icon('back','sm') + '</span>'
+      + av(chat.initial, chat.color, 'on')
+      + '<span class="who"><strong data-act="chat-title">' + chat.name + '</strong><span>متصل الآن</span></span>'
+      + '<span class="icon-quiet">' + icon('phone','sm') + '</span>'
+      + '<span class="icon-quiet">' + icon('more','sm') + '</span>'
+    + '</div>'
+    + '<div class="msgs">'
+      + '<span class="divider">اليوم</span>'
+      + '<div class="msg-row in">' + av('س','hsl(340, 62%, 52%)')
+        + '<div class="bubble">مرحبًا، هل جهزت شاشة الليف للتجربة؟' + stamp('11:58') + '</div></div>'
+      + '<div class="msg-row out"><div class="bubble">جهزت المشاهدة والاستكشاف، باقي مراجعة الألوان.' + stamp('12:01') + '</div></div>'
+      + voice
+      + media
+      + '<div class="msg-row out"><div class="bubble">سأرفع النسخة بعد قليل.' + stamp('12:07') + '</div></div>'
+      + typing
+    + '</div>'
+    + '<div class="composer">'
+      + (state.showAttach ? '<span class="icon-plain">' + icon('plus','sm') + '</span><span class="icon-plain">' + icon('camera','sm') + '</span>' : '')
+      + '<span class="field">رسالة…</span>'
+      + '<span class="send-btn">' + icon(state.showAttach ? 'mic' : 'send','sm') + '</span>'
+    + '</div>'
+    + '<span class="homebar"></span>';
+}
+
+/* =========================================================
+   render
+   ========================================================= */
+function screenVars(p){
+  return '--bg:' + p.bg + ';--text:' + p.text + ';--muted:' + p.muted + ';--line:' + p.line
+    + ';--surface:' + p.surface + ';--bar:' + p.bar + ';--accent:' + p.accent + ';--accent2:' + p.accent2 + ';--soft:' + p.soft
+    + ';--bubble-in:' + p.bubbleIn + ';--bubble-out:' + p.bubbleOut + ';--sb:' + p.sb
+    + ';--vid1:' + p.video.v1 + ';--vid2:' + p.video.v2 + ';--vid3:' + p.video.v3
+    + ';--d:' + state.density + ';--ff:' + FONTS[state.font] + ';--r:' + state.radius + 'px';
+}
+function device(cap, inner, p){
+  return '<div class="device">'
+    + '<div class="phone"><div class="screen"'
+    + ' style="' + screenVars(p) + '"'
+    + ' dir="' + state.dir + '"'
+    + ' data-avatar="' + state.avatar + '"'
+    + ' data-bubble="' + state.bubble + '"'
+    + ' data-pulse="' + (state.hearts ? 'true' : 'false') + '">'
+    + inner + '</div></div>'
+    + '<span class="device-cap">' + cap + '</span></div>';
+}
+function render(){
+  const p = pal();
+  state.dark = p.dark;
+  const out = [];
+  if (state.screen === 'both' || state.screen === 'live'){
+    out.push(device(state.liveView === 'watch' ? 'Live — مشاهدة البث' : 'Live — استكشاف البث',
+      state.liveView === 'watch' ? liveWatch(p) : liveExplore(p), p));
+  }
+  if (state.screen === 'both' || state.screen === 'messenger'){
+    out.push(device(state.msgView === 'list' ? 'Messenger — المحادثات' : 'Messenger — داخل محادثة',
+      state.msgView === 'list' ? msgList(p) : msgChat(p), p));
+  }
+  document.getElementById('phones').innerHTML = out.join('');
+  updatePrompt(p);
+  syncActive();
+}
+
+/* =========================================================
+   prompt output
+   ========================================================= */
+function updatePrompt(p){
+  const L = [];
+  const d = DEFAULTS;
+  L.push('اعمل على واجهة تطبيق موبايل تحتوي قسمَي "Live" (بث مباشر) و"Messenger" (محادثات). نفّذ المواصفات التالية:');
+  L.push('');
+  L.push('المظهر العام');
+  L.push('• الاتجاه: ' + (state.dir === 'rtl' ? 'RTL بالكامل مع انعكاس الأيقونات الاتجاهية، وبقاء الأرقام والوقت بشكل صحيح.' : 'LTR مع دعم RTL بنفس المكوّنات.'));
+  if (state.mode === 'dark'){
+    L.push('• الوضع: داكن — الخلفية #0A0B10، الأسطح rgba(255,255,255,0.05)، البطاقات الشريطية rgba(12,14,20,0.92)، النص #ECEEF4، النص الثانوي #8B91A3، الحدود rgba(255,255,255,0.09).');
+  } else {
+    L.push('• الوضع: فاتح — الخلفية #F1F2F8، الأسطح #FFFFFF مع حدود rgba(15,17,26,0.09)، النص #12141C، النص الثانوي #6B7180.');
+  }
+  L.push('• اللون الأساسي ' + p.accentHex + ' (hsl(' + state.hue + ' ' + state.sat + '% ' + (p.dark ? 62 : 50) + '%)) للأزرار النشطة والفقاعات الصادرة والشارات، مع نسخة شفافة 16% للخلفيات الخفيفة وتدرّج نحو لون أفتح للأسماء في التعليقات.');
+  L.push('• نصف قطر العناصر ' + state.radius + 'px (الأزرار الصغيرة ' + Math.round(state.radius * .6) + 'px، الفقاعات ' + Math.round(state.radius * .8) + 'px).');
+  L.push('• الكثافة: ' + (state.density < 1 ? 'مضغوطة' : state.density > 1.1 ? 'مريحة وواسعة' : 'متوسطة') + ' — حشوة أساسية ' + Math.round(16 * state.density) + 'px وفراغات ' + Math.round(12 * state.density) + 'px.');
+  L.push('• الخط: ' + ({system:'خط النظام system-ui مع بديل Tahoma للعربية', rounded:'خط مستدير (SF Pro Rounded / Nunito) مع بديل للعربية', mono:'خط أحادي المسافة للنصوص التقنية'})[state.font] + '، والأرقام لاتينية.');
+  if (state.avatar === 'squircle') L.push('• الصور الرمزية مربعة ناعمة (نصف قطر ' + Math.round(state.radius * .5) + 'px) بدل الدائرة.');
+  L.push('');
+  L.push('قسم Live');
+  if (state.liveView === 'watch'){
+    L.push('• بدأنا بشاشة المشاهدة: الفيديو يملأ الشاشة كخلفية مع تعتيم متدرّج من الأسفل لقراءة النصوص.');
+    L.push('• أعلى الشاشة: شريحة المضيف (صورة + اسم + وصف قصير + زر "متابعة")، شارة "مباشر" نابضة، ' + (state.showViewers ? 'كبسولة عدد المشاهدين (أيقونة عين + 12.4K)، ' : '') + 'وأزرار مشاركة وإغلاق.');
+    L.push('• الدردشة: ' + (state.comments === 'overlay'
+      ? 'تعليقات عائمة فوق الفيديو (٣ فقاعات، نصف قطر ' + Math.round(state.radius * 0.7) + 'px، خلفية rgba(8,9,13,0.42) مع blur 12px، اسم المتحدث بتدرّج اللون الأساسي).'
+      : 'لوحة دردشة أسفل الفيديو (خلفية rgba(8,9,13,0.55) مع blur، عنوان "الدردشة المباشرة" وعدّاد الرسائل، وفقاعات داخلية أفتح).'));
+  } else {
+    L.push('• بدأنا بشاشة الاستكشاف: شبكة بطاقات 2×2 للبث الجاري (صورة متدرّجة + شارة "مباشر" + عدد المشاهدين + الاسم والعنوان)، ثم شريط أفقي لدوائر المذيعين النشطين بحلقة باللون الأساسي.');
+    L.push('• أعلى الشاشة عنوان "البث المباشر" مع أيقونتَي بحث وترند، وحقل بحث وتبويبات (رائج / متابَعون / قريب منك).');
+    L.push('• الضغط على أي بطاقة يفتح شاشة المشاهدة بنفس المضيف.');
+  }
+  if (state.showGifts) L.push('• شريط "الأكثر دعمًا": ٤ صور متراكبة + أيقونة هدية، ومعه زر هدية في الشريط السفلي.');
+  L.push('• الشريط السفلي: حقل "اكتب تعليقًا…" + أزرار الهدية والقلب (زر القلب يعرض العدّاد ويطلق حركات قلب تصاعدية).');
+  if (state.hearts) L.push('• حركة القلوب: تظهر كل 3 ثوانٍ وترتفع 230px مع تلاشٍ، بـ transform/opacity فقط.');
+  L.push('');
+  L.push('قسم Messenger');
+  L.push('• قائمة المحادثات: عنوان "المحادثات" وأيقونتا بحث وإنشاء، تبويبات (الكل / غير مقروءة / مجموعات)، صفوف المحادثة = صورة مع نقطة اتصال + الاسم + آخر رسالة + الوقت + شارة غير مقروء باللون الأساسي، وشريط تبويب سفلي (الرسائل / المجموعات / المكالمات / الإعدادات) مع شارة عدّاد.');
+  if (state.showTyping) L.push('• مؤشر "يكتب الآن…" بلون أساسي داخل صف المحادثة، وفقاعة ثلاث نقاط متحركة داخل المحادثة.');
+  L.push('• المحادثة: شريط علوي (رجوع + صورة + الاسم + "متصل الآن" + اتصال/مزيد)، فاصل تاريخ، فقاعات واردة بخلفية السطح والصادرة باللون الأساسي' + (state.bubble === 'tail' ? ' مع ذيل في زاوية واحدة' : state.bubble === 'square' ? ' بزوايا شبه حِدّية 7px' : ' بزوايا موحّدة') + '.');
+  if (state.showVoice) L.push('• فقاعة رسالة صوتية: زر تشغيل + موجة ١٦ عمودًا + المدة، وفقاعة صورة بمصغّرة متدرّجة وتعليق.');
+  if (state.showReceipts) L.push('• علامتا قراءة (double check) على الرسائل الصادرة داخل طابع الوقت.');
+  L.push('• شريط الكتابة: ' + (state.showAttach ? 'زر مرفقات + كاميرا + ' : '') + 'حقل "رسالة…" + زر دائري باللون الأساسي يتبدّل بين الميكروفون والإرسال حسب وجود نص.');
+  L.push('');
+  L.push('ملاحظات تنفيذ إلزامية');
+  L.push('• ابنِ القوائم الطويلة (المحادثات، التعليقات، الرسائل) بمكوّن افتراضي (FlatList / ListView.builder / react-window) مع حد أقصى 50 عنصرًا محفوظًا وتحميل أقدم بالصفحات (cursor).');
+  L.push('• تعليقات البث تُجمَّع على دفعات كل 100ms قبل الإضافة، ولا تُعِد رسم الشاشة كاملة عند وصول رسالة — حدّث الصف المتأثر فقط.');
+  L.push('• كل الحركات transform/opacity فقط (60fps) مع احترام إعداد تقليل الحركة في النظام، وأحجام اللمس لا تقل عن 44×44px.');
+  const txt = L.join('\n');
+  document.getElementById('prompt').textContent = txt;
+  document.getElementById('hint').textContent = txt.length + ' حرف';
+}
+
+/* =========================================================
+   controls
+   ========================================================= */
+let raf = null;
+function schedule(){ if (raf) return; raf = requestAnimationFrame(() => { raf = null; render(); }); }
+
+function syncActive(){
+  document.querySelectorAll('[data-seg]').forEach(seg => {
+    const key = seg.dataset.seg;
+    seg.querySelectorAll('button').forEach(b => {
+      const v = b.dataset.set.split(':')[1];
+      b.classList.toggle('on', String(state[key]) === v);
+    });
+  });
+  document.querySelectorAll('[data-preset]').forEach(b =>
+    b.classList.toggle('on', b.dataset.preset === state.preset));
+  document.querySelectorAll('[data-toggle]').forEach(i => { i.checked = !!state[i.dataset.toggle]; });
+  document.querySelectorAll('[data-range]').forEach(r => { r.value = state[r.dataset.range]; });
+  document.getElementById('v-hue').textContent = state.hue;
+  document.getElementById('v-sat').textContent = state.sat;
+  document.getElementById('v-radius').textContent = state.radius + 'px';
+  document.getElementById('v-density').textContent = Number(state.density).toFixed(2) + 'x';
+}
+
+function coerce(key, v){
+  const d = DEFAULTS[key];
+  if (typeof d === 'boolean') return v === 'true';
+  if (typeof d === 'number') return Number(v);
+  return v;
+}
+
+document.addEventListener('click', e => {
+  const pre = e.target.closest('[data-preset]');
+  if (pre){
+    state = Object.assign({}, DEFAULTS, PRESETS[pre.dataset.preset], {preset: pre.dataset.preset});
+    syncActive(); render(); return;
+  }
+  const set = e.target.closest('[data-set]');
+  if (set){
+    const parts = set.dataset.set.split(':');
+    state[parts[0]] = coerce(parts[0], parts.slice(1).join(':'));
+    syncActive(); render(); return;
+  }
+  const act = e.target.closest('[data-act]');
+  if (!act) return;
+  const a = act.dataset.act;
+  if (a === 'open-chat'){
+    chat = {name: act.dataset.name, initial: act.dataset.initial, color: act.dataset.color};
+    state.msgView = 'chat'; syncActive(); render();
+  } else if (a === 'back'){
+    state.msgView = 'list'; syncActive(); render();
+  } else if (a === 'open-live'){
+    state.liveView = 'watch'; syncActive(); render();
+  }
+});
+
+document.addEventListener('input', e => {
+  const r = e.target.closest('[data-range]');
+  if (!r) return;
+  state[r.dataset.range] = Number(r.value);
+  const lbl = document.getElementById('v-' + r.dataset.range);
+  if (lbl) lbl.textContent = r.dataset.range === 'density' ? Number(r.value).toFixed(2) + 'x'
+    : r.dataset.range === 'radius' ? r.value + 'px' : r.value;
+  schedule();
+});
+
+document.addEventListener('change', e => {
+  const t = e.target.closest('[data-toggle]');
+  if (!t) return;
+  state[t.dataset.toggle] = t.checked;
+  render();
+});
+
+document.getElementById('copy').addEventListener('click', async function(){
+  const txt = document.getElementById('prompt').textContent;
+  try { await navigator.clipboard.writeText(txt); }
+  catch (err){
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  this.textContent = 'تم النسخ';
+  this.classList.add('done');
+  setTimeout(() => { this.textContent = 'نسخ المواصفات'; this.classList.remove('done'); }, 1500);
+});
+
+/* also let clicks inside the phone work: the delegation above is on document, so nothing else needed */
+syncActive();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "release": "V62",
+  "base": "Hamkei62-SocialNova-v7",
+  "preserve_original_files": true,
+  "feature_groups": [
+    "feed_posts_reels_stories_moments",
+    "interactive_posts_poll_quiz_slider_countdown_question_music",
+    "messenger_and_presence_status",
+    "live_battles_gifts_and_audio_rooms",
+    "communities_and_creator_teams",
+    "creator_progression_xp_levels_achievements_passport",
+    "creator_seasons_milestones_series_collections_cards_smart_share",
+    "movies_series_seasons_episodes_free_paid_subscriber_only",
+    "subscriptions_single_content_purchase_and_ad_supported_content",
+    "ad_frequency_cap_and_creator_revenue_reporting",
+    "creator_studio_and_analytics",
+    "creator_academy_and_hall_of_fame",
+    "ai_creator_coach_contract",
+    "translation_and_data_saver",
+    "admin_dashboard_rbac_reports_moderation_audit_logs",
+    "google_play_billing_integration_contract",
+    "security_and_server_authoritative_entitlements"
+  ],
+  "verification": {
+    "zip_integrity": true,
+    "original_files_preserved": true,
+    "flutter_build_verified_here": false,
+    "backend_runtime_verified_here": false
+  }
+}

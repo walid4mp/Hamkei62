@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: hamkei62
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: socialnova-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: '*'
+      - key: APP_URL
+        sync: false
+      # Do not run prisma db push automatically against production data.
+      - key: PRISMA_PUSH
+        value: "false"
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: ADMIN_LOGIN_EMAIL
+        sync: false
+      - key: ADMIN_LOGIN_PASSWORD
+        sync: false
+      - key: ADMIN_LOGIN_USERNAME
+        value: admin
+      - key: ADMIN_LOGIN_NAME
+        value: SocialNova Admin
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: STORAGE_UPLOAD_URL
+        sync: false
+      - key: STORAGE_PUBLIC_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GOOGLE_PLAY_PACKAGE_NAME
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+        sync: false
+
+databases:
+  - name: socialnova-db
+    databaseName: socialnova
+    user: socialnova
+    plan: free

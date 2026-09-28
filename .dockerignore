@@ -1,0 +1,7 @@
+.git
+.github
+flutter-app
+admin-panel
+node_modules
+*.zip
+.env
