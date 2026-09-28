@@ -217,6 +217,32 @@ export function hasPermission(user, permission) {
   return wanted.some((p) => perms.includes(p));
 }
 
+// Live-room staff roles. A room host may appoint Moderators and Assistant
+// Moderators; each role has a distinct, enforced capability set.
+export const LIVE_ROLE_PERMISSIONS = Object.freeze({
+  MODERATOR: ['comments.delete', 'comments.pin', 'live.mute', 'live.remove', 'live.end'],
+  ASSISTANT_MODERATOR: ['comments.delete', 'live.report'],
+});
+
+/**
+ * True when a LiveModerator row grants `permission`. An explicit `permissions`
+ * JSON list on the row is honoured on top of the role defaults.
+ */
+export function liveStaffCan(staffRow, permission) {
+  if (!staffRow) return false;
+  let role = String(staffRow.role || 'ASSISTANT_MODERATOR').toUpperCase();
+  if (role === 'ASSISTANT') role = 'ASSISTANT_MODERATOR';
+  if (role === 'FULL_MODERATOR') role = 'MODERATOR';
+  const defaults = LIVE_ROLE_PERMISSIONS[role] || [];
+  let extra = [];
+  try {
+    const p = staffRow.permissions;
+    if (Array.isArray(p)) extra = p.map(String);
+    else if (typeof p === 'string') extra = JSON.parse(p);
+  } catch { /* ignore malformed */ }
+  return defaults.includes(permission) || extra.includes(permission) || extra.includes('*');
+}
+
 /** Permissions that may only be held by a SUPER_ADMIN (guarded grants). */
 export const SUPER_ADMIN_ONLY_PERMISSIONS = Object.freeze([
   'permissions.grant', 'permissions.revoke', 'admins.create', 'admins.delete',

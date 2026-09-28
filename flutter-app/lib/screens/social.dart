@@ -2236,6 +2236,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   dynamic _chatSub;
   dynamic _giftSub;
   dynamic _tapSub;
+  dynamic _liveMuteSub;
+  dynamic _liveRemovedSub;
+  dynamic _liveMutedNoticeSub;
   dynamic _liveCommentSub;
   dynamic _livePinSub;
   dynamic _liveDeleteSub;
@@ -2273,6 +2276,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   Map<String, dynamic>? _replyingTo;
   String? _pinnedCommentId;
   final Set<String> _moderatorIds = <String>{};
+  final Set<String> _mutedIds = <String>{};
   String _moderatorRole = '';
   bool get _isHost => widget.hostId != null && widget.hostId!.isNotEmpty && '${Api.me?['id']}' == widget.hostId;
   Future<void> _showSharedReel(String url) async {
@@ -2312,6 +2316,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     _livePinSub = SocketService.i.liveCommentPins.listen((m) { if (!mounted) return; setState(() { _pinnedCommentId = m['pinned'] == false ? null : '${m['commentId'] ?? ''}'; for (final x in chat) { x['pinned'] = '${x['id']}' == _pinnedCommentId; } }); });
     _liveDeleteSub = SocketService.i.liveCommentDeletes.listen((m) { if (!mounted) return; final id='${m['commentId'] ?? ''}'; setState(() { chat.removeWhere((x) => '${x['id'] ?? ''}' == id); }); });
     _liveModeratorSub = SocketService.i.liveModerators.listen((m) { if (!mounted) return; final id='${m['userId'] ?? ''}'; setState(() { if ('${m['action']}' == 'removed') _moderatorIds.remove(id); else _moderatorIds.add(id); }); });
+    _liveMuteSub = SocketService.i.liveMuted.listen((m) { if (!mounted) return; final id='${m['userId'] ?? ''}'; if (id.isEmpty) return; if (m['value'] == false) { setState(() => _mutedIds.remove(id)); } else { setState(() => _mutedIds.add(id)); final myId='${Api.me?['id']}'; if (id == myId) toast(context, 'تم كتمك في هذا البث بواسطة الإشراف'); } });
+    _liveRemovedSub = SocketService.i.liveRemoved.listen((m) { if (!mounted) return; if ('${m['userId'] ?? ''}' == '${Api.me?['id']}') { toast(context, 'تم إخراجك من البث'); Navigator.maybePop(context); } });
+    _liveMutedNoticeSub = SocketService.i.liveMutedNotice.listen((_) { if (mounted) toast(context, 'أنت مكتوم في هذا البث ولا يمكنك التعليق'); });
     _loadLiveComments();
     _loadLiveModerators();
     _loadLiveStats();
@@ -2387,7 +2394,14 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     if (widget.roomId == null || widget.roomId!.isEmpty) return;
     try { final rows = await Api.liveModerators(widget.roomId!); if (mounted) setState(() { _moderatorIds..clear()..addAll(rows.map((e) => '${(e as Map)['userId']}')); final me=rows.cast<dynamic>().map((e)=>Map<String,dynamic>.from(e as Map)).where((e)=>'${e['userId']}'=='${Api.me?['id']}').toList(); _moderatorRole = me.isEmpty ? '' : '${me.first['role'] ?? ''}'; }); } catch (_) {}
   }
-  bool get _canModerate => _isHost || _moderatorRole.isNotEmpty;
+  // Live staff capabilities (see backend LIVE_ROLE_PERMISSIONS). A Moderator
+  // can pin/mute/remove; an Assistant can only delete and report.
+  bool get _isFullModerator => _isHost || _moderatorRole == 'MODERATOR';
+  bool get _canPinComments => _isFullModerator;
+  bool get _canDeleteComments => _isHost || _moderatorRole.isNotEmpty;
+  bool get _canMuteViewer => _isFullModerator;
+  bool get _canRemoveViewer => _isFullModerator;
+  bool get _canReportComment => _isHost || _moderatorRole.isNotEmpty;
 
   void _onRoomChanged() {
     if (mounted) setState(() {});
@@ -2572,12 +2586,40 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     try { await Api.pinLiveComment(widget.roomId ?? '', id); } catch (_) { SocketService.i.pinLiveComment(widget.roomName, id); }
   }
   void _commentActions(Map<String,dynamic> comment) {
-    final mine='${comment['authorId'] ?? comment['author']?['id'] ?? ''}'=='${Api.me?['id']}';
+    final author = comment['author'] is Map ? Map<String,dynamic>.from(comment['author'] as Map) : <String,dynamic>{};
+    final authorId = '${comment['authorId'] ?? author['id'] ?? ''}';
+    final mine = authorId == '${Api.me?['id']}';
+    final isMuted = _mutedIds.contains(authorId);
     showModalBottomSheet(context:context,backgroundColor:SN.bg1,showDragHandle:true,builder:(ctx)=>SafeArea(child:Wrap(children:[
       ListTile(leading:const Icon(Icons.reply_rounded,color:SN.cyan),title:const Text('الرد على التعليق'),onTap:(){Navigator.pop(ctx);_replyTo(comment);}),
-      if(_canModerate)ListTile(leading:Icon(comment['pinned']==true?Icons.push_pin:Icons.push_pin_outlined,color:SN.gold),title:Text(comment['pinned']==true?'إلغاء تثبيت التعليق':'تثبيت التعليق'),onTap:(){Navigator.pop(ctx);_pinComment(comment);}),
-      if(_canModerate||mine)ListTile(leading:const Icon(Icons.delete_outline,color:Colors.redAccent),title:const Text('حذف التعليق'),onTap:(){Navigator.pop(ctx);_deleteComment(comment);}),
+      if(!mine && authorId.isNotEmpty) ListTile(leading:const Icon(Icons.person_outline,color:SN.violet),title:const Text('عرض الملف الشخصي'),onTap:(){Navigator.pop(ctx);openProfile(context, authorId);}),
+      if(_canPinComments)ListTile(leading:Icon(comment['pinned']==true?Icons.push_pin:Icons.push_pin_outlined,color:SN.gold),title:Text(comment['pinned']==true?'إلغاء تثبيت التعليق':'تثبيت التعليق'),onTap:(){Navigator.pop(ctx);_pinComment(comment);}),
+      if(_canDeleteComments||mine)ListTile(leading:const Icon(Icons.delete_outline,color:Colors.redAccent),title:const Text('حذف التعليق'),onTap:(){Navigator.pop(ctx);_deleteComment(comment);}),
+      if(_canMuteViewer && !mine && authorId.isNotEmpty)
+        ListTile(leading:Icon(isMuted?Icons.volume_up_rounded:Icons.volume_off_rounded,color:Colors.orangeAccent),title:Text(isMuted?'إلغاء كتم المستخدم':'كتم المستخدم'),onTap:(){Navigator.pop(ctx);_muteUser(authorId, !isMuted);}),
+      if(_canRemoveViewer && !mine && authorId.isNotEmpty)
+        ListTile(leading:const Icon(Icons.person_remove_alt_1_rounded,color:Colors.redAccent),title:const Text('إخراج من البث'),onTap:(){Navigator.pop(ctx);_removeUser(authorId);}),
+      if(_canReportComment && !mine)
+        ListTile(leading:const Icon(Icons.flag_outlined,color:Colors.redAccent),title:const Text('إبلاغ عن التعليق'),onTap:(){Navigator.pop(ctx);_reportComment(comment);}),
     ])));
+  }
+
+  void _muteUser(String userId, bool value) {
+    SocketService.i.muteLiveUser(widget.roomName, userId, value: value);
+    if (mounted) setState(() { if (value) { _mutedIds.add(userId); } else { _mutedIds.remove(userId); } });
+    toast(context, value ? 'تم كتم المستخدم في البث' : 'تم إلغاء الكتم');
+  }
+
+  void _removeUser(String userId) {
+    SocketService.i.removeLiveUser(widget.roomName, userId);
+    toast(context, 'تم إخراج المستخدم من البث');
+  }
+
+  void _reportComment(Map<String,dynamic> comment) {
+    final id = '${comment['id'] ?? ''}';
+    if (id.isEmpty) return;
+    Api.reportLiveComment(id, 'إبلاغ من مشرف البث').catchError((_) {});
+    toast(context, 'تم إرسال البلاغ للإدارة 🛡️');
   }
 
   Future<void> _manageModerators() async {
@@ -2664,6 +2706,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     SocketService.i.leaveLive(widget.roomName);
     _chatSub?.cancel();
     _liveCommentSub?.cancel(); _livePinSub?.cancel(); _liveDeleteSub?.cancel(); _liveModeratorSub?.cancel();
+    _liveMuteSub?.cancel(); _liveRemovedSub?.cancel(); _liveMutedNoticeSub?.cancel();
     _giftSub?.cancel();
     _tapSub?.cancel();
     _giftFxTimer?.cancel();
@@ -3034,8 +3077,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   blur: 16,
                   child: TextField(
                     controller: ctrl,
+                    enabled: !_mutedIds.contains('${Api.me?['id']}'),
                     style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: const InputDecoration(hintText: 'اكتب تعليقًا…', hintStyle: TextStyle(color: Colors.white70), border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 9, vertical: 13)),
+                    decoration: InputDecoration(hintText: _mutedIds.contains('${Api.me?['id']}') ? 'أنت مكتوم في هذا البث' : 'اكتب تعليقًا…', hintStyle: const TextStyle(color: Colors.white70), border: InputBorder.none, isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 9, vertical: 13)),
                     onSubmitted: (_) => _sendChat(),
                   ),
                 ),

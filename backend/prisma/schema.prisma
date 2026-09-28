@@ -31,6 +31,7 @@ enum NotificationType {
   VERIFICATION
   GIFT
   WALLET
+  REPORT
 }
 
 enum VerificationTier {

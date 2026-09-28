@@ -395,6 +395,7 @@ class Api {
   static Future<Map<String,dynamic>> reelFeedback(String id,String kind,{String reason=''}) async => Map<String,dynamic>.from(await req('POST','/api/reels/$id/feedback',body:{'kind':kind,'reason':reason}));
   static Future<void> reportReel(String id,String reason) async => req('POST','/api/reels/$id/report',body:{'reason':reason});
   static Future<void> reportPost(String id,String reason) async => req('POST','/api/posts/$id/report',body:{'reason':reason});
+  static Future<void> reportLiveComment(String id,String reason) async => req('POST','/api/live/comments/$id/report',body:{'reason':reason});
   static Future<Map<String,dynamic>> addReelToStory(String id) async => Map<String,dynamic>.from(await req('POST','/api/reels/$id/add-to-story'));
   static Future<void> viewReel(String id) async => req('POST', '/api/reels/$id/view');
   static Future<void> createStory(String mediaUrl, String type, String caption, {int rotationDegrees = 0, String overlayText = '', String overlayEmoji = '', String overlayImageUrl = '', String musicUrl = '', String musicTitle = '', int durationHours = 24, String audienceMode = 'EVERYONE', List<String> hiddenUserIds = const [], bool replyEnabled = true, bool archived = false, String? scheduledAt, int autoHideViews = 0, bool autoHideAfterInteraction = false}) async =>

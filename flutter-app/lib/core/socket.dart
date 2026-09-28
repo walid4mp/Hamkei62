@@ -22,6 +22,9 @@ class SocketService {
   final _liveCommentPins = StreamController<Map<String, dynamic>>.broadcast();
   final _liveCommentDeletes = StreamController<Map<String, dynamic>>.broadcast();
   final _liveModerators = StreamController<Map<String, dynamic>>.broadcast();
+  final _liveMuted = StreamController<Map<String, dynamic>>.broadcast();
+  final _liveRemoved = StreamController<Map<String, dynamic>>.broadcast();
+  final _liveMutedNotice = StreamController<Map<String, dynamic>>.broadcast();
   final _callInvites = StreamController<Map<String, dynamic>>.broadcast();
   final _callAccepted = StreamController<Map<String, dynamic>>.broadcast();
   final _callRejected = StreamController<Map<String, dynamic>>.broadcast();
@@ -50,6 +53,9 @@ class SocketService {
   Stream<Map<String, dynamic>> get liveCommentPins => _liveCommentPins.stream;
   Stream<Map<String, dynamic>> get liveCommentDeletes => _liveCommentDeletes.stream;
   Stream<Map<String, dynamic>> get liveModerators => _liveModerators.stream;
+  Stream<Map<String, dynamic>> get liveMuted => _liveMuted.stream;
+  Stream<Map<String, dynamic>> get liveRemoved => _liveRemoved.stream;
+  Stream<Map<String, dynamic>> get liveMutedNotice => _liveMutedNotice.stream;
 
   void connect() {
     if (Api.token == null) return;
@@ -75,6 +81,9 @@ class SocketService {
       s.on('live:comment:pin', (d) { if (d is Map) _liveCommentPins.add(Map<String, dynamic>.from(d)); });
       s.on('live:comment:delete', (d) { if (d is Map) _liveCommentDeletes.add(Map<String, dynamic>.from(d)); });
       s.on('live:moderator', (d) { if (d is Map) _liveModerators.add(Map<String, dynamic>.from(d)); });
+      s.on('live:muted', (d) { if (d is Map) _liveMuted.add(Map<String, dynamic>.from(d)); });
+      s.on('live:removed', (d) { if (d is Map) _liveRemoved.add(Map<String, dynamic>.from(d)); });
+      s.on('live:muted-notice', (d) { if (d is Map) _liveMutedNotice.add(Map<String, dynamic>.from(d)); });
       s.on('live:user-joined', (d) {
         if (d is Map) _liveUsers.add(Map<String, dynamic>.from(d));
       });
@@ -126,6 +135,8 @@ class SocketService {
   }
   void pinLiveComment(String room, String commentId) { _s?.emit('live:comment:pin', {'room': room, 'commentId': commentId}); }
   void deleteLiveComment(String room, String commentId) { _s?.emit('live:comment:delete', {'room': room, 'commentId': commentId}); }
+  void muteLiveUser(String room, String userId, {bool value = true, String reason = ''}) { _s?.emit('live:mute', {'room': room, 'userId': userId, 'value': value, 'reason': reason}); }
+  void removeLiveUser(String room, String userId) { _s?.emit('live:remove', {'room': room, 'userId': userId}); }
 
   void sendLiveTap(String room) {
     _s?.emit('live:tap', {'room': room});
