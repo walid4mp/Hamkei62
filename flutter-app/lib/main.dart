@@ -7,6 +7,7 @@ import 'core/theme.dart';
 import 'core/localization.dart';
 import 'core/chat_bubbles.dart';
 import 'core/push_notifications.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'screens/auth.dart';
 import 'screens/home.dart';
 import 'screens/social.dart';
@@ -52,11 +53,12 @@ class SocialNovaApp extends StatelessWidget {
           navigatorKey: socialNovaNavigatorKey,
           theme: SN.theme(night: mode == 'night'),
           localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: AppLocale.supported,
+          supportedLocales: AppLocalizations.supportedLocales,
           locale: locale,
           builder: (context, child) {
             WidgetsBinding.instance.addPostFrameCallback((_) {

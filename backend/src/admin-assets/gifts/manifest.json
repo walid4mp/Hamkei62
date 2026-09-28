@@ -1,0 +1,1475 @@
+{
+ "count": 210,
+ "gifts": [
+  {
+   "slug": "love_001",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_001.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_001.webp"
+  },
+  {
+   "slug": "love_002",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_002.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_002.webp"
+  },
+  {
+   "slug": "love_003",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_003.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_003.webp"
+  },
+  {
+   "slug": "love_004",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_004.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_004.webp"
+  },
+  {
+   "slug": "love_005",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_005.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_005.webp"
+  },
+  {
+   "slug": "love_006",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_006.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_006.webp"
+  },
+  {
+   "slug": "love_007",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_007.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_007.webp"
+  },
+  {
+   "slug": "love_008",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_008.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_008.webp"
+  },
+  {
+   "slug": "love_009",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_009.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_009.webp"
+  },
+  {
+   "slug": "love_010",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_010.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_010.webp"
+  },
+  {
+   "slug": "love_011",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_011.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_011.webp"
+  },
+  {
+   "slug": "love_012",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_012.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_012.webp"
+  },
+  {
+   "slug": "love_013",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_013.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_013.webp"
+  },
+  {
+   "slug": "love_014",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_014.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_014.webp"
+  },
+  {
+   "slug": "love_015",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_015.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_015.webp"
+  },
+  {
+   "slug": "love_016",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_016.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_016.webp"
+  },
+  {
+   "slug": "love_017",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_017.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_017.webp"
+  },
+  {
+   "slug": "love_018",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_018.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_018.webp"
+  },
+  {
+   "slug": "love_019",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_019.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_019.webp"
+  },
+  {
+   "slug": "love_020",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_020.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_020.webp"
+  },
+  {
+   "slug": "love_021",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_021.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_021.webp"
+  },
+  {
+   "slug": "love_022",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_022.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_022.webp"
+  },
+  {
+   "slug": "love_023",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_023.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_023.webp"
+  },
+  {
+   "slug": "love_024",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_024.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_024.webp"
+  },
+  {
+   "slug": "love_025",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_025.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_025.webp"
+  },
+  {
+   "slug": "love_026",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_026.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_026.webp"
+  },
+  {
+   "slug": "love_027",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_027.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_027.webp"
+  },
+  {
+   "slug": "love_028",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_028.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_028.webp"
+  },
+  {
+   "slug": "love_029",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_029.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_029.webp"
+  },
+  {
+   "slug": "love_030",
+   "category": "love",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/love/love_030.webp",
+   "previewUrl": "/admin-assets/gifts/preview/love_030.webp"
+  },
+  {
+   "slug": "food_031",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_031.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_031.webp"
+  },
+  {
+   "slug": "food_032",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_032.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_032.webp"
+  },
+  {
+   "slug": "food_033",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_033.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_033.webp"
+  },
+  {
+   "slug": "food_034",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_034.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_034.webp"
+  },
+  {
+   "slug": "food_035",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_035.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_035.webp"
+  },
+  {
+   "slug": "food_036",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_036.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_036.webp"
+  },
+  {
+   "slug": "food_037",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_037.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_037.webp"
+  },
+  {
+   "slug": "food_038",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_038.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_038.webp"
+  },
+  {
+   "slug": "food_039",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_039.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_039.webp"
+  },
+  {
+   "slug": "food_040",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_040.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_040.webp"
+  },
+  {
+   "slug": "food_041",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_041.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_041.webp"
+  },
+  {
+   "slug": "food_042",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_042.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_042.webp"
+  },
+  {
+   "slug": "food_043",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_043.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_043.webp"
+  },
+  {
+   "slug": "food_044",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_044.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_044.webp"
+  },
+  {
+   "slug": "food_045",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_045.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_045.webp"
+  },
+  {
+   "slug": "food_046",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_046.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_046.webp"
+  },
+  {
+   "slug": "food_047",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_047.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_047.webp"
+  },
+  {
+   "slug": "food_048",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_048.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_048.webp"
+  },
+  {
+   "slug": "food_049",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_049.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_049.webp"
+  },
+  {
+   "slug": "food_050",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_050.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_050.webp"
+  },
+  {
+   "slug": "food_051",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_051.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_051.webp"
+  },
+  {
+   "slug": "food_052",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_052.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_052.webp"
+  },
+  {
+   "slug": "food_053",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_053.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_053.webp"
+  },
+  {
+   "slug": "food_054",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_054.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_054.webp"
+  },
+  {
+   "slug": "food_055",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_055.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_055.webp"
+  },
+  {
+   "slug": "food_056",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_056.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_056.webp"
+  },
+  {
+   "slug": "food_057",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_057.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_057.webp"
+  },
+  {
+   "slug": "food_058",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_058.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_058.webp"
+  },
+  {
+   "slug": "food_059",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_059.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_059.webp"
+  },
+  {
+   "slug": "food_060",
+   "category": "food",
+   "rarity": "COMMON",
+   "imageUrl": "/admin-assets/gifts/food/food_060.webp",
+   "previewUrl": "/admin-assets/gifts/preview/food_060.webp"
+  },
+  {
+   "slug": "music_061",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_061.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_061.webp"
+  },
+  {
+   "slug": "music_062",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_062.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_062.webp"
+  },
+  {
+   "slug": "music_063",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_063.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_063.webp"
+  },
+  {
+   "slug": "music_064",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_064.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_064.webp"
+  },
+  {
+   "slug": "music_065",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_065.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_065.webp"
+  },
+  {
+   "slug": "music_066",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_066.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_066.webp"
+  },
+  {
+   "slug": "music_067",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_067.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_067.webp"
+  },
+  {
+   "slug": "music_068",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_068.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_068.webp"
+  },
+  {
+   "slug": "music_069",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_069.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_069.webp"
+  },
+  {
+   "slug": "music_070",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_070.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_070.webp"
+  },
+  {
+   "slug": "music_071",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_071.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_071.webp"
+  },
+  {
+   "slug": "music_072",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_072.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_072.webp"
+  },
+  {
+   "slug": "music_073",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_073.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_073.webp"
+  },
+  {
+   "slug": "music_074",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_074.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_074.webp"
+  },
+  {
+   "slug": "music_075",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_075.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_075.webp"
+  },
+  {
+   "slug": "music_076",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_076.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_076.webp"
+  },
+  {
+   "slug": "music_077",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_077.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_077.webp"
+  },
+  {
+   "slug": "music_078",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_078.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_078.webp"
+  },
+  {
+   "slug": "music_079",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_079.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_079.webp"
+  },
+  {
+   "slug": "music_080",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_080.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_080.webp"
+  },
+  {
+   "slug": "music_081",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_081.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_081.webp"
+  },
+  {
+   "slug": "music_082",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_082.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_082.webp"
+  },
+  {
+   "slug": "music_083",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_083.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_083.webp"
+  },
+  {
+   "slug": "music_084",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_084.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_084.webp"
+  },
+  {
+   "slug": "music_085",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_085.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_085.webp"
+  },
+  {
+   "slug": "music_086",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_086.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_086.webp"
+  },
+  {
+   "slug": "music_087",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_087.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_087.webp"
+  },
+  {
+   "slug": "music_088",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_088.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_088.webp"
+  },
+  {
+   "slug": "music_089",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_089.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_089.webp"
+  },
+  {
+   "slug": "music_090",
+   "category": "music",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/music/music_090.webp",
+   "previewUrl": "/admin-assets/gifts/preview/music_090.webp"
+  },
+  {
+   "slug": "sport_091",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_091.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_091.webp"
+  },
+  {
+   "slug": "sport_092",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_092.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_092.webp"
+  },
+  {
+   "slug": "sport_093",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_093.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_093.webp"
+  },
+  {
+   "slug": "sport_094",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_094.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_094.webp"
+  },
+  {
+   "slug": "sport_095",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_095.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_095.webp"
+  },
+  {
+   "slug": "sport_096",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_096.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_096.webp"
+  },
+  {
+   "slug": "sport_097",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_097.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_097.webp"
+  },
+  {
+   "slug": "sport_098",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_098.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_098.webp"
+  },
+  {
+   "slug": "sport_099",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_099.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_099.webp"
+  },
+  {
+   "slug": "sport_100",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_100.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_100.webp"
+  },
+  {
+   "slug": "sport_101",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_101.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_101.webp"
+  },
+  {
+   "slug": "sport_102",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_102.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_102.webp"
+  },
+  {
+   "slug": "sport_103",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_103.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_103.webp"
+  },
+  {
+   "slug": "sport_104",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_104.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_104.webp"
+  },
+  {
+   "slug": "sport_105",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_105.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_105.webp"
+  },
+  {
+   "slug": "sport_106",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_106.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_106.webp"
+  },
+  {
+   "slug": "sport_107",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_107.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_107.webp"
+  },
+  {
+   "slug": "sport_108",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_108.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_108.webp"
+  },
+  {
+   "slug": "sport_109",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_109.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_109.webp"
+  },
+  {
+   "slug": "sport_110",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_110.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_110.webp"
+  },
+  {
+   "slug": "sport_111",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_111.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_111.webp"
+  },
+  {
+   "slug": "sport_112",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_112.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_112.webp"
+  },
+  {
+   "slug": "sport_113",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_113.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_113.webp"
+  },
+  {
+   "slug": "sport_114",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_114.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_114.webp"
+  },
+  {
+   "slug": "sport_115",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_115.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_115.webp"
+  },
+  {
+   "slug": "sport_116",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_116.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_116.webp"
+  },
+  {
+   "slug": "sport_117",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_117.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_117.webp"
+  },
+  {
+   "slug": "sport_118",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_118.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_118.webp"
+  },
+  {
+   "slug": "sport_119",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_119.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_119.webp"
+  },
+  {
+   "slug": "sport_120",
+   "category": "sport",
+   "rarity": "RARE",
+   "imageUrl": "/admin-assets/gifts/sport/sport_120.webp",
+   "previewUrl": "/admin-assets/gifts/preview/sport_120.webp"
+  },
+  {
+   "slug": "tech_121",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_121.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_121.webp"
+  },
+  {
+   "slug": "tech_122",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_122.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_122.webp"
+  },
+  {
+   "slug": "tech_123",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_123.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_123.webp"
+  },
+  {
+   "slug": "tech_124",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_124.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_124.webp"
+  },
+  {
+   "slug": "tech_125",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_125.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_125.webp"
+  },
+  {
+   "slug": "tech_126",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_126.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_126.webp"
+  },
+  {
+   "slug": "tech_127",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_127.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_127.webp"
+  },
+  {
+   "slug": "tech_128",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_128.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_128.webp"
+  },
+  {
+   "slug": "tech_129",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_129.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_129.webp"
+  },
+  {
+   "slug": "tech_130",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_130.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_130.webp"
+  },
+  {
+   "slug": "tech_131",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_131.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_131.webp"
+  },
+  {
+   "slug": "tech_132",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_132.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_132.webp"
+  },
+  {
+   "slug": "tech_133",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_133.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_133.webp"
+  },
+  {
+   "slug": "tech_134",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_134.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_134.webp"
+  },
+  {
+   "slug": "tech_135",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_135.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_135.webp"
+  },
+  {
+   "slug": "tech_136",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_136.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_136.webp"
+  },
+  {
+   "slug": "tech_137",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_137.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_137.webp"
+  },
+  {
+   "slug": "tech_138",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_138.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_138.webp"
+  },
+  {
+   "slug": "tech_139",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_139.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_139.webp"
+  },
+  {
+   "slug": "tech_140",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_140.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_140.webp"
+  },
+  {
+   "slug": "tech_141",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_141.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_141.webp"
+  },
+  {
+   "slug": "tech_142",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_142.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_142.webp"
+  },
+  {
+   "slug": "tech_143",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_143.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_143.webp"
+  },
+  {
+   "slug": "tech_144",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_144.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_144.webp"
+  },
+  {
+   "slug": "tech_145",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_145.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_145.webp"
+  },
+  {
+   "slug": "tech_146",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_146.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_146.webp"
+  },
+  {
+   "slug": "tech_147",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_147.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_147.webp"
+  },
+  {
+   "slug": "tech_148",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_148.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_148.webp"
+  },
+  {
+   "slug": "tech_149",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_149.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_149.webp"
+  },
+  {
+   "slug": "tech_150",
+   "category": "tech",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/tech/tech_150.webp",
+   "previewUrl": "/admin-assets/gifts/preview/tech_150.webp"
+  },
+  {
+   "slug": "nature_151",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_151.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_151.webp"
+  },
+  {
+   "slug": "nature_152",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_152.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_152.webp"
+  },
+  {
+   "slug": "nature_153",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_153.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_153.webp"
+  },
+  {
+   "slug": "nature_154",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_154.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_154.webp"
+  },
+  {
+   "slug": "nature_155",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_155.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_155.webp"
+  },
+  {
+   "slug": "nature_156",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_156.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_156.webp"
+  },
+  {
+   "slug": "nature_157",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_157.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_157.webp"
+  },
+  {
+   "slug": "nature_158",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_158.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_158.webp"
+  },
+  {
+   "slug": "nature_159",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_159.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_159.webp"
+  },
+  {
+   "slug": "nature_160",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_160.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_160.webp"
+  },
+  {
+   "slug": "nature_161",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_161.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_161.webp"
+  },
+  {
+   "slug": "nature_162",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_162.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_162.webp"
+  },
+  {
+   "slug": "nature_163",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_163.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_163.webp"
+  },
+  {
+   "slug": "nature_164",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_164.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_164.webp"
+  },
+  {
+   "slug": "nature_165",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_165.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_165.webp"
+  },
+  {
+   "slug": "nature_166",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_166.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_166.webp"
+  },
+  {
+   "slug": "nature_167",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_167.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_167.webp"
+  },
+  {
+   "slug": "nature_168",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_168.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_168.webp"
+  },
+  {
+   "slug": "nature_169",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_169.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_169.webp"
+  },
+  {
+   "slug": "nature_170",
+   "category": "nature",
+   "rarity": "EPIC",
+   "imageUrl": "/admin-assets/gifts/nature/nature_170.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_170.webp"
+  },
+  {
+   "slug": "nature_171",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_171.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_171.webp"
+  },
+  {
+   "slug": "nature_172",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_172.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_172.webp"
+  },
+  {
+   "slug": "nature_173",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_173.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_173.webp"
+  },
+  {
+   "slug": "nature_174",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_174.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_174.webp"
+  },
+  {
+   "slug": "nature_175",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_175.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_175.webp"
+  },
+  {
+   "slug": "nature_176",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_176.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_176.webp"
+  },
+  {
+   "slug": "nature_177",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_177.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_177.webp"
+  },
+  {
+   "slug": "nature_178",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_178.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_178.webp"
+  },
+  {
+   "slug": "nature_179",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_179.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_179.webp"
+  },
+  {
+   "slug": "nature_180",
+   "category": "nature",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/nature/nature_180.webp",
+   "previewUrl": "/admin-assets/gifts/preview/nature_180.webp"
+  },
+  {
+   "slug": "luxury_181",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_181.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_181.webp"
+  },
+  {
+   "slug": "luxury_182",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_182.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_182.webp"
+  },
+  {
+   "slug": "luxury_183",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_183.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_183.webp"
+  },
+  {
+   "slug": "luxury_184",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_184.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_184.webp"
+  },
+  {
+   "slug": "luxury_185",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_185.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_185.webp"
+  },
+  {
+   "slug": "luxury_186",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_186.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_186.webp"
+  },
+  {
+   "slug": "luxury_187",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_187.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_187.webp"
+  },
+  {
+   "slug": "luxury_188",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_188.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_188.webp"
+  },
+  {
+   "slug": "luxury_189",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_189.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_189.webp"
+  },
+  {
+   "slug": "luxury_190",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_190.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_190.webp"
+  },
+  {
+   "slug": "luxury_191",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_191.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_191.webp"
+  },
+  {
+   "slug": "luxury_192",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_192.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_192.webp"
+  },
+  {
+   "slug": "luxury_193",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_193.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_193.webp"
+  },
+  {
+   "slug": "luxury_194",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_194.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_194.webp"
+  },
+  {
+   "slug": "luxury_195",
+   "category": "luxury",
+   "rarity": "LEGENDARY",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_195.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_195.webp"
+  },
+  {
+   "slug": "luxury_196",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_196.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_196.webp"
+  },
+  {
+   "slug": "luxury_197",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_197.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_197.webp"
+  },
+  {
+   "slug": "luxury_198",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_198.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_198.webp"
+  },
+  {
+   "slug": "luxury_199",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_199.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_199.webp"
+  },
+  {
+   "slug": "luxury_200",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_200.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_200.webp"
+  },
+  {
+   "slug": "luxury_201",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_201.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_201.webp"
+  },
+  {
+   "slug": "luxury_202",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_202.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_202.webp"
+  },
+  {
+   "slug": "luxury_203",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_203.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_203.webp"
+  },
+  {
+   "slug": "luxury_204",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_204.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_204.webp"
+  },
+  {
+   "slug": "luxury_205",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_205.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_205.webp"
+  },
+  {
+   "slug": "luxury_206",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_206.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_206.webp"
+  },
+  {
+   "slug": "luxury_207",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_207.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_207.webp"
+  },
+  {
+   "slug": "luxury_208",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_208.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_208.webp"
+  },
+  {
+   "slug": "luxury_209",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_209.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_209.webp"
+  },
+  {
+   "slug": "luxury_210",
+   "category": "luxury",
+   "rarity": "MYTHIC",
+   "imageUrl": "/admin-assets/gifts/luxury/luxury_210.webp",
+   "previewUrl": "/admin-assets/gifts/preview/luxury_210.webp"
+  }
+ ]
+}

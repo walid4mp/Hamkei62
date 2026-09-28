@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'api.dart';
 import 'nova_audio.dart';
 
 /// The four price tiers used across the app (kept for legacy gift sheets).
@@ -45,6 +46,9 @@ class NovaGift {
     this.rarity = NovaGiftRarity.common,
     this.category = '',
     this.durationMs = 1800,
+    this.imageUrl = '',
+    this.previewUrl = '',
+    this.premium = false,
   });
 
   final String slug;
@@ -57,8 +61,22 @@ class NovaGift {
   final NovaGiftRarity rarity;
   final String category;
   final int durationMs;
+  /// Real artwork rendered by tools/generate_gift_assets.py and served by the
+  /// backend. Empty when an admin has not attached an image yet — the UI then
+  /// falls back to the emoji so the sheet never shows a broken card.
+  final String imageUrl;
+  final String previewUrl;
+  final bool premium;
 
   String get tierKey => tier.key;
+  bool get hasArtwork => imageUrl.trim().isNotEmpty;
+  /// Absolute URL the app can load (the server returns a root-relative path).
+  String get artworkUrl {
+    final u = imageUrl.trim();
+    if (u.isEmpty) return '';
+    if (u.startsWith('http://') || u.startsWith('https://')) return u;
+    return '${Api.baseUrl}$u';
+  }
 
   static NovaGift fromMap(Map<String, dynamic> m) {
     final price = ((m['priceCoins'] ?? 0) as num).toInt();
@@ -73,6 +91,9 @@ class NovaGift {
       rarity: NovaGiftCatalog.rarityFor('${m['rarity'] ?? ''}'),
       category: '${m['category'] ?? ''}',
       durationMs: (m['effectMs'] as num?)?.toInt() ?? 1800,
+      imageUrl: '${m['imageUrl'] ?? ''}',
+      previewUrl: '${m['previewUrl'] ?? ''}',
+      premium: m['premium'] == true,
     );
   }
 
@@ -229,6 +250,7 @@ class NovaGiftEffect extends StatefulWidget {
     this.coins = 0,
     this.hostName = '',
     this.duration = const Duration(milliseconds: 2600),
+    this.gift,
     this.onDone,
   });
 
@@ -241,6 +263,9 @@ class NovaGiftEffect extends StatefulWidget {
   final int coins;
   final String hostName;
   final Duration duration;
+  /// When provided, the effect renders the gift's real artwork instead of the
+  /// emoji fallback.
+  final NovaGift? gift;
   final VoidCallback? onDone;
 
   @override
@@ -428,7 +453,9 @@ class _NovaGiftEffectState extends State<NovaGiftEffect>
           border: Border.all(color: _accent.withValues(alpha: .8), width: 2),
           boxShadow: [BoxShadow(color: _accent.withValues(alpha: .6), blurRadius: 60, spreadRadius: 16)],
         ),
-        child: Text(widget.emoji, style: TextStyle(fontSize: fontSize)),
+        child: (widget.gift?.hasArtwork ?? false)
+            ? NovaGiftArt(gift: widget.gift!, size: size * .74, showPremiumBadge: false)
+            : Text(widget.emoji, style: TextStyle(fontSize: fontSize)),
       ),
     );
   }
@@ -533,4 +560,68 @@ class _SpeedPainter extends CustomPainter {
 /// Speaks the gift's sound. Kept here so any screen can trigger audio.
 void playGiftSound(String soundKey, NovaGiftTier tier) {
   NovaAudio.i.playSfx(NovaGiftCatalog.sfxKeyFor(soundKey, tier));
+}
+
+/// Renders a gift's real artwork from the server, falling back to the emoji
+/// while the image loads or when a gift has no image attached yet.
+///
+/// Every gift card in the store, the live gift overlay and the gift counter
+/// use this widget, so artwork only has to be uploaded once (Asset Manager or
+/// `PATCH /api/admin/gifts/:id`) for it to appear everywhere.
+class NovaGiftArt extends StatelessWidget {
+  const NovaGiftArt({
+    super.key,
+    required this.gift,
+    this.size = 56,
+    this.showPremiumBadge = true,
+  });
+
+  final NovaGift gift;
+  final double size;
+  final bool showPremiumBadge;
+
+  @override
+  Widget build(BuildContext context) {
+    final art = gift.hasArtwork
+        ? Image.network(
+            gift.artworkUrl,
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.medium,
+            errorBuilder: (_, __, ___) => _emoji(),
+            loadingBuilder: (ctx, child, progress) =>
+                progress == null ? child : _emoji(),
+          )
+        : _emoji();
+    if (!showPremiumBadge || !gift.premium) return art;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        art,
+        Positioned(
+          right: -2,
+          top: -2,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFFFFD54F), Color(0xFFFF8F00)]),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [BoxShadow(color: Colors.amber.withValues(alpha: .5), blurRadius: 8)],
+            ),
+            child: const Text('PRO',
+                style: TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w900)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emoji() => SizedBox(
+        width: size,
+        height: size,
+        child: Center(
+          child: Text(gift.emoji, style: TextStyle(fontSize: size * .58)),
+        ),
+      );
 }

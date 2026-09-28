@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import '../core/localization.dart';
+import 'call_history.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -228,6 +229,7 @@ class _MessengerPageState extends State<MessengerPage> {
                 ],
               ),
             ),
+            IconButton(tooltip: 'سجل المكالمات', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CallHistoryPage())), icon: const Icon(Icons.call_rounded)),
             IconButton(tooltip: 'طلبات المراسلة', onPressed: () => showMessageRequests(context), icon: const Icon(Icons.mail_outline_rounded)),
             IconButton(
               tooltip: 'محادثة جديدة',
@@ -1799,11 +1801,13 @@ class _GroupChatPageState extends State<GroupChatPage> {
 // ---------------------------------------------------------------------------
 
 class CallRoomPage extends StatefulWidget {
-  const CallRoomPage({super.key, required this.title, required this.roomName, this.videoCall = false, this.peerUserId, this.isCaller = false});
+  const CallRoomPage({super.key, required this.title, required this.roomName, this.videoCall = false, this.peerUserId, this.isCaller = false, this.callId = ''});
   final String title, roomName;
   final bool videoCall;
   final String? peerUserId;
   final bool isCaller;
+  /// V93: the persisted Call row, so hang-up records the real duration.
+  final String callId;
   @override State<CallRoomPage> createState() => _CallRoomPageState();
 }
 
@@ -1812,6 +1816,8 @@ class _CallRoomPageState extends State<CallRoomPage> {
   bool connected=false, micOn=true, cameraOn=false, speakerOn=true;
   String? error;
   DateTime? _startedAt;
+  Timer? _durationTimer;
+  int _callSeconds = 0;
   bool _sawRemote = false;
   bool _callLogged = false;
   bool _ending = false;
@@ -1831,12 +1837,29 @@ class _CallRoomPageState extends State<CallRoomPage> {
   }
 
   Future<void> _finishCallLog() async {
-    if (_callLogged || !widget.isCaller || widget.peerUserId == null || widget.peerUserId!.isEmpty || _startedAt == null) return;
+    if (_callLogged || widget.peerUserId == null || widget.peerUserId!.isEmpty) return;
     _callLogged = true;
-    final seconds = DateTime.now().difference(_startedAt!).inSeconds.clamp(0, 86400);
+    final seconds = _startedAt == null ? 0 : DateTime.now().difference(_startedAt!).inSeconds.clamp(0, 86400);
+    if (seconds == 0 && !connected) return; // never answered: let the ring-timeout mark it MISSED
+    // V93: write the real record (status + duration) and tell the peer.
     try {
-      await Api.sendMessage(widget.peerUserId!, '[call:${widget.videoCall ? 'video' : 'audio'}]$seconds');
+      if (widget.callId.isNotEmpty) {
+        await Api.endCall(widget.callId);
+      } else {
+        SocketService.i.sendCallEnd(to: widget.peerUserId!, roomName: widget.roomName);
+      }
     } catch (_) {}
+    if (widget.isCaller) {
+      try {
+        await Api.sendMessage(widget.peerUserId!, '[call:${widget.videoCall ? 'video' : 'audio'}]$seconds');
+      } catch (_) {}
+    }
+  }
+
+  String get _durationLabel {
+    final m = (_callSeconds ~/ 60).toString().padLeft(2, '0');
+    final sec = (_callSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$sec';
   }
   Future<void> _connect() async {
     try {
@@ -1847,6 +1870,10 @@ class _CallRoomPageState extends State<CallRoomPage> {
       if(widget.videoCall){try{await room.localParticipant?.setCameraEnabled(true);cameraOn=true;}catch(_){}}
       if(mounted)setState(()=>connected=true);
       _startedAt ??= DateTime.now();
+      _durationTimer ??= Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted || _startedAt == null) return;
+        setState(() => _callSeconds = DateTime.now().difference(_startedAt!).inSeconds);
+      });
     }catch(e){if(mounted)setState(()=>error=e.toString().replaceFirst('Exception: ',''));}
   }
   Future<void> _mic() async {try{micOn=!micOn;await room.localParticipant?.setMicrophoneEnabled(micOn);if(mounted)setState((){});}catch(_){}}
@@ -1906,13 +1933,13 @@ class _CallRoomPageState extends State<CallRoomPage> {
       backgroundColor:Colors.black,
       body:error!=null?Center(child:Container(margin:const EdgeInsets.all(24),padding:const EdgeInsets.all(22),decoration:BoxDecoration(color:Colors.white10,borderRadius:BorderRadius.circular(24)),child:Column(mainAxisSize:MainAxisSize.min,children:[const Icon(Icons.call_end_rounded,color:Colors.white70,size:48),const SizedBox(height:12),Text(error!,textAlign:TextAlign.center,style:const TextStyle(color:Colors.white)),const SizedBox(height:16),FilledButton(onPressed:_connect,child:const Text('إعادة الاتصال'))]))):Stack(children:[
         Positioned.fill(child:rem.isNotEmpty?_video(rem.first):Container(decoration:const BoxDecoration(gradient:LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors:[Color(0xFF151A2A),Color(0xFF05060A)])),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Container(width:112,height:112,decoration:BoxDecoration(shape:BoxShape.circle,gradient:SN.grad,boxShadow:const [BoxShadow(color:Colors.black54,blurRadius:35,spreadRadius:6)]),padding:const EdgeInsets.all(4),child:CircleAvatar(backgroundColor:Colors.black,child:Text(widget.title.isNotEmpty?widget.title[0].toUpperCase():'S',style:const TextStyle(color:Colors.white,fontSize:42,fontWeight:FontWeight.w900)))),const SizedBox(height:18),Text(widget.title,style:const TextStyle(color:Colors.white,fontSize:22,fontWeight:FontWeight.w900)),const SizedBox(height:6),Text(connected?'في انتظار اتصال الطرف الآخر…':'جاري الاتصال…',style:const TextStyle(color:Colors.white60))]))),
-        Positioned(top:MediaQuery.of(context).padding.top+12,left:16,right:16,child:Row(children:[Material(color:Colors.black.withValues(alpha: .38),shape:const CircleBorder(),child:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back_rounded,color:Colors.white))),const SizedBox(width:10),Expanded(child:Container(padding:const EdgeInsets.symmetric(horizontal:14,vertical:10),decoration:BoxDecoration(color:Colors.black.withValues(alpha: .35),borderRadius:BorderRadius.circular(20)),child:Row(children:[const Icon(Icons.lock_rounded,color:Colors.white54,size:14),const SizedBox(width:7),Expanded(child:Text(widget.videoCall?'مكالمة فيديو مشفرة':'مكالمة صوتية',style:const TextStyle(color:Colors.white,fontWeight:FontWeight.w800)))])))])),
+        Positioned(top:MediaQuery.of(context).padding.top+12,left:16,right:16,child:Row(children:[Material(color:Colors.black.withValues(alpha: .38),shape:const CircleBorder(),child:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back_rounded,color:Colors.white))),const SizedBox(width:10),Expanded(child:Container(padding:const EdgeInsets.symmetric(horizontal:14,vertical:10),decoration:BoxDecoration(color:Colors.black.withValues(alpha: .35),borderRadius:BorderRadius.circular(20)),child:Row(children:[const Icon(Icons.lock_rounded,color:Colors.white54,size:14),const SizedBox(width:7),Expanded(child:Text(widget.videoCall?'مكالمة فيديو مشفرة':'مكالمة صوتية',style:const TextStyle(color:Colors.white,fontWeight:FontWeight.w800))),if(connected)Text(_durationLabel,style:const TextStyle(color:Colors.white70,fontWeight:FontWeight.w700,fontFeatures:[FontFeature.tabularFigures()]))])))])),
         if(widget.videoCall&&local!=null)Positioned(right:16,top:MediaQuery.of(context).padding.top+78,width:112,height:158,child:Container(decoration:BoxDecoration(borderRadius:BorderRadius.circular(20),border:Border.all(color:Colors.white24),boxShadow:const [BoxShadow(color:Colors.black54,blurRadius:18)]),clipBehavior:Clip.antiAlias,child:_video(local))),
         Positioned(left:16,right:16,bottom:MediaQuery.of(context).padding.bottom+18,child:Container(padding:const EdgeInsets.fromLTRB(12,14,12,12),decoration:BoxDecoration(color:Colors.black.withValues(alpha: .62),borderRadius:BorderRadius.circular(30),border:Border.all(color:Colors.white12)),child:Row(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children:[_callButton(icon:micOn?Icons.mic_rounded:Icons.mic_off_rounded,onTap:_mic,active:micOn,label:micOn?'صوت':'مكتوم'),_callButton(icon:speakerOn?Icons.volume_up_rounded:Icons.volume_off_rounded,onTap:_speaker,active:speakerOn,label:'مكبر'),_callButton(icon:Icons.movie_filter_rounded,onTap:_watchReelTogether,label:'Reels معًا'),if(widget.videoCall)_callButton(icon:cameraOn?Icons.videocam_rounded:Icons.videocam_off_rounded,onTap:_camera,active:cameraOn,label:'كاميرا'),_callButton(icon:Icons.call_end_rounded,onTap:()=>Navigator.pop(context),danger:true,label:'إنهاء')]))),
       ]),
     );
   }
-  @override void dispose(){_finishCallLog();_reelSub?.cancel();room.removeListener(_changed);room.disconnect();room.dispose();super.dispose();}
+  @override void dispose(){_durationTimer?.cancel();_finishCallLog();_reelSub?.cancel();room.removeListener(_changed);room.disconnect();room.dispose();super.dispose();}
 }
 
 class LivePage extends StatefulWidget {
@@ -3276,6 +3303,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     return NovaGiftEffect(
       key: ValueKey('${g['id'] ?? gift.slug}-${_giftFxSeq}'),
       emoji: gift.emoji,
+      gift: gift,
       name: gift.name,
       effectKey: gift.effectKey,
       tier: gift.tier,

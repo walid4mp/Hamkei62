@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'admin_console_page.dart';
 import 'conversation_moderation_center_page.dart';
 
 class AdminDashboardPage extends StatelessWidget {
@@ -53,7 +55,19 @@ class AdminDashboardPage extends StatelessWidget {
                 onTap: () {
                   if (m.title == 'Conversation Review') {
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ConversationModerationCenterPage()));
+                    return;
                   }
+                  // V93: the modules that have a real, permission-guarded
+                  // backend now open the working console instead of doing
+                  // nothing.
+                  final tab = switch (m.title) {
+                    'Gifts' => 0,
+                    'Movies & Series' || 'Episodes' => 3,
+                    'Creators' || 'XP & Achievements' => 2,
+                    _ => -1,
+                  };
+                  if (tab < 0) return;
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => AdminConsolePage(initialTab: tab)));
                 },
               ),
             );

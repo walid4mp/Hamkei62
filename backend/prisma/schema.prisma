@@ -937,7 +937,11 @@ model Series {
   title       String
   description String   @default("")
   posterUrl   String   @default("")
+  backdropUrl String   @default("")
   trailerUrl  String   @default("")
+  genres      String   @default("")
+  cast        String   @default("")
+  rating      Float    @default(0)
   visibility  String   @default("PUBLIC")
   status      String   @default("PUBLISHED")
   featured    Boolean  @default(false)
@@ -983,6 +987,8 @@ model Episode {
   videoUrl    String
   thumbnailUrl String  @default("")
   durationSec Int      @default(0)
+  releaseDate DateTime?
+  status      String   @default("PUBLISHED")
   accessMode  String   @default("FREE")
   priceCents  Int      @default(0)
   currency    String   @default("USD")
@@ -1007,8 +1013,14 @@ model Movie {
   title       String
   description String   @default("")
   posterUrl   String   @default("")
+  backdropUrl String   @default("")
   trailerUrl  String   @default("")
   videoUrl    String
+  year        Int?
+  genres      String   @default("")
+  cast        String   @default("")
+  rating      Float    @default(0)
+  status      String   @default("PUBLISHED")
   durationSec Int      @default(0)
   accessMode  String   @default("FREE")
   priceCents  Int      @default(0)

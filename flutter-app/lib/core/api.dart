@@ -556,6 +556,60 @@ class Api {
   static Future<Map<String,dynamic>> updateLiveChallenge(String id,{required int scoreA,required int scoreB}) async => Map<String,dynamic>.from(await req('PATCH','/api/live/challenges/$id',body:{'scoreA':scoreA,'scoreB':scoreB}));
   static Future<Map<String,dynamic>> finishLiveChallenge(String id,String winnerId) async => Map<String,dynamic>.from(await req('POST','/api/live/challenges/$id/finish',body:{'winnerId':winnerId}));
 
+  // ---------------- V93 admin console ----------------
+  static Future<Map<String, dynamic>> adminGifts({String q = ''}) async =>
+      Map<String, dynamic>.from(await req('GET', '/api/admin/gifts${q.isEmpty ? '' : '?q=$q'}'));
+  static Future<Map<String, dynamic>> createGift(Map<String, dynamic> body) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/admin/gifts', body: body));
+  static Future<Map<String, dynamic>> updateGift(String id, Map<String, dynamic> body) async =>
+      Map<String, dynamic>.from(await req('PATCH', '/api/admin/gifts/$id', body: body));
+  static Future<void> disableGift(String id) async => req('DELETE', '/api/admin/gifts/$id');
+
+  static Future<List<dynamic>> adminAssets({String type = ''}) async =>
+      List<dynamic>.from(await req('GET', '/api/admin/assets${type.isEmpty ? '' : '?type=$type'}'));
+  static Future<Map<String, dynamic>> createAsset(Map<String, dynamic> body) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/admin/assets', body: body));
+  static Future<Map<String, dynamic>> updateAsset(String id, Map<String, dynamic> body) async =>
+      Map<String, dynamic>.from(await req('PATCH', '/api/admin/assets/$id', body: body));
+  static Future<void> deleteAsset(String id) async => req('DELETE', '/api/admin/assets/$id');
+
+  static Future<List<dynamic>> adminMilestones() async =>
+      List<dynamic>.from(await req('GET', '/api/creator/milestones'));
+  static Future<Map<String, dynamic>> saveMilestones(List<Map<String, dynamic>> milestones) async =>
+      Map<String, dynamic>.from(await req('PUT', '/api/admin/creator-milestones', body: {'milestones': milestones}));
+  static Future<List<dynamic>> adminCreatorLevels() async =>
+      List<dynamic>.from(await req('GET', '/api/creator/levels'));
+  static Future<Map<String, dynamic>> saveCreatorLevels(List<Map<String, dynamic>> levels) async =>
+      Map<String, dynamic>.from(await req('PUT', '/api/admin/creator-levels', body: {'levels': levels}));
+
+  static Future<Map<String, dynamic>> adminContentTree() async =>
+      Map<String, dynamic>.from(await req('GET', '/api/admin/content-tree'));
+  static Future<Map<String, dynamic>> saveMovie(Map<String, dynamic> body, {String id = ''}) async =>
+      id.isEmpty
+          ? Map<String, dynamic>.from(await req('POST', '/api/admin/movies', body: body))
+          : Map<String, dynamic>.from(await req('PATCH', '/api/admin/movies/$id', body: body));
+  static Future<void> archiveMovie(String id) async => req('DELETE', '/api/admin/movies/$id');
+  static Future<Map<String, dynamic>> saveSeries(Map<String, dynamic> body, {String id = ''}) async =>
+      id.isEmpty
+          ? Map<String, dynamic>.from(await req('POST', '/api/admin/series', body: body))
+          : Map<String, dynamic>.from(await req('PATCH', '/api/admin/series/$id', body: body));
+  static Future<void> archiveSeries(String id) async => req('DELETE', '/api/admin/series/$id');
+  static Future<Map<String, dynamic>> saveSeason(Map<String, dynamic> body) async =>
+      Map<String, dynamic>.from(await req('POST', '/api/admin/seasons', body: body));
+  static Future<void> deleteSeason(String id) async => req('DELETE', '/api/admin/seasons/$id');
+  static Future<Map<String, dynamic>> saveEpisode(Map<String, dynamic> body, {String id = ''}) async =>
+      id.isEmpty
+          ? Map<String, dynamic>.from(await req('POST', '/api/admin/episodes', body: body))
+          : Map<String, dynamic>.from(await req('PATCH', '/api/admin/episodes/$id', body: body));
+  static Future<void> archiveEpisode(String id) async => req('DELETE', '/api/admin/episodes/$id');
+
+  /// Uploads a file (poster, backdrop, trailer, video, gift art) and returns
+  /// the stored URL. Thin wrapper over the existing uploader.
+  static Future<String> uploadAndGetUrl(String filePath, {String kind = 'IMAGE'}) async {
+    final res = await uploadMedia(filePath, kind: kind);
+    return '${res['url'] ?? ''}';
+  }
+
   // ---------------- V93 calls ----------------
   static Future<Map<String, dynamic>> startCall({required String receiverId, String kind = 'AUDIO'}) async =>
       Map<String, dynamic>.from(await req('POST', '/api/calls/start', body: {'receiverId': receiverId, 'kind': kind}));

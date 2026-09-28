@@ -688,6 +688,18 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "reward" TEXT NOT NULL DEFAULT '{}'`,
     `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
     `ALTER TABLE "CreatorMilestone" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "backdropUrl" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "year" INTEGER`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "genres" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "cast" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "rating" DOUBLE PRECISION NOT NULL DEFAULT 0`,
+    `ALTER TABLE "Movie" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'PUBLISHED'`,
+    `ALTER TABLE "Series" ADD COLUMN IF NOT EXISTS "backdropUrl" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Series" ADD COLUMN IF NOT EXISTS "genres" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Series" ADD COLUMN IF NOT EXISTS "cast" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "Series" ADD COLUMN IF NOT EXISTS "rating" DOUBLE PRECISION NOT NULL DEFAULT 0`,
+    `ALTER TABLE "Episode" ADD COLUMN IF NOT EXISTS "releaseDate" TIMESTAMP(3)`,
+    `ALTER TABLE "Episode" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'PUBLISHED'`,
     `CREATE TABLE IF NOT EXISTS "CreatorMilestoneReward" ("id" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"milestoneId" TEXT NOT NULL,"grantedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"payload" TEXT NOT NULL DEFAULT '{}')`,
     `CREATE UNIQUE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_milestoneId_key" ON "CreatorMilestoneReward"("userId","milestoneId")`,
     `CREATE INDEX IF NOT EXISTS "CreatorMilestoneReward_userId_grantedAt_idx" ON "CreatorMilestoneReward"("userId","grantedAt")`,
@@ -1997,6 +2009,151 @@ app.get('/api/admin/movies',auth,admin,async(req,res)=>res.json(await prisma.mov
 app.get('/api/admin/series',auth,admin,async(req,res)=>res.json(await prisma.series.findMany({orderBy:{createdAt:'desc'},take:300,include:{creator:true,seasons:{include:{episodes:true}}}})));
 app.patch('/api/admin/movies/:id/feature',auth,admin,async(req,res)=>res.json(await prisma.movie.update({where:{id:req.params.id},data:{featured:Boolean(req.body?.featured),featuredPriority:Math.max(0,Math.min(10000,Number(req.body?.priority||0)))}})));
 app.patch('/api/admin/series/:id/feature',auth,admin,async(req,res)=>res.json(await prisma.series.update({where:{id:req.params.id},data:{featured:Boolean(req.body?.featured),featuredPriority:Math.max(0,Math.min(10000,Number(req.body?.priority||0)))}})));
+
+// ---- V93 admin content CRUD (Nova TV) --------------------------------------
+// The API for creators already existed; an admin can now manage the whole
+// catalog (movies, series, seasons, episodes, poster/backdrop/trailer/video)
+// from the in-app console. Every write is audited.
+const adminMovieInput=z.object({
+  title:z.string().min(1).max(200), description:z.string().max(5000).default(''),
+  posterUrl:z.string().max(5000).default(''), backdropUrl:z.string().max(5000).default(''),
+  trailerUrl:z.string().max(5000).default(''), videoUrl:z.string().max(5000).default(''),
+  year:z.number().int().min(1888).max(2200).optional(),
+  durationSec:z.number().int().min(0).max(200000).default(0),
+  genres:z.string().max(400).default(''), cast:z.string().max(600).default(''),
+  rating:z.number().min(0).max(10).default(0),
+  accessMode:z.enum(['FREE','PAID','SUBSCRIPTION','AD']).default('FREE'),
+  priceCents:z.number().int().min(0).max(10000000).default(0),
+  currency:z.string().max(8).default('USD'), adSupported:z.boolean().default(false),
+  published:z.boolean().default(true), featured:z.boolean().default(false),
+  featuredPriority:z.number().int().min(0).max(10000).default(0),
+  status:z.string().max(40).default('PUBLISHED'),
+});
+const adminSeriesInput=z.object({
+  title:z.string().min(1).max(200), description:z.string().max(5000).default(''),
+  posterUrl:z.string().max(5000).default(''), backdropUrl:z.string().max(5000).default(''),
+  trailerUrl:z.string().max(5000).default(''), genres:z.string().max(400).default(''),
+  cast:z.string().max(600).default(''), rating:z.number().min(0).max(10).default(0),
+  visibility:z.enum(['PUBLIC','PRIVATE','UNLISTED']).default('PUBLIC'),
+  status:z.string().max(40).default('PUBLISHED'),
+  featured:z.boolean().default(false), featuredPriority:z.number().int().min(0).max(10000).default(0),
+  subscriberOnly:z.boolean().default(false),
+  seasonPassPriceCents:z.number().int().min(0).max(10000000).default(0),
+  currency:z.string().max(8).default('USD'),
+});
+const adminEpisodeInput=z.object({
+  seasonId:z.string().min(1), number:z.number().int().min(0).max(100000),
+  title:z.string().min(1).max(200), description:z.string().max(5000).default(''),
+  videoUrl:z.string().max(5000).default(''), thumbnailUrl:z.string().max(5000).default(''),
+  durationSec:z.number().int().min(0).max(200000).default(0),
+  releaseDate:z.string().max(40).default(''),
+  accessMode:z.enum(['FREE','PAID','SUBSCRIPTION','AD']).default('FREE'),
+  priceCents:z.number().int().min(0).max(10000000).default(0),
+  currency:z.string().max(8).default('USD'), adSupported:z.boolean().default(false),
+  published:z.boolean().default(true), status:z.string().max(40).default('PUBLISHED'),
+});
+
+app.post('/api/admin/movies',auth,requirePermission('movies.create'),async(req,res)=>{
+  try{ const d=adminMovieInput.parse(req.body||{});
+    const row=await prisma.movie.create({data:{...d,creatorId:req.user.id}});
+    await auditAction(req,'MOVIE_CREATE',{permission:'movies.create',targetType:'Movie',targetId:row.id,after:d});
+    res.status(201).json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.patch('/api/admin/movies/:id',auth,requirePermission('movies.edit'),async(req,res)=>{
+  try{ const before=await prisma.movie.findUnique({where:{id:req.params.id}});
+    if(!before)return res.status(404).json({error:'NOT_FOUND'});
+    const d=adminMovieInput.partial().parse(req.body||{});
+    const row=await prisma.movie.update({where:{id:before.id},data:d});
+    await auditAction(req,'MOVIE_UPDATE',{permission:'movies.edit',targetType:'Movie',targetId:row.id,before,after:row});
+    res.json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.delete('/api/admin/movies/:id',auth,requirePermission('movies.delete'),async(req,res)=>{
+  const before=await prisma.movie.findUnique({where:{id:req.params.id}});
+  if(!before)return res.status(404).json({error:'NOT_FOUND'});
+  // Unpublish instead of destroying purchase history.
+  const row=await prisma.movie.update({where:{id:before.id},data:{published:false,status:'ARCHIVED'}});
+  await auditAction(req,'MOVIE_ARCHIVE',{permission:'movies.delete',targetType:'Movie',targetId:row.id,before,after:row});
+  res.json({ok:true,movie:row});
+});
+
+app.post('/api/admin/series',auth,requirePermission('series.create'),async(req,res)=>{
+  try{ const d=adminSeriesInput.parse(req.body||{});
+    const row=await prisma.series.create({data:{...d,creatorId:req.user.id}});
+    await auditAction(req,'SERIES_CREATE',{permission:'series.create',targetType:'Series',targetId:row.id,after:d});
+    res.status(201).json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.patch('/api/admin/series/:id',auth,requirePermission('series.edit'),async(req,res)=>{
+  try{ const before=await prisma.series.findUnique({where:{id:req.params.id}});
+    if(!before)return res.status(404).json({error:'NOT_FOUND'});
+    const d=adminSeriesInput.partial().parse(req.body||{});
+    const row=await prisma.series.update({where:{id:before.id},data:d});
+    await auditAction(req,'SERIES_UPDATE',{permission:'series.edit',targetType:'Series',targetId:row.id,before,after:row});
+    res.json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.delete('/api/admin/series/:id',auth,requirePermission('series.delete'),async(req,res)=>{
+  const before=await prisma.series.findUnique({where:{id:req.params.id}});
+  if(!before)return res.status(404).json({error:'NOT_FOUND'});
+  const row=await prisma.series.update({where:{id:before.id},data:{status:'ARCHIVED'}});
+  await auditAction(req,'SERIES_ARCHIVE',{permission:'series.delete',targetType:'Series',targetId:row.id,before,after:row});
+  res.json({ok:true,series:row});
+});
+
+app.post('/api/admin/seasons',auth,requirePermission('series.edit'),async(req,res)=>{
+  try{
+    const d=z.object({seriesId:z.string().min(1),number:z.number().int().min(0).max(1000),title:z.string().max(200).default(''),description:z.string().max(2000).default(''),passPriceCents:z.number().int().min(0).max(10000000).default(0)}).parse(req.body||{});
+    const series=await prisma.series.findUnique({where:{id:d.seriesId}});
+    if(!series)return res.status(404).json({error:'SERIES_NOT_FOUND'});
+    const row=await prisma.season.upsert({where:{seriesId_number:{seriesId:d.seriesId,number:d.number}},create:d,update:{title:d.title,description:d.description,passPriceCents:d.passPriceCents}});
+    await auditAction(req,'SEASON_UPSERT',{permission:'series.edit',targetType:'Season',targetId:row.id,after:d});
+    res.status(201).json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.delete('/api/admin/seasons/:id',auth,requirePermission('series.edit'),async(req,res)=>{
+  const before=await prisma.season.findUnique({where:{id:req.params.id}});
+  if(!before)return res.status(404).json({error:'NOT_FOUND'});
+  await prisma.season.delete({where:{id:before.id}});
+  await auditAction(req,'SEASON_DELETE',{permission:'series.edit',targetType:'Season',targetId:before.id,before});
+  res.json({ok:true});
+});
+
+app.post('/api/admin/episodes',auth,requirePermission('episodes.create'),async(req,res)=>{
+  try{ const d=adminEpisodeInput.parse(req.body||{});
+    const season=await prisma.season.findUnique({where:{id:d.seasonId}});
+    if(!season)return res.status(404).json({error:'SEASON_NOT_FOUND'});
+    const row=await prisma.episode.upsert({where:{seasonId_number:{seasonId:d.seasonId,number:d.number}},create:{...d,creatorId:req.user.id},update:{...d,creatorId:req.user.id}});
+    await auditAction(req,'EPISODE_UPSERT',{permission:'episodes.create',targetType:'Episode',targetId:row.id,after:d});
+    res.status(201).json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.patch('/api/admin/episodes/:id',auth,requirePermission('episodes.edit'),async(req,res)=>{
+  try{ const before=await prisma.episode.findUnique({where:{id:req.params.id}});
+    if(!before)return res.status(404).json({error:'NOT_FOUND'});
+    const d=adminEpisodeInput.partial().parse(req.body||{});
+    const row=await prisma.episode.update({where:{id:before.id},data:d});
+    await auditAction(req,'EPISODE_UPDATE',{permission:'episodes.edit',targetType:'Episode',targetId:row.id,before,after:row});
+    res.json(row);
+  }catch(e){res.status(400).json({error:'VALIDATION_ERROR',detail:String(e.message||'')});}
+});
+app.delete('/api/admin/episodes/:id',auth,requirePermission('episodes.delete'),async(req,res)=>{
+  const before=await prisma.episode.findUnique({where:{id:req.params.id}});
+  if(!before)return res.status(404).json({error:'NOT_FOUND'});
+  const row=await prisma.episode.update({where:{id:before.id},data:{published:false,status:'ARCHIVED'}});
+  await auditAction(req,'EPISODE_ARCHIVE',{permission:'episodes.delete',targetType:'Episode',targetId:row.id,before,after:row});
+  res.json({ok:true,episode:row});
+});
+
+/// V93: everything the admin console needs for Nova TV in one call.
+app.get('/api/admin/content-tree',auth,admin,async(req,res)=>{
+  const [movies,series]=await Promise.all([
+    prisma.movie.findMany({orderBy:{createdAt:'desc'},take:200}),
+    prisma.series.findMany({orderBy:{createdAt:'desc'},take:200,include:{seasons:{orderBy:{number:'asc'},include:{episodes:{orderBy:{number:'asc'}}}}}}),
+  ]);
+  res.json({movies,series});
+});
 app.get('/api/admin/content-revenue',auth,admin,async(req,res)=>{const [p,a]=await Promise.all([prisma.contentPurchase.findMany({where:{status:'VERIFIED'},orderBy:{createdAt:'desc'},take:1000}),prisma.adImpression.findMany({where:{qualified:true},orderBy:{createdAt:'desc'},take:2000})]);const gross=p.reduce((x,r)=>x+r.amountCents,0)+a.reduce((x,r)=>x+r.revenueCents,0);const creator=p.reduce((x,r)=>x+Math.floor(r.amountCents*r.creatorSharePct/100),0)+a.reduce((x,r)=>x+Math.floor(r.revenueCents*0.7),0);res.json({grossCents:gross,creatorCents:creator,platformCents:gross-creator,purchases:p.length,qualifiedAds:a.length});});
 
 // ---- Content analytics/archive ----
@@ -2197,6 +2354,26 @@ io.on('connection',socket=>{
   socket.on('disconnect',()=>{const u=me(),room=socket.data.liveRoom;if(u&&room)io.to(`live:${room}`).emit('live:user-left',{userId:u.id});});
 });
 
+/// V93: real artwork. `tools/generate_gift_assets.py` renders one image and one
+/// 4-frame preview per gift into src/admin-assets/gifts and writes a manifest.
+/// Seeding attaches those URLs to gifts that do not have artwork yet, so an
+/// admin-replaced image (via the Asset Manager / PATCH gift) is never undone.
+async function attachGiftArtwork(){
+  try{
+    const manifestPath=path.join(__dirname,'admin-assets','gifts','manifest.json');
+    if(!fs.existsSync(manifestPath))return;
+    const manifest=JSON.parse(await fs.promises.readFile(manifestPath,'utf8'));
+    const rows=Array.isArray(manifest?.gifts)?manifest.gifts:[];
+    let attached=0;
+    for(const row of rows){
+      if(!row?.slug)continue;
+      const res=await prisma.gift.updateMany({where:{slug:row.slug,imageUrl:''},data:{imageUrl:row.imageUrl||'',previewUrl:row.previewUrl||''}});
+      attached+=res.count;
+    }
+    if(attached)console.log(`[gifts] attached artwork to ${attached} gifts`);
+  }catch(e){console.warn('[gifts] artwork manifest skipped:',e.message);}
+}
+
 async function ensureCatalog(){
   // Gift Engine: a deterministic catalog of 200+ unique gifts generated in
   // modules/gifts.js. V93 promoted every column into prisma/schema.prisma, so
@@ -2218,6 +2395,7 @@ async function ensureCatalog(){
       await prisma.gift.create({data:{slug:g.slug,...base,imageUrl:g.imageUrl,previewUrl:g.previewUrl,animationUrl:g.animationUrl,premium:g.premium}}).catch(()=>{});
     }
   }
+  await attachGiftArtwork();
   await prisma.commissionSetting.upsert({where:{id:'default'},create:{id:'default'},update:{}}).catch(async()=>{if(!(await prisma.commissionSetting.findFirst()))await prisma.commissionSetting.create({data:{}});});
 }
 
