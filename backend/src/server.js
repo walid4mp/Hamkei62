@@ -8,15 +8,65 @@ import {promisify} from 'util';
 import {execFile} from 'child_process';
 import https from 'https';
 import { AccessToken } from 'livekit-server-sdk';
+import { PERMISSIONS, ROLES, ROLE_PERMISSIONS, effectivePermissions, hasPermission, normalizeRole, expandLegacy, toArray, SUPER_ADMIN_ONLY_PERMISSIONS } from './modules/permissions.js';
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
 const execFileAsync=promisify(execFile);
 const prisma=new PrismaClient(); const app=express(); const http=createServer(app);
 
-app.use(cors({origin:process.env.CORS_ORIGIN||'*'})); app.use(express.json({limit:'5mb'})); app.use(morgan('tiny'));
+// CORS: an explicit allow-list when configured; otherwise reflect the request
+// origin (native apps send none). Never credentials-with-wildcard.
+const CORS_ORIGINS=(process.env.CORS_ORIGIN||'').split(',').map(x=>x.trim()).filter(Boolean);
+app.use(cors({origin:CORS_ORIGINS.length?CORS_ORIGINS:true,credentials:false}));
+// Baseline security headers (dependency-free).
+app.use((req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-XSS-Protection','0');res.setHeader('Strict-Transport-Security','max-age=15552000; includeSubDomains');res.setHeader('Permissions-Policy','geolocation=(), microphone=(self), camera=(self)');next();});
+app.use(express.json({limit:'5mb'})); app.use(morgan('tiny'));
+
+// ---- Idempotency for money/content mutations -------------------------------
+// A client sends `Idempotency-Key` on every mutation (it reuses the same key
+// across its own retries). Replayed keys return the stored response instead of
+// executing the operation a second time. Keys are scoped to the caller so one
+// user can never read another user's cached response.
+const IDEMPOTENT_PATTERNS=[
+  /^\/api\/wallet\//, /^\/api\/posts$/, /^\/api\/reels$/, /^\/api\/stories$/,
+  /^\/api\/rewards\//, /^\/api\/creators\/subscri/, /^\/api\/friends\/.*transfer/,
+];
+// JWT-only pre-auth: identifies the caller for idempotency without hitting the
+// DB. Route-level `auth` still performs the full validation.
+app.use((req,res,next)=>{ try{ const h=req.headers.authorization||''; if(h.startsWith('Bearer ')) req.user=jwt.verify(h.slice(7),JWT_SECRET); }catch{} next(); });
+app.use(async(req,res,next)=>{
+  if(req.method!=='POST') return next();
+  const key=String(req.headers['idempotency-key']||'').trim();
+  if(!key || key.length<8 || key.length>200) return next();
+  if(!IDEMPOTENT_PATTERNS.some(re=>re.test(req.path))) return next();
+  const uid=req.user?.id||'';
+  if(!uid) return next();
+  try{
+    const rows=await prisma.$queryRawUnsafe('SELECT "statusCode","response" FROM "IdempotencyRecord" WHERE "key"=$1 AND "userId"=$2 LIMIT 1',key,uid);
+    if(rows?.[0]?.response){ res.status(rows[0].statusCode||200).type('application/json').send(rows[0].response); return; }
+  }catch{}
+  let stored=false;
+  const remember=(body)=>{
+    if(stored||!body) return; stored=true;
+    try{ prisma.$executeRawUnsafe('INSERT INTO "IdempotencyRecord" ("key","userId","path","method","statusCode","response") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("key") DO NOTHING',key,uid,req.path,'POST',res.statusCode||200,String(body)).catch(()=>{}); }catch{}
+  };
+  const origJson=res.json.bind(res);
+  const origSend=res.send.bind(res);
+  res.json=(body)=>{ if((res.statusCode||200)<500){ try{remember(JSON.stringify(body));}catch{} } return origJson(body); };
+  res.send=(body)=>{ if((res.statusCode||200)<500){ try{remember(typeof body==='string'?body:JSON.stringify(body));}catch{} } return origSend(body); };
+  next();
+});
 app.use('/admin-assets',express.static(path.join(__dirname,'admin-assets')));
-const io=new Server(http,{cors:{origin:'*'}}); const JWT_SECRET=process.env.JWT_SECRET||'change-me';
-const safe=u=>{if(!u)return null; const {passwordHash,...x}=u; return x}; const sign=u=>jwt.sign({id:u.id,username:u.username,email:u.email,role:u.role||'USER'},JWT_SECRET,{expiresIn:'30d'});
+const io=new Server(http,{cors:{origin:'*'}});
+// A known JWT secret is a critical vulnerability. Require JWT_SECRET in
+// production; otherwise fall back to a random per-boot secret (sessions are
+// intentionally invalidated on restart) and warn loudly.
+let JWT_SECRET=process.env.JWT_SECRET||'';
+if(!JWT_SECRET||JWT_SECRET==='change-me'){
+  JWT_SECRET=crypto.randomBytes(48).toString('hex');
+  console.warn('[security] JWT_SECRET is not set (or is the default) — using a random ephemeral secret. Set JWT_SECRET in production.');
+}
+const safe=u=>{if(!u)return null; const {passwordHash,...x}=u; return x}; const sign=u=>jwt.sign({id:u.id,username:u.username,email:u.email,role:u.role||'USER',tv:Number(u.tokenVersion||0)},JWT_SECRET,{expiresIn:'30d'});
 const RELATIONSHIP_TYPES=new Set(['SINGLE','IN_RELATIONSHIP','ENGAGED','MARRIED','CIVIL_UNION','DOMESTIC_PARTNERSHIP','OPEN_RELATIONSHIP','COMPLICATED','SEPARATED','DIVORCED','WIDOWED']);
 async function relationshipFor(userId, viewerId){
   const user=await prisma.user.findUnique({where:{id:userId},select:{relationshipStatus:true,relationshipSince:true}});
@@ -65,7 +115,9 @@ async function notifyMentions(body, text){
   for(const u of users){await prisma.notification.create({data:{userId:u.id,type:'MENTION',text:text||`تمت الإشارة إليك @${u.username}`}});}
 }
 function auth(req,res,next){(async()=>{try{const h=req.headers.authorization||''; if(!h.startsWith('Bearer ')) throw 0; req.user=jwt.verify(h.slice(7),JWT_SECRET); const did=rawDeviceId(req); if(did && await isDeviceBanned(did)) return res.status(403).json({error:'DEVICE_BANNED'}); // Account-close check is best-effort: if the additive column is missing on an older database we must not lock existing users out.
-    try{const row=await prisma.user.findUnique({where:{id:req.user.id},select:{isDeactivated:true}}); if(row?.isDeactivated===true) return res.status(403).json({error:'ACCOUNT_CLOSED'});}catch{} next()}catch{res.status(401).json({error:'UNAUTHORIZED'})}})()}
+    try{const row=await prisma.user.findUnique({where:{id:req.user.id},select:{isDeactivated:true,tokenVersion:true}}); if(row?.isDeactivated===true) return res.status(403).json({error:'ACCOUNT_CLOSED'}); if(row && Number(req.user.tv??0)!==Number(row.tokenVersion??0)) return res.status(401).json({error:'SESSION_REVOKED'});}catch{} next()}catch{res.status(401).json({error:'UNAUTHORIZED'})}})()}
+// Account status + moderation flags for the client, without leaking the hash.
+function publicUser(u){ if(!u) return null; return {...safe(u), permissions: effectiveFor(u)}; }
 function rawDeviceId(req, body={}){ return String(req.headers['x-device-id'] || body.deviceId || '').trim().slice(0,256); }
 function deviceHash(deviceId){ if(!deviceId) return ''; return crypto.createHash('sha256').update(`${process.env.DEVICE_BAN_SALT||JWT_SECRET}:device:${deviceId}`).digest('hex'); }
 async function ensureDeviceBanTable(){
@@ -104,21 +156,16 @@ const STAFF_PERMISSION_CATALOG=[
   'MANAGE_AI','MANAGE_SETTINGS','MANAGE_ADMIN_ROLES','VIEW_AUDIT_LOGS',
   'MANAGE_ASSIGNED_PROFILES','ASSIGNED_PROFILE_BAN','ASSIGNED_PROFILE_VERIFY','ASSIGNED_PROFILE_FEATURE','ASSIGNED_PROFILE_COINS','ASSIGNED_PROFILE_EFFECTS','ASSIGNED_PROFILE_SPECIALS','ASSIGNED_PROFILE_SUBSCRIPTIONS'
 ];
-function permissionArray(value){return Array.isArray(value)?value.map(String).filter(Boolean):[];}
+function permissionArray(value){return toArray(value);}
 async function currentAdmin(req){
   if(!req.user?.id)return null;
   return prisma.user.findUnique({where:{id:req.user.id},select:{id:true,email:true,role:true,adminPermissions:true,specialFeatures:true,isBanned:true}});
 }
-function hasPermission(user,permission){
-  if(!user || user.isBanned)return false;
-  if(user.role==='DEVELOPER')return true;
-  const perms=permissionArray(user.adminPermissions);
-  return perms.includes('*') || perms.includes(permission);
-}
+// All permission checks go through the central catalog (modules/permissions.js).
+// `hasPermission` accepts either a dotted permission or a legacy constant.
 async function superAdmin(req,res,next){
   const u=await currentAdmin(req);
-  const adminEmails=(process.env.ADMIN_EMAILS||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
-  if(u?.role==='DEVELOPER' || (u?.email && adminEmails.includes(String(u.email).toLowerCase())))return next();
+  if(isSuperAdmin(u))return next();
   return res.status(403).json({error:'SUPER_ADMIN_ONLY'});
 }
 async function staffPermission(permission){
@@ -130,8 +177,52 @@ async function staffPermission(permission){
 }
 function adminEmailList(){return (process.env.ADMIN_EMAILS||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);}
 function isAdminEmail(email){const e=String(email||'').toLowerCase();return e?adminEmailList().includes(e):false;}
-// Route permission guard: DEVELOPER, ADMIN_EMAILS and granted staff permissions all pass.
-function requirePermission(permission){ return async function(req,res,next){ try{ const u=await currentAdmin(req); if(u?.role==='DEVELOPER')return next(); if(u?.email&&adminEmailList().includes(String(u.email).toLowerCase()))return next(); if(hasPermission(u,permission))return next(); return res.status(403).json({error:'PERMISSION_DENIED',permission}); }catch(e){ return res.status(500).json({error:'PERMISSION_CHECK_FAILED'}); } }; }
+// Route permission guard. Every admin endpoint names the permission it needs;
+// SUPER_ADMIN is the only role that carries the wildcard. ADMIN_EMAILS is a
+// bootstrap-only list (see ensureSuperAdmin) and does NOT bypass runtime checks.
+function requirePermission(permission){ return async function(req,res,next){ try{ const u=await currentAdmin(req); if(hasPermission(u,permission))return next(); return res.status(403).json({error:'PERMISSION_DENIED',permission}); }catch(e){ return res.status(500).json({error:'PERMISSION_CHECK_FAILED'}); } }; }
+async function requireAnyPermission(list){ return async function(req,res,next){ try{ const u=await currentAdmin(req); if(list.some(p=>hasPermission(u,p)))return next(); return res.status(403).json({error:'PERMISSION_DENIED',permission:list.join('|')}); }catch(e){ return res.status(500).json({error:'PERMISSION_CHECK_FAILED'}); } }; }
+
+// ---- Audit log -----------------------------------------------------------
+// Rich audit helper: every sensitive action records who did what to whom, the
+// permission used, before/after, request IP/device and the result.
+async function auditAction(req, action, { permission='', targetUserId=null, targetType='', targetId='', before=null, after=null, result='OK' }={}){
+  try{
+    const actor=await currentAdmin(req);
+    await prisma.auditLog.create({data:{
+      actorId:req.user?.id||'system',
+      action:String(action).slice(0,120),
+      targetUserId:targetUserId||null,
+      metadata:JSON.stringify({
+        actorRole:actor?.role||'', permission, targetType, targetId,
+        before, after, ip:req.ip||'', device:req.headers?.['x-device-id']||'', result,
+      }),
+    }});
+  }catch(e){ console.warn('[audit]',e?.message||e); }
+}
+
+function isSuperAdmin(user){ return !!user && normalizeRole(user.role)==='SUPER_ADMIN'; }
+function effectiveFor(user){ return effectivePermissions(user); }
+// Bootstrap: guarantee at least one SUPER_ADMIN. ADMIN_EMAILS accounts are
+// promoted once; otherwise the oldest DEVELOPER is promoted. This is the only
+// place ADMIN_EMAILS has any effect at runtime — it never bypasses a
+// permission check inside a request.
+async function ensureSuperAdmin(){
+  try{
+    const existing=await prisma.user.count({where:{role:'SUPER_ADMIN'}});
+    if(existing>0)return;
+    const emails=adminEmailList();
+    let promoted=0;
+    if(emails.length){
+      promoted=await prisma.user.updateMany({where:{email:{in:emails}},data:{role:'SUPER_ADMIN',adminPermissions:['*']}}).then(r=>r.count).catch(()=>0);
+    }
+    if(!promoted){
+      const dev=await prisma.user.findFirst({where:{role:'DEVELOPER'},orderBy:{createdAt:'asc'}});
+      if(dev){ await prisma.user.update({where:{id:dev.id},data:{role:'SUPER_ADMIN',adminPermissions:['*']}}); promoted=1; }
+    }
+    if(promoted)console.log('[admin] bootstrapped SUPER_ADMIN account(s):',promoted);
+  }catch(e){ console.warn('[admin] ensureSuperAdmin skipped:',e?.message||e); }
+}
 
 let fcmAccessToken=null;
 let fcmAccessTokenExpiresAt=0;
@@ -379,6 +470,17 @@ async function ensureSchemaCompatibility(){
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "fcmToken" TEXT`,
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isDeactivated" BOOLEAN NOT NULL DEFAULT false`,
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "deactivatedAt" TIMESTAMP(3)`,
+    // Bumped by "logout all devices"; JWTs carrying an older version are rejected.
+    `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "tokenVersion" INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "actorRole" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "permission" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "targetType" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "targetId" TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "result" TEXT NOT NULL DEFAULT 'OK'`,
+    `ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "ipAddress" TEXT NOT NULL DEFAULT ''`,
+    // Idempotency for money/content mutations (Idempotency-Key header).
+    `CREATE TABLE IF NOT EXISTS "IdempotencyRecord" ("key" TEXT PRIMARY KEY,"userId" TEXT NOT NULL,"path" TEXT NOT NULL,"method" TEXT NOT NULL,"statusCode" INTEGER NOT NULL DEFAULT 0,"response" TEXT,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE INDEX IF NOT EXISTS "IdempotencyRecord_user_created_idx" ON "IdempotencyRecord"("userId","createdAt")`,
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "showBirthDateInProfile" BOOLEAN NOT NULL DEFAULT true`,
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "showLocationInProfile" BOOLEAN NOT NULL DEFAULT true`,
     `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "showRelationshipInProfile" BOOLEAN NOT NULL DEFAULT true`,
@@ -550,7 +652,7 @@ app.get('/api/admin/conversations/:userId/:peerId',auth,conversationModerator,as
   }catch(e){console.error('[admin conversation]',e);res.status(500).json({error:'SERVER_ERROR'});}
 });
 
-app.get('/api/admin/audit-logs',auth,conversationModerator,async(req,res)=>{
+app.get('/api/admin/audit-logs',auth,requirePermission('audit.view'),async(req,res)=>{
   const limit=Math.min(200,Math.max(1,Number(req.query.limit||50)));
   const rows=await prisma.auditLog.findMany({orderBy:{createdAt:'desc'},take:limit});
   res.json(rows);
@@ -558,12 +660,12 @@ app.get('/api/admin/audit-logs',auth,conversationModerator,async(req,res)=>{
 
 // Staff / developer permission management. Only a DEVELOPER (super admin)
 // may grant or revoke administrative permissions or create privileged staff.
-app.get('/api/admin/permission-catalog',auth,superAdmin,async(req,res)=>{
-  res.json({roles:[
-    {id:'CUSTOM_MODERATOR',label:'Custom Moderator',permissions:MODERATION_PERMISSIONS},
-    {id:'FULL_MODERATOR',label:'Full Moderator',permissions:MODERATION_PERMISSIONS},
-    {id:'DEVELOPER',label:'Super Admin / Developer',permissions:['*']}
-  ],permissions:STAFF_PERMISSION_CATALOG});
+app.get('/api/admin/permission-catalog',auth,requirePermission('permissions.view'),async(req,res)=>{
+  res.json({
+    roles:ROLES.map(id=>({id,label:id,permissions:ROLE_PERMISSIONS[id]||[]})),
+    permissions:PERMISSIONS,
+    legacy:STAFF_PERMISSION_CATALOG,
+  });
 });
 
 app.get('/api/admin/users/:id/privileges',auth,superAdmin,async(req,res)=>{
@@ -572,24 +674,43 @@ app.get('/api/admin/users/:id/privileges',auth,superAdmin,async(req,res)=>{
   res.json(u);
 });
 
-app.patch('/api/admin/users/:id/privileges',auth,superAdmin,async(req,res)=>{
+app.patch('/api/admin/users/:id/privileges',auth,requirePermission('permissions.grant'),async(req,res)=>{
   try{
     const d=z.object({
-      role:z.enum(['USER','CUSTOM_MODERATOR','FULL_MODERATOR','DEVELOPER']).optional(),
-      permissions:z.array(z.string().max(80)).max(100).optional(),
-      specialFeatures:z.array(z.string().max(80)).max(100).optional()
+      role:z.enum(['USER','ASSISTANT_MODERATOR','MODERATOR','ADMIN','SECURITY_ACCOUNT','DEVELOPER','SUPER_ADMIN']).optional(),
+      permissions:z.array(z.string().max(80)).max(200).optional(),
+      specialFeatures:z.array(z.string().max(80)).max(100).optional(),
+      confirm:z.boolean().optional(),
     }).parse(req.body||{});
     const existing=await prisma.user.findUnique({where:{id:req.params.id},select:{id:true,role:true,adminPermissions:true,specialFeatures:true}});
     if(!existing)return res.status(404).json({error:'USER_NOT_FOUND'});
-    const role=d.role||existing.role;
-    let permissions=d.permissions!==undefined?d.permissions:permissionArray(existing.adminPermissions);
-    if(role==='DEVELOPER')permissions=['*'];
-    if(role==='FULL_MODERATOR')permissions=MODERATION_PERMISSIONS;
-    if(role==='CUSTOM_MODERATOR')permissions=permissions.filter(x=>STAFF_PERMISSION_CATALOG.includes(x));
-    if(role==='USER')permissions=[];
+    const actor=await currentAdmin(req);
+    const role=normalizeRole(d.role||existing.role);
+
+    // Guardrail: the last SUPER_ADMIN cannot be demoted or stripped.
+    if(normalizeRole(existing.role)==='SUPER_ADMIN' && role!=='SUPER_ADMIN'){
+      const count=await prisma.user.count({where:{role:'SUPER_ADMIN'}});
+      if(count<=1)return res.status(409).json({error:'LAST_SUPER_ADMIN'});
+      if(d.confirm!==true)return res.status(428).json({error:'CONFIRMATION_REQUIRED'});
+    }
+    // Only a SUPER_ADMIN may create another SUPER_ADMIN.
+    if(role==='SUPER_ADMIN' && !isSuperAdmin(actor))return res.status(403).json({error:'SUPER_ADMIN_ONLY'});
+
+    let permissions=d.permissions!==undefined?expandLegacy(d.permissions):expandLegacy(permissionArray(existing.adminPermissions));
+    // Role defaults are what make the role meaningful; explicit grants are added
+    // on top. SUPER_ADMIN is the single wildcard role.
+    if(role==='SUPER_ADMIN')permissions=['*'];
+    else if(role==='USER')permissions=[];
+    else permissions=[...new Set([...(ROLE_PERMISSIONS[role]||[]),...permissions])];
+    // Only SUPER_ADMIN may hold the guarded permission-management set.
+    if(!isSuperAdmin(actor))permissions=permissions.filter(p=>!SUPER_ADMIN_ONLY_PERMISSIONS.includes(p));
+    if(permissionArray(existing.adminPermissions).includes('*') && role!=='SUPER_ADMIN' && d.confirm!==true){
+      return res.status(428).json({error:'CONFIRMATION_REQUIRED'});
+    }
+
     const updated=await prisma.user.update({where:{id:existing.id},data:{role,adminPermissions:permissions,specialFeatures:d.specialFeatures!==undefined?d.specialFeatures:existing.specialFeatures}});
-    await prisma.auditLog.create({data:{actorId:req.user.id,action:'STAFF_PERMISSIONS_UPDATE',targetUserId:existing.id,metadata:JSON.stringify({role,permissions})}});
-    res.json({ok:true,user:safe(updated)});
+    await auditAction(req,'STAFF_PERMISSIONS_UPDATE',{permission:'permissions.grant',targetUserId:existing.id,targetType:'USER',targetId:existing.id,before:{role:existing.role,permissions:permissionArray(existing.adminPermissions)},after:{role,permissions}});
+    res.json({ok:true,user:{...safe(updated),permissions:effectiveFor(updated)}});
   }catch(e){res.status(400).json({error:'VALIDATION_ERROR',details:String(e?.message||'')});}
 });
 
@@ -601,15 +722,18 @@ app.get('/api/admin/users/:id/profile-effects',auth,admin,async(req,res)=>{const
 app.patch('/api/admin/users/:id/profile-effects',auth,async(req,res)=>{const id=req.params.id;if(!(await canManageAssigned(req,id,'ASSIGNED_PROFILE_EFFECTS')))return res.status(403).json({error:'ASSIGNED_PROFILE_PERMISSION_DENIED',permission:'ASSIGNED_PROFILE_EFFECTS'});const u=await prisma.user.findUnique({where:{id},select:{id:true,specialFeatures:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});const d=z.object({profileOpenEffect:z.enum(['NONE','GOLDEN_AURA','NEON_PORTAL','HEART_BURST','SPARKLES']).optional(),profileOpenVideoUrl:z.string().max(5000).optional(),profileOpenEnabled:z.boolean().optional(),profileOpenDurationMs:z.number().int().min(1000).max(15000).optional()}).parse(req.body||{});const f=jsonObject(u.specialFeatures);const next={...f,...d};if(next.profileOpenEffect==='NONE')next.profileOpenEffect='';const out=await prisma.user.update({where:{id},data:{specialFeatures:next}});await prisma.auditLog.create({data:{actorId:req.user.id,action:'PROFILE_OPEN_EFFECT_UPDATE',targetUserId:id,metadata:JSON.stringify(d)}}).catch(()=>{});res.json({user:safe(out),effects:{profileOpenEffect:next.profileOpenEffect||'',profileOpenVideoUrl:next.profileOpenVideoUrl||'',profileOpenEnabled:next.profileOpenEnabled===true,profileOpenDurationMs:Number(next.profileOpenDurationMs||4500)}})});
 app.post('/api/admin/managed-users/:id/action',auth,async(req,res)=>{const id=req.params.id;const action=String(req.body?.action||'').toUpperCase();const map={BAN:'ASSIGNED_PROFILE_BAN',VERIFY:'ASSIGNED_PROFILE_VERIFY',FEATURE:'ASSIGNED_PROFILE_FEATURE',COINS:'ASSIGNED_PROFILE_COINS',SPECIALS:'ASSIGNED_PROFILE_SPECIALS',SUBSCRIPTION:'ASSIGNED_PROFILE_SUBSCRIPTIONS'};if(!map[action])return res.status(400).json({error:'INVALID_ACTION'});if(!(await canManageAssigned(req,id,map[action])))return res.status(403).json({error:'ASSIGNED_PROFILE_PERMISSION_DENIED',permission:map[action]});const u=await prisma.user.findUnique({where:{id},include:{wallet:true}});if(!u)return res.status(404).json({error:'USER_NOT_FOUND'});let out=u;if(action==='BAN')out=await prisma.user.update({where:{id},data:{isBanned:Boolean(req.body?.value)}});if(action==='VERIFY')out=await prisma.user.update({where:{id},data:{isVerified:Boolean(req.body?.value),verificationTier:String(req.body?.tier||'NORMAL')}});if(action==='FEATURE')out=await prisma.user.update({where:{id},data:{featuredAccount:Boolean(req.body?.value),featuredPriority:Math.max(0,Math.min(10000,Number(req.body?.priority||100)))}});if(action==='COINS'){const coins=Number(req.body?.coins||0);if(!Number.isInteger(coins)||coins===0)return res.status(400).json({error:'INVALID_COINS'});const wallet=u.wallet||await prisma.wallet.create({data:{userId:id}});const next=Math.max(0,wallet.coinBalance+coins);await prisma.wallet.update({where:{id:wallet.id},data:{coinBalance:next}});await prisma.walletTransaction.create({data:{userId:id,walletId:wallet.id,type:coins>0?'ADMIN_GRANT':'ADMIN_DEBIT',coins,balanceAfter:next,withdrawableAfter:wallet.withdrawableCoins,reference:`ASSIGNED-${crypto.randomUUID()}`,description:'تعديل من مسؤول مفوض'}});out=await prisma.user.findUnique({where:{id}});}if(action==='SUBSCRIPTION'){const creatorId=String(req.body?.creatorId||id);const days=Math.max(1,Math.min(3650,Number(req.body?.days||30)));const creator=await prisma.user.findUnique({where:{id:creatorId}});if(!creator)return res.status(404).json({error:'CREATOR_NOT_FOUND'});const existing=await prisma.creatorSubscription.findFirst({where:{creatorId,subscriberId:id,status:'VERIFIED'}});const expires=new Date(Date.now()+days*86400000);if(existing)out=await prisma.user.update({where:{id},data:{specialFeatures:{...jsonObject(u.specialFeatures),subscriptionGrantedByAdmin:true,subscriptionExpiresAt:expires.toISOString()}}});else{await prisma.creatorSubscription.create({data:{creatorId,subscriberId:id,provider:'ADMIN',productId:`ADMIN-SUB-${crypto.randomUUID()}`,purchaseToken:`ADMIN-${crypto.randomUUID()}`,status:'VERIFIED',expiresAt:expires}});out=await prisma.user.findUnique({where:{id}});}}
   if(action==='SPECIALS'){const current=jsonObject(u.specialFeatures);const patch=req.body?.features;if(!patch||typeof patch!=='object'||Array.isArray(patch))return res.status(400).json({error:'INVALID_FEATURES'});out=await prisma.user.update({where:{id},data:{specialFeatures:{...current,...patch}}});}await prisma.auditLog.create({data:{actorId:req.user.id,action:`ASSIGNED_${action}`,targetUserId:id,metadata:JSON.stringify(req.body||{})}}).catch(()=>{});res.json({ok:true,user:safe(out)})});
-app.post('/api/admin/developer-accounts',auth,superAdmin,async(req,res)=>{
+app.post('/api/admin/developer-accounts',auth,requirePermission('admins.create'),async(req,res)=>{
   try{
-    const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(8),displayName:z.string().min(2).max(60),role:z.enum(['CUSTOM_MODERATOR','FULL_MODERATOR','DEVELOPER']).default('CUSTOM_MODERATOR'),permissions:z.array(z.string()).max(100).default([])}).parse(req.body||{});
+    const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(8),displayName:z.string().min(2).max(60),role:z.enum(['ASSISTANT_MODERATOR','MODERATOR','ADMIN','SECURITY_ACCOUNT','DEVELOPER']).default('SECURITY_ACCOUNT'),permissions:z.array(z.string()).max(200).default([])}).parse(req.body||{});
     const exists=await prisma.user.findFirst({where:{OR:[{email:d.email},{username:d.username}]}});
     if(exists)return res.status(409).json({error:'EMAIL_OR_USERNAME_EXISTS'});
-    const permissions=d.role==='DEVELOPER'?['*']:d.role==='FULL_MODERATOR'?MODERATION_PERMISSIONS:d.permissions.filter(x=>STAFF_PERMISSION_CATALOG.includes(x));
-    const u=await prisma.user.create({data:{username:d.username,email:d.email.toLowerCase(),displayName:d.displayName,passwordHash:await bcrypt.hash(d.password,12),role:d.role,adminPermissions:permissions,specialFeatures:['admin_panel'],isVerified:true}});
-    await prisma.auditLog.create({data:{actorId:req.user.id,action:'STAFF_ACCOUNT_CREATED',targetUserId:u.id,metadata:JSON.stringify({role:d.role,permissions})}});
-    res.status(201).json({user:safe(u)});
+    const role=normalizeRole(d.role);
+    let permissions=[...new Set([...(ROLE_PERMISSIONS[role]||[]),...expandLegacy(d.permissions)])];
+    const actor=await currentAdmin(req);
+    if(!isSuperAdmin(actor))permissions=permissions.filter(p=>!SUPER_ADMIN_ONLY_PERMISSIONS.includes(p));
+    const u=await prisma.user.create({data:{username:d.username,email:d.email.toLowerCase(),displayName:d.displayName,passwordHash:await bcrypt.hash(d.password,12),role,adminPermissions:permissions,specialFeatures:['admin_panel'],isVerified:true}});
+    await auditAction(req,'STAFF_ACCOUNT_CREATED',{permission:'admins.create',targetUserId:u.id,targetType:'USER',targetId:u.id,after:{role,permissions}});
+    res.status(201).json({user:{...safe(u),permissions:effectiveFor(u)}});
   }catch(e){res.status(400).json({error:'VALIDATION_ERROR',details:String(e?.message||'')});}
 });
 
@@ -707,7 +831,7 @@ app.delete('/api/admin/stories/:id',auth,requirePermission('STORY_MODERATION'),a
 app.delete('/api/admin/groups/:id',auth,requirePermission('GROUP_MODERATION'),async(req,res)=>{await prisma.group.delete({where:{id:req.params.id}});res.json({ok:true});});
 app.get('/api/admin/comments',auth,admin,async(req,res)=>{const rows=await prisma.comment.findMany({orderBy:{createdAt:'desc'},take:300,include:{author:true,post:true}});res.json(rows.map(c=>({...c,author:safe(c.author)})));});
 app.delete('/api/admin/comments/:id',auth,requirePermission('COMMENT_MODERATION'),async(req,res)=>{await prisma.comment.delete({where:{id:req.params.id}});res.json({ok:true});});
-app.get('/api/admin/audit-logs-full',auth,admin,async(req,res)=>res.json(await prisma.auditLog.findMany({orderBy:{createdAt:'desc'},take:300}))); 
+app.get('/api/admin/audit-logs-full',auth,requirePermission('audit.view'),async(req,res)=>res.json(await prisma.auditLog.findMany({orderBy:{createdAt:'desc'},take:300}))); 
 app.get('/api/admin/analytics',auth,admin,async(req,res)=>{const [users,posts,reels,groups,live,withdrawals]=await Promise.all([prisma.user.count(),prisma.post.count(),prisma.reel.count(),prisma.group.count(),prisma.liveRoom.count({where:{status:'LIVE'}}),prisma.withdrawalRequest.aggregate({where:{status:'PAID'},_sum:{cashCents:true,coins:true}})]);res.json({users,posts,reels,groups,live,paidWithdrawals:withdrawals});});
 
 app.get('/api/admin/device-bans',auth,admin,async(req,res)=>{
@@ -741,11 +865,13 @@ app.post('/api/admin/device-bans/:id/revoke',auth,admin,async(req,res)=>{
   res.json({ok:true});
 });
 app.get('/api/health',(req,res)=>res.json({ok:true,service:'SocialNova API',version:'3.0.0',time:new Date().toISOString()}));
-app.post('/api/auth/register',requireAllowedDevice,async(req,res)=>{try{const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(6),displayName:z.string().min(2).max(60),deviceId:z.string().max(256).optional()}).parse(req.body);const deviceId=rawDeviceId(req,d);if(deviceId && await isDeviceBanned(deviceId))return res.status(403).json({error:'DEVICE_BANNED'});const exists=await prisma.user.findFirst({where:{OR:[{email:d.email},{username:d.username}]}});if(exists)return res.status(409).json({error:'EMAIL_OR_USERNAME_EXISTS'});const{password:pw,deviceId:_device,...rest}=d;const u=await prisma.user.create({data:{...rest,passwordHash:await bcrypt.hash(pw,12)}});await rememberDevice(u.id,deviceId);res.status(201).json({user:safe(u),token:sign(u)})}catch(e){res.status(400).json({error:e.message})}});
-app.post('/api/auth/login',requireAllowedDevice,async(req,res)=>{const d=req.body||{};if(rawDeviceId(req,d) && await isDeviceBanned(rawDeviceId(req,d)))return res.status(403).json({error:'DEVICE_BANNED'});const u=await prisma.user.findFirst({where:{OR:[{email:d.login},{username:d.login}]}});if(!u||u.isBanned||!(await bcrypt.compare(d.password||'',u.passwordHash)))return res.status(401).json({error:'INVALID_CREDENTIALS'});if(u.isDeactivated===true)return res.status(403).json({error:'ACCOUNT_CLOSED'});const adminEmails=(process.env.ADMIN_EMAILS||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);const isAdmin=u.role==='DEVELOPER'||adminEmails.includes(String(u.email).toLowerCase());await rememberDevice(u.id,rawDeviceId(req,d));res.json({user:safe(u),isAdmin,token:sign(u)})});
-app.get('/api/me',auth,async(req,res)=>{const u=await prisma.user.findUnique({where:{id:req.user.id}});if(!u)return res.status(404).json({error:'NOT_FOUND'});const [followers,following,posts,relationship]=await Promise.all([prisma.follow.count({where:{followingId:u.id}}),prisma.follow.count({where:{followerId:u.id}}),prisma.post.count({where:{authorId:u.id}}),relationshipFor(u.id,u.id)]);res.json({user:{...safe(u),followers,following,posts,relationshipType:relationship.type,relationship}})});
+app.post('/api/auth/register',requireAllowedDevice,async(req,res)=>{try{const d=z.object({username:z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.]+$/),email:z.string().email(),password:z.string().min(6),displayName:z.string().min(2).max(60),deviceId:z.string().max(256).optional()}).parse(req.body);const deviceId=rawDeviceId(req,d);if(deviceId && await isDeviceBanned(deviceId))return res.status(403).json({error:'DEVICE_BANNED'});const exists=await prisma.user.findFirst({where:{OR:[{email:d.email},{username:d.username}]}});if(exists)return res.status(409).json({error:'EMAIL_OR_USERNAME_EXISTS'});const{password:pw,deviceId:_device,...rest}=d;const u=await prisma.user.create({data:{...rest,passwordHash:await bcrypt.hash(pw,12)}});await rememberDevice(u.id,deviceId);res.status(201).json({user:publicUser(u),token:sign(u)})}catch(e){res.status(400).json({error:e.message})}});
+app.post('/api/auth/login',requireAllowedDevice,async(req,res)=>{const d=req.body||{};if(rawDeviceId(req,d) && await isDeviceBanned(rawDeviceId(req,d)))return res.status(403).json({error:'DEVICE_BANNED'});const u=await prisma.user.findFirst({where:{OR:[{email:d.login},{username:d.login}]}});if(!u||u.isBanned||!(await bcrypt.compare(d.password||'',u.passwordHash)))return res.status(401).json({error:'INVALID_CREDENTIALS'});if(u.isDeactivated===true)return res.status(403).json({error:'ACCOUNT_CLOSED'});const isAdmin=effectiveFor(u).length>0;await rememberDevice(u.id,rawDeviceId(req,d));res.json({user:publicUser(u),isAdmin,token:sign(u)})});
+app.get('/api/me',auth,async(req,res)=>{const u=await prisma.user.findUnique({where:{id:req.user.id}});if(!u)return res.status(404).json({error:'NOT_FOUND'});const [followers,following,posts,relationship]=await Promise.all([prisma.follow.count({where:{followingId:u.id}}),prisma.follow.count({where:{followerId:u.id}}),prisma.post.count({where:{authorId:u.id}}),relationshipFor(u.id,u.id)]);res.json({user:{...publicUser(u),followers,following,posts,relationshipType:relationship.type,relationship}})});
 app.post('/api/account/close',auth,async(req,res)=>{try{await prisma.user.update({where:{id:req.user.id},data:{isDeactivated:true,deactivatedAt:new Date()}});res.json({ok:true})}catch(e){res.status(500).json({error:'ACCOUNT_CLOSE_FAILED'})}});
 app.post('/api/account/reactivate',auth,async(req,res)=>{try{await prisma.user.update({where:{id:req.user.id},data:{isDeactivated:false,deactivatedAt:null}});res.json({ok:true})}catch(e){res.status(500).json({error:'ACCOUNT_REACTIVATE_FAILED'})}});
+// Invalidate every existing session of this account (all devices).
+app.post('/api/auth/logout-all',auth,async(req,res)=>{try{await prisma.user.update({where:{id:req.user.id},data:{tokenVersion:{increment:1}}});await auditAction(req,'LOGOUT_ALL_DEVICES',{targetUserId:req.user.id});res.json({ok:true})}catch(e){res.status(500).json({error:'LOGOUT_ALL_FAILED'})}});
 app.patch('/api/me',auth,async(req,res)=>{try{const d=z.object({displayName:z.string().min(2).max(60).optional(),bio:z.string().max(500).optional(),website:z.string().max(500).optional(),location:z.string().max(200).optional(),gender:z.string().max(20).optional(),birthDate:z.string().datetime().nullable().optional(),avatarUrl:z.string().max(2000000).optional(),coverUrl:z.string().max(2000000).optional(),digitalCardTheme:z.string().max(30).optional(),digitalCardShape:z.string().max(30).optional(),digitalCardVisibility:z.enum(['PUBLIC','FRIENDS','PRIVATE']).optional(),digitalCardShowFollowers:z.boolean().optional(),digitalCardShowPosts:z.boolean().optional(),digitalCardShowStories:z.boolean().optional(),digitalCardShowActivity:z.boolean().optional(),digitalCardShowGender:z.boolean().optional(),digitalCardShowBirthDate:z.boolean().optional(),digitalCardGroupId:z.string().max(100).nullable().optional(),specialFeatures:z.record(z.any()).optional()}).parse(req.body);const data={...d};
     if(data.specialFeatures){const current=await prisma.user.findUnique({where:{id:req.user.id},select:{specialFeatures:true,role:true}});const base=jsonObject(current?.specialFeatures);const incoming=jsonObject(data.specialFeatures);if(current?.role!=='DEVELOPER'){for(const k of ['profileOpenEffect','profileOpenVideoUrl','profileOpenEnabled','profileOpenDurationMs'])delete incoming[k];}data.specialFeatures={...base,...incoming};}if(data.birthDate!==undefined)data.birthDate=data.birthDate?new Date(data.birthDate):null;if(data.digitalCardGroupId){const member=await prisma.groupMember.findUnique({where:{groupId_userId:{groupId:data.digitalCardGroupId,userId:req.user.id}}});if(!member)return res.status(403).json({error:'FORBIDDEN'})}res.json({user:safe(await prisma.user.update({where:{id:req.user.id},data}))})}catch(e){res.status(400).json({error:'VALIDATION_ERROR'})}});
 app.get('/api/feed',auth,async(req,res)=>{const fl=await prisma.follow.findMany({where:{followerId:req.user.id},select:{followingId:true}});const ids=fl.map(f=>f.followingId);const visibleReposters=[req.user.id,...ids];const posts=await prisma.post.findMany({where:{AND:[{OR:[{visibility:'PUBLIC',author:{isBanned:false}},{authorId:req.user.id},{visibility:'FOLLOWERS',authorId:{in:ids}},{reposts:{some:{userId:{in:visibleReposters}}}}]},{OR:[{authorId:req.user.id},{postViews:{none:{userId:req.user.id}}}]}]},orderBy:[{author:{featuredAccount:'desc'}},{author:{featuredPriority:'desc'}},{createdAt:'desc'}],take:50,include:{author:true,likes:true,bookmarks:true,reposts:{include:{user:true}},shares:true,comments:{include:{author:true},orderBy:{createdAt:'desc'},take:3}}});const statusMap=await statusRingsForUserIds(posts.map(p=>p.authorId),req.user.id);res.json(posts.map(p=>({...p,author:withStatus(p.author,statusMap),likedByMe:p.likes.some(x=>x.userId===req.user.id),bookmarkedByMe:p.bookmarks.some(x=>x.userId===req.user.id),repostedByMe:p.reposts.some(x=>x.userId===req.user.id),reposters:p.reposts.slice(0,3).map(x=>safe(x.user)),likeCount:p.likes.length,commentCount:p.comments.length,repostCount:p.reposts.length,shareCount:p.shares.length,comments:p.comments.map(c=>({...c,author:safe(c.author)}))}))) });
@@ -1445,6 +1571,7 @@ const PORT=Number(process.env.PORT||10000);
     await ensureSchemaCompatibility();
     await ensureDeviceBanTable();
     await ensureCatalog();
+    await ensureSuperAdmin();
     await ensureAdminLogin();
     http.listen(PORT,'0.0.0.0',()=>console.log(`[SocialNova] API listening on ${PORT}`));
   }catch(e){

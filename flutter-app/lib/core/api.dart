@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'device_identity.dart';
 
 const Map<String, String> apiMessages = {
@@ -45,30 +47,32 @@ const Map<String, String> apiMessages = {
 };
 
 class Api {
+  /// The ONLY API host the app may talk to. It is fixed at build time via
+  /// `--dart-define=API_URL=...`; there is intentionally **no** runtime host
+  /// switching and no fallback list, so credentials can never be sent to an
+  /// arbitrary or unowned host.
   static const base = String.fromEnvironment(
     'API_URL',
     defaultValue: 'https://hamkei62.onrender.com',
   );
-  static String baseUrl = base;
-  static String socketUrl = const String.fromEnvironment(
+  static final String baseUrl = base.trim().replaceAll(RegExp(r'/+$'), '');
+  static final String socketUrl = const String.fromEnvironment(
     'SOCKET_URL',
     defaultValue: 'https://hamkei62.onrender.com',
-  );
+  ).trim().replaceAll(RegExp(r'/+$'), '');
 
   static String? token;
   static Map<String, dynamic>? me;
 
-  /// Real, distinct fallback endpoints. We deliberately avoid duplicating the
-  /// primary URL — Render's free plan returns 502 while waking up; the API now
-  /// probes each candidate with a *short* timeout and switches baseUrl to the
-  /// first one that responds.
-  static const List<String> fallbackBases = <String>[
-    'https://hamkei62.onrender.com',
-    'https://hamkei62-api.onrender.com',
-    'https://socialnova-api.onrender.com',
-    'https://hamkei62.up.railway.app',
-    'https://hamkei62.fly.dev',
-  ];
+  /// Secure, encrypted storage for the session token (never SharedPreferences).
+  static const _secure = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
+  static const _tokenKey = 'sn_session_token';
+
+  /// Set by main.dart: called after a 401 so the app can drop to the login
+  /// screen instead of leaving the user on a broken authenticated screen.
+  static Future<void> Function()? onUnauthorized;
 
   static Future<bool> ping(String root) async {
     final r = root.trim().replaceAll(RegExp(r'/+$'), '');
@@ -92,48 +96,43 @@ class Api {
       List<dynamic>.from(await req('GET', '/api/admin/audit-logs?limit=$limit'));
 
   static Future<void> init() async {
-    final p = await SharedPreferences.getInstance();
-    token = p.getString('token');
-    final saved = p.getString('api_url');
-    final preferred = (saved != null && saved.trim().isNotEmpty) ? saved.trim() : base;
-    baseUrl = preferred;
-    unawaited(_resolveReachable(preferred));
-  }
-
-  static Future<void> _resolveReachable(String preferred) async {
-    if (await ping(preferred)) return;
-    for (final candidate in <String>[base, ...fallbackBases]) {
-      final c = candidate.trim().replaceAll(RegExp(r'/+$'), '');
-      if (c == preferred) continue;
-      if (await ping(c)) {
-        baseUrl = c;
-        return;
-      }
+    // One-time migration from the old SharedPreferences token, then delete it.
+    try {
+      token = await _secure.read(key: _tokenKey);
+    } catch (_) {
+      token = null;
     }
-  }
-
-  static Future<void> setBaseUrl(String value) async {
-    final v = value.trim().replaceAll(RegExp(r'/+$'), '');
-    baseUrl = v.isEmpty ? base : v;
-    final p = await SharedPreferences.getInstance();
-    if (v.isEmpty) {
-      await p.remove('api_url');
-    } else {
-      await p.setString('api_url', baseUrl);
+    if (token == null || token!.isEmpty) {
+      try {
+        final legacy = await SharedPreferences.getInstance();
+        final old = legacy.getString('token');
+        if (old != null && old.isNotEmpty) {
+          token = old;
+          await _secure.write(key: _tokenKey, value: old);
+        }
+        await legacy.remove('token');
+        await legacy.remove('api_url');
+      } catch (_) {}
     }
   }
 
   static Future<void> saveToken(String value) async {
     token = value;
-    final p = await SharedPreferences.getInstance();
-    await p.setString('token', value);
+    try {
+      await _secure.write(key: _tokenKey, value: value);
+    } catch (_) {}
   }
 
   static Future<void> logout() async {
     token = null;
     me = null;
-    final p = await SharedPreferences.getInstance();
-    await p.remove('token');
+    try {
+      await _secure.delete(key: _tokenKey);
+    } catch (_) {}
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.remove('token');
+    } catch (_) {}
   }
 
   /// Multipart upload with the same wake-up/retry protection as JSON requests.
@@ -180,12 +179,23 @@ class Api {
   /// Retries automatically: Render's free tier answers 502/503/504 for a few
   /// seconds while the container wakes up from sleep, which used to surface as
   /// the "فشل الطلب (HTTP 502)" screen the user saw.
+  static final math.Random _rand = math.Random.secure();
+  static String _newIdempotencyKey() {
+    final bytes = List<int>.generate(16, (_) => _rand.nextInt(256));
+    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  }
+
   static Future<dynamic> req(String method, String path, {Map<String, dynamic>? body}) async {
     const maxAttempts = 3;
+    // One key per logical call: retries reuse it, so a wake-up retry can never
+    // execute the same mutation twice on the server.
+    final idemKey = _newIdempotencyKey();
+    final isMutation = method.toUpperCase() != 'GET';
     for (var attempt = 1; ; attempt++) {
       final headers = <String, String>{
         'Content-Type': 'application/json',
         'X-Device-ID': await DeviceIdentity.get(),
+        if (isMutation) 'Idempotency-Key': idemKey,
         if (token != null) 'Authorization': 'Bearer $token',
       };
       final uri = Uri.parse('$baseUrl$path');
@@ -233,6 +243,17 @@ class Api {
           attempt < maxAttempts) {
         await Future<void>.delayed(Duration(seconds: attempt * 4));
         continue;
+      }
+
+      // Expired/invalid session: clear the token and let the app return to
+      // login instead of leaving the user on authenticated screens with a token
+      // the server no longer accepts.
+      if (response.statusCode == 401) {
+        await logout();
+        final cb = onUnauthorized;
+        if (cb != null) {
+          try { await cb(); } catch (_) {}
+        }
       }
 
       if (response.statusCode >= 400) {
@@ -392,14 +413,21 @@ class Api {
   static Future<Map<String,dynamic>> managedProfileAction(String id, String action, Map<String,dynamic> body) async => Map<String,dynamic>.from(await req('POST','/api/admin/managed-users/$id/action',body:{'action':action,...body}));
 
   // ---- In-app moderation (works once a staff permission is granted) ----
-  static bool get isDeveloper => '${me?['role'] ?? ''}' == 'DEVELOPER';
+  /// Effective permissions as resolved by the server (role defaults + grants),
+  /// exposed on /api/me. Falls back to the raw grants for older servers.
   static List<String> get permissions {
+    final effective = me?['permissions'];
+    if (effective is List && effective.isNotEmpty) return effective.map((e) => '$e').toList();
     final raw = me?['adminPermissions'];
     if (raw is List) return raw.map((e) => '$e').toList();
     if (raw is String && raw.isNotEmpty) return raw.split(',');
     return const <String>[];
   }
-  static bool can(String permission) => isDeveloper || permissions.contains('*') || permissions.contains(permission);
+  static bool get isDeveloper => '${me?['role'] ?? ''}' == 'DEVELOPER';
+  static bool get isSuperAdmin => '${me?['role'] ?? ''}' == 'SUPER_ADMIN';
+  static bool can(String permission) => isSuperAdmin || permissions.contains('*') || permissions.contains(permission);
+
+  static Future<void> logoutAllDevices() async => req('POST', '/api/auth/logout-all');
 
   static Future<void> adminDeletePost(String id) async => req('DELETE', '/api/admin/posts/$id');
   static Future<void> adminDeleteComment(String id) async => req('DELETE', '/api/admin/comments/$id');

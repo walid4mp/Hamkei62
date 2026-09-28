@@ -1629,6 +1629,22 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsPage())),
                 ),
                 ListTile(
+                  leading: Icon(Icons.devices_other_rounded, color: Colors.orangeAccent),
+                  title: const Text('تسجيل الخروج من كل الأجهزة'),
+                  subtitle: Text('ينهي كل الجلسات المفتوحة على هذا الحساب', style: TextStyle(color: SN.textMut, fontSize: 12)),
+                  onTap: () async {
+                    try {
+                      await Api.logoutAllDevices();
+                    } catch (_) {}
+                    await Api.logout();
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const AuthScreen()),
+                      (_) => false,
+                    );
+                  },
+                ),
+                ListTile(
                   leading: Icon(Icons.logout, color: SN.red),
                   title: Text('تسجيل الخروج', style: TextStyle(color: SN.red)),
                   onTap: () async {

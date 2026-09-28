@@ -14,6 +14,16 @@ import 'screens/social.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Api.init();
+  // A 401 anywhere means the session is gone: clear state and return to login.
+  Api.onUnauthorized = () async {
+    final nav = socialNovaNavigatorKey.currentState;
+    if (nav != null) {
+      nav.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+        (route) => false,
+      );
+    }
+  };
   if (Api.token != null) { await initPushNotifications(); }
   ChatBubbleManager.i.setDefaultOpen(() {
     final nav = socialNovaNavigatorKey.currentState;

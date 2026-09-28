@@ -1,1 +1,16 @@
+# Flutter/Dart tooling (never commit)
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.iml
+
+# Android secrets — keystore and its passwords must stay OUT of git
+android/key.properties
+android/.gradle/
+local.properties
+android/app/*.jks
+android/app/*.keystore
+android/app/upload-keystore.jks
 android/app/google-services.json
