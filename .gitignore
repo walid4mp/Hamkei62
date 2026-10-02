@@ -1,0 +1,36 @@
+# Node
+node_modules/
+npm-debug.log*
+.env
+.env.*
+!.env.example
+
+# Flutter / Dart
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# Android build & signing secrets
+**/local.properties
+**/.gradle/
+**/android/key.properties
+**/*.jks
+**/*.keystore
+**/android/app/upload-keystore.jks
+**/android/app/google-services.json
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+*.log
+
+# Android NDK/CMake build cache
+**/.cxx/
+
+# Generated coverage output
+coverage/
+**/coverage/
