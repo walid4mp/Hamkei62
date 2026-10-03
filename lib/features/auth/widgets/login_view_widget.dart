@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
+import 'package:socialnova/core/widgets/custom_elevated_button.dart';
+import 'package:socialnova/core/widgets/custom_text_form_field.dart';
+import 'package:socialnova/features/auth/cubits/auth_cubit/auth_cubit.dart';
+import 'package:socialnova/features/auth/widgets/sign_text_section.dart';
+import 'package:socialnova/features/auth/widgets/social_sign_section.dart';
+import '../../../core/router/app_routes.dart';
+import '../../../core/toast/app_toast.dart';
+import '../../../core/utilities/app_formatters.dart';
+import '../../../core/utilities/app_validators.dart';
+
+class LoginViewWidget extends StatefulWidget {
+  const LoginViewWidget({super.key});
+
+  @override
+  State<LoginViewWidget> createState() => _LoginViewWidgetState();
+}
+
+class _LoginViewWidgetState extends State<LoginViewWidget> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const Gap(12),
+              CustomTextFormField(
+                prefixIcon: const Icon(Icons.email_rounded),
+                controller: _emailController,
+                labelText: 'Email',
+                hintText: 'Enter Email',
+                inputFormatters: AppFormatters.noSpaces,
+                validator: AppValidators.validateEmail,
+              ),
+              const Gap(26),
+              CustomTextFormField(
+                prefixIcon: const Icon(Icons.lock_rounded),
+                controller: _passwordController,
+                labelText: 'Password',
+                hintText: 'Enter password',
+                isPassword: true,
+                validator: AppValidators.validatePassword,
+              ),
+              const Gap(12),
+              const Align(
+                alignment: Alignment.topRight,
+                child: Text('Forgot Password?'),
+              ),
+              const Gap(42),
+              BlocConsumer<AuthCubit, AuthState>(
+                listenWhen:
+                    (previous, current) =>
+                        (previous is! AuthSuccess && current is AuthSuccess) ||
+                        current is AuthFailure,
+                listener: (context, state) async {
+                  if (state is AuthSuccess) {
+                    AppToast.success('Login Successfully');
+                    await Future.delayed(const Duration(milliseconds: 550));
+                    if (context.mounted) {
+                      Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).pushNamedAndRemoveUntil(
+                        AppRoutes.homeRoute,
+                        (route) => false,
+                      );
+                    }
+                  } else if (state is AuthFailure) {
+                    AppToast.error(state.errMsg);
+                  }
+                },
+                buildWhen:
+                    (previous, current) =>
+                        current is AuthLoading ||
+                        current is AuthSuccess ||
+                        current is AuthFailure ||
+                        current is AuthInitial ||
+                        current is AuthSignedOut,
+                builder: (context, state) {
+                  return CustomElevatedButton(
+                    txtBtn: 'Login',
+                    isLoading: state is AuthLoading,
+                    isSuccess: state is AuthSuccess,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        context.read<AuthCubit>().signInWithEmail(
+                          _emailController.text.trim(),
+                          _passwordController.text,
+                        );
+                      }
+                    },
+                  );
+                },
+              ),
+              const Gap(14),
+              const SocialSignSection(label: 'Or Sign in with'),
+              const Gap(22),
+              SignTextSection(
+                staticText: 'Don\'t  have an account?',
+                clickableText: '\t\tSign up',
+                onTap: () {
+                  DefaultTabController.of(context).animateTo(1);
+                },
+              ),
+              const Gap(18),
+              Gap(bottomInset > 0 ? bottomInset : 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

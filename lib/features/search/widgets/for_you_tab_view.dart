@@ -1,0 +1,363 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
+import '../../../core/widgets/custom_pull_to_refresh.dart';
+import '../../../core/constants/app_images.dart';
+import '../../../core/widgets/empty_findings_animation_widget.dart';
+import '../../posts/cubits/posts_cubit/posts_cubit.dart';
+import '../../posts/helpers/posts_skeleton_items.dart';
+import '../../posts/models/post_model.dart';
+import '../../posts/widgets/post_item_widget.dart';
+import '../../reels/models/reel_model.dart';
+import '../cubits/search_reels_cubit/search_reels_cubit.dart';
+import '../cubits/search_posts_cubit/search_posts_cubit.dart';
+import '../models/injection_plan_entry.dart';
+import '../utils/error_search_state.dart';
+import '../utils/search_view_metrics.dart';
+import 'for_you_feed_item.dart';
+import 'for_you_reels_grid_section.dart';
+import 'suggested_accounts_section.dart';
+
+class ForYouTabView extends StatefulWidget {
+  final ValueListenable<String> searchQuery;
+  const ForYouTabView({super.key, required this.searchQuery});
+
+  @override
+  State<ForYouTabView> createState() => _ForYouTabViewState();
+}
+
+class _ForYouTabViewState extends State<ForYouTabView>
+    with AutomaticKeepAliveClientMixin {
+  List<String>? _cachedPostIds;
+  List<PostModel>? _rankedPosts;
+  List<InjectionPlanEntry>? _injectionPlan;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchQuery.addListener(_onQueryChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeTopUpReels());
+  }
+
+  void _onQueryChanged() {
+    context.read<SearchPostsCubit>().search(widget.searchQuery.value);
+  }
+
+  @override
+  void dispose() {
+    widget.searchQuery.removeListener(_onQueryChanged);
+    super.dispose();
+  }
+
+  void _maybeTopUpReels() {
+    if (!mounted) return;
+    if (widget.searchQuery.value.isNotEmpty) return;
+    final reelsState = context.read<SearchReelsCubit>().state;
+    if (reelsState is SearchReelsInitial) {
+      context.read<SearchReelsCubit>().getReels();
+    } else if (reelsState is SearchReelsLoaded && !reelsState.hasReachedMax) {
+      context.read<SearchReelsCubit>().getReels();
+    }
+  }
+
+  List<PostModel> _rankPosts(List<PostModel> posts) {
+    final ranked = List<PostModel>.of(posts)..shuffle();
+    ranked.sort((a, b) => _engagementScore(b).compareTo(_engagementScore(a)));
+    return ranked;
+  }
+
+  int _engagementScore(PostModel post) =>
+      post.likesCount + post.sharesCount + post.savedCount;
+
+  List<ForYouFeedItem> _mergeForYouFeed({
+    required List<PostModel> rankedPosts,
+    required List<InjectionPlanEntry> plan,
+    required List<ReelModel> reelsPool,
+    required bool showSuggestedAccounts,
+  }) {
+    final items = <ForYouFeedItem>[];
+    if (showSuggestedAccounts) {
+      items.add(const ForYouFeedItem.suggestedAccounts());
+    }
+
+    var planCursor = 0;
+    var reelOffset = 0;
+
+    for (var i = 0; i < rankedPosts.length; i++) {
+      items.add(ForYouFeedItem.post(rankedPosts[i]));
+
+      if (planCursor < plan.length &&
+          (i + 1) == plan[planCursor].afterPostIndex) {
+        final entry = plan[planCursor];
+        final remaining = reelsPool.length - reelOffset;
+        if (remaining >= 2) {
+          final requested = entry.reelsCount.clamp(1, remaining);
+          final take = requested.isEven ? requested : requested - 1;
+          items.add(ForYouFeedItem.reelsGrid(reelsPool, reelOffset, take));
+          reelOffset += take;
+        }
+        planCursor++;
+      }
+    }
+    return items;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final theme = Theme.of(context);
+
+    return ValueListenableBuilder<String>(
+      valueListenable: widget.searchQuery,
+      builder: (context, query, _) {
+        if (query.isNotEmpty) {
+          return NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification scrollInfo) {
+              if (scrollInfo.metrics.pixels >=
+                  scrollInfo.metrics.maxScrollExtent - 200) {
+                context.read<SearchPostsCubit>().loadMore();
+              }
+              return false;
+            },
+            child: BlocBuilder<SearchPostsCubit, SearchPostsState>(
+              builder:
+                  (context, searchState) =>
+                      _buildSearchResults(context, theme, searchState, query),
+            ),
+          );
+        }
+        return BlocBuilder<PostsCubit, PostsState>(
+          buildWhen:
+              (p, c) =>
+                  c is PostsLoading || c is PostsLoaded || c is PostsError,
+          builder: (context, postsState) {
+            return BlocBuilder<SearchReelsCubit, SearchReelsState>(
+              builder:
+                  (context, reelsState) =>
+                      NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification scrollInfo) {
+                          if (scrollInfo.metrics.pixels >=
+                              scrollInfo.metrics.maxScrollExtent - 200) {
+                            _maybeTopUpReels();
+                          }
+                          return false;
+                        },
+                        child: _buildBody(
+                          context,
+                          theme,
+                          postsState,
+                          reelsState,
+                        ),
+                      ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchResults(
+    BuildContext context,
+    ThemeData theme,
+    SearchPostsState state,
+    String query,
+  ) {
+    if (state is SearchPostsError) {
+      return _buildErrorState(
+        context,
+        theme,
+        state.message,
+        onRetry: () => context.read<SearchPostsCubit>().search(query),
+      );
+    }
+    if (state is SearchPostsInitial || state is SearchPostsLoading) {
+      return const PostsSkeletonItems();
+    }
+
+    final posts = (state as SearchPostsLoaded).posts;
+    if (posts.isEmpty) return _buildEmptyState(theme, query);
+
+    final postsCubit = context.read<PostsCubit>();
+
+    return CustomScrollView(
+      slivers: [
+        const SliverToBoxAdapter(
+          child: SizedBox(height: SearchViewMetrics.topGap),
+        ),
+        SliverList.separated(
+          itemCount: posts.length,
+          itemBuilder:
+              (context, i) => Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: SearchViewMetrics.horizontalPadding,
+                ),
+                child: PostItemWidget(
+                  key: ValueKey(posts[i].id),
+                  currPost: posts[i],
+                  postsCubit: postsCubit,
+                ),
+              ),
+          separatorBuilder:
+              (context, i) => const Gap(SearchViewMetrics.itemGap),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: SearchViewMetrics.bottomGap,
+            child:
+                !state.hasReachedMax
+                    ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                    : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    ThemeData theme,
+    PostsState postsState,
+    SearchReelsState reelsState,
+  ) {
+    if (postsState is PostsError) {
+      return _buildErrorState(
+        context,
+        theme,
+        postsState.message,
+        onRetry: () => context.read<PostsCubit>().fetchPosts(isRefresh: true),
+      );
+    }
+
+    if (postsState is! PostsLoaded) {
+      return const PostsSkeletonItems();
+    }
+
+    final posts = postsState.posts;
+    if (posts.isEmpty) {
+      return _buildEmptyState(theme, '');
+    }
+
+    final postsCubit = context.read<PostsCubit>();
+
+    final postIds = posts.map((p) => p.id).toList();
+    if (!listEquals(_cachedPostIds, postIds)) {
+      _cachedPostIds = postIds;
+      _rankedPosts = _rankPosts(posts);
+      _injectionPlan = buildInjectionPlan(_rankedPosts!.length);
+    } else if (_rankedPosts != null) {
+      final byId = {for (final p in posts) p.id: p};
+      _rankedPosts = _rankedPosts!.map((p) => byId[p.id] ?? p).toList();
+    }
+
+    final reelsPool =
+        reelsState is SearchReelsLoaded
+            ? reelsState.reels
+            : const <ReelModel>[];
+
+    final items = _mergeForYouFeed(
+      rankedPosts: _rankedPosts!,
+      plan: _injectionPlan!,
+      reelsPool: reelsPool,
+      showSuggestedAccounts: true,
+    );
+
+    return CustomPullToRefresh(
+      onRefresh: () => postsCubit.fetchPosts(isRefresh: true),
+      child: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(
+            child: SizedBox(height: SearchViewMetrics.topGap),
+          ),
+          SliverList.separated(
+            itemCount: items.length,
+            itemBuilder:
+                (context, i) => _buildItem(context, items[i], postsCubit),
+            separatorBuilder:
+                (context, i) => const Gap(SearchViewMetrics.itemGap),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: SearchViewMetrics.bottomGap),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItem(
+    BuildContext context,
+    ForYouFeedItem item,
+    PostsCubit postsCubit,
+  ) {
+    switch (item.type) {
+      case ForYouItemType.suggestedAccounts:
+        return const SuggestedAccountsSection();
+      case ForYouItemType.post:
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: SearchViewMetrics.horizontalPadding,
+          ),
+          child: PostItemWidget(
+            key: ValueKey(item.post!.id),
+            currPost: item.post!,
+            postsCubit: postsCubit,
+          ),
+        );
+      case ForYouItemType.reelsGrid:
+        return Padding(
+          key: ValueKey('reels_grid_${item.reelsStartIndex}'),
+          padding: const EdgeInsets.symmetric(
+            horizontal: SearchViewMetrics.horizontalPadding,
+          ),
+          child: ForYouReelsGridSection(
+            reelsPool: item.reelsPool!,
+            startIndex: item.reelsStartIndex!,
+            count: item.reelsCount!,
+          ),
+        );
+    }
+  }
+
+  Widget _buildEmptyState(ThemeData theme, String query) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const EmptyFindingsThemedAnimation(
+              animationPath: AppImages.emptyFindingsLot,
+              width: 150,
+              height: 150,
+            ),
+            const Gap(12),
+            Text(
+              query.isEmpty
+                  ? 'Nothing to show yet'
+                  : 'No results found for "$query"',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(
+    BuildContext context,
+    ThemeData theme,
+    String message, {
+    required VoidCallback onRetry,
+  }) => ErrorSearchState(message: message, onRetry: onRetry);
+}

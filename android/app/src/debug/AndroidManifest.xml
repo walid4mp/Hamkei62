@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The INTERNET permission is required for development. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <!-- Add this to allow HTTP traffic ONLY in debug mode -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>
