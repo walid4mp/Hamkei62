@@ -1,0 +1,413 @@
+import 'dart:convert';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:socialnova/features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
+import '../../../core/supabase/supabase_provider.dart';
+import '../../../core/themes/app_colors.dart';
+import '../../../core/utilities/supabase_constants.dart';
+import '../../../core/widgets/cached_cloudinary_image.dart';
+import '../../group_calls/helpers/group_call_join_helper.dart';
+import '../../group_calls/models/group_call_model.dart';
+import '../../group_calls/services/group_call_signaling_service.dart';
+import '../models/groupe_message_model.dart';
+
+class GroupCallMessageContent extends StatelessWidget {
+  final GroupMessageModel message;
+  final bool isMe;
+  final Color primary;
+
+  const GroupCallMessageContent({
+    super.key,
+    required this.message,
+    required this.isMe,
+    required this.primary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Map<String, dynamic> initialData = {};
+    try {
+      final txt = message.text.trim();
+      if (txt.startsWith('{')) {
+        initialData = jsonDecode(txt) as Map<String, dynamic>;
+      }
+    } catch (e) {
+      debugPrint(
+        '[GroupCallMessageContent] failed to parse call message data: $e',
+      );
+    }
+
+    final isTemp = message.id.startsWith('temp_');
+    if (isTemp) {
+      return _buildCallBubbleContent(context, initialData, isDark);
+    }
+
+    return StreamBuilder<Map<String, dynamic>?>(
+      stream: _watchCallData(),
+      initialData: initialData.isNotEmpty ? initialData : null,
+      builder: (context, snapshot) {
+        final callData =
+            snapshot.data ?? (initialData.isNotEmpty ? initialData : {});
+
+        return _buildCallBubbleContent(context, callData, isDark);
+      },
+    );
+  }
+
+  Stream<Map<String, dynamic>?> _watchCallData() {
+    return SupabaseProvider.client
+        .from(SupabaseConstants.groupMessages)
+        .stream(primaryKey: ['id'])
+        .eq('id', message.id)
+        .map((list) {
+          if (list.isEmpty) return null;
+          try {
+            final msgText = list.first['message_text'] as String? ?? '';
+            if (msgText.trim().startsWith('{')) {
+              return jsonDecode(msgText) as Map<String, dynamic>;
+            }
+          } catch (e) {
+            debugPrint(
+              '[GroupCallMessageContent] failed to parse latest call message: $e',
+            );
+          }
+          return null;
+        });
+  }
+
+  Widget _buildCallBubbleContent(
+    BuildContext context,
+    Map<String, dynamic> callData,
+    bool isDark,
+  ) {
+    final status = callData['status'] as String? ?? 'ended';
+    final callType = callData['call_type'] as String? ?? 'audio';
+
+    final rawDuration = callData['duration'];
+    final duration =
+        (rawDuration is String && rawDuration.isNotEmpty) ? rawDuration : '';
+
+    final callId = callData['call_id'] as String? ?? '';
+    final groupId = callData[GroupMemberColumns.groupId] as String? ?? '';
+    final groupAvatarUrl = callData['group_avatar_url'] as String?;
+
+    final isAudio = callType == 'audio';
+
+    final isLive = status == 'accepted' || status == 'ongoing';
+
+    final isActionable =
+        status == 'ringing' || status == 'accepted' || status == 'ongoing';
+
+    final isEndedConnected = status == 'ended' && duration.isNotEmpty;
+
+    final neverConnected =
+        status == 'missed' || (status == 'ended' && duration.isEmpty);
+
+    final showAsMissed = neverConnected && !isMe;
+
+    final bubbleBg =
+        isMe
+            ? primary
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.09)
+                : primary.withValues(alpha: 0.08));
+
+    final labelColor =
+        isMe ? Colors.white : (isDark ? Colors.white70 : Colors.black87);
+    final subColor =
+        isMe ? Colors.white70 : (isDark ? Colors.white54 : Colors.black45);
+    final missedTint = Colors.redAccent.shade100;
+    final iconColor = showAsMissed ? missedTint : Colors.greenAccent;
+
+    final IconData callIcon =
+        showAsMissed
+            ? (isAudio
+                ? Icons.call_missed_rounded
+                : Icons.missed_video_call_rounded)
+            : (isAudio ? Icons.call_rounded : Icons.videocam_rounded);
+
+    final String callLabel;
+    if (neverConnected) {
+      callLabel =
+          showAsMissed
+              ? (isAudio ? 'Missed voice call' : 'Missed video call')
+              : 'Ended call';
+    } else if (isEndedConnected) {
+      callLabel = 'Ended call';
+    } else {
+      callLabel = isAudio ? 'Group voice call' : 'Group video call';
+    }
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 210, maxWidth: 270),
+      decoration: BoxDecoration(
+        color: bubbleBg,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMe ? 18 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 18),
+        ),
+        border:
+            !isMe
+                ? Border.all(
+                  color: primary.withValues(alpha: isDark ? 0.2 : 0.12),
+                  width: 1,
+                )
+                : null,
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!isMe)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                message.senderName,
+                style: TextStyle(
+                  color: primary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildGroupAvatar(groupId, groupAvatarUrl, primary),
+
+              const SizedBox(width: 10),
+
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(callIcon, color: iconColor, size: 17),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            callLabel,
+                            style: TextStyle(
+                              color: showAsMissed ? missedTint : labelColor,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isEndedConnected) ...[
+                      const SizedBox(height: 3),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.timer_outlined, size: 11, color: subColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            duration,
+                            style: TextStyle(color: subColor, fontSize: 11.5),
+                          ),
+                        ],
+                      ),
+                    ] else if (isLive) ...[
+                      const SizedBox(height: 3),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Ongoing',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          if (isActionable && groupId.isNotEmpty && callId.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _buildJoinButton(context, callId, groupId, callType, primary),
+          ],
+
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: _buildLocalTimeWidget(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupAvatar(
+    String? groupId,
+    String? fallbackAvatarUrl,
+    Color primary,
+  ) {
+    const double size = 40;
+
+    return BlocBuilder<GroupListCubit, GroupListState>(
+      builder: (context, state) {
+        String? liveAvatarUrl;
+        if (state is GroupListLoaded && groupId != null && groupId.isNotEmpty) {
+          final liveGroup = state.groups.firstWhereOrNull(
+            (g) => g.id == groupId,
+          );
+          liveAvatarUrl = liveGroup?.avatarUrl;
+        }
+
+        final avatarUrl = liveAvatarUrl ?? fallbackAvatarUrl;
+        final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
+
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isMe ? Colors.white : primary.withValues(alpha: 0.15),
+            border: Border.all(
+              color: primary.withValues(alpha: 0.35),
+              width: 1.5,
+            ),
+          ),
+          child: ClipOval(
+            child:
+                hasAvatar
+                    ? CachedCloudinaryImage(
+                      secureUrl: avatarUrl,
+                      width: size,
+                      height: size,
+                      fit: BoxFit.cover,
+
+                      isAvatar: true,
+                      errorWidget:
+                          (_, __) => _groupAvatarFallback(primary, size),
+                    )
+                    : _groupAvatarFallback(primary, size),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _groupAvatarFallback(Color primary, double size) {
+    return Container(
+      width: size,
+      height: size,
+      color: primary.withValues(alpha: 0.12),
+      child: Center(
+        child: Icon(Icons.group_rounded, color: primary, size: size * 0.55),
+      ),
+    );
+  }
+
+  Widget _buildLocalTimeWidget(BuildContext context) {
+    final localTime = message.createdAt.toLocal();
+    final period = localTime.hour >= 12 ? 'PM' : 'AM';
+    int hour12 = localTime.hour % 12;
+    hour12 = hour12 == 0 ? 12 : hour12;
+
+    final hourStr = hour12.toString();
+    final minuteStr = localTime.minute.toString().padLeft(2, '0');
+
+    return Text(
+      '$hourStr:$minuteStr $period',
+      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+        color:
+            isMe ? AppColors.white70 : Theme.of(context).colorScheme.onSurface,
+        fontSize: 9,
+      ),
+    );
+  }
+
+  Widget _buildJoinButton(
+    BuildContext context,
+    String callId,
+    String groupId,
+    String callType,
+    Color primary,
+  ) {
+    return StreamBuilder<GroupCallModel?>(
+      stream: context.read<GroupCallSignalingService>().activeCallStream(
+        groupId,
+      ),
+      builder: (context, snapshot) {
+        final activeCall = snapshot.data;
+        if (activeCall == null) return const SizedBox.shrink();
+        if (activeCall.callId != callId) return const SizedBox.shrink();
+
+        final currentUserId = SupabaseProvider.id;
+        if (activeCall.initiatorId == currentUserId) {
+          return const SizedBox.shrink();
+        }
+
+        return GestureDetector(
+          onTap: () => GroupCallJoinHelper.join(context, activeCall),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.green.shade500,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  callType == 'video'
+                      ? Icons.videocam_rounded
+                      : Icons.call_rounded,
+                  color: Colors.white,
+                  size: 15,
+                ),
+                const SizedBox(width: 5),
+                const Text(
+                  'Tap to Join',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "SocialNova",
+  "source_projects": [
+    "Social-Media-App-main",
+    "SocialNova-V217-INSPECTED-ENHANCED"
+  ],
+  "frontend": "Flutter Social-Media-App feature set",
+  "hosting": "SocialNova backend/admin/Prisma",
+  "status": "merged-source",
+  "note": "Supabase client data layer preserved; SocialNova backend retained as hosting/API stack."
+}

@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
+import '../../../core/router/app_routes.dart';
+import '../../profile/cubits/profile_cubit/profile_cubit.dart';
+import '../cubits/discover_people_cubit.dart';
+import '../views/discover_people_search_view.dart';
+
+class DiscoverPeopleHeaderSection extends StatelessWidget {
+  const DiscoverPeopleHeaderSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Discover People',
+                  style: theme.textTheme.titleLarge!.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Gap(2),
+                Text(
+                  'People you may know',
+                  style: theme.textTheme.bodySmall!.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Gap(12),
+          InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: () {
+              final discoverCubit = context.read<DiscoverPeopleCubit>();
+
+              Navigator.of(context, rootNavigator: true).push(
+                PageRouteBuilder(
+                  pageBuilder:
+                      (_, animation, __) => BlocProvider.value(
+                        value: discoverCubit,
+                        child: const DiscoverPeopleSearchView(),
+                      ),
+                  transitionsBuilder: (_, anim, __, child) {
+                    return FadeTransition(
+                      opacity: anim,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.05),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(parent: anim, curve: Curves.easeOut),
+                        ),
+                        child: child,
+                      ),
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 280),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_outlined,
+                size: 22,
+                color: theme.primaryColor,
+              ),
+            ),
+          ),
+          const Gap(10),
+          InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: () {
+              Navigator.of(context, rootNavigator: true).pushNamed(
+                AppRoutes.settingsViewRoute,
+                arguments: context.read<ProfileCubit>(),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.settings_outlined,
+                size: 22,
+                color: theme.primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
