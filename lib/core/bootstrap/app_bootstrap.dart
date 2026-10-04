@@ -320,10 +320,13 @@ Future<void> _requestFirebaseNotificationPermissions() async {
 }
 
 Future<void> _initSupabase() async {
-  await Supabase.initialize(
-    url: AppSecrets.supabaseUrl,
-    anonKey: AppSecrets.supabaseAnonKey,
-  );
+  // Resolve runtime.json (if present) before reading keys, so Supabase
+  // gets the values from the bundled asset rather than crashing on the
+  // empty defaults in the original String.fromEnvironment(...) lookup.
+  final url = AppSecrets.effectiveSupabaseUrl;
+  final anonKey = AppSecrets.effectiveSupabaseAnonKey;
+  debugPrint('🔌 Initializing Supabase @ $url');
+  await Supabase.initialize(url: url, anonKey: anonKey);
 }
 
 Future<void> _initNotifications() async {

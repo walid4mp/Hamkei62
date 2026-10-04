@@ -2,8 +2,12 @@ class AppValidators {
   static final RegExp _nameRegExp = RegExp(
     r"^[a-zA-Zأ-ي]+(([',. -][a-zA-Zأ-ي ])?[a-zA-Zأ-ي]*)*$",
   );
+
+  // RFC 5322 compliant email regex (practical subset). The previous
+  // expression allowed zero-length local part and double dots which made
+  // `a@b.c` invalid even though Gmail happily sends those references.
   static final RegExp _emailRegExp = RegExp(
-    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$",
   );
 
   static String? validateName(String? value) {
@@ -23,7 +27,8 @@ class AppValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Email is required';
     }
-    if (!_emailRegExp.hasMatch(value.trim())) {
+    final trimmed = value.trim();
+    if (!_emailRegExp.hasMatch(trimmed)) {
       return 'Please enter a valid email address';
     }
     return null;
@@ -55,7 +60,7 @@ class AppValidators {
     if (password.length >= 8) strength += 0.25;
     if (password.contains(RegExp(r'[A-Z]'))) strength += 0.25;
     if (password.contains(RegExp(r'[0-9]'))) strength += 0.25;
-    if (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) strength += 0.25;
+    if (password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) strength += 0.25;
     return strength;
   }
 }

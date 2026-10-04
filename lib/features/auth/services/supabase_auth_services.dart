@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:socialnova/core/secrets/app_secrets.dart';
 import 'package:socialnova/features/auth/data/repository/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_pkg;
@@ -69,7 +72,13 @@ class SupabaseAuthServices implements AuthRepository {
         data: {'full_name': name},
       );
       if (response.user == null) throw Exception('User not found');
-      await setUserData(name, email, response.user!.id);
+      // Only write to public.users if the JWT session already exists
+      // (i.e. email confirmation is OFF). If confirmation is ON, the row
+      // will be inserted on the first auto-login after the user clicks
+      // the email link — `ensureUserExistsInDb` runs in the auth listener.
+      if (_supabase.auth.currentSession != null) {
+        await setUserData(name, email, response.user!.id);
+      }
     } catch (e) {
       rethrow;
     }
@@ -78,16 +87,23 @@ class SupabaseAuthServices implements AuthRepository {
   @override
   Future<AuthResponse> signInWithGoogle() async {
     try {
-      const webClientId =
-          '548020841452-cvtj4vs047g5acgtsmga02990tfagvg4.apps.googleusercontent.com';
+      final webClientId =
+          AppSecrets.effectiveGoogleWebClientId.isNotEmpty
+              ? AppSecrets.effectiveGoogleWebClientId
+              : '548020841452-cvtj4vs047g5acgtsmga02990tfagvg4.apps.googleusercontent.com';
+
+      final iosClientId = defaultTargetPlatform == TargetPlatform.iOS
+          ? webClientId
+          : null;
+
       final GoogleSignIn googleSignIn = GoogleSignIn(
         serverClientId: webClientId,
+        clientId: iosClientId,
       );
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
         throw 'Sign in aborted by user';
-        // return ;
       }
 
       final googleAuth = await googleUser.authentication;
@@ -111,13 +127,28 @@ class SupabaseAuthServices implements AuthRepository {
     }
   }
 
+  /// Returns the redirect URL Supabase should bounce OAuth providers to.
+  /// Uses the deployed API origin in production and the custom scheme on
+  /// mobile so app_links can deliver the callback back to the app.
+  static String _oauthRedirectTo() {
+    if (kIsWeb) {
+      // On web, OAuth providers must bounce back to a real https URL.
+      // We use the deployed backend as a stable origin; the backend
+      // forwards the token to whitelisted web SPA routes.
+      return AppSecrets.effectiveApiUrl.isNotEmpty
+          ? '${AppSecrets.effectiveApiUrl}/auth/callback'
+          : 'https://exwvavqkjrnprbyknoih.supabase.co/auth/v1/callback';
+    }
+    return 'socialapp://login-callback';
+  }
+
   @override
   Future<void> signInWithFacebook() async {
     try {
       await _supabase.auth.signInWithOAuth(
         OAuthProvider.facebook,
-        redirectTo: 'socialapp://login-callback',
-        // authScreenLaunchMode: LaunchMode.externalApplication,
+        redirectTo: _oauthRedirectTo(),
+        authScreenLaunchMode: LaunchMode.externalApplication,
       );
     } catch (e) {
       debugPrint('Facebook Sign-In Error: $e');
@@ -130,7 +161,7 @@ class SupabaseAuthServices implements AuthRepository {
     try {
       await _supabase.auth.signInWithOAuth(
         OAuthProvider.azure,
-        redirectTo: 'socialapp://login-callback',
+        redirectTo: _oauthRedirectTo(),
         scopes: 'openid profile email',
         authScreenLaunchMode: LaunchMode.externalApplication,
       );
@@ -144,8 +175,16 @@ class SupabaseAuthServices implements AuthRepository {
   Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
-      await FacebookAuth.instance.logOut();
-      await GoogleSignIn().signOut();
+      try {
+        await FacebookAuth.instance.logOut();
+      } catch (_) {}
+      try {
+        // Don't call signOut() on the singleton googleSignIn we built
+        // for ID-token sign-in (signOut() opens a Chrome Custom Tab
+        // which is undesirable when the user is already gone).
+        // Just disconnect so the next googleUser is fetched fresh.
+        await GoogleSignIn().disconnect();
+      } catch (_) {}
     } catch (e) {
       rethrow;
     }
