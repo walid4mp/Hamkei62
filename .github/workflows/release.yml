@@ -3,8 +3,8 @@ name: Release
 # CI proves a change is safe. CD ships it. Keeping them in one file is how
 # you end up building a signed release bundle on every pull request.
 on:
-  # push:
-  #   tags: ["v*.*.*"]
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       build_type:
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - uses: subosito/flutter-action@v2
         with:
