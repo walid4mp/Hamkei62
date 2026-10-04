@@ -76,3 +76,5 @@ supabase/.temp/linked-project.json
 
 coverage/
 !scripts/local_ci.ps1
+# Node
+node_modules/

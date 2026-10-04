@@ -19,6 +19,7 @@ class GroupInfoHeaderWidget extends StatelessWidget {
   final VoidCallback onSubmit;
   final VoidCallback onChangePhoto;
   final VoidCallback onSettingsTap;
+  final VoidCallback? onCancel;
   final bool isMuted;
 
   const GroupInfoHeaderWidget({
@@ -33,6 +34,7 @@ class GroupInfoHeaderWidget extends StatelessWidget {
     required this.onSubmit,
     required this.onChangePhoto,
     required this.onSettingsTap,
+    this.onCancel,
     required this.isMuted,
   });
 
@@ -50,6 +52,7 @@ class GroupInfoHeaderWidget extends StatelessWidget {
         onSubmit: onSubmit,
         onChangePhoto: onChangePhoto,
         onSettingsTap: onSettingsTap,
+        onCancel: onCancel,
         isMuted: isMuted,
         topPadding: MediaQuery.paddingOf(context).top,
         primary: Theme.of(context).primaryColor,
@@ -78,6 +81,7 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
   final VoidCallback onChangePhoto;
   final VoidCallback onSettingsTap;
   final bool isMuted;
+  final VoidCallback? onCancel;
   final double topPadding;
   final Color primary;
 
@@ -93,6 +97,7 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.onChangePhoto,
     required this.onSettingsTap,
     required this.isMuted,
+    this.onCancel,
     required this.topPadding,
     required this.primary,
   });
@@ -391,6 +396,13 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
+            if (onCancel != null)
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                onPressed: onCancel,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
           ],
         ),
       );

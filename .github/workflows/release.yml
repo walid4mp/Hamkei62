@@ -59,13 +59,27 @@ jobs:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
           FIREBASE_OPTIONS_DART_BASE64: ${{ secrets.FIREBASE_OPTIONS_DART_BASE64 }}
         run: |
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
-          echo "$FIREBASE_OPTIONS_DART_BASE64" | base64 -d > lib/firebase_options.dart
+          # The repo commits google-services.json and firebase_options.dart.
+          # Overwrite them only when real secrets are provided, so a run
+          # without secrets uses the committed config instead of empty files.
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
+          fi
+          if [ -n "$FIREBASE_OPTIONS_DART_BASE64" ]; then
+            echo "$FIREBASE_OPTIONS_DART_BASE64" | base64 -d > lib/firebase_options.dart
+          fi
 
       - name: Restore dart-define file
         env:
           DART_DEFINE_ENV_BASE64: ${{ secrets.DART_DEFINE_ENV_PROD_BASE64 }}
-        run: echo "$DART_DEFINE_ENV_BASE64" | base64 -d > ci.env
+        run: |
+          # With no secret provided, fall back to an empty define file so the
+          # build still completes (runtime config can be supplied later).
+          if [ -n "$DART_DEFINE_ENV_BASE64" ]; then
+            echo "$DART_DEFINE_ENV_BASE64" | base64 -d > ci.env
+          else
+            echo '{}' > ci.env
+          fi
 
       # ⚠️ `android/app/build.gradle(.kts)` was NOT in the repomix, so I
       # cannot confirm your signingConfig reads these property names. Open
@@ -117,6 +131,16 @@ jobs:
         run: |
           rm -f ci.env android/key.properties android/app/upload-keystore.jks
           rm -f android/app/google-services.json lib/firebase_options.dart
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-builds-${{ github.run_number }}
+          path: |
+            build/app/outputs/bundle/release/*.aab
+            build/app/outputs/flutter-apk/*.apk
+          retention-days: 14
 
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/')

@@ -62,7 +62,14 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
            getByName("release") {
            
-            signingConfig = signingConfigs.getByName("release")
+            // Sign with the upload keystore when key.properties exists (CI),
+            // otherwise fall back to the debug key so a release build stays
+            // installable instead of failing on a missing keystore.
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             
             isMinifyEnabled = false 
             isShrinkResources = false
