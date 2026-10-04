@@ -65,7 +65,7 @@ android {
             // Sign with the upload keystore when key.properties exists (CI),
             // otherwise fall back to the debug key so a release build stays
             // installable instead of failing on a missing keystore.
-            signingConfig = if (keystorePropertiesFile.exists()) {
+            signingConfig = if (keystorePropertiesFile.exists() && keystoreProperties.getProperty("storeFile") != null) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")

@@ -92,13 +92,21 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
-          cat > android/key.properties <<EOF
+          # Write key.properties ONLY when a real keystore is configured.
+          # Creating an empty key.properties would make Gradle pick the empty
+          # release signing config and fail the build; leaving the file absent
+          # lets build.gradle.kts fall back to debug signing.
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+            cat > android/key.properties <<EOF
           storePassword=$STORE_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
           storeFile=upload-keystore.jks
           EOF
+          else
+            echo "::notice::ANDROID_KEYSTORE_BASE64 not configured; release build will use debug signing."
+          fi
 
       - name: Resolve version
         id: version
