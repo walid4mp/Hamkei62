@@ -47,13 +47,17 @@ Future<void> confirmAndDeleteConversations(
           .map((r) => r.id)
           .toSet();
 
+  // Resolve every dependency from the tree BEFORE awaiting: `context.read`
+  // after an async gap is unsafe when the widget is disposed mid-flight.
+  final chatsCubit = context.read<ChatsCubit>();
+  final groupListCubit = context.read<GroupListCubit>();
+  final selectionCubit = context.read<ConversationSelectionCubit>();
+
   if (singleIds.isNotEmpty) {
-    await context.read<ChatsCubit>().clearChatsLocally(singleIds);
+    await chatsCubit.clearChatsLocally(singleIds);
   }
   if (groupIds.isNotEmpty) {
-    await context.read<GroupListCubit>().clearChatsLocally(groupIds);
+    await groupListCubit.clearChatsLocally(groupIds);
   }
-  if (context.mounted) {
-    context.read<ConversationSelectionCubit>().clear();
-  }
+  selectionCubit.clear();
 }

@@ -98,7 +98,7 @@ class _TaglineFormFieldState extends State<TaglineFormField> {
               opacity: animation,
               child: SizeTransition(
                 sizeFactor: animation,
-                axisAlignment: -1,
+                alignment: const Alignment(-1.0, -1.0),
                 child: child,
               ),
             );

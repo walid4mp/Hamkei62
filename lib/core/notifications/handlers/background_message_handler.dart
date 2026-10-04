@@ -26,9 +26,10 @@ Future<void> ensureSupabaseReady() {
     } catch (_) {}
 
     try {
+      await AppSecrets.load();
       await Supabase.initialize(
-        url: AppSecrets.supabaseUrl,
-        anonKey: AppSecrets.supabaseAnonKey,
+        url: AppSecrets.effectiveSupabaseUrl,
+        publishableKey: AppSecrets.effectiveSupabaseAnonKey,
       );
     } catch (e) {
       debugPrint('[Supabase] init failed in background isolate: $e');

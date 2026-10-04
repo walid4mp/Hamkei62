@@ -86,9 +86,11 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
         final targetContext = _highlightKey.currentContext;
         final renderObject = targetContext?.findRenderObject();
 
-        if (renderObject is RenderBox && renderObject.hasSize) {
+        if (targetContext != null &&
+            renderObject is RenderBox &&
+            renderObject.hasSize) {
           Scrollable.ensureVisible(
-            targetContext!,
+            targetContext,
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeOutCubic,
             alignment: 0.4,

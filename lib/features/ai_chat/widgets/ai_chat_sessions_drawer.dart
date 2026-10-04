@@ -103,6 +103,7 @@ class AiChatSessionsDrawer extends StatelessWidget {
             );
           }
           return _SessionsListSection(
+            selectedModel: selectedModel,
             sessions: sessions,
             activeSessionId: activeSessionId,
             onOpenSession: onOpenSession,

@@ -158,12 +158,10 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
         participantName: widget.currentUserName,
       );
 
-      final room = Room();
-      await room.connect(
-        connection.url,
-        connection.token,
+      final room = Room(
         roomOptions: const RoomOptions(adaptiveStream: true, dynacast: true),
       );
+      await room.connect(connection.url, connection.token);
 
       await room.localParticipant?.setMicrophoneEnabled(true);
       if (_isVideo) {

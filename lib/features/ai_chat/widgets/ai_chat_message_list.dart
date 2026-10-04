@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// ScrollCacheExtent lives in rendering and is not re-exported by
+// material.dart in this Flutter version.
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import '../controllers/ai_chat_scroll_anchor.dart';
 import '../models/ai_chat_message.dart';
 import '../models/ai_model_option.dart';
@@ -61,7 +64,7 @@ class AiChatMessageList extends StatelessWidget {
       reverse: true,
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 48, 16, 12),
-      cacheExtent: 900,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(900),
       itemCount: reversed.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) return _buildThinkingSlot();

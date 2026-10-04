@@ -79,17 +79,13 @@ class _ThoughtBubbleRippleState extends State<ThoughtBubbleRipple>
 }
 
 class _CloudGlowPainter extends CustomPainter {
-  const _CloudGlowPainter({
-    required this.cloud,
-    required this.color,
-    this.blurRadius = 18,
-    this.spread = 2,
-  });
+  const _CloudGlowPainter({required this.cloud, required this.color});
 
   final ThoughtCloudPath cloud;
   final Color color;
-  final double blurRadius;
-  final double spread;
+
+  static const double blurRadius = 18;
+  static const double spread = 2;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -118,8 +114,5 @@ class _CloudGlowPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CloudGlowPainter oldDelegate) =>
-      oldDelegate.cloud != cloud ||
-      oldDelegate.color != color ||
-      oldDelegate.blurRadius != blurRadius ||
-      oldDelegate.spread != spread;
+      oldDelegate.cloud != cloud || oldDelegate.color != color;
 }

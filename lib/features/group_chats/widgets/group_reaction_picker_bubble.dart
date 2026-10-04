@@ -144,7 +144,12 @@ class _GroupReactionPickerBubbleState extends State<GroupReactionPickerBubble>
                                   ),
                                   transform:
                                       isSelected
-                                          ? (Matrix4.identity()..scale(1.15))
+                                          ? (Matrix4.identity()..scaleByDouble(
+                                            1.15,
+                                            1.15,
+                                            1.15,
+                                            1.0,
+                                          ))
                                           : Matrix4.identity(),
                                   child: Text(
                                     emoji,

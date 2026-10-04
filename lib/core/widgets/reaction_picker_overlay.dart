@@ -192,11 +192,12 @@ class _ReactionPickerBubbleState extends State<_ReactionPickerBubble>
                           ),
                           transform:
                               isSelected
-                                  ? (Matrix4.identity()..scale(1.18))
+                                  ? (Matrix4.identity()
+                                    ..scaleByDouble(1.18, 1.18, 1.18, 1.0))
                                   : isHov
                                   ? (Matrix4.identity()
-                                    ..translate(0.0, -8.0)
-                                    ..scale(1.1))
+                                    ..translateByDouble(0.0, -8.0, 0.0, 1.0)
+                                    ..scaleByDouble(1.1, 1.1, 1.1, 1.0))
                                   : Matrix4.identity(),
                           child: Tooltip(
                             message: r['label']!,

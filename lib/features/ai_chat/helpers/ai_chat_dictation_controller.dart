@@ -51,9 +51,11 @@ class AiChatDictationController {
           _onLiveUpdate?.call(result.recognizedWords);
         }
       },
-      listenFor: const Duration(minutes: 2),
-      pauseFor: const Duration(seconds: 5),
-      listenOptions: SpeechListenOptions(partialResults: true),
+      listenOptions: SpeechListenOptions(
+        partialResults: true,
+        listenFor: const Duration(minutes: 2),
+        pauseFor: const Duration(seconds: 5),
+      ),
     );
   }
 

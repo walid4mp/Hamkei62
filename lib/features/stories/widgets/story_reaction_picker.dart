@@ -180,11 +180,12 @@ class StoryReactionBubbleState extends State<_StoryReactionBubble>
                       ),
                       transform:
                           isSelected
-                              ? (Matrix4.identity()..scale(1.3))
+                              ? (Matrix4.identity()
+                                ..scaleByDouble(1.3, 1.3, 1.3, 1.0))
                               : isHov
                               ? (Matrix4.identity()
-                                ..translate(-6.0, 0.0)
-                                ..scale(1.15))
+                                ..translateByDouble(-6.0, 0.0, 0.0, 1.0)
+                                ..scaleByDouble(1.15, 1.15, 1.15, 1.0))
                               : Matrix4.identity(),
                       transformAlignment: Alignment.center,
                       child: Text(

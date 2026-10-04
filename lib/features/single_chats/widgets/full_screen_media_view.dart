@@ -259,7 +259,8 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
     if (_transformationController.value != Matrix4.identity()) {
       _transformationController.value = Matrix4.identity();
     } else {
-      _transformationController.value = Matrix4.identity()..scale(2.0);
+      _transformationController.value =
+          Matrix4.identity()..scaleByDouble(2.0, 2.0, 2.0, 1.0);
     }
     setState(() {});
   }

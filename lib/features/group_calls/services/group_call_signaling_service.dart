@@ -557,9 +557,7 @@ class _CallSnapshot {
   final GroupCallModel? call;
   final bool confirmedEnded;
 
-  const _CallSnapshot.active(GroupCallModel call)
-    : call = call,
-      confirmedEnded = false;
+  const _CallSnapshot.active(this.call) : confirmedEnded = false;
   const _CallSnapshot.confirmedEnded() : call = null, confirmedEnded = true;
   const _CallSnapshot.ambiguous() : call = null, confirmedEnded = false;
 }

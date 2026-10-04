@@ -15,7 +15,7 @@ class AudiencePickerView extends StatefulWidget {
 
 class _AudiencePickerViewState extends State<AudiencePickerView> {
   List<Map<String, dynamic>> _connections = [];
-  late Set<String> _selectedIds = {...widget.initialSelectedIds};
+  late final Set<String> _selectedIds = {...widget.initialSelectedIds};
   bool _isLoading = true;
   String? _errorMessage;
 

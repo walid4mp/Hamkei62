@@ -68,7 +68,11 @@ class AppPermissionsService {
     final completer = Completer<bool>();
     _callPermissionTail = _callPermissionTail.then((_) async {
       try {
-        completer.complete(await _ensure(isVideo: isVideo, context: context));
+        final safeContext =
+            (context != null && context.mounted) ? context : null;
+        completer.complete(
+          await _ensure(isVideo: isVideo, context: safeContext),
+        );
       } catch (e, s) {
         debugPrint('[AppPermissionsService] ensureCallPermissions: $e\n$s');
         if (!completer.isCompleted) completer.complete(false);
@@ -94,11 +98,17 @@ class AppPermissionsService {
         isVideo && (camStatus.isPermanentlyDenied || camStatus.isRestricted);
 
     if (micBlocked || camBlocked) {
-      await _promptOpenSettings(
-        context: context,
-        missingMic: !micStatus.isGranted,
-        missingCamera: isVideo && !camStatus.isGranted,
-      );
+      // `context` may have been captured before the permission dialogs
+      // awaited; only use it while the widget is still mounted.
+      final promptContext =
+          (context != null && context.mounted) ? context : null;
+      if (promptContext != null) {
+        await _promptOpenSettings(
+          context: promptContext,
+          missingMic: !micStatus.isGranted,
+          missingCamera: isVideo && !camStatus.isGranted,
+        );
+      }
       return false;
     }
 

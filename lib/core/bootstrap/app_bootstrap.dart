@@ -85,6 +85,9 @@ Future<void> waitForCoreServicesReady() {
 }
 
 Future<void> initializeCoreServices() async {
+  // Read assets/cfg/runtime.json first: the effective* getters below are
+  // synchronous, so the bundled values must already be in memory.
+  await AppSecrets.load();
   AppSecrets.assertSecretsLoaded();
 
   // Group A — fully independent: each touches a different
@@ -326,7 +329,7 @@ Future<void> _initSupabase() async {
   final url = AppSecrets.effectiveSupabaseUrl;
   final anonKey = AppSecrets.effectiveSupabaseAnonKey;
   debugPrint('🔌 Initializing Supabase @ $url');
-  await Supabase.initialize(url: url, anonKey: anonKey);
+  await Supabase.initialize(url: url, publishableKey: anonKey);
 }
 
 Future<void> _initNotifications() async {

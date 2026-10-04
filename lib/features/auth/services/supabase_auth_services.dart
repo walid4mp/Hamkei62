@@ -92,9 +92,8 @@ class SupabaseAuthServices implements AuthRepository {
               ? AppSecrets.effectiveGoogleWebClientId
               : '548020841452-cvtj4vs047g5acgtsmga02990tfagvg4.apps.googleusercontent.com';
 
-      final iosClientId = defaultTargetPlatform == TargetPlatform.iOS
-          ? webClientId
-          : null;
+      final iosClientId =
+          defaultTargetPlatform == TargetPlatform.iOS ? webClientId : null;
 
       final GoogleSignIn googleSignIn = GoogleSignIn(
         serverClientId: webClientId,

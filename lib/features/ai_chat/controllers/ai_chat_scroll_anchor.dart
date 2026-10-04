@@ -46,7 +46,7 @@ class AiChatScrollAnchor {
     for (var sweep = 0; sweep < maxSweeps; sweep++) {
       final context = _keys[stableKey]?.currentContext;
 
-      if (context != null) {
+      if (context != null && context.mounted) {
         await Scrollable.ensureVisible(
           context,
           alignment: 0.35,

@@ -63,6 +63,7 @@ class _AiActionIconState extends State<AiActionIcon> {
   @override
   void initState() {
     super.initState();
+    // Read the preferences once, in the synchronous frame of initState.
     final aiPrefs = context.read<AiPreferencesCubit>().state;
     _cubit = AiTextFieldCubit(
       repository: widget.repository ?? AiRepositoryImpl(),
@@ -106,6 +107,9 @@ class _AiActionIconState extends State<AiActionIcon> {
   }
 
   Future<AiRequestContext> _buildContext() async {
+    // Resolved BEFORE any await: reading an InheritedWidget after an
+    // async gap is unsafe if this element was deactivated meanwhile.
+
     String? imageBase64;
     // local user image
     if (widget.hasMediaAttached && widget.imageBytesProvider != null) {

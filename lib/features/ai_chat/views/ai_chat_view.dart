@@ -711,17 +711,12 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
     _attachments.cancelUpload(message.id);
   }
 
-  // ignore: unused_field
-  bool _scrollToBottomScheduled = false;
-
   void _scheduleScrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _scrollAnchor.pinToBottom();
     });
   }
-
-  void _scrollToBottom() => _scrollAnchor.pinToBottom();
 
   void _handleRetry(AiChatMessage message) {
     _chatCubit?.sendMessage(

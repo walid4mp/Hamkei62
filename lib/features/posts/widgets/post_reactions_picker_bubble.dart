@@ -123,8 +123,8 @@ class _PostReactionsPickerBubbleState extends State<PostReactionsPickerBubble>
                       transform:
                           isHovered
                               ? (Matrix4.identity()
-                                ..translate(0.0, -8.0)
-                                ..scale(1.35))
+                                ..translateByDouble(0.0, -8.0, 0.0, 1.0)
+                                ..scaleByDouble(1.35, 1.35, 1.35, 1.0))
                               : Matrix4.identity(),
                       child: Tooltip(
                         message: r['label']!,

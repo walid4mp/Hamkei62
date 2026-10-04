@@ -56,12 +56,17 @@ class AppSecrets {
   static String? _runtimeFileApiUrl;
   static String? _runtimeFileGoogleWebClientId;
   static bool _runtimeLoaded = false;
-  static Completer<void>? _runtimeLoader;
+  static Future<void>? _runtimeLoader;
+
+  /// Reads `assets/cfg/runtime.json` once. Bootstrap awaits this before it
+  /// calls [effectiveSupabaseUrl]/[effectiveSupabaseAnonKey] so the bundled
+  /// values are visible to the synchronous getters below.
+  static Future<void> load() => _ensureRuntimeLoaded();
 
   static Future<void> _ensureRuntimeLoaded() async {
     if (_runtimeLoaded) return;
     _runtimeLoader ??= _doLoadRuntime();
-    await _runtimeLoader!.future;
+    await _runtimeLoader;
   }
 
   static Future<void> _doLoadRuntime() async {
