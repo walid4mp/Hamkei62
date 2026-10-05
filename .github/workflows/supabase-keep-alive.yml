@@ -1,0 +1,25 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: '0 6 */3 * *'
+  workflow_dispatch: {}   
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase keep-alive function
+        run: |
+          if [ -z "${{ secrets.SUPABASE_FUNCTIONS_URL }}" ] || [ -z "${{ secrets.SUPABASE_ANON_KEY }}" ]; then
+            echo "::notice::SUPABASE_FUNCTIONS_URL / SUPABASE_ANON_KEY are not configured; skipping keep-alive ping."
+            exit 0
+          fi
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/keep-alive" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json")
+          echo "Response code: $response"
+          if [ "$response" -ne 200 ]; then
+            echo "::warning::Keep-alive ping returned status $response (not failing the run)."
+          fi

@@ -1,0 +1,1021 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:collection/collection.dart';
+import 'package:dio/dio.dart' as dio_pkg;
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:uuid/uuid.dart';
+import '../../../../core/audio/voice_recorder/services/audio_compression_service.dart';
+import '../../../../core/cache/repository/media_cache_repository.dart';
+import '../../../../core/cache/services/messages_snapshot_cache.dart';
+import '../../../../core/chat_shared/controllers/chat_search_controller.dart';
+import '../../../../core/chat_shared/helpers/chat_mute_status_cache.dart';
+import '../../../../core/chat_shared/services/chat_mute_service.dart';
+import '../../../../core/connectivity/services/connectivity_banner_controller.dart';
+import '../../../../core/errors/exceptions.dart';
+import '../../../../core/errors/supabase_error_mapper.dart';
+import '../../../../core/helpers/chat_helper.dart';
+import '../../../../core/helpers/safe_emit_mixin.dart';
+import '../../../../core/helpers/selected_message_star_controller.dart';
+import '../../../../core/messaging/message_reconciler.dart';
+import '../../../../core/presence/models/chat_action_type.dart';
+import '../../../../core/services/fcm_services.dart';
+import '../../../../core/supabase/supabase_provider.dart';
+import '../../../../core/toast/app_toast.dart';
+import '../../../../core/utilities/supabase_constants.dart';
+import '../../../notifications/repository/notifications_repository.dart';
+import '../../../settings/repository/settings_repository.dart';
+import '../../../../core/chat_shared/helpers/message_reaction_preview_helper.dart';
+import '../../helpers/chat_clear_store.dart';
+import '../../models/chat_block_status.dart';
+import '../../models/message_model.dart';
+import '../../services/chat_permission_service.dart';
+import '../../services/chat_presence_service.dart';
+import '../../services/chat_services.dart';
+import '../../widgets/chat_bubble.dart';
+import '../chats_cubit/chats_cubit.dart';
+part 'chat_details_state.dart';
+part 'chat_reactions_mixin.dart';
+part 'chat_selection_mixin.dart';
+part 'chat_presence_action_mixin.dart';
+
+class ChatDetailsCubit extends Cubit<ChatDetailsState>
+    with
+        ChatReactionsMixin,
+        ChatSelectionMixin,
+        ChatPresenceActionMixin,
+        WidgetsBindingObserver,
+        SafeEmitMixin<ChatDetailsState> {
+  @override
+  final ChatServices _chatServices;
+  @override
+  final ChatsCubit? chatsCubit;
+  @override
+  final ChatPresenceService _presenceService;
+  final MediaCacheRepository _mediaCacheRepository;
+  final ChatPermissionService _chatPermissionService;
+  final AudioCompressionService _audioCompressionService;
+  final String receiverName;
+  final String? senderImageUrl;
+
+  static final _snapshotCache = MessagesSnapshotCache<MessageModel>(
+    toCacheJson: (m) => m.toCacheJson(),
+    fromJson: MessageModel.fromJson,
+  );
+
+  // Single mutation boundary for `cachedMessages`. Every event source
+  // (optimistic send, API ack, Realtime/disk snapshot, reactions) goes
+  // through this instead of assigning `cachedMessages` directly. See
+  // `message_reconciler.dart` for why.
+  //
+  // Merge precedence: the incoming representation (Realtime row / API ack)
+  // is treated as the source of truth for content, EXCEPT `reactions` /
+  static final _reconciler = MessageReconciler<MessageModel>(
+    idOf: (m) => m.id,
+    clientMessageIdOf: (m) => m.clientMessageId,
+    createdAtOf: (m) => m.createdAt,
+    merge:
+        (existing, incoming) => incoming.copyWith(
+          reactions: incoming.reactions,
+          reactionsCreatedAt:
+              incoming.reactionsCreatedAt ?? existing.reactionsCreatedAt,
+        ),
+  );
+
+  final ValueNotifier<ChatPermissionResult> chatPermission = ValueNotifier(
+    const ChatPermissionResult(permission: ChatPermission.allowed),
+  );
+
+  final ValueNotifier<ChatBlockStatus> blockStatus = ValueNotifier(
+    const ChatBlockStatus(),
+  );
+  StreamSubscription<ChatBlockStatus>? _blockStatusSubscription;
+
+  final ValueNotifier<bool> muteStatus = ValueNotifier(false);
+  StreamSubscription<bool>? _muteStatusSubscription;
+  final _chatMuteService = ChatMuteService();
+
+  final ValueNotifier<MessageModel?> replyToMessage =
+      ValueNotifier<MessageModel?>(null);
+
+  StreamSubscription? _messageSubscription;
+  bool _hasReceivedFirstStreamEvent = false;
+  // Correlation keys (see `correlationKeyFor`) that should survive one more
+  // snapshot cycle even if the incoming snapshot doesn't contain them yet:
+  // messages just loaded from disk (not yet confronted with a live
+  // snapshot) and messages currently SENDING (optimistic, not yet
+  // acknowledged by the API). This replaces the old
+  // `id.startsWith('temp_')` check, which stops working now that a
+  // message's id is a real UUID (the CID) from the moment it's created.
+  Set<String> _protectedKeys = {};
+  bool get hasConfirmedInitialLoad => _hasReceivedFirstStreamEvent;
+  bool _hasHydratedFromDisk = false;
+  String? _activeReceiverId;
+
+  @override
+  List<MessageModel> cachedMessages = [];
+  @override
+  String? _messagesSnapshotKey;
+
+  /// Resolved through an injectable provider rather than read straight off
+  /// the `SupabaseProvider` singleton.
+  ///
+  /// Every production call site (`app_router.dart`, two places) omits the
+  /// parameter and behaves exactly as before. Tests supply a fixed id, which
+  /// is what makes this Cubit testable at all — the same seam `HomeCubit`
+  /// already uses.
+  @override
+  final String currentUserId;
+
+  final String currentUserName;
+
+  final Map<String, GlobalKey<ChatBubbleState>> bubbleKeys = {};
+
+  late final ChatSearchController<MessageModel> searchController =
+      ChatSearchController<MessageModel>(
+        getMessages: () => cachedMessages,
+        getSearchableText:
+            (m) => (m.caption?.isNotEmpty == true ? m.caption! : m.text),
+        getId: (m) => m.id,
+      );
+
+  ChatDetailsCubit(
+    this._chatServices,
+    this.receiverName,
+    this._mediaCacheRepository, {
+    this.chatsCubit,
+    this.senderImageUrl,
+    this.currentUserName = 'Someone',
+    ChatPermissionService? chatPermissionService,
+    AudioCompressionService? audioCompressionService,
+    String Function()? currentUserIdProvider,
+    required ChatPresenceService presenceService,
+  }) : _presenceService = presenceService,
+       currentUserId = (currentUserIdProvider ?? (() => SupabaseProvider.id))(),
+       _chatPermissionService =
+           chatPermissionService ?? ChatPermissionService(),
+       _audioCompressionService =
+           audioCompressionService ?? AudioCompressionService(),
+       super(ChatDetailsInitial()) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final wasBackgrounded =
+        _lastLifecycleState == AppLifecycleState.paused ||
+        _lastLifecycleState == AppLifecycleState.inactive ||
+        _lastLifecycleState == AppLifecycleState.hidden;
+    _lastLifecycleState = state;
+
+    if (state == AppLifecycleState.resumed &&
+        wasBackgrounded &&
+        _activeReceiverId != null) {
+      getMessagesStream(receiverId: _activeReceiverId!);
+    }
+  }
+
+  Future<void> resolveChatPermission(String receiverId) async {
+    try {
+      chatPermission.value = await _chatPermissionService.resolve(
+        currentUserId: currentUserId,
+        otherUserId: receiverId,
+      );
+    } catch (e) {
+      debugPrint('resolveChatPermission error: $e');
+    }
+  }
+
+  void watchBlockStatus(String receiverId) {
+    final cached = ChatBlockStatusCache.instance.read(receiverId);
+    if (cached != null) {
+      blockStatus.value = cached;
+    }
+
+    _blockStatusSubscription?.cancel();
+    _blockStatusSubscription = _chatServices
+        .watchBlockStatus(currentUserId: currentUserId, otherUserId: receiverId)
+        .listen((status) {
+          blockStatus.value = status;
+        }, onError: (e) => debugPrint('watchBlockStatus error: $e'));
+  }
+
+  Future<void> toggleBlock({
+    required String receiverId,
+    required String otherUserName,
+  }) async {
+    try {
+      if (blockStatus.value.blockedByMe) {
+        await _chatServices.unblockUser(
+          blockerId: currentUserId,
+          blockedId: receiverId,
+        );
+      } else {
+        await _chatServices.blockUser(
+          blockerId: currentUserId,
+          blockedId: receiverId,
+        );
+      }
+
+      blockStatus.value = blockStatus.value.copyWith(
+        blockedByMe: !blockStatus.value.blockedByMe,
+        isLoaded: true,
+      );
+      unawaited(
+        ChatBlockStatusCache.instance.write(receiverId, blockStatus.value),
+      );
+    } catch (e) {
+      debugPrint('toggleBlock error: $e');
+    }
+  }
+
+  void watchMuteStatus(String receiverId) {
+    final cached = ChatMuteStatusCache.instance.read(receiverId);
+    if (cached != null) {
+      muteStatus.value = cached;
+    }
+
+    _muteStatusSubscription?.cancel();
+    _muteStatusSubscription = _chatMuteService
+        .watchMuted(peerId: receiverId)
+        .listen((muted) {
+          muteStatus.value = muted;
+          unawaited(ChatMuteStatusCache.instance.write(receiverId, muted));
+        }, onError: (e) => debugPrint('watchMuteStatus error: $e'));
+  }
+
+  Future<void> toggleMute({required String receiverId}) async {
+    final newValue = !muteStatus.value;
+    muteStatus.value = newValue;
+    unawaited(ChatMuteStatusCache.instance.write(receiverId, newValue));
+    try {
+      await _chatMuteService.setMuted(peerId: receiverId, muted: newValue);
+    } catch (e) {
+      muteStatus.value = !newValue;
+      unawaited(ChatMuteStatusCache.instance.write(receiverId, !newValue));
+      AppToast.error(SupabaseErrorMapper.toUserMessage(e));
+    }
+  }
+
+  Future<void> _ensureAllowedToSend(String receiverId) async {
+    final current = chatPermission.value;
+    switch (current.permission) {
+      case ChatPermission.allowed:
+        return;
+      case ChatPermission.needsRequest:
+        try {
+          final requestId = await _chatPermissionService.createRequest(
+            senderId: currentUserId,
+            receiverId: receiverId,
+          );
+          chatPermission.value = ChatPermissionResult(
+            permission: ChatPermission.allowed,
+            messageRequestId: requestId,
+          );
+        } catch (e) {
+          debugPrint('createRequest error: $e');
+        }
+        return;
+      case ChatPermission.awaitingMyResponse:
+        final requestId = current.messageRequestId;
+        if (requestId != null) {
+          try {
+            await _chatPermissionService.acceptRequest(requestId);
+          } catch (e) {
+            debugPrint('acceptRequest error: $e');
+          }
+        }
+        chatPermission.value = ChatPermissionResult(
+          permission: ChatPermission.allowed,
+          messageRequestId: requestId,
+        );
+        return;
+    }
+  }
+
+  Future<void> declineMessageRequest() async {
+    final requestId = chatPermission.value.messageRequestId;
+    if (requestId == null) return;
+    try {
+      await _chatPermissionService.declineRequest(requestId);
+    } catch (e) {
+      debugPrint('declineRequest error: $e');
+    }
+  }
+
+  @override
+  final ValueNotifier<bool> isAtBottomNotifier = ValueNotifier<bool>(true);
+  bool get isUserAtBottom => isAtBottomNotifier.value;
+
+  List<MessageModel> _pendingMessagesSnapshot = [];
+  final ValueNotifier<int> pendingNewCountNotifier = ValueNotifier<int>(0);
+  bool get hasPendingMessages => pendingNewCountNotifier.value > 0;
+  void setUserAtBottom(bool isAtBottom) {
+    isAtBottomNotifier.value = isAtBottom;
+  }
+
+  int _messagesStreamEpoch = 0;
+  AppLifecycleState? _lastLifecycleState;
+
+  void getMessagesStream({required String receiverId}) {
+    final bool isSwitchingPeer =
+        _activeReceiverId != null && _activeReceiverId != receiverId;
+    if (isSwitchingPeer) {
+      cachedMessages = [];
+      _hasHydratedFromDisk = false;
+    }
+    _activeReceiverId = receiverId;
+    final int myEpoch = ++_messagesStreamEpoch;
+    _messageSubscription?.cancel();
+    _hasReceivedFirstStreamEvent = false;
+    _protectedKeys = {};
+
+    final conversationId = ChatHelper.buildConversationId(
+      currentUserId,
+      receiverId,
+    );
+    _messagesSnapshotKey = 'chat_messages_snapshot_$conversationId';
+
+    if (!_hasHydratedFromDisk) {
+      _hasHydratedFromDisk = true;
+      final diskMessages = _readMessagesSnapshot(_messagesSnapshotKey!);
+      if (diskMessages.isNotEmpty) {
+        for (var m in diskMessages) {
+          if (m.reactions.isNotEmpty) {
+            _reactionsCache[m.id] = Map<String, String>.from(m.reactions);
+          }
+        }
+
+        final enrichedDiskMessages =
+            diskMessages.map((m) {
+              final reactions = _reactionsCache[m.id] ?? m.reactions;
+              return m.copyWith(reactions: reactions);
+            }).toList();
+
+        final dedupedDiskMessages = _reconciler.dedupe(enrichedDiskMessages);
+
+        cachedMessages = dedupedDiskMessages;
+        _registerBubbleKeys(dedupedDiskMessages);
+        emit(MessagesSuccessLoaded(messages: dedupedDiskMessages));
+      }
+    }
+
+    _protectedKeys =
+        cachedMessages
+            .map(
+              (m) => correlationKeyFor(
+                id: m.id,
+                clientMessageId: m.clientMessageId,
+              ),
+            )
+            .toSet();
+
+    _listenReactions(conversationId);
+
+    _messageSubscription = _chatServices
+        .getMessagesStream(senderId: currentUserId, receiverId: receiverId)
+        .listen(
+          (rawMessages) {
+            if (myEpoch != _messagesStreamEpoch) return;
+
+            final clearedAt = ChatClearStore.instance.clearedAtFor(receiverId);
+            final messages =
+                clearedAt == null
+                    ? rawMessages
+                    : rawMessages
+                        .where((m) => m.createdAt.isAfter(clearedAt))
+                        .toList();
+
+            final enriched =
+                messages.map((m) {
+                  final reactions = _reactionsCache[m.id] ?? {};
+                  return m.copyWith(reactions: reactions);
+                }).toList();
+
+            final reconciliation = _reconciler.applySnapshot(
+              cachedMessages,
+              snapshot: enriched,
+              protectedKeys: _protectedKeys,
+            );
+            _protectedKeys = reconciliation.stillUnconfirmed;
+            final resolved = reconciliation.messages;
+
+            _hasReceivedFirstStreamEvent = true;
+
+            final existingIds = cachedMessages.map((m) => m.id).toSet();
+            final newIds = resolved
+                .map((m) => m.id)
+                .toSet()
+                .difference(existingIds);
+
+            final bool hasOwnNewMessage = resolved.any(
+              (m) => newIds.contains(m.id) && m.senderId == currentUserId,
+            );
+            final int otherNewCount =
+                resolved
+                    .where(
+                      (m) =>
+                          newIds.contains(m.id) && m.senderId != currentUserId,
+                    )
+                    .length;
+
+            if (!isAtBottomNotifier.value &&
+                otherNewCount > 0 &&
+                !hasOwnNewMessage) {
+              _pendingMessagesSnapshot = resolved;
+              pendingNewCountNotifier.value = otherNewCount;
+              _persistMessagesSnapshot(_messagesSnapshotKey!, resolved);
+              return;
+            }
+
+            _registerBubbleKeys(resolved);
+
+            cachedMessages = resolved;
+            _pendingMessagesSnapshot = [];
+            pendingNewCountNotifier.value = 0;
+            emit(MessagesSuccessLoaded(messages: resolved));
+
+            _persistMessagesSnapshot(_messagesSnapshotKey!, resolved);
+          },
+          onError: (e) {
+            debugPrint('Messages stream error: $e');
+          },
+        );
+  }
+
+  void flushPendingMessages() {
+    if (_pendingMessagesSnapshot.isEmpty) return;
+    _registerBubbleKeys(_pendingMessagesSnapshot);
+    cachedMessages = _pendingMessagesSnapshot;
+    _pendingMessagesSnapshot = [];
+    pendingNewCountNotifier.value = 0;
+    emit(MessagesSuccessLoaded(messages: cachedMessages));
+  }
+
+  // Keyed by stable logical identity (clientMessageId when present, else
+  // server id — see correlationKeyFor), NOT by the mutable `id` field.
+  // `bubbleKeys` isn't currently wired into any ChatBubble's `key:` (it's
+  // unused scaffolding as of this codebase snapshot), but keeping its
+  // bookkeeping on the stable identity now avoids silently reintroducing
+  // the same widget-remount-on-reconciliation bug this whole fix is about
+  // the moment it does get wired up.
+  void _registerBubbleKeys(List<MessageModel> messages) {
+    final currentKeys =
+        messages
+            .map(
+              (m) => correlationKeyFor(
+                id: m.id,
+                clientMessageId: m.clientMessageId,
+              ),
+            )
+            .toSet();
+    bubbleKeys.removeWhere((key, _) => !currentKeys.contains(key));
+    for (final msg in messages) {
+      final key = correlationKeyFor(
+        id: msg.id,
+        clientMessageId: msg.clientMessageId,
+      );
+      bubbleKeys.putIfAbsent(key, () => GlobalKey<ChatBubbleState>());
+    }
+  }
+
+  @override
+  void _persistMessagesSnapshot(String key, List<MessageModel> messages) {
+    _snapshotCache.persist(key, messages);
+  }
+
+  List<MessageModel> _readMessagesSnapshot(String key) {
+    return _snapshotCache.read(key);
+  }
+
+  Future<void> markAsRead({required String senderId}) async {
+    if (!SettingsRepository.instance.readReceipts) return;
+    try {
+      await _chatServices.markMessagesAsRead(
+        senderId: senderId,
+        currentUserId: currentUserId,
+      );
+    } catch (e) {
+      debugPrint('error marking as read: $e');
+      emit(MessagesError(SupabaseErrorMapper.toUserMessage(e)));
+    }
+  }
+
+  final Map<String, double> uploadProgressMap = {};
+  final Map<String, ValueNotifier<double>> uploadProgressNotifiers = {};
+
+  ValueNotifier<double> progressNotifierFor(String messageId) {
+    return uploadProgressNotifiers.putIfAbsent(
+      messageId,
+      () => ValueNotifier<double>(0),
+    );
+  }
+
+  void _disposeProgressNotifier(String messageId) {
+    uploadProgressNotifiers.remove(messageId)?.dispose();
+  }
+
+  Future<void> sendMessage({
+    required String receiverId,
+    required String messageText,
+    String messageType = 'text',
+    File? imageFile,
+    File? videoFile,
+    File? voiceFile,
+    int? durationSeconds,
+    File? documentFile,
+    String? fileName,
+    int? fileSizeBytes,
+    String? remoteImageUrl,
+    String? caption,
+    MessageModel? replyTo,
+    String? forwardedFromUserId,
+    String? forwardedFromUserName,
+    String? forwardedFromUserAvatar,
+  }) async {
+    if (blockStatus.value.isBlocked) return;
+
+    if (messageText.trim().isEmpty &&
+        imageFile == null &&
+        videoFile == null &&
+        voiceFile == null &&
+        documentFile == null &&
+        remoteImageUrl == null) {
+      return;
+    }
+    await _ensureAllowedToSend(receiverId);
+
+    final List<MessageModel> currentMessages = List.from(cachedMessages);
+
+    // The CID is generated once, here, and used as both the optimistic
+    // message's `id` (until the server id is known) and its permanent
+    // `clientMessageId` (sent to the server, kept forever). This replaces
+    // the old `'temp_${DateTime.now().millisecondsSinceEpoch}'` scheme,
+    // which could collide between two messages sent within the same
+    // millisecond.
+    final tempId = const Uuid().v4();
+    final optimisticMessage = MessageModel(
+      id: tempId,
+      clientMessageId: tempId,
+      senderId: currentUserId,
+      receiverId: receiverId,
+      text: messageText,
+      messageType: messageType,
+      createdAt: DateTime.now(),
+      isRead: false,
+      imageUrl: remoteImageUrl ?? imageFile?.path,
+      videoUrl: videoFile?.path,
+      voiceUrl: voiceFile?.path,
+      durationSeconds: durationSeconds,
+      caption: caption,
+      fileName: fileName,
+      fileUrl: documentFile?.path,
+      fileSizeBytes: fileSizeBytes,
+      replyToMessageId: replyTo?.id,
+      replyToText:
+          (replyTo?.text != null && replyTo!.text.isNotEmpty)
+              ? replyTo.text
+              : replyTo?.caption,
+      replyToMessageType: replyTo?.messageType,
+      replyToSenderId: replyTo?.senderId,
+      replyToMediaUrl: MessageModel.replyMediaUrlFrom(replyTo),
+      forwardedFromUserId: forwardedFromUserId,
+      forwardedFromUserName: forwardedFromUserName,
+      forwardedFromUserAvatar: forwardedFromUserAvatar,
+      replyToStoryId: replyTo?.replyToStoryId,
+      replyToStoryAuthorId: replyTo?.replyToStoryAuthorId,
+      replyToStoryType: replyTo?.replyToStoryType,
+      replyToStoryMediaUrl: replyTo?.replyToStoryMediaUrl,
+      replyToStoryText: replyTo?.replyToStoryText,
+      replyToStoryBgColor: replyTo?.replyToStoryBgColor,
+      replyToStoryDurationSeconds: replyTo?.replyToStoryDurationSeconds,
+    );
+
+    final updatedMessages = _reconciler.applyOptimistic(
+      cachedMessages,
+      optimisticMessage,
+    );
+    cachedMessages = updatedMessages;
+    _protectedKeys.add(correlationKeyFor(id: tempId, clientMessageId: tempId));
+    emit(MessagesSending(messages: updatedMessages));
+
+    final cancelToken = dio_pkg.CancelToken();
+    _cancelTokens[tempId] = cancelToken;
+    try {
+      String? imageUrl, videoUrl, voiceUrl, fileUrl;
+      String? imagePublicId, videoPublicId, voicePublicId, filePublicId;
+
+      if (remoteImageUrl != null) {
+        imageUrl = remoteImageUrl;
+      } else if (imageFile != null) {
+        if (await imageFile.exists()) {
+          uploadProgressMap[tempId] = 0.0;
+          emit(MessagesSending(messages: updatedMessages));
+
+          final result = await _chatServices.storage.uploadFile(
+            imageFile,
+            'chats',
+            'image',
+            cancelToken: cancelToken,
+            onProgress: (progress) {
+              uploadProgressMap[tempId] = progress;
+              progressNotifierFor(tempId).value = progress;
+            },
+          );
+          imageUrl = result.secureUrl;
+          imagePublicId = result.publicId;
+          await _mediaCacheRepository.adoptUploadedFile(imageUrl, imageFile);
+          uploadProgressMap[tempId] = 1.0;
+          emit(MessagesSending(messages: updatedMessages));
+          await Future.delayed(const Duration(milliseconds: 200));
+          uploadProgressMap.remove(tempId);
+          _disposeProgressNotifier(tempId);
+        } else {
+          emit(
+            MessagesError("Image file not found. Please try picking it again."),
+          );
+          emit(MessagesSuccessLoaded(messages: currentMessages));
+        }
+      }
+
+      if (videoFile != null) {
+        if (await videoFile.exists()) {
+          uploadProgressMap[tempId] = 0.0;
+          emit(MessagesSending(messages: updatedMessages));
+          final result = await _chatServices.storage.uploadFile(
+            videoFile,
+            'chats',
+            'video',
+            cancelToken: cancelToken,
+            onProgress: (progress) {
+              uploadProgressMap[tempId] = progress;
+              progressNotifierFor(tempId).value = progress;
+            },
+          );
+          videoUrl = result.secureUrl;
+          videoPublicId = result.publicId;
+          await _mediaCacheRepository.adoptUploadedFile(videoUrl, videoFile);
+
+          uploadProgressMap[tempId] = 1.0;
+          emit(MessagesSending(messages: updatedMessages));
+          await Future.delayed(const Duration(milliseconds: 200));
+          uploadProgressMap.remove(tempId);
+          _disposeProgressNotifier(tempId);
+        } else {
+          emit(MessagesError("Video file not found. Please try again."));
+          emit(MessagesSuccessLoaded(messages: currentMessages));
+          return;
+        }
+      }
+
+      if (voiceFile != null) {
+        if (await voiceFile.exists()) {
+          uploadProgressMap[tempId] = 0.0;
+          emit(MessagesSending(messages: updatedMessages));
+
+          final compression = await _audioCompressionService.compress(
+            voiceFile,
+          );
+          try {
+            final result = await _chatServices.storage.uploadFile(
+              compression.fileToUpload,
+              'chats',
+              'voice',
+              cancelToken: cancelToken,
+              onProgress: (progress) {
+                uploadProgressMap[tempId] = progress;
+                progressNotifierFor(tempId).value = progress;
+              },
+            );
+            voiceUrl = result.secureUrl;
+            voicePublicId = result.publicId;
+            uploadProgressMap.remove(tempId);
+            _disposeProgressNotifier(tempId);
+          } finally {
+            await _audioCompressionService.cleanup(compression);
+          }
+        } else {
+          emit(MessagesError("Voice file not found."));
+          return;
+        }
+      }
+
+      if (documentFile != null) {
+        if (await documentFile.exists()) {
+          uploadProgressMap[tempId] = 0.0;
+          emit(MessagesSending(messages: updatedMessages));
+
+          final originalName =
+              fileName ?? documentFile.path.split('/').last.split('\\').last;
+          final nameWithoutExt =
+              originalName.contains('.')
+                  ? originalName.substring(0, originalName.lastIndexOf('.'))
+                  : originalName;
+          final safeName = nameWithoutExt.replaceAll(
+            RegExp(r'[^a-zA-Z0-9\-_]'),
+            '_',
+          );
+
+          final result = await _chatServices.storage.uploadFile(
+            documentFile,
+            'chats',
+            'file',
+            filePrefix: '${safeName}_',
+            cancelToken: cancelToken,
+            onProgress: (progress) {
+              uploadProgressMap[tempId] = progress;
+              progressNotifierFor(tempId).value = progress;
+            },
+          );
+          fileUrl = result.secureUrl;
+          filePublicId = result.publicId;
+          await _mediaCacheRepository.adoptUploadedFile(
+            result.secureUrl,
+            documentFile,
+          );
+          uploadProgressMap[tempId] = 1.0;
+          emit(MessagesSending(messages: updatedMessages));
+          await Future.delayed(const Duration(milliseconds: 200));
+          uploadProgressMap.remove(tempId);
+          _disposeProgressNotifier(tempId);
+        } else {
+          emit(MessagesError("File not found. Please try picking it again."));
+          emit(MessagesSuccessLoaded(messages: currentMessages));
+          return;
+        }
+      }
+
+      final ({String id, DateTime createdAt}) sent;
+      try {
+        sent = await _chatServices.sendMessage(
+          senderId: currentUserId,
+          receiverId: receiverId,
+          text: messageText,
+          clientMessageId: tempId,
+          messageType: messageType,
+          imageUrl: imageUrl,
+          videoUrl: videoUrl,
+          voiceUrl: voiceUrl,
+          durationSeconds: durationSeconds,
+          fileUrl: fileUrl,
+          fileName: fileName,
+          fileSizeBytes: fileSizeBytes,
+          caption: caption,
+          replyToMessageId: replyTo?.id,
+          replyToText:
+              (replyTo?.text != null && replyTo!.text.isNotEmpty)
+                  ? replyTo.text
+                  : replyTo?.caption,
+          replyToMessageType: replyTo?.messageType,
+          replyToSenderId: replyTo?.senderId,
+          replyToMediaUrl: MessageModel.replyMediaUrlFrom(replyTo),
+
+          imagePublicId: imagePublicId,
+          videoPublicId: videoPublicId,
+          voicePublicId: voicePublicId,
+          filePublicId: filePublicId,
+          forwardedFromUserId: forwardedFromUserId,
+          forwardedFromUserName: forwardedFromUserName,
+          forwardedFromUserAvatar: forwardedFromUserAvatar,
+        );
+      } catch (e) {
+        // UNKNOWN OUTCOME, not definite failure: uploads already
+        // succeeded (we got this far), so the INSERT itself may well have
+        // committed even though this HTTP call failed/timed out before we
+        // saw the response. Do NOT remove the optimistic message — it
+        // stays in `cachedMessages` and its correlation key stays in
+        // `_protectedKeys`, so if a later Realtime snapshot (or a
+        // reconnect, which re-triggers this same `.stream()`) confirms the
+        // row by clientMessageId, it will be reconciled into REAL
+        // automatically. If the row genuinely was never written, the
+        // upsert's `ON CONFLICT ... DO NOTHING` semantics make a future
+        // retry with this same CID safe either way.
+        debugPrint(
+          'sendMessage: unknown outcome, keeping optimistic message: $e',
+        );
+        _cancelTokens.remove(tempId);
+        uploadProgressMap.remove(tempId);
+        unawaited(ConnectivityBannerController.notifyIfOffline());
+        emit(
+          MessagesError(
+            "Couldn't confirm your message was sent. It will update automatically once you're back online.",
+          ),
+        );
+        emit(MessagesSuccessLoaded(messages: cachedMessages));
+        return;
+      }
+
+      final newMessageId = sent.id;
+      final acknowledged = optimisticMessage.copyWith(
+        id: newMessageId,
+        clientMessageId: tempId,
+        createdAt: sent.createdAt,
+        imageUrl: imageUrl,
+        videoUrl: videoUrl,
+        voiceUrl: voiceUrl,
+        fileUrl: fileUrl,
+      );
+      cachedMessages = _reconciler.applyPointEvent(
+        cachedMessages,
+        acknowledged,
+      );
+      _registerBubbleKeys(cachedMessages);
+      emit(MessagesSuccessLoaded(messages: cachedMessages));
+
+      if (messageType != 'call') {
+        if (isClosed) return;
+        await NotificationRepository.instance.notifyChatMessage(
+          receiverId: receiverId,
+          senderId: currentUserId,
+          senderName:
+              _resolvedCurrentUserName.isNotEmpty
+                  ? _resolvedCurrentUserName
+                  : currentUserName,
+          senderImageUrl:
+              _resolvedSenderImageUrl.isNotEmpty
+                  ? _resolvedSenderImageUrl
+                  : (senderImageUrl ?? ''),
+          messageBody: caption ?? messageText,
+          messageType: messageType,
+          chatReferenceId: currentUserId,
+          fileName: fileName,
+        );
+      }
+      _cancelTokens.remove(tempId);
+    } on UploadCanceledException {
+      return;
+    } catch (e) {
+      _cancelTokens.remove(tempId);
+      uploadProgressMap.remove(tempId);
+
+      if (e is dio_pkg.DioException &&
+          e.type == dio_pkg.DioExceptionType.cancel) {
+        debugPrint("User canceled the upload");
+        return;
+      }
+
+      cachedMessages = _reconciler.applyRemoval(
+        cachedMessages,
+        id: tempId,
+        clientMessageId: tempId,
+      );
+      _protectedKeys.remove(
+        correlationKeyFor(id: tempId, clientMessageId: tempId),
+      );
+      debugPrint('error sending message: $e');
+
+      if (e.toString().contains('session_expired')) {
+        emit(MessagesError('Your session has expired; please log in again'));
+        emit(MessagesSuccessLoaded(messages: cachedMessages));
+        return;
+      }
+
+      unawaited(ConnectivityBannerController.notifyIfOffline());
+
+      emit(
+        MessagesError("Failed to send message. Please check your connection."),
+      );
+      emit(MessagesSuccessLoaded(messages: cachedMessages));
+    }
+  }
+
+  Future<void> editMessage({
+    required String messageId,
+    required String newText,
+  }) async {
+    final trimmed = newText.trim();
+    if (trimmed.isEmpty) return;
+
+    final target = cachedMessages.firstWhereOrNull((m) => m.id == messageId);
+    if (target == null) return;
+
+    final isCaptionEdit =
+        target.messageType == 'image' || target.messageType == 'video';
+
+    cachedMessages = _reconciler.applyFieldUpdate(cachedMessages, (m) {
+      if (m.id != messageId) return m;
+      return isCaptionEdit
+          ? m.copyWith(caption: trimmed, isEdited: true)
+          : m.copyWith(text: trimmed, isEdited: true);
+    });
+    // _emitLoaded();
+    emit(MessagesSuccessLoaded(messages: cachedMessages));
+
+    try {
+      await _chatServices.editMessage(
+        messageId: messageId,
+        newText: trimmed,
+        isCaptionEdit: isCaptionEdit,
+      );
+    } catch (e) {
+      debugPrint('Error editing message: $e');
+    }
+  }
+
+  String _resolvedCurrentUserName = '';
+  String _resolvedSenderImageUrl = '';
+
+  String get effectiveCurrentUserName =>
+      _resolvedCurrentUserName.isNotEmpty
+          ? _resolvedCurrentUserName
+          : currentUserName;
+
+  String? get effectiveSenderImageUrl =>
+      _resolvedSenderImageUrl.isNotEmpty
+          ? _resolvedSenderImageUrl
+          : senderImageUrl;
+
+  Future<void> loadCurrentUserInfo() async {
+    try {
+      final info = await _chatServices.getCurrentUserInfo(currentUserId);
+      _resolvedCurrentUserName = info['name'] ?? currentUserName;
+      _resolvedSenderImageUrl = info['imageUrl'] ?? senderImageUrl ?? '';
+    } catch (e) {
+      debugPrint('[ChatDetailsCubit] failed to load current user info: $e');
+    }
+  }
+
+  final Map<String, dio_pkg.CancelToken> _cancelTokens = {};
+  @override
+  void cancelUpload(String tempId) {
+    if (_cancelTokens.containsKey(tempId)) {
+      _cancelTokens[tempId]!.cancel();
+      _cancelTokens.remove(tempId);
+      uploadProgressMap.remove(tempId);
+      _disposeProgressNotifier(tempId);
+      if (state is MessagesSending) {
+        final currentList = (state as MessagesSending).messages;
+        final updatedList = currentList!.where((m) => m.id != tempId).toList();
+        emit(MessagesSuccessLoaded(messages: updatedList));
+      }
+    }
+  }
+
+  void setReplyMessage(MessageModel message) {
+    replyToMessage.value = message;
+  }
+
+  void cancelReply() {
+    replyToMessage.value = null;
+  }
+
+  int? findMessageIndex(String messageId) {
+    final index = cachedMessages.indexWhere((m) => m.id == messageId);
+    return index == -1 ? null : index;
+  }
+
+  final ValueNotifier<String?> highlightedMessageId = ValueNotifier(null);
+
+  Future<void> scrollToMessage({
+    required String messageId,
+    required ItemScrollController itemScrollController,
+  }) async {
+    final index = cachedMessages.indexWhere((m) => m.id == messageId);
+    if (index == -1) return;
+
+    await itemScrollController.scrollTo(
+      index: index,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.3,
+    );
+
+    highlightedMessageId.value = messageId;
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (!isClosed) highlightedMessageId.value = null;
+    });
+  }
+
+  Future<void> deleteMessage({
+    required String messageId,
+    required String receiverId,
+  }) async {
+    try {
+      await _chatServices.deleteMessage(messageId: messageId);
+    } catch (e) {
+      debugPrint('error deleting message: $e');
+      emit(MessagesError(SupabaseErrorMapper.toUserMessage(e)));
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    WidgetsBinding.instance.removeObserver(this);
+    _blockStatusSubscription?.cancel();
+    _muteStatusSubscription?.cancel();
+    _messageSubscription?.cancel();
+    await super.close();
+    chatPermission.dispose();
+    blockStatus.dispose();
+    muteStatus.dispose();
+    replyToMessage.dispose();
+    highlightedMessageId.dispose();
+    searchController.dispose();
+    for (final notifier in uploadProgressNotifiers.values) {
+      notifier.dispose();
+    }
+    isAtBottomNotifier.dispose();
+    pendingNewCountNotifier.dispose();
+  }
+}

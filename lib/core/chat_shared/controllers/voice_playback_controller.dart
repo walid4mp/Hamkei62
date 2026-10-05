@@ -1,0 +1,104 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:video_player/video_player.dart';
+
+class VoicePlaybackController {
+  VoicePlaybackController._();
+  static final VoicePlaybackController instance = VoicePlaybackController._();
+
+  final ValueNotifier<String?> activeVoiceUrl = ValueNotifier<String?>(null);
+
+  final Map<String, VideoPlayerController> cache = {};
+  final Map<String, Duration> durationCache = {};
+  final Set<String> failedUrls = {};
+  final Map<String, Future<void>> _preloadFutures = {};
+
+  static const Duration minReliableDuration = Duration(seconds: 1);
+
+  VideoPlayerController? controllerFor(String url) => cache[url];
+
+  bool get isAnyPlaying => activeVoiceUrl.value != null;
+
+  void stopActiveIfDifferent(String url) {
+    final active = activeVoiceUrl.value;
+    if (active != null && active != url) {
+      cache[active]?.pause();
+    }
+  }
+
+  void markStopped(String url) {
+    if (activeVoiceUrl.value == url) {
+      activeVoiceUrl.value = null;
+    }
+  }
+
+  void setActive(String url) {
+    stopActiveIfDifferent(url);
+    activeVoiceUrl.value = url;
+  }
+
+  void pauseActive() {
+    final active = activeVoiceUrl.value;
+    if (active != null) {
+      cache[active]?.pause();
+      activeVoiceUrl.value = null;
+    }
+  }
+
+  Future<Duration?> fetchDuration(String url) async {
+    if (url.isEmpty || failedUrls.contains(url)) return null;
+    if (durationCache.containsKey(url)) return durationCache[url];
+    if (_preloadFutures.containsKey(url)) {
+      await _preloadFutures[url];
+      return durationCache[url];
+    }
+
+    final completer = Completer<void>();
+    _preloadFutures[url] = completer.future;
+    VideoPlayerController? temp;
+    try {
+      final isLocal = url.startsWith('/');
+      temp =
+          isLocal
+              ? VideoPlayerController.file(File(url))
+              : VideoPlayerController.networkUrl(Uri.parse(url));
+      await temp.initialize();
+      final duration = temp.value.duration;
+      await temp.dispose();
+      temp = null;
+      if (duration >= minReliableDuration) {
+        durationCache[url] = duration;
+      }
+      return duration;
+    } catch (e) {
+      failedUrls.add(url);
+      debugPrint('[VoicePlaybackController] fetchDuration failed for $url: $e');
+      return null;
+    } finally {
+      await temp?.dispose();
+      _preloadFutures.remove(url);
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    }
+  }
+
+  void register(String url, VideoPlayerController controller) {
+    cache[url] = controller;
+    if (controller.value.duration >= minReliableDuration) {
+      durationCache[url] = controller.value.duration;
+    }
+  }
+
+  Future<void> clearCache() async {
+    activeVoiceUrl.value = null;
+    _preloadFutures.clear();
+    failedUrls.clear();
+    for (final c in cache.values) {
+      await c.dispose();
+    }
+    cache.clear();
+    durationCache.clear();
+  }
+}
