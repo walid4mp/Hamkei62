@@ -13,7 +13,7 @@ dependencies:
   audio_decoder: ^0.8.0
   audio_session: 0.1.25
   audioplayers: ^6.6.0
-  cached_network_image: ^3.4.1
+  cached_network_image: ^4.0.4
   characters: ^1.4.1
   collection: ^1.18.0
   crypto: ^3.0.6
@@ -47,7 +47,7 @@ dependencies:
   html: ^0.15.6
   image: ^4.5.4
   image_picker: ^1.2.1
-  intl: 0.20.2
+  intl: 0.20.3
   linkify: ^5.0.0
   livekit_client: 2.5.3
   local_auth: ^2.3.0
