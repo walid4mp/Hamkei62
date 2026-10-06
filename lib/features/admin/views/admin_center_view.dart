@@ -241,7 +241,7 @@ class _AdminCenterViewState extends State<AdminCenterView> {
     _adminAction('طلبات السحب والمحفظة', Icons.account_balance_wallet, () => _openList('/api/admin/wallet/withdrawals', 'السحب')),
     _adminAction('حالة التخزين والوسائط', Icons.cloud, () => _openStorage()),
     _adminAction('الصلاحيات والحسابات الخاصة', Icons.admin_panel_settings, () => _openList('/api/admin/users', 'الحسابات والصلاحيات')),
-  ];
+  ]);
 
   Widget _adminAction(String title, IconData icon, VoidCallback onTap) => Card(child: ListTile(leading: Icon(icon), title: Text(title), trailing: const Icon(Icons.chevron_right), onTap: onTap));
 
