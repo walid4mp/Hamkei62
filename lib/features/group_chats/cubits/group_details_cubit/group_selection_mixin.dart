@@ -7,7 +7,7 @@ mixin GroupSelectionMixin on Cubit<GroupDetailsState> {
   set cachedMessages(List<GroupMessageModel> value);
   bool get isMember;
   void cancelUpload(String tempId);
-  void _emitLoaded();
+  void _emitLoaded({bool force = false});
 
   final ValueNotifier<Set<String>> selectedMessageIds =
       ValueNotifier<Set<String>>({});

@@ -13,7 +13,7 @@ mixin GroupReactionsMixin on Cubit<GroupDetailsState> {
   final Map<String, Map<String, String>> _reactionsCreatedAtCache = {};
 
   String? get _messagesSnapshotKey;
-  void _emitLoaded();
+  void _emitLoaded({bool force = false});
   void _persistMessagesSnapshot(String key, List<GroupMessageModel> messages);
 
   StreamSubscription? _reactionsSubscription;
