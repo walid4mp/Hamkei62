@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const execFileAsync = promisify(execFile);
 
 try {
-  const rows = await prisma.$queryRawUnsafe(`SELECT to_regclass('"User"') AS name`);
+  const rows = await prisma.$queryRawUnsafe(`SELECT to_regclass('"User"')::text AS name`);
   const exists = Boolean(rows?.[0]?.name);
   if (!exists) {
     const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
