@@ -583,7 +583,7 @@ async function ensurePrismaSchemaOnFreshDatabase(){
   // On a brand-new PostgreSQL database Prisma creates every model from
   // prisma/schema.prisma automatically. On an existing database we skip
   // db push so no production data or legacy tables can be dropped.
-  const rows = await prisma.$queryRawUnsafe(`SELECT to_regclass('"User"') AS name`);
+  const rows = await prisma.$queryRawUnsafe(`SELECT to_regclass('"User"')::text AS name`);
   const userTableExists = Boolean(rows?.[0]?.name);
   if (userTableExists) return;
 
