@@ -1,0 +1,223 @@
+import 'package:social_media_app/core/utilities/supabase_constants.dart';
+import 'package:social_media_app/features/single_chats/models/chat_user_model.dart';
+import '../../../core/mentions/models/mention_ref.dart';
+import '../../social_graph/models/content_privacy.dart';
+
+enum StoryType { image, video, text }
+
+class StoryModel {
+  final String id;
+  final String? imageUrl;
+  final String? videoUrl;
+  final String? contentText;
+  final String? backgroundColor;
+  final String authorId;
+  final String authorName;
+  final String? authorImageUrl;
+  final String createdAt;
+  final String? caption;
+  final DateTime? lastSeen;
+  final String? imagePublicId;
+  final String? videoPublicId;
+  final int? videoDurationSeconds;
+  final int? fileSizeBytes;
+  final List<MentionRef> mentions;
+  final ContentPrivacy privacyType;
+
+  const StoryModel({
+    this.id = '',
+    this.imageUrl,
+    this.videoUrl,
+    this.contentText,
+    this.backgroundColor,
+    required this.authorId,
+    required this.authorName,
+    this.authorImageUrl,
+    required this.createdAt,
+    this.caption,
+    this.lastSeen,
+    this.imagePublicId,
+    this.videoPublicId,
+    this.videoDurationSeconds,
+    this.fileSizeBytes,
+    this.mentions = const [],
+    this.privacyType = ContentPrivacy.public,
+  });
+
+  StoryModel copyWith({
+    String? id,
+    String? imageUrl,
+    String? videoUrl,
+    String? contentText,
+    String? backgroundColor,
+    String? authorId,
+    String? authorName,
+    String? authorImageUrl,
+    bool clearAuthorImageUrl = false,
+    String? createdAt,
+    String? caption,
+    DateTime? lastSeen,
+    String? imagePublicId,
+    String? videoPublicId,
+    int? videoDurationSeconds,
+    int? fileSizeBytes,
+    List<MentionRef>? mentions,
+    ContentPrivacy? privacyType,
+  }) {
+    return StoryModel(
+      id: id ?? this.id,
+      imageUrl: imageUrl ?? this.imageUrl,
+      videoUrl: videoUrl ?? this.videoUrl,
+      contentText: contentText ?? this.contentText,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      authorId: authorId ?? this.authorId,
+      authorName: authorName ?? this.authorName,
+      authorImageUrl:
+          clearAuthorImageUrl ? null : (authorImageUrl ?? this.authorImageUrl),
+      createdAt: createdAt ?? this.createdAt,
+      caption: caption ?? this.caption,
+      lastSeen: lastSeen ?? this.lastSeen,
+      imagePublicId: imagePublicId ?? this.imagePublicId,
+      videoPublicId: videoPublicId ?? this.videoPublicId,
+      videoDurationSeconds: videoDurationSeconds ?? this.videoDurationSeconds,
+      fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,
+      mentions: mentions ?? this.mentions,
+      privacyType: privacyType ?? this.privacyType,
+    );
+  }
+
+  StoryType get storyType {
+    if (videoUrl != null) return StoryType.video;
+    if (imageUrl != null) return StoryType.image;
+    return StoryType.text;
+  }
+
+  bool get isPendingUpload =>
+      (imageUrl != null && !imageUrl!.startsWith('http')) ||
+      (videoUrl != null && !videoUrl!.startsWith('http'));
+
+  static const Duration activeWindow = Duration(days: 200);
+
+  bool get isExpired {
+    final created = DateTime.tryParse(createdAt);
+    if (created == null) return false;
+    return DateTime.now().difference(created) > activeWindow;
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      if (id.isNotEmpty) StoryColumns.id: id,
+      StoryColumns.imageUrl: imageUrl,
+      StoryColumns.videoUrl: videoUrl,
+      StoryColumns.contentText: contentText,
+      StoryColumns.backgroundColor: backgroundColor,
+      StoryColumns.authorId: authorId,
+      StoryColumns.createdAt:
+          DateTime.parse(createdAt).toUtc().toIso8601String(),
+      StoryColumns.storyCaption: caption,
+
+      StoryColumns.imagePublicId: imagePublicId,
+      StoryColumns.videoPublicId: videoPublicId,
+      StoryColumns.videoDurationSeconds: videoDurationSeconds,
+      StoryColumns.privacyType: contentPrivacyToString(privacyType),
+    };
+  }
+
+  factory StoryModel.fromMap(Map<String, dynamic> map) {
+    final userData = map[SupabaseConstants.users] as Map<String, dynamic>?;
+    String formattedLocalTime = '';
+    if (map[StoryColumns.createdAt] != null) {
+      formattedLocalTime =
+          DateTime.parse(
+            map[StoryColumns.createdAt].toString(),
+          ).toLocal().toString();
+    }
+
+    final List<MentionRef> mentions =
+        map['story_mentions'] != null
+            ? (map['story_mentions'] as List<dynamic>)
+                .map((m) => MentionRef.fromMap(m as Map<String, dynamic>))
+                .toList()
+            : [];
+
+    return StoryModel(
+      id: map[StoryColumns.id] as String,
+      imageUrl: map[StoryColumns.imageUrl] as String?,
+      videoUrl: map[StoryColumns.videoUrl] as String?,
+      contentText: map[StoryColumns.contentText] as String?,
+      backgroundColor: map[StoryColumns.backgroundColor] as String?,
+      authorId: map[StoryColumns.authorId] as String? ?? '',
+      authorName: userData?[UserColumns.name] as String? ?? 'Unknown User',
+      authorImageUrl: userData?[UserColumns.imageUrl] as String?,
+      createdAt: formattedLocalTime,
+      caption: map[StoryColumns.storyCaption] as String?,
+      lastSeen:
+          userData != null && userData[UserColumns.lastSeen] != null
+              ? DateTime.parse(userData[UserColumns.lastSeen].toString())
+              : null,
+      videoDurationSeconds:
+          (map[StoryColumns.videoDurationSeconds] as num?)?.toInt(),
+      mentions: mentions,
+      privacyType: contentPrivacyFromString(
+        map[StoryColumns.privacyType] as String?,
+      ),
+    );
+  }
+
+  ChatUserModel toChatUserModel() {
+    return ChatUserModel(
+      id: authorId,
+      name: authorName,
+      imageUrl: authorImageUrl,
+      lastSeen: lastSeen,
+    );
+  }
+
+  Map<String, dynamic> toCacheJson() => {
+    'id': id,
+    'image_url': imageUrl,
+    'video_url': videoUrl,
+    'content_text': contentText,
+    'background_color': backgroundColor,
+    'author_id': authorId,
+    'author_name': authorName,
+    'author_image_url': authorImageUrl,
+    'created_at': createdAt,
+    'caption': caption,
+    'last_seen': lastSeen?.toIso8601String(),
+    'image_public_id': imagePublicId,
+    'video_public_id': videoPublicId,
+    'video_duration_seconds': videoDurationSeconds,
+    'mentions': mentions.map((m) => m.toCacheJson()).toList(),
+    StoryColumns.privacyType: contentPrivacyToString(privacyType),
+  };
+
+  factory StoryModel.fromCacheJson(Map<String, dynamic> map) {
+    return StoryModel(
+      id: map['id'] as String? ?? '',
+      imageUrl: map['image_url'] as String?,
+      videoUrl: map['video_url'] as String?,
+      contentText: map['content_text'] as String?,
+      backgroundColor: map['background_color'] as String?,
+      authorId: map['author_id'] as String? ?? '',
+      authorName: map['author_name'] as String? ?? 'Unknown User',
+      authorImageUrl: map['author_image_url'] as String?,
+      createdAt: map['created_at'] as String? ?? '',
+      caption: map['caption'] as String?,
+      lastSeen:
+          map['last_seen'] != null
+              ? DateTime.parse(map['last_seen'] as String)
+              : null,
+      imagePublicId: map['image_public_id'] as String?,
+      videoPublicId: map['video_public_id'] as String?,
+      videoDurationSeconds: (map['video_duration_seconds'] as num?)?.toInt(),
+      mentions:
+          (map['mentions'] as List<dynamic>? ?? [])
+              .map((m) => MentionRef.fromCacheJson(m as Map<String, dynamic>))
+              .toList(),
+      privacyType: contentPrivacyFromString(
+        map[StoryColumns.privacyType] as String?,
+      ),
+    );
+  }
+}

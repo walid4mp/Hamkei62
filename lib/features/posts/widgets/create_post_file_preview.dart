@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:social_media_app/core/helpers/chat_helper.dart';
+import 'package:social_media_app/core/themes/app_colors.dart';
+import '../../../core/helpers/file_icon_helper.dart';
+import '../../../core/utilities/file_size_formatter.dart';
+
+class CreatePostFilePreview extends StatelessWidget {
+  final String fileName;
+  final int? fileSizeBytes;
+  final VoidCallback onRemove;
+
+  const CreatePostFilePreview({
+    super.key,
+    required this.fileName,
+    this.fileSizeBytes,
+    required this.onRemove,
+  });
+
+  String _getFileExtension() {
+    if (fileName.contains('.')) {
+      return fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase();
+    }
+    return 'FILE';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.primaryColor;
+    final ext = _getFileExtension();
+    final (fileIcon, iconAccent) = FileIconHelper.getIconAndColor(ext, primary);
+
+    final sizeStr =
+        fileSizeBytes != null && fileSizeBytes! > 0
+            ? formatMediaFileSize(fileSizeBytes)
+            : '';
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color:
+            isDark
+                ? iconAccent.withValues(alpha: 0.12)
+                : iconAccent.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: iconAccent.withValues(alpha: isDark ? 0.3 : 0.18),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(11),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.07),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: FaIcon(fileIcon, color: iconAccent, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textDirection: ChatHelper.getTextDirection(fileName),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.5,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: iconAccent.withValues(
+                          alpha: isDark ? 0.25 : 0.14,
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        ext,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : iconAccent,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ),
+                    if (sizeStr.isNotEmpty) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        sizeStr,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isDark ? Colors.white70 : AppColors.grey,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onRemove,
+            icon: const Icon(Icons.cancel, color: AppColors.grey, size: 22),
+            splashRadius: 18,
+          ),
+        ],
+      ),
+    );
+  }
+}

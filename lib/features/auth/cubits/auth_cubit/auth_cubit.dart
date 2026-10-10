@@ -1,0 +1,239 @@
+import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/services/network_status_service.dart';
+import 'package:social_media_app/features/auth/handlers/auth_exception_handler.dart';
+import 'package:social_media_app/features/auth/services/supabase_auth_services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/helpers/safe_emit_mixin.dart';
+import '../../../../core/presence/services/presence_service.dart';
+import '../../../../core/supabase/supabase_provider.dart';
+import '../../../../core/utilities/supabase_constants.dart';
+part 'auth_state.dart';
+
+class AuthCubit extends Cubit<AuthState> with SafeEmitMixin<AuthState> {
+  final SupabaseAuthServices _authServices;
+  final NetworkStatusService _networkStatus;
+  StreamSubscription? _authSubscription;
+
+  AuthCubit(
+    this._authServices, {
+    @visibleForTesting NetworkStatusService? networkStatus,
+  }) : _networkStatus = networkStatus ?? NetworkStatusService.instance,
+       super(AuthInitial()) {
+    _monitorAuthState();
+  }
+
+  void _monitorAuthState() {
+    _authSubscription = _authServices.authStateStream.listen((data) async {
+      final session = data.session;
+      final event = data.event;
+
+      if (session != null &&
+          (event == AuthChangeEvent.signedIn ||
+              event == AuthChangeEvent.initialSession)) {
+        final user = session.user;
+        emit(AuthSuccess());
+
+        unawaited(
+          _authServices.ensureUserExistsInDb(user).catchError((e) {
+            debugPrint(
+              '⚠️ ensureUserExistsInDb failed (likely offline), will retry naturally on next auth event: $e',
+            );
+          }),
+        );
+      } else if (event == AuthChangeEvent.signedOut) {
+        emit(AuthSignedOut());
+      }
+    });
+  }
+
+  void _handleError(Object e) {
+    final rawError = e.toString().toLowerCase();
+
+    if (rawError.contains('cancelled') ||
+        rawError.contains('aborted') ||
+        rawError.contains('user_cancelled') ||
+        rawError.contains('user_cancel')) {
+      emit(AuthInitial());
+      return;
+    }
+
+    final message = AuthExceptionHandler.handle(e);
+    final displayMessage =
+        message == 'no-internet'
+            ? 'No internet connection. Please check your network.'
+            : message;
+
+    if (displayMessage.isEmpty) {
+      emit(AuthInitial());
+      return;
+    }
+
+    emit(AuthFailure(displayMessage));
+  }
+
+  Future<void> signInWithEmail(String email, String password) async {
+    emit(AuthLoading());
+    try {
+      await _authServices.signInWithEmail(email, password);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> signUpWithEmail(
+    String name,
+    String email,
+    String password,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await _authServices.signUpWithEmail(name, email, password);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    emit(AuthLoading());
+    try {
+      await _authServices.signInWithGoogle();
+    } catch (e) {
+      debugPrint('Error in Cubit Google Sign-In: $e');
+      if (e.toString().contains('aborted')) {
+        emit(AuthInitial());
+      } else {
+        _handleError(e);
+      }
+    }
+  }
+
+  static const _oauthResultTimeout = Duration(seconds: 10);
+
+  Future<void> _waitForAuthResultOrTimeout() async {
+    if (state is! AuthLoading) return;
+
+    try {
+      await stream
+          .firstWhere((s) => s is! AuthLoading)
+          .timeout(_oauthResultTimeout);
+    } on TimeoutException {
+      if (state is AuthLoading) {
+        emit(AuthInitial());
+      }
+    }
+  }
+
+  Future<void> signInWithFacebook() async {
+    emit(AuthLoading());
+    try {
+      await _authServices.signInWithFacebook();
+      await _waitForAuthResultOrTimeout();
+    } catch (e) {
+      debugPrint('Facebook Sign-In Error: $e');
+      _handleError(e);
+    }
+  }
+
+  Future<void> signInWithMicrosoft() async {
+    emit(AuthLoading());
+    try {
+      await _authServices.signInWithMicrosoft();
+      await _waitForAuthResultOrTimeout();
+    } catch (e) {
+      debugPrint('Microsoft Sign-In Error: $e');
+      _handleError(e);
+    }
+  }
+
+  Future<void> signOut() async {
+    emit(AuthLoading());
+    try {
+      // 1. Cleanup FCM token in Supabase while user is still authenticated
+      final currentUserId = SupabaseProvider.idOrNull;
+      if (currentUserId != null) {
+        try {
+          await SupabaseProvider.client
+              .from(SupabaseConstants.users)
+              .update({UserColumns.fcmToken: null})
+              .eq(UserColumns.id, currentUserId);
+        } catch (e) {
+          debugPrint('⚠️ Error clearing FCM token in Supabase on signOut: $e');
+        }
+      }
+      // 2. Invalidate the device token with Firebase servers
+      try {
+        await FirebaseMessaging.instance.deleteToken();
+      } catch (e) {
+        debugPrint('⚠️ Error deleting FCM token from Firebase: $e');
+      }
+      // 3. Mark user offline & proceed with sign out
+      await PresenceService.instance.setVisibility(false);
+      await _authServices.signOut();
+      emit(AuthSignedOut());
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    emit(AuthLoading());
+    try {
+      await _authServices.resetPassword(email);
+      emit(AuthSuccess());
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> checkAuthStatus() async {
+    final session = _authServices.currentSession;
+
+    if (session == null) {
+      emit(AuthInitial());
+      return;
+    }
+
+    if (!session.isExpired) {
+      emit(AuthSuccess());
+      return;
+    }
+
+    final isOnline = await _networkStatus.isConnected();
+
+    if (!isOnline) {
+      debugPrint(
+        '⚠️ Access token looks expired but device is offline — '
+        'keeping the cached session. It will refresh automatically '
+        'once connectivity returns.',
+      );
+      emit(AuthSuccess());
+      return;
+    }
+
+    if (isClosed) return;
+
+    try {
+      final response = await _authServices.refreshSession();
+      if (response.session != null) {
+        emit(AuthSuccess());
+      } else {
+        debugPrint(
+          '⚠️ Session expired and refresh returned no session! Forcing Sign Out...',
+        );
+        await signOut();
+      }
+    } catch (e) {
+      debugPrint('⚠️ Session refresh failed: $e — Forcing Sign Out...');
+      await signOut();
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _authSubscription?.cancel();
+    return super.close();
+  }
+}

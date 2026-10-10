@@ -1,0 +1,162 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:gap/gap.dart';
+import 'package:social_media_app/core/themes/background_theme_widget.dart';
+import 'package:social_media_app/core/widgets/custom_pull_to_refresh.dart';
+import 'package:social_media_app/core/widgets/custom_tab_wrapper.dart';
+import 'package:social_media_app/features/discover/cubits/discover_people_cubit.dart';
+import 'package:social_media_app/features/discover/views/discover_skeleton_view.dart';
+import '../../../core/connectivity/cubits/connectivity_cubit.dart';
+import '../../../core/connectivity/cubits/connectivity_state.dart';
+import '../../../core/widgets/custom_loading_indicator.dart';
+import '../utils/discover_grid_metrics.dart';
+import '../widgets/discover_people_header_section.dart';
+import '../widgets/discover_person_grid_card_widget.dart';
+
+class DiscoverView extends StatefulWidget {
+  final ScrollController scrollController;
+  const DiscoverView({super.key, required this.scrollController});
+
+  @override
+  State<DiscoverView> createState() => _DiscoverViewState();
+}
+
+class _DiscoverViewState extends State<DiscoverView> {
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (widget.scrollController.position.pixels >=
+        widget.scrollController.position.maxScrollExtent - 200) {
+      context.read<DiscoverPeopleCubit>().getDiscoverPeople();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BackgroundThemeWidget(
+      top: true,
+      child: BlocListener<ConnectivityCubit, ConnectivityState>(
+        listener: (context, connState) {
+          if (connState is ConnectivityRestored ||
+              connState is ConnectivityOnline) {
+            final currentDiscoverState =
+                context.read<DiscoverPeopleCubit>().state;
+
+            if (currentDiscoverState is DiscoverPeopleFailure ||
+                currentDiscoverState is DiscoverPeopleInitial) {
+              context.read<DiscoverPeopleCubit>().getDiscoverPeople(
+                isRefresh: true,
+              );
+            }
+          }
+        },
+        child: BlocBuilder<DiscoverPeopleCubit, DiscoverPeopleState>(
+          builder: (context, state) {
+            bool hasReachedMax = false;
+            if (state is DiscoverPeopleSuccess) {
+              hasReachedMax = state.hasReachedMax;
+            }
+
+            return CustomTabWrapper(
+              isLoading:
+                  state is DiscoverPeopleInitial ||
+                  state is DiscoverPeopleLoading ||
+                  state is DiscoverPeopleRefreshFeedback,
+              loadingSkeleton: const DiscoverPeopleSkeleton(),
+              errorMessage:
+                  state is DiscoverPeopleFailure ? state.message : null,
+              onRetry:
+                  () => context.read<DiscoverPeopleCubit>().getDiscoverPeople(),
+
+              child: CustomPullToRefresh(
+                onRefresh:
+                    () async => await context
+                        .read<DiscoverPeopleCubit>()
+                        .getDiscoverPeople(isRefresh: true),
+
+                child: CustomScrollView(
+                  controller: widget.scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  ),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          const Gap(12),
+                          DiscoverPeopleHeaderSection(),
+                          const Gap(8),
+                        ],
+                      ),
+                    ),
+
+                    Builder(
+                      builder: (context) {
+                        if (state is DiscoverPeopleSuccess) {
+                          return SliverPadding(
+                            padding: const EdgeInsets.only(
+                              top: 4,
+                              left: 12,
+                              right: 12,
+                            ),
+                            sliver: SliverMasonryGrid.count(
+                              crossAxisCount:
+                                  DiscoverGridMetrics.crossAxisCount,
+                              mainAxisSpacing:
+                                  DiscoverGridMetrics.mainAxisSpacing,
+                              crossAxisSpacing:
+                                  DiscoverGridMetrics.crossAxisSpacing,
+                              childCount: state.users.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final person = state.users[index];
+                                return DiscoverPersonGridCardWidget(
+                                  key: ValueKey(person.user.id),
+                                  personData: person,
+                                  onDismiss:
+                                      () => context
+                                          .read<DiscoverPeopleCubit>()
+                                          .dismissSuggestion(person.user.id),
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return const SliverToBoxAdapter(
+                            child: SizedBox.shrink(),
+                          );
+                        }
+                      },
+                    ),
+
+                    if (state is DiscoverPeopleSuccess && !hasReachedMax)
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: CustomLoadingIndicator(radius: 12),
+                          ),
+                        ),
+                      ),
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
