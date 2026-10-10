@@ -410,7 +410,6 @@ class _GroupInfoViewState extends State<GroupInfoView> {
                             });
                           },
                           onSubmit: _updateGroupName,
-                          onCancel: _cancelEditingName,
                           onChangePhoto: _changeGroupPhoto,
                           onSettingsTap:
                               () => _openGroupSettings(
