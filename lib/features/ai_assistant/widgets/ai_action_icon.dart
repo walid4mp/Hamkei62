@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/toast/app_toast.dart';
+
 import '../cubits/ai_preferences_cubit/ai_preferences_cubit.dart';
 import '../cubits/ai_text_field_cubit.dart';
 import '../data/repositories/ai_repository_impl.dart';
@@ -9,7 +10,9 @@ import '../entities/ai_active_provider.dart';
 import '../entities/ai_request_context.dart';
 import '../helpers/ai_image_encoder.dart';
 import '../repository/ai_repository.dart';
+
 import 'dart:typed_data';
+
 import 'animated_ai_stars_icon.dart';
 
 class AiActionIcon extends StatefulWidget {
@@ -173,10 +176,9 @@ class _AiActionIconState extends State<AiActionIcon> {
     return BlocProvider.value(
       value: _cubit,
       child: BlocListener<AiPreferencesCubit, AiPreferencesState>(
-        listenWhen:
-            (previous, current) =>
-                previous.autoCompleteEnabled != current.autoCompleteEnabled ||
-                previous.autoDetectEnabled != current.autoDetectEnabled,
+        listenWhen: (previous, current) =>
+            previous.autoCompleteEnabled != current.autoCompleteEnabled ||
+            previous.autoDetectEnabled != current.autoDetectEnabled,
         listener: (context, prefs) {
           _cubit.updatePreferences(
             autoCompleteEnabled: prefs.autoCompleteEnabled,
@@ -226,8 +228,11 @@ class _AiActionIconState extends State<AiActionIcon> {
             final needsVisionNow =
                 state is AiFieldIdle &&
                 widget.targetMediaType == AiTargetMediaType.image;
-            final activeProvider =
-                context.watch<AiPreferencesCubit>().state.usage.activeProvider;
+            final activeProvider = context
+                .watch<AiPreferencesCubit>()
+                .state
+                .usage
+                .activeProvider;
             final isVisionUnavailable =
                 needsVisionNow && !activeProvider.supportsVision;
 
@@ -241,23 +246,21 @@ class _AiActionIconState extends State<AiActionIcon> {
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 visualDensity: VisualDensity.compact,
-                tooltip:
-                    isSpellingError
-                        ? 'Spelling Correction'
-                        : (isVisionUnavailable
-                            ? 'Smart reply to images is currently unavailable'
-                            : 'AI Suggestion'),
+                tooltip: isSpellingError
+                    ? 'Spelling Correction'
+                    : (isVisionUnavailable
+                          ? 'Smart reply to images is currently unavailable'
+                          : 'AI Suggestion'),
                 icon: Icon(
                   isSpellingError
                       ? Icons.spellcheck_rounded
                       : Icons.auto_awesome_rounded,
                   size: 22,
-                  color:
-                      isDisabledLook
-                          ? theme.disabledColor
-                          : (isSpellingError
-                              ? Colors.orangeAccent
-                              : theme.primaryColor),
+                  color: isDisabledLook
+                      ? theme.disabledColor
+                      : (isSpellingError
+                            ? Colors.orangeAccent
+                            : theme.primaryColor),
                 ),
                 onPressed: () async {
                   if (isQuotaExceeded) {

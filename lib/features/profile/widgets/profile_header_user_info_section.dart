@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../auth/data/models/user_data.dart';
 import '../../social_graph/models/friendship_status.dart';

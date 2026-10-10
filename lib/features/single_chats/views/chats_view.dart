@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/single_chats/cubits/chats_cubit/chats_cubit.dart';
 import 'package:social_media_app/features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
+
 import '../../../core/chat_shared/cubits/conversation_selection_cubit/conversation_selection_cubit.dart';
 import '../../../core/chat_shared/cubits/conversations_cubit/conversations_cubit.dart';
 import '../../../core/chat_shared/helpers/conversation_delete_confirmation.dart';
@@ -125,12 +126,11 @@ class _ChatsViewState extends State<ChatsView>
                   (_tabNeedsChats && chatsLoading) ||
                   (_tabNeedsGroups && groupsLoading);
 
-              final errorMsg =
-                  (_tabNeedsChats && chatsState is ChatsError)
-                      ? chatsState.message
-                      : (_tabNeedsGroups && groupsState is GroupListError)
-                      ? groupsState.message
-                      : null;
+              final errorMsg = (_tabNeedsChats && chatsState is ChatsError)
+                  ? chatsState.message
+                  : (_tabNeedsGroups && groupsState is GroupListError)
+                  ? groupsState.message
+                  : null;
 
               return Stack(
                 children: [
@@ -236,37 +236,32 @@ class _ChatsViewState extends State<ChatsView>
                                             ),
                                           );
                                         },
-                                        child:
-                                            selection.isSelecting
-                                                ? ConversationsSelectionHeaderBar(
-                                                  key: const ValueKey(
-                                                    'selection_bar',
-                                                  ),
-                                                  selectedRefs:
-                                                      selection.selectedRefs,
-                                                  onCancel:
-                                                      () =>
-                                                          context
-                                                              .read<
-                                                                ConversationSelectionCubit
-                                                              >()
-                                                              .clear(),
-                                                  onDelete:
-                                                      () =>
-                                                          confirmAndDeleteConversations(
-                                                            context,
-                                                            selection
-                                                                .selectedRefs,
-                                                          ),
-                                                )
-                                                : MessagesHeaderSection(
-                                                  key: const ValueKey(
-                                                    'normal_header',
-                                                  ),
-                                                  tabController: _tabController,
-                                                  isDark: isDark,
-                                                  primary: primary,
+                                        child: selection.isSelecting
+                                            ? ConversationsSelectionHeaderBar(
+                                                key: const ValueKey(
+                                                  'selection_bar',
                                                 ),
+                                                selectedRefs:
+                                                    selection.selectedRefs,
+                                                onCancel: () => context
+                                                    .read<
+                                                      ConversationSelectionCubit
+                                                    >()
+                                                    .clear(),
+                                                onDelete: () =>
+                                                    confirmAndDeleteConversations(
+                                                      context,
+                                                      selection.selectedRefs,
+                                                    ),
+                                              )
+                                            : MessagesHeaderSection(
+                                                key: const ValueKey(
+                                                  'normal_header',
+                                                ),
+                                                tabController: _tabController,
+                                                isDark: isDark,
+                                                primary: primary,
+                                              ),
                                       ),
                                       const SizedBox(height: 10),
                                     ],
@@ -291,15 +286,14 @@ class _ChatsViewState extends State<ChatsView>
                           body: TabBarView(
                             controller: _tabController,
                             physics: const NeverScrollableScrollPhysics(),
-                            children:
-                                _tabOrder
-                                    .map(
-                                      (tab) => ConversationsTabBody(
-                                        tab: tab,
-                                        tabController: _tabController,
-                                      ),
-                                    )
-                                    .toList(),
+                            children: _tabOrder
+                                .map(
+                                  (tab) => ConversationsTabBody(
+                                    tab: tab,
+                                    tabController: _tabController,
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'profile_action_button.dart';
 import 'profile_ui_tokens.dart';
 
@@ -108,8 +109,9 @@ class _ProfileAnimatedActionButtonState
       width: widget.width ?? double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final fullWidth =
-              constraints.maxWidth.isFinite ? constraints.maxWidth : 120.0;
+          final fullWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : 120.0;
           final targetWidth = isMorphed ? _height : fullWidth;
 
           return Center(

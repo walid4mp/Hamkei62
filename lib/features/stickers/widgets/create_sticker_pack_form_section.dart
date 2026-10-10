@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_cubit.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_state.dart';
 import 'create_sticker_pack_action_button.dart';
@@ -18,10 +19,9 @@ class CreateStickerPackFormSection extends StatelessWidget {
     final cubit = context.read<CreateStickerPackCubit>();
     final sizeMb = (state.totalSizeBytes / (1024 * 1024)).toStringAsFixed(1);
 
-    final selectedFriends =
-        state.allFriends
-            .where((f) => state.selectedFriendIds.contains(f.user.id))
-            .toList();
+    final selectedFriends = state.allFriends
+        .where((f) => state.selectedFriendIds.contains(f.user.id))
+        .toList();
     final avatars = selectedFriends.map((f) => f.user.imageUrl ?? '').toList();
 
     return Column(

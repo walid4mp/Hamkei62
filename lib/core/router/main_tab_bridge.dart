@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'app_routes.dart';
 
 /// Indexes of the tabs hosted by `CustomBottomNavBar`.

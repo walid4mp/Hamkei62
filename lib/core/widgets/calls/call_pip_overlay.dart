@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:livekit_client/livekit_client.dart';
+
 import '../../services/active_call/call_navigation_helper.dart';
 import '../../services/active_call/cubits/active_call_session_cubit.dart';
 import '../../services/active_call/pip/call_pip_cubit.dart';
@@ -63,17 +64,16 @@ class _CallPipOverlayState extends State<CallPipOverlay> {
               child: SizedBox(
                 width: _bubbleWidth,
                 height: _bubbleHeight,
-                child:
-                    pip.previewTrack != null
-                        ? VideoTrackRenderer(pip.previewTrack!)
-                        : Container(
-                          color: Colors.black87,
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.videocam_off_rounded,
-                            color: Colors.white54,
-                          ),
+                child: pip.previewTrack != null
+                    ? VideoTrackRenderer(pip.previewTrack!)
+                    : Container(
+                        color: Colors.black87,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.videocam_off_rounded,
+                          color: Colors.white54,
                         ),
+                      ),
               ),
             ),
           ),

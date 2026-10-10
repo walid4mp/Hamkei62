@@ -53,10 +53,9 @@ class ShareActionTile extends StatelessWidget {
                       title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color:
-                            enabled
-                                ? theme.colorScheme.onSurface
-                                : theme.disabledColor,
+                        color: enabled
+                            ? theme.colorScheme.onSurface
+                            : theme.disabledColor,
                       ),
                     ),
                     if (subtitle != null)

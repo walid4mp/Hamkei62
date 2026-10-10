@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/chat_shared/widgets/reply_preview_thumbnail.dart';
 import '../models/groupe_message_model.dart';
@@ -33,10 +34,9 @@ class GroupReplyBubblePreview extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final senderName =
-        message.replyToSenderId == currentUserId
-            ? 'You'
-            : (message.replyToSenderName ?? 'Unknown');
+    final senderName = message.replyToSenderId == currentUserId
+        ? 'You'
+        : (message.replyToSenderName ?? 'Unknown');
 
     return Container(
       width: double.infinity,
@@ -59,12 +59,10 @@ class GroupReplyBubblePreview extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        isMe
-                            ? Colors.white.withValues(alpha: 0.2)
-                            : Theme.of(
-                              context,
-                            ).primaryColor.withValues(alpha: 0.08),
+                    color: isMe
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : Theme.of(context).primaryColor
+                              .withValues(alpha: 0.08),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,10 +77,9 @@ class GroupReplyBubblePreview extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    isMe
-                                        ? Colors.white.withValues(alpha: 0.9)
-                                        : Theme.of(context).primaryColor,
+                                color: isMe
+                                    ? Colors.white.withValues(alpha: 0.9)
+                                    : Theme.of(context).primaryColor,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -92,8 +89,9 @@ class GroupReplyBubblePreview extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                color:
-                                    isMe ? Colors.white70 : AppColors.greyColor,
+                                color: isMe
+                                    ? Colors.white70
+                                    : AppColors.greyColor,
                               ),
                             ),
                           ],

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:social_media_app/features/group_chats/models/group_member_model.dart';
 import 'package:social_media_app/features/group_chats/services/group_chat_services.dart';
+
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../models/group_add_members_result.dart';
 import '../group_list_cubit/group_list_cubit.dart';
@@ -118,20 +119,19 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updated =
-        current.members.map((m) {
-          return m.userId == member.userId
-              ? GroupMemberModel(
-                id: m.id,
-                groupId: m.groupId,
-                userId: m.userId,
-                userName: m.userName,
-                userAvatar: m.userAvatar,
-                role: GroupMemberRole.admin,
-                joinedAt: m.joinedAt,
-              )
-              : m;
-        }).toList();
+    final updated = current.members.map((m) {
+      return m.userId == member.userId
+          ? GroupMemberModel(
+              id: m.id,
+              groupId: m.groupId,
+              userId: m.userId,
+              userName: m.userName,
+              userAvatar: m.userAvatar,
+              role: GroupMemberRole.admin,
+              joinedAt: m.joinedAt,
+            )
+          : m;
+    }).toList();
     emit(current.copyWith(members: updated));
 
     try {
@@ -152,20 +152,19 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updated =
-        current.members.map((m) {
-          return m.userId == member.userId
-              ? GroupMemberModel(
-                id: m.id,
-                groupId: m.groupId,
-                userId: m.userId,
-                userName: m.userName,
-                userAvatar: m.userAvatar,
-                role: GroupMemberRole.member,
-                joinedAt: m.joinedAt,
-              )
-              : m;
-        }).toList();
+    final updated = current.members.map((m) {
+      return m.userId == member.userId
+          ? GroupMemberModel(
+              id: m.id,
+              groupId: m.groupId,
+              userId: m.userId,
+              userName: m.userName,
+              userAvatar: m.userAvatar,
+              role: GroupMemberRole.member,
+              joinedAt: m.joinedAt,
+            )
+          : m;
+    }).toList();
     emit(current.copyWith(members: updated));
 
     try {
@@ -210,8 +209,9 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updatedMembers =
-        current.members.where((m) => m.userId != member.userId).toList();
+    final updatedMembers = current.members
+        .where((m) => m.userId != member.userId)
+        .toList();
     emit(
       current.copyWith(
         members: updatedMembers,

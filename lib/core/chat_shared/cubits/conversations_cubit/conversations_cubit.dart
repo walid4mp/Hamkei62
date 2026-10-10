@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/toast/app_toast.dart';
 import '../../../../features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
@@ -63,35 +65,33 @@ class ConversationsCubit extends Cubit<ConversationsState>
 
     final channelName = 'conversations_chat_mutes_$currentUserId';
     supabase.removeChannel(supabase.channel(channelName));
-    _chatMutesChannel =
-        supabase.channel(channelName)
-          ..onPostgresChanges(
-            event: PostgresChangeEvent.all,
-            schema: 'public',
-            table: 'chat_mutes',
-            callback: (payload) {
-              final row =
-                  payload.eventType == PostgresChangeEvent.delete
-                      ? payload.oldRecord
-                      : payload.newRecord;
-              final ownerId = row['owner_id'] as String?;
-              if (ownerId != currentUserId) return;
+    _chatMutesChannel = supabase.channel(channelName)
+      ..onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'chat_mutes',
+        callback: (payload) {
+          final row = payload.eventType == PostgresChangeEvent.delete
+              ? payload.oldRecord
+              : payload.newRecord;
+          final ownerId = row['owner_id'] as String?;
+          if (ownerId != currentUserId) return;
 
-              final peerId = row['peer_id'] as String?;
-              if (peerId == null) return;
+          final peerId = row['peer_id'] as String?;
+          if (peerId == null) return;
 
-              if (payload.eventType == PostgresChangeEvent.delete) {
-                _liveSingleChatMutes.remove(peerId);
-                unawaited(ChatMuteStatusCache.instance.write(peerId, false));
-              } else {
-                final muted = row['is_muted'] as bool? ?? false;
-                _liveSingleChatMutes[peerId] = muted;
-                unawaited(ChatMuteStatusCache.instance.write(peerId, muted));
-              }
-              _recompute();
-            },
-          )
-          ..subscribe();
+          if (payload.eventType == PostgresChangeEvent.delete) {
+            _liveSingleChatMutes.remove(peerId);
+            unawaited(ChatMuteStatusCache.instance.write(peerId, false));
+          } else {
+            final muted = row['is_muted'] as bool? ?? false;
+            _liveSingleChatMutes[peerId] = muted;
+            unawaited(ChatMuteStatusCache.instance.write(peerId, muted));
+          }
+          _recompute();
+        },
+      )
+      ..subscribe();
 
     _loadInitialSingleChatMutes();
   }
@@ -148,10 +148,10 @@ class ConversationsCubit extends Cubit<ConversationsState>
 
     final merged = [...chatItems, ...groupItems];
 
-    final visible =
-        merged.where((i) => !i.isArchived).toList()..sort(_comparator);
-    final archived =
-        merged.where((i) => i.isArchived).toList()..sort(_archiveComparator);
+    final visible = merged.where((i) => !i.isArchived).toList()
+      ..sort(_comparator);
+    final archived = merged.where((i) => i.isArchived).toList()
+      ..sort(_archiveComparator);
 
     emit(ConversationsLoaded(items: visible, archivedItems: archived));
   }
@@ -187,10 +187,9 @@ class ConversationsCubit extends Cubit<ConversationsState>
   }
 
   List<ConversationItem> filtered(ConversationTab tab) {
-    final items =
-        state is ConversationsLoaded
-            ? (state as ConversationsLoaded).items
-            : const <ConversationItem>[];
+    final items = state is ConversationsLoaded
+        ? (state as ConversationsLoaded).items
+        : const <ConversationItem>[];
 
     switch (tab) {
       case ConversationTab.all:
@@ -210,10 +209,9 @@ class ConversationsCubit extends Cubit<ConversationsState>
     Set<ConversationRef> refs,
     bool Function(ConversationFlags) test,
   ) {
-    final values =
-        refs
-            .map((r) => test(ConversationFlagsStore.instance.flagsFor(r)))
-            .toSet();
+    final values = refs
+        .map((r) => test(ConversationFlagsStore.instance.flagsFor(r)))
+        .toSet();
     if (values.length > 1) return SelectionFlagState.mixed;
     return (values.isNotEmpty && values.first)
         ? SelectionFlagState.allOn
@@ -230,21 +228,16 @@ class ConversationsCubit extends Cubit<ConversationsState>
       _flagState(refs, (f) => f.isPinnedInArchive);
 
   SelectionFlagState mutedState(Set<ConversationRef> refs) {
-    final items =
-        state is ConversationsLoaded
-            ? [
-              ...(state as ConversationsLoaded).items,
-              ...(state as ConversationsLoaded).archivedItems,
-            ]
-            : const <ConversationItem>[];
+    final items = state is ConversationsLoaded
+        ? [
+            ...(state as ConversationsLoaded).items,
+            ...(state as ConversationsLoaded).archivedItems,
+          ]
+        : const <ConversationItem>[];
 
-    final values =
-        refs
-            .map(
-              (r) =>
-                  items.firstWhereOrNull((i) => i.ref == r)?.isMuted ?? false,
-            )
-            .toSet();
+    final values = refs
+        .map((r) => items.firstWhereOrNull((i) => i.ref == r)?.isMuted ?? false)
+        .toSet();
 
     if (values.length > 1) return SelectionFlagState.mixed;
     return (values.isNotEmpty && values.first)
@@ -312,8 +305,9 @@ class ConversationsCubit extends Cubit<ConversationsState>
       return;
     }
 
-    final previousOverride =
-        ConversationFlagsStore.instance.flagsFor(ref).muteOverride;
+    final previousOverride = ConversationFlagsStore.instance
+        .flagsFor(ref)
+        .muteOverride;
     await ConversationFlagsStore.instance.setMuteOverride(ref, value);
     unawaited(ChatMuteStatusCache.instance.write(ref.id, value));
     try {
@@ -377,7 +371,7 @@ class ConversationsCubit extends Cubit<ConversationsState>
         failures == refs.length
             ? "Couldn't update mute status. Please try again."
             : 'Updated ${refs.length - failures} of ${refs.length} chats — '
-                'some failed. Please try again.',
+                  'some failed. Please try again.',
       );
     }
     _recompute();

@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:social_media_app/features/auth/data/repository/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_pkg;
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/utilities/supabase_constants.dart';
 import '../data/models/user_data.dart';
@@ -21,12 +22,11 @@ class SupabaseAuthServices implements AuthRepository {
 
   Future<void> ensureUserExistsInDb(supabase_pkg.User user) async {
     try {
-      final existingUser =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select()
-              .eq(UserColumns.id, user.id)
-              .maybeSingle();
+      final existingUser = await _supabase
+          .from(SupabaseConstants.users)
+          .select()
+          .eq(UserColumns.id, user.id)
+          .maybeSingle();
 
       if (existingUser == null) {
         final String userName =
@@ -166,8 +166,11 @@ class SupabaseAuthServices implements AuthRepository {
       final user = _supabase.auth.currentUser;
       if (user == null) return null;
 
-      final response =
-          await _supabase.from('users').select().eq('id', user.id).single();
+      final response = await _supabase
+          .from('users')
+          .select()
+          .eq('id', user.id)
+          .single();
       if (response.keys.isEmpty) {
         throw Exception('Failed to fetch user data');
       }

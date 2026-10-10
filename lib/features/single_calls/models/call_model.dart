@@ -53,8 +53,9 @@ class CallModel {
       receiverAvatar: map['receiver_avatar'],
       status: CallStatus.values.byName(map['status']),
       type: CallType.values.byName(map['type']),
-      startTime:
-          map['start_time'] != null ? DateTime.parse(map['start_time']) : null,
+      startTime: map['start_time'] != null
+          ? DateTime.parse(map['start_time'])
+          : null,
     );
   }
 }

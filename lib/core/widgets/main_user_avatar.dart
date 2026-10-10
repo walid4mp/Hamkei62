@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/app_avatar.dart';
+
 import '../presence/widgets/presence_avatar_widget.dart';
 
 class MainUserAvatar extends StatelessWidget {
@@ -26,10 +27,9 @@ class MainUserAvatar extends StatelessWidget {
       child: AppAvatar(
         imageUrl: imageUrl,
         size: size ?? 31,
-        borderColor:
-            showBorder
-                ? Theme.of(context).primaryColor.withValues(alpha: 0.8)
-                : null,
+        borderColor: showBorder
+            ? Theme.of(context).primaryColor.withValues(alpha: 0.8)
+            : null,
         borderWidth: 2.2,
       ),
     );

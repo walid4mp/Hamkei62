@@ -141,11 +141,10 @@ class SupabaseDatabaseServices {
     }
     // Map each update into model instances
     return streamQuery.map((rows) {
-      final list =
-          rows.map((row) {
-            final id = row[primaryKey.first]?.toString() ?? '';
-            return builder(row, id);
-          }).toList();
+      final list = rows.map((row) {
+        final id = row[primaryKey.first]?.toString() ?? '';
+        return builder(row, id);
+      }).toList();
       if (sort != null) {
         list.sort(sort);
       }
@@ -234,13 +233,11 @@ class SupabaseDatabaseServices {
         finalQuery = filter(query);
       }
       final List<dynamic> rows = await finalQuery;
-      final List<T> list =
-          rows.map<T>((e) {
-            final row = e as Map<String, dynamic>;
-            final id =
-                primaryKey != null ? row[primaryKey]?.toString() ?? '' : '';
-            return builder(row, id);
-          }).toList();
+      final List<T> list = rows.map<T>((e) {
+        final row = e as Map<String, dynamic>;
+        final id = primaryKey != null ? row[primaryKey]?.toString() ?? '' : '';
+        return builder(row, id);
+      }).toList();
       if (sort != null) list.sort(sort);
       return list;
     } on PostgrestException catch (e) {

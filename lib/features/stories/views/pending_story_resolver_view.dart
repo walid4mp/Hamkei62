@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/toast/app_toast.dart';
 import '../cubits/stories_cubit/stories_cubit.dart';
 import '../models/story_model.dart';
@@ -91,13 +93,15 @@ class _PendingStoryResolverViewState extends State<PendingStoryResolverView> {
     final currentGroup = _groups![_groupIndex];
     final authorId = currentGroup.first.authorId;
 
-    final freshAuthorStories =
-        freshStories.where((s) => s.authorId == authorId).toList();
+    final freshAuthorStories = freshStories
+        .where((s) => s.authorId == authorId)
+        .toList();
     if (freshAuthorStories.isEmpty) return;
 
     final existingIds = currentGroup.map((s) => s.id).toSet();
-    final newlyAdded =
-        freshAuthorStories.where((s) => !existingIds.contains(s.id)).toList();
+    final newlyAdded = freshAuthorStories
+        .where((s) => !existingIds.contains(s.id))
+        .toList();
     if (newlyAdded.isEmpty) return;
 
     setState(() {

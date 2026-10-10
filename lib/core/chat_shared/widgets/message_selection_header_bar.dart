@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'premium_selection_bar_pieces.dart';
 
 class MessageSelectionHeaderBar extends StatelessWidget
@@ -78,10 +79,9 @@ class MessageSelectionHeaderBar extends StatelessWidget
 
             if (showStar)
               PremiumSelectionActionIcon(
-                state:
-                    isStarred
-                        ? PremiumActionVisualState.on
-                        : PremiumActionVisualState.off,
+                state: isStarred
+                    ? PremiumActionVisualState.on
+                    : PremiumActionVisualState.off,
                 onIcon: Icons.star_rounded,
                 offIcon: Icons.star_border_rounded,
                 onLabel: 'Unstar',

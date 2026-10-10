@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/widgets/custom_elevated_button.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/themes/cubits/theme_cubit.dart';
 import '../../../core/themes/themed_error_lottie.dart';

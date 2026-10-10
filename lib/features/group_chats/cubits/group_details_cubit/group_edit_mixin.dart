@@ -31,17 +31,16 @@ mixin GroupEditMixin on Cubit<GroupDetailsState> {
         target.messageType == 'image' || target.messageType == 'video';
 
     final nowUtc = DateTime.now().toUtc();
-    final stampedMentions =
-        mentions
-            .map(
-              (r) => MentionRef(
-                mentionedUserId: r.mentionedUserId,
-                startIndex: r.startIndex,
-                endIndex: r.endIndex,
-                createdAt: nowUtc,
-              ),
-            )
-            .toList();
+    final stampedMentions = mentions
+        .map(
+          (r) => MentionRef(
+            mentionedUserId: r.mentionedUserId,
+            startIndex: r.startIndex,
+            endIndex: r.endIndex,
+            createdAt: nowUtc,
+          ),
+        )
+        .toList();
 
     final selfCubit = this as GroupDetailsCubit;
     selfCubit._localEditedMentions[messageId] = stampedMentions;
@@ -53,15 +52,15 @@ mixin GroupEditMixin on Cubit<GroupDetailsState> {
         if (m.id != messageId) return m;
         return isCaptionEdit
             ? m.copyWith(
-              caption: trimmed,
-              mentions: stampedMentions,
-              isEdited: true,
-            )
+                caption: trimmed,
+                mentions: stampedMentions,
+                isEdited: true,
+              )
             : m.copyWith(
-              text: trimmed,
-              mentions: stampedMentions,
-              isEdited: true,
-            );
+                text: trimmed,
+                mentions: stampedMentions,
+                isEdited: true,
+              );
       },
     );
     _emitLoaded();

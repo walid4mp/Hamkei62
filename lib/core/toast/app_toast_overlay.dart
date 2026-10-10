@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'app_toast.dart';
 import 'app_toast_request.dart';
 import 'app_toast_type.dart';

@@ -1,9 +1,11 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
 import '../../../core/cache/services/starred_message_store.dart';
 import '../../../core/chat_shared/models/starred_message_entry.dart';
 import '../../../core/chat_shared/views/starred_messages_view.dart';
@@ -204,24 +206,20 @@ class _GroupInfoViewState extends State<GroupInfoView> {
   Future<bool?> _showRemoveConfirmDialog(GroupMemberModel member) {
     return showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Remove Member'),
-            content: Text('Remove ${member.userName} from the group?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Remove',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: const Text('Remove Member'),
+        content: Text('Remove ${member.userName} from the group?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -232,16 +230,15 @@ class _GroupInfoViewState extends State<GroupInfoView> {
   ) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder:
-            (_) => GroupSettingsView(
-              group: liveGroup,
-              membersCubit: _membersCubit,
-              groupListCubit: context.read<GroupListCubit>(),
-              detailsCubit: widget.detailsCubit,
-              isAdmin: hasAdminPrivileges,
-              isOwner: isOwner,
-              currentUserId: _currentUserId,
-            ),
+        builder: (_) => GroupSettingsView(
+          group: liveGroup,
+          membersCubit: _membersCubit,
+          groupListCubit: context.read<GroupListCubit>(),
+          detailsCubit: widget.detailsCubit,
+          isAdmin: hasAdminPrivileges,
+          isOwner: isOwner,
+          currentUserId: _currentUserId,
+        ),
       ),
     );
   }
@@ -249,12 +246,11 @@ class _GroupInfoViewState extends State<GroupInfoView> {
   void _openAddMembers(List<GroupMemberModel> currentMembers) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder:
-            (_) => AddGroupMembersView(
-              membersCubit: _membersCubit,
-              existingMemberIds: currentMembers.map((m) => m.userId).toSet(),
-              currentUserId: _currentUserId,
-            ),
+        builder: (_) => AddGroupMembersView(
+          membersCubit: _membersCubit,
+          existingMemberIds: currentMembers.map((m) => m.userId).toSet(),
+          currentUserId: _currentUserId,
+        ),
       ),
     );
   }
@@ -286,26 +282,24 @@ class _GroupInfoViewState extends State<GroupInfoView> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder:
-            (_) => StarredMessagesView(
-              entriesLoader: loadEntries,
-              onUnstar:
-                  (messageId) => StarredMessagesStore.instance.toggleStar(
-                    currentUserId: _currentUserId,
-                    messageId: messageId,
-                  ),
-              onTapEntry: (messageId) {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-                final controller = widget.itemScrollController;
-                if (controller != null) {
-                  detailsCubit.scrollToMessage(
-                    messageId: messageId,
-                    itemScrollController: controller,
-                  );
-                }
-              },
-            ),
+        builder: (_) => StarredMessagesView(
+          entriesLoader: loadEntries,
+          onUnstar: (messageId) => StarredMessagesStore.instance.toggleStar(
+            currentUserId: _currentUserId,
+            messageId: messageId,
+          ),
+          onTapEntry: (messageId) {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+            final controller = widget.itemScrollController;
+            if (controller != null) {
+              detailsCubit.scrollToMessage(
+                messageId: messageId,
+                itemScrollController: controller,
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -318,10 +312,9 @@ class _GroupInfoViewState extends State<GroupInfoView> {
       return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
         bloc: detailsCubit,
         builder: (context, detailsState) {
-          final isMemberLive =
-              detailsState is GroupDetailsLoaded
-                  ? detailsState.isMember
-                  : widget.group.isMember;
+          final isMemberLive = detailsState is GroupDetailsLoaded
+              ? detailsState.isMember
+              : widget.group.isMember;
           return _buildBody(context, primary, isMemberOverride: isMemberLive);
         },
       );
@@ -336,13 +329,12 @@ class _GroupInfoViewState extends State<GroupInfoView> {
   }) {
     return BlocBuilder<GroupListCubit, GroupListState>(
       builder: (context, listState) {
-        final liveGroup =
-            (listState is GroupListLoaded)
-                ? listState.groups.firstWhere(
-                  (g) => g.id == widget.group.id,
-                  orElse: () => widget.group,
-                )
-                : widget.group;
+        final liveGroup = (listState is GroupListLoaded)
+            ? listState.groups.firstWhere(
+                (g) => g.id == widget.group.id,
+                orElse: () => widget.group,
+              )
+            : widget.group;
 
         if (!_isEditingName && _nameController.text != liveGroup.name) {
           _nameController.text = liveGroup.name;
@@ -410,12 +402,11 @@ class _GroupInfoViewState extends State<GroupInfoView> {
                           onSubmit: _updateGroupName,
                           onCancel: _cancelEditingName,
                           onChangePhoto: _changeGroupPhoto,
-                          onSettingsTap:
-                              () => _openGroupSettings(
-                                hasAdminPrivileges,
-                                isOwner,
-                                liveGroup,
-                              ),
+                          onSettingsTap: () => _openGroupSettings(
+                            hasAdminPrivileges,
+                            isOwner,
+                            liveGroup,
+                          ),
                           isMuted: _isMuted,
                         ),
                         SliverToBoxAdapter(
@@ -423,18 +414,16 @@ class _GroupInfoViewState extends State<GroupInfoView> {
                             isMuted: _isMuted,
                             isMember: isMemberOverride ?? liveGroup.isMember,
                             onMessage: () => Navigator.of(context).pop(),
-                            onCall:
-                                () => GroupCallInitiator.initiate(
-                                  context,
-                                  liveGroup,
-                                  GroupCallType.audio,
-                                ),
-                            onVideo:
-                                () => GroupCallInitiator.initiate(
-                                  context,
-                                  liveGroup,
-                                  GroupCallType.video,
-                                ),
+                            onCall: () => GroupCallInitiator.initiate(
+                              context,
+                              liveGroup,
+                              GroupCallType.audio,
+                            ),
+                            onVideo: () => GroupCallInitiator.initiate(
+                              context,
+                              liveGroup,
+                              GroupCallType.video,
+                            ),
                             onToggleMute: _toggleMute,
                           ),
                         ),
@@ -443,10 +432,11 @@ class _GroupInfoViewState extends State<GroupInfoView> {
                             child: StarredMessagesRow(
                               primary: primary,
                               currentUserId: _currentUserId,
-                              chatMessageIds:
-                                  widget.detailsCubit!.cachedMessages
-                                      .map((m) => m.id)
-                                      .toSet(),
+                              chatMessageIds: widget
+                                  .detailsCubit!
+                                  .cachedMessages
+                                  .map((m) => m.id)
+                                  .toSet(),
                               onTap: () => _openStarredMessages(context),
                             ),
                           ),
@@ -471,8 +461,8 @@ class _GroupInfoViewState extends State<GroupInfoView> {
                                     children: [
                                       const Text('Failed to load members'),
                                       TextButton(
-                                        onPressed:
-                                            () => _membersCubit.loadMembers(),
+                                        onPressed: () =>
+                                            _membersCubit.loadMembers(),
                                         child: const Text('Retry'),
                                       ),
                                     ],

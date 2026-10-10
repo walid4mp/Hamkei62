@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../../core/widgets/skeleton_shapes.dart';
 import '../../discover/utils/discover_grid_metrics.dart';
 import 'search_view_metrics.dart';
@@ -37,14 +38,13 @@ class AccountsSkeletonList extends StatelessWidget {
           mainAxisSpacing: DiscoverGridMetrics.mainAxisSpacing,
           crossAxisSpacing: DiscoverGridMetrics.crossAxisSpacing,
           childCount: 6,
-          itemBuilder:
-              (_, index) => _buildSkeletonItem(
-                index,
-                cardColor,
-                borderColor,
-                baseColor,
-                highlightColor,
-              ),
+          itemBuilder: (_, index) => _buildSkeletonItem(
+            index,
+            cardColor,
+            borderColor,
+            baseColor,
+            highlightColor,
+          ),
         ),
       );
     }
@@ -56,14 +56,13 @@ class AccountsSkeletonList extends StatelessWidget {
       padding: padding,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 6,
-      itemBuilder:
-          (_, index) => _buildSkeletonItem(
-            index,
-            cardColor,
-            borderColor,
-            baseColor,
-            highlightColor,
-          ),
+      itemBuilder: (_, index) => _buildSkeletonItem(
+        index,
+        cardColor,
+        borderColor,
+        baseColor,
+        highlightColor,
+      ),
     );
   }
 

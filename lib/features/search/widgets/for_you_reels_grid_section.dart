@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../reels/models/reel_model.dart';
 import '../../reels/views/reels_full_screen_view.dart';
 import 'reel_grid_tile.dart';
@@ -19,11 +20,10 @@ class ForYouReelsGridSection extends StatelessWidget {
   void _openReel(BuildContext context, int localIndex) {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder:
-            (_) => ReelsFullScreenView(
-              reels: reelsPool,
-              initialIndex: startIndex + localIndex,
-            ),
+        builder: (_) => ReelsFullScreenView(
+          reels: reelsPool,
+          initialIndex: startIndex + localIndex,
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/helpers/formatted_date.dart';
 import '../../../core/themes/app_colors.dart';
 import '../models/groupe_message_model.dart';
@@ -20,12 +21,10 @@ class GroupTimeRow extends StatelessWidget {
             Text(
               'Edited',
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color:
-                    isMe
-                        ? AppColors.white70
-                        : Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: isMe
+                    ? AppColors.white70
+                    : Theme.of(context).colorScheme.onSurface
+                          .withValues(alpha: 0.6),
                 fontSize: 9,
                 fontStyle: FontStyle.italic,
               ),
@@ -37,12 +36,10 @@ class GroupTimeRow extends StatelessWidget {
             FormattedDate.getMessageTime(message.createdAt),
 
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color:
-                  isMe
-                      ? AppColors.white70
-                      : Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isMe
+                  ? AppColors.white70
+                  : Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.6),
               fontSize: 9,
             ),
           ),

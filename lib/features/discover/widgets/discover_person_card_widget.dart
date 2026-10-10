@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/themes/app_colors.dart';
@@ -86,10 +87,9 @@ class DiscoverPersonCardWidget extends StatelessWidget {
             boxShadow ??
             [
               BoxShadow(
-                color:
-                    isDark
-                        ? Colors.black.withValues(alpha: 0.3)
-                        : Colors.black.withValues(alpha: 0.04),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -101,11 +101,10 @@ class DiscoverPersonCardWidget extends StatelessWidget {
         children: [
           InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap:
-                () => Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).pushNamed(AppRoutes.profileViewRoute, arguments: userData.id),
+            onTap: () => Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed(AppRoutes.profileViewRoute, arguments: userData.id),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -127,14 +126,12 @@ class DiscoverPersonCardWidget extends StatelessWidget {
                     child: AppAvatar(
                       imageUrl: userData.imageUrl,
                       size: isCompact ? 44 : 50,
-                      onTap:
-                          () => showDialog(
-                            context: context,
-                            builder:
-                                (context) => UserPreviewDialog(
-                                  user: ChatUserModel.fromEntity(userData),
-                                ),
-                          ),
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (context) => UserPreviewDialog(
+                          user: ChatUserModel.fromEntity(userData),
+                        ),
+                      ),
                     ),
                   ),
                 ),

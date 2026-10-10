@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+
 import '../datasources/media_local_data_source.dart';
 import 'cache_eviction_policy.dart';
 

@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../models/ai_suggestion_item.dart';
 
 class AiSuggestionGrid extends StatelessWidget {

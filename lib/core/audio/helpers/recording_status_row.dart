@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'pulsing_red_dot.dart';
 
 class RecordingStatusRow extends StatelessWidget {

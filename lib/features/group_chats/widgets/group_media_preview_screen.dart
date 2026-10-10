@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../../../core/widgets/directional_text_field.dart';
 import '../../ai_assistant/entities/ai_action_type.dart';
@@ -193,21 +195,20 @@ class _GroupMediaPreviewScreenState extends State<GroupMediaPreviewScreen> {
           children: [
             Expanded(
               child: Center(
-                child:
-                    widget.type == 'image'
-                        ? Image.file(widget.file, fit: BoxFit.contain)
-                        : _videoCtrl != null && _videoCtrl!.value.isInitialized
-                        ? AspectRatio(
-                          aspectRatio: _videoCtrl!.value.aspectRatio,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              VideoPlayer(_videoCtrl!),
-                              _buildVideoControls(),
-                            ],
-                          ),
-                        )
-                        : const CustomLoadingIndicator(color: Colors.white),
+                child: widget.type == 'image'
+                    ? Image.file(widget.file, fit: BoxFit.contain)
+                    : _videoCtrl != null && _videoCtrl!.value.isInitialized
+                    ? AspectRatio(
+                        aspectRatio: _videoCtrl!.value.aspectRatio,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            VideoPlayer(_videoCtrl!),
+                            _buildVideoControls(),
+                          ],
+                        ),
+                      )
+                    : const CustomLoadingIndicator(color: Colors.white),
               ),
             ),
             Container(
@@ -241,14 +242,12 @@ class _GroupMediaPreviewScreenState extends State<GroupMediaPreviewScreen> {
                             generationAction: AiActionType.autocompleteCaption,
                             actionContext: AiActionContext.mediaCaption,
                             hasMediaAttached: true,
-                            targetMediaType:
-                                widget.type == 'image'
-                                    ? AiTargetMediaType.image
-                                    : AiTargetMediaType.video,
-                            imageBytesProvider:
-                                widget.type == 'image'
-                                    ? () => widget.file.readAsBytes()
-                                    : null,
+                            targetMediaType: widget.type == 'image'
+                                ? AiTargetMediaType.image
+                                : AiTargetMediaType.video,
+                            imageBytesProvider: widget.type == 'image'
+                                ? () => widget.file.readAsBytes()
+                                : null,
                           ),
                         ),
                       ),

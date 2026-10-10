@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/chat_shared/helpers/message_reaction_preview_helper.dart';
 import '../../../core/helpers/chat_helper.dart';
 import '../../../core/services/network_status_service.dart';
@@ -18,17 +20,16 @@ class ChatListService {
 
   Future<ReceiverPushInfo?> getReceiverPushInfo(String receiverId) async {
     try {
-      final data =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select(
-                '${UserColumns.id}, '
-                '${UserColumns.name}, '
-                '${UserColumns.imageUrl}, '
-                '${UserColumns.fcmToken}',
-              )
-              .eq(UserColumns.id, receiverId)
-              .maybeSingle();
+      final data = await _supabase
+          .from(SupabaseConstants.users)
+          .select(
+            '${UserColumns.id}, '
+            '${UserColumns.name}, '
+            '${UserColumns.imageUrl}, '
+            '${UserColumns.fcmToken}',
+          )
+          .eq(UserColumns.id, receiverId)
+          .maybeSingle();
 
       if (data == null) return null;
       final token = data[UserColumns.fcmToken] as String?;
@@ -70,10 +71,9 @@ class ChatListService {
 
       if (response == null) return [];
 
-      final chats =
-          (response as List)
-              .map((data) => ChatUserModel.fromUserData(data, currentUserId))
-              .toList();
+      final chats = (response as List)
+          .map((data) => ChatUserModel.fromUserData(data, currentUserId))
+          .toList();
 
       if (chats.isEmpty) return chats;
 
@@ -87,18 +87,16 @@ class ChatListService {
         for (final row in presenceRows as List)
           if (PresenceService.isConsideredOnline(
             isOnline: row[PresenceColumns.isOnline] as bool? ?? false,
-            updatedAt:
-                row[PresenceColumns.updatedAt] != null
-                    ? DateTime.parse(row[PresenceColumns.updatedAt].toString())
-                    : null,
+            updatedAt: row[PresenceColumns.updatedAt] != null
+                ? DateTime.parse(row[PresenceColumns.updatedAt].toString())
+                : null,
           ))
             row['user_id'] as String,
       };
 
-      var enrichedChats =
-          chats
-              .map((c) => c.copyWith(isOnline: onlineSet.contains(c.id)))
-              .toList();
+      var enrichedChats = chats
+          .map((c) => c.copyWith(isOnline: onlineSet.contains(c.id)))
+          .toList();
 
       enrichedChats = await _enrichWithLatestReactions(
         enrichedChats,
@@ -144,14 +142,16 @@ class ChatListService {
       final targetMessageIds = <String>{};
       for (final chat in chats) {
         final convId = convIdByPeerId[chat.id];
-        final reactionRow =
-            convId != null ? latestReactionByConv[convId] : null;
+        final reactionRow = convId != null
+            ? latestReactionByConv[convId]
+            : null;
         if (reactionRow == null) continue;
 
         final createdAtStr =
             reactionRow[MessageReactionColumns.createdAt] as String?;
-        final reactionTime =
-            createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+        final reactionTime = createdAtStr != null
+            ? DateTime.tryParse(createdAtStr)
+            : null;
         if (reactionTime == null) continue;
 
         if (chat.lastMessageTime == null ||
@@ -187,53 +187,52 @@ class ChatListService {
 
       if (messagesById.isEmpty) return chats;
 
-      final updated =
-          chats.map((chat) {
-            final convId = convIdByPeerId[chat.id];
-            final reactionRow =
-                convId != null ? latestReactionByConv[convId] : null;
-            if (reactionRow == null) return chat;
+      final updated = chats.map((chat) {
+        final convId = convIdByPeerId[chat.id];
+        final reactionRow = convId != null
+            ? latestReactionByConv[convId]
+            : null;
+        if (reactionRow == null) return chat;
 
-            final createdAtStr =
-                reactionRow[MessageReactionColumns.createdAt] as String?;
-            final reactionTime =
-                createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
-            if (reactionTime == null) return chat;
+        final createdAtStr =
+            reactionRow[MessageReactionColumns.createdAt] as String?;
+        final reactionTime = createdAtStr != null
+            ? DateTime.tryParse(createdAtStr)
+            : null;
+        if (reactionTime == null) return chat;
 
-            if (chat.lastMessageTime != null &&
-                !reactionTime.isAfter(chat.lastMessageTime!)) {
-              return chat;
-            }
+        if (chat.lastMessageTime != null &&
+            !reactionTime.isAfter(chat.lastMessageTime!)) {
+          return chat;
+        }
 
-            final msgId =
-                reactionRow[MessageReactionColumns.messageId] as String?;
-            final msg = msgId != null ? messagesById[msgId] : null;
-            if (msg == null) return chat;
+        final msgId = reactionRow[MessageReactionColumns.messageId] as String?;
+        final msg = msgId != null ? messagesById[msgId] : null;
+        if (msg == null) return chat;
 
-            final reactorId =
-                reactionRow[MessageReactionColumns.userId] as String? ?? '';
-            final isMe = reactorId == currentUserId;
-            final reactionEmoji =
-                reactionRow[MessageReactionColumns.reaction] as String?;
+        final reactorId =
+            reactionRow[MessageReactionColumns.userId] as String? ?? '';
+        final isMe = reactorId == currentUserId;
+        final reactionEmoji =
+            reactionRow[MessageReactionColumns.reaction] as String?;
 
-            final previewText =
-                MessageReactionPreviewHelper.formatReactionPreview(
-                  isMe: isMe,
-                  reactorName: chat.name,
-                  reactionType: reactionEmoji,
-                  messageType: msg[MessagesColumns.messageType] as String?,
-                  messageText: msg[MessagesColumns.messageText] as String?,
-                  fileName: msg[MessagesColumns.fileName] as String?,
-                  caption: msg[MessagesColumns.caption] as String?,
-                );
+        final previewText = MessageReactionPreviewHelper.formatReactionPreview(
+          isMe: isMe,
+          reactorName: chat.name,
+          reactionType: reactionEmoji,
+          messageType: msg[MessagesColumns.messageType] as String?,
+          messageText: msg[MessagesColumns.messageText] as String?,
+          fileName: msg[MessagesColumns.fileName] as String?,
+          caption: msg[MessagesColumns.caption] as String?,
+        );
 
-            return chat.copyWith(
-              lastMessage: previewText,
-              lastMessageType: 'message_react',
-              lastMessageTime: reactionTime,
-              lastMessageIsMe: isMe,
-            );
-          }).toList();
+        return chat.copyWith(
+          lastMessage: previewText,
+          lastMessageType: 'message_react',
+          lastMessageTime: reactionTime,
+          lastMessageIsMe: isMe,
+        );
+      }).toList();
 
       updated.sort((a, b) {
         final aTime =

@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_media_app/core/mentions/widgets/mention_rich_text.dart';
 import 'package:social_media_app/core/router/app_routes.dart';
+
 import '../../../core/attachment/widgets/file_message_bubble.dart';
 import '../../../core/helpers/link_color_helper.dart';
 import '../../../core/link/widgets/message_link_preview.dart';
@@ -53,9 +54,9 @@ class GroupRegularMessageContent extends StatelessWidget {
     final currentUserId = SupabaseProvider.id;
     final displayText =
         (message.messageType == 'text' ||
-                message.messageType == GroupMessageModel.systemEventType)
-            ? (message.caption ?? message.text)
-            : (message.caption ?? '');
+            message.messageType == GroupMessageModel.systemEventType)
+        ? (message.caption ?? message.text)
+        : (message.caption ?? '');
     final timeWidget = GroupTimeRow(message: message, isMe: isMe);
 
     final hasReactions = message.reactions.isNotEmpty;
@@ -115,31 +116,29 @@ class GroupRegularMessageContent extends StatelessWidget {
               SizedBox(
                 width: 305,
                 height: 320,
-                child:
-                    message.imageUrl != null
-                        ? ImageMessageWidget(
-                          imageUrl: message.imageUrl!,
-                          caption: message.caption,
-                          isMe: isMe,
-                          fileSizeBytes: message.fileSizeBytes,
-                        )
-                        : const SizedBox.shrink(),
+                child: message.imageUrl != null
+                    ? ImageMessageWidget(
+                        imageUrl: message.imageUrl!,
+                        caption: message.caption,
+                        isMe: isMe,
+                        fileSizeBytes: message.fileSizeBytes,
+                      )
+                    : const SizedBox.shrink(),
               ),
 
             if (isVideo)
               SizedBox(
                 height: 200,
                 width: 280,
-                child:
-                    message.videoUrl != null
-                        ? VideoMessageWidget(
-                          videoUrl: message.videoUrl!,
-                          caption: message.caption,
-                          isMe: isMe,
-                          fileSizeBytes: message.fileSizeBytes,
-                          durationSeconds: message.durationSeconds,
-                        )
-                        : const SizedBox.shrink(),
+                child: message.videoUrl != null
+                    ? VideoMessageWidget(
+                        videoUrl: message.videoUrl!,
+                        caption: message.caption,
+                        isMe: isMe,
+                        fileSizeBytes: message.fileSizeBytes,
+                        durationSeconds: message.durationSeconds,
+                      )
+                    : const SizedBox.shrink(),
               ),
             if (isGif)
               Column(
@@ -150,19 +149,16 @@ class GroupRegularMessageContent extends StatelessWidget {
                     child: SizedBox(
                       width: 200,
                       height: 200,
-                      child:
-                          message.imageUrl != null
-                              ? GifMessageBubble(
-                                url: message.imageUrl!,
-                                isMe: isMe,
-                              )
-                              : const SizedBox.shrink(),
+                      child: message.imageUrl != null
+                          ? GifMessageBubble(url: message.imageUrl!, isMe: isMe)
+                          : const SizedBox.shrink(),
                     ),
                   ),
                   const Gap(2.8),
                   Align(
-                    alignment:
-                        isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isMe
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: _buildMediaTimeOverlay(context),
                   ),
                 ],
@@ -177,16 +173,16 @@ class GroupRegularMessageContent extends StatelessWidget {
                     child: SizedBox(
                       width: 150,
                       height: 150,
-                      child:
-                          message.imageUrl != null
-                              ? StickerMessageBubble(url: message.imageUrl!)
-                              : const SizedBox.shrink(),
+                      child: message.imageUrl != null
+                          ? StickerMessageBubble(url: message.imageUrl!)
+                          : const SizedBox.shrink(),
                     ),
                   ),
                   const Gap(2.8),
                   Align(
-                    alignment:
-                        isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isMe
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: _buildMediaTimeOverlay(context),
                   ),
                 ],
@@ -205,36 +201,34 @@ class GroupRegularMessageContent extends StatelessWidget {
             if (isFile && (message.fileUrl != null || isUploading))
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child:
-                    isUploading
-                        ? ValueListenableBuilder<double>(
-                          valueListenable: context
-                              .read<GroupDetailsCubit>()
-                              .progressNotifierFor(message.id),
-                          builder: (context, progress, _) {
-                            return FileMessageBubble(
-                              fileUrl: message.fileUrl ?? '',
-                              fileName: message.fileName,
-                              fileSizeBytes: message.fileSizeBytes,
-                              isMe: isMe,
+                child: isUploading
+                    ? ValueListenableBuilder<double>(
+                        valueListenable: context
+                            .read<GroupDetailsCubit>()
+                            .progressNotifierFor(message.id),
+                        builder: (context, progress, _) {
+                          return FileMessageBubble(
+                            fileUrl: message.fileUrl ?? '',
+                            fileName: message.fileName,
+                            fileSizeBytes: message.fileSizeBytes,
+                            isMe: isMe,
 
-                              isUploading: isUploading,
-                              uploadProgress: progress,
-                              onCancelTap:
-                                  () => context
-                                      .read<GroupDetailsCubit>()
-                                      .cancelUpload(message.id),
-                            );
-                          },
-                        )
-                        : FileMessageBubble(
-                          fileUrl: message.fileUrl ?? '',
-                          fileName: message.fileName,
-                          fileSizeBytes: message.fileSizeBytes,
-                          isMe: isMe,
-                          isUploading: false,
-                          uploadProgress: null,
-                        ),
+                            isUploading: isUploading,
+                            uploadProgress: progress,
+                            onCancelTap: () => context
+                                .read<GroupDetailsCubit>()
+                                .cancelUpload(message.id),
+                          );
+                        },
+                      )
+                    : FileMessageBubble(
+                        fileUrl: message.fileUrl ?? '',
+                        fileName: message.fileName,
+                        fileSizeBytes: message.fileSizeBytes,
+                        isMe: isMe,
+                        isUploading: false,
+                        uploadProgress: null,
+                      ),
               ),
             if (displayText.isNotEmpty)
               Padding(
@@ -296,9 +290,8 @@ class GroupRegularMessageContent extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(
           brightness: Brightness.dark,
-          colorScheme: Theme.of(
-            context,
-          ).colorScheme.copyWith(onSurface: Colors.white),
+          colorScheme: Theme.of(context).colorScheme
+              .copyWith(onSurface: Colors.white),
         ),
         child: GroupTimeRow(message: message, isMe: isMe),
       ),
@@ -340,8 +333,9 @@ class _MentionRichText extends StatelessWidget {
           maxTextWidth: bubbleMaxWidth,
           mentions: message.mentions,
           highlightQuery: query,
-          collapsedMaxLines:
-              query.isNotEmpty ? _uncollapsedMaxLines : collapsedMaxLines,
+          collapsedMaxLines: query.isNotEmpty
+              ? _uncollapsedMaxLines
+              : collapsedMaxLines,
           onMentionTap: (userId, name) {
             final currentUserId = SupabaseProvider.idOrNull;
 
@@ -349,10 +343,9 @@ class _MentionRichText extends StatelessWidget {
               if (message.senderId == currentUserId) {
                 AppToast.info('You mentioned yourself in this message');
               } else {
-                final senderName =
-                    message.senderName.trim().isNotEmpty
-                        ? message.senderName.trim()
-                        : 'Someone';
+                final senderName = message.senderName.trim().isNotEmpty
+                    ? message.senderName.trim()
+                    : 'Someone';
                 AppToast.info('$senderName mentioned you in this message');
               }
             } else {

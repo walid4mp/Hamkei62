@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/constants/app_images.dart';
+
 import '../../../core/widgets/empty_findings_animation_widget.dart';
 import '../models/app_notification_model.dart';
 

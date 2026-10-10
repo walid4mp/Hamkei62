@@ -40,24 +40,20 @@ class ConversationFlags {
       isPinned: isPinned ?? this.isPinned,
       isFavorite: isFavorite ?? this.isFavorite,
       isArchived: isArchived ?? this.isArchived,
-      muteOverride:
-          identical(muteOverride, _unsetFlag)
-              ? this.muteOverride
-              : muteOverride as bool?,
+      muteOverride: identical(muteOverride, _unsetFlag)
+          ? this.muteOverride
+          : muteOverride as bool?,
       autoMutedByArchive: autoMutedByArchive ?? this.autoMutedByArchive,
-      pinnedAt:
-          identical(pinnedAt, _unsetFlag)
-              ? this.pinnedAt
-              : pinnedAt as DateTime?,
-      archivedAt:
-          identical(archivedAt, _unsetFlag)
-              ? this.archivedAt
-              : archivedAt as DateTime?,
+      pinnedAt: identical(pinnedAt, _unsetFlag)
+          ? this.pinnedAt
+          : pinnedAt as DateTime?,
+      archivedAt: identical(archivedAt, _unsetFlag)
+          ? this.archivedAt
+          : archivedAt as DateTime?,
       isPinnedInArchive: isPinnedInArchive ?? this.isPinnedInArchive,
-      archivePinnedAt:
-          identical(archivePinnedAt, _unsetFlag)
-              ? this.archivePinnedAt
-              : archivePinnedAt as DateTime?,
+      archivePinnedAt: identical(archivePinnedAt, _unsetFlag)
+          ? this.archivePinnedAt
+          : archivePinnedAt as DateTime?,
     );
   }
 
@@ -80,13 +76,16 @@ class ConversationFlags {
       isArchived: map['a'] as bool? ?? false,
       muteOverride: map['mo'] as bool?,
       autoMutedByArchive: map['am'] as bool? ?? false,
-      pinnedAt:
-          map['pAt'] != null ? DateTime.tryParse(map['pAt'] as String) : null,
-      archivedAt:
-          map['aAt'] != null ? DateTime.tryParse(map['aAt'] as String) : null,
+      pinnedAt: map['pAt'] != null
+          ? DateTime.tryParse(map['pAt'] as String)
+          : null,
+      archivedAt: map['aAt'] != null
+          ? DateTime.tryParse(map['aAt'] as String)
+          : null,
       isPinnedInArchive: map['ap'] as bool? ?? false,
-      archivePinnedAt:
-          map['apAt'] != null ? DateTime.tryParse(map['apAt'] as String) : null,
+      archivePinnedAt: map['apAt'] != null
+          ? DateTime.tryParse(map['apAt'] as String)
+          : null,
     );
   }
 }

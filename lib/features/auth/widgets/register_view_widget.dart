@@ -8,6 +8,7 @@ import 'package:social_media_app/features/auth/cubits/auth_cubit/auth_cubit.dart
 import 'package:social_media_app/features/auth/widgets/password_strength_bar.dart';
 import 'package:social_media_app/features/auth/widgets/sign_text_section.dart';
 import 'package:social_media_app/features/auth/widgets/social_sign_section.dart';
+
 import '../../../core/toast/app_toast.dart';
 import '../../../core/widgets/custom_elevated_button.dart';
 import '../../../core/widgets/custom_text_form_field.dart';
@@ -99,26 +100,25 @@ class _RegisterViewWidgetState extends State<RegisterViewWidget> {
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 300),
-                child:
-                    _showStrenghtPasswordBar
-                        ? Column(
-                          children: [
-                            const Gap(8),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: SizedBox(
-                                width: MediaQuery.sizeOf(context).width * 0.5,
-                                child: ValueListenableBuilder<String>(
-                                  valueListenable: _passwordStrengthNotifier,
-                                  builder: (context, value, child) {
-                                    return PasswordStrengthBar(password: value);
-                                  },
-                                ),
+                child: _showStrenghtPasswordBar
+                    ? Column(
+                        children: [
+                          const Gap(8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: MediaQuery.sizeOf(context).width * 0.5,
+                              child: ValueListenableBuilder<String>(
+                                valueListenable: _passwordStrengthNotifier,
+                                builder: (context, value, child) {
+                                  return PasswordStrengthBar(password: value);
+                                },
                               ),
                             ),
-                          ],
-                        )
-                        : const SizedBox.shrink(),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
               ),
               const Gap(18),
               CustomTextFormField(
@@ -127,18 +127,16 @@ class _RegisterViewWidgetState extends State<RegisterViewWidget> {
                 labelText: 'Confirm Password',
                 hintText: 'Retype your password',
                 isPassword: true,
-                validator:
-                    (v) => AppValidators.validateConfirmPassword(
-                      v,
-                      _passwordController.text,
-                    ),
+                validator: (v) => AppValidators.validateConfirmPassword(
+                  v,
+                  _passwordController.text,
+                ),
               ),
               const Gap(22),
               BlocConsumer<AuthCubit, AuthState>(
-                listenWhen:
-                    (previous, current) =>
-                        (previous is! AuthSuccess && current is AuthSuccess) ||
-                        current is AuthFailure,
+                listenWhen: (previous, current) =>
+                    (previous is! AuthSuccess && current is AuthSuccess) ||
+                    current is AuthFailure,
                 listener: (BuildContext context, AuthState state) async {
                   if (state is AuthSuccess) {
                     AppToast.success('Sign up Successfully');
@@ -156,13 +154,12 @@ class _RegisterViewWidgetState extends State<RegisterViewWidget> {
                     AppToast.error(state.errMsg);
                   }
                 },
-                buildWhen:
-                    (previous, current) =>
-                        current is AuthLoading ||
-                        current is AuthSuccess ||
-                        current is AuthFailure ||
-                        current is AuthInitial ||
-                        current is AuthSignedOut,
+                buildWhen: (previous, current) =>
+                    current is AuthLoading ||
+                    current is AuthSuccess ||
+                    current is AuthFailure ||
+                    current is AuthInitial ||
+                    current is AuthSignedOut,
                 builder: (context, state) {
                   return CustomElevatedButton(
                     txtBtn: 'Join Now',

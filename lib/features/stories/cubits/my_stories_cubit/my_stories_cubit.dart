@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/supabase/supabase_provider.dart';
 import 'package:social_media_app/core/toast/app_toast.dart';
+
 import '../../models/story_model.dart';
 import '../../models/story_stat_model.dart';
 import '../../services/stories_services.dart';
@@ -185,8 +187,9 @@ class MyStoriesCubit extends Cubit<MyStoriesState> {
     final current = state;
     if (current is! MyStoriesLoaded) return;
 
-    final updatedStories =
-        current.stories.where((s) => !ids.contains(s.id)).toList();
+    final updatedStories = current.stories
+        .where((s) => !ids.contains(s.id))
+        .toList();
     final updatedStats = Map<String, StoryStatModel>.from(
       current.statsByStoryId,
     )..removeWhere((id, _) => ids.contains(id));

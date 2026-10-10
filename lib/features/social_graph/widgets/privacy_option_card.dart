@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/content_privacy.dart';
 
 class PrivacyOptionCard extends StatelessWidget {
@@ -39,12 +40,11 @@ class PrivacyOptionCard extends StatelessWidget {
               color: isSelected ? primary : Colors.transparent,
               width: 2,
             ),
-            color:
-                isSelected
-                    ? primary.withValues(alpha: 0.08)
-                    : (isDark
-                        ? Colors.grey.withValues(alpha: 0.1)
-                        : Colors.grey.withValues(alpha: 0.05)),
+            color: isSelected
+                ? primary.withValues(alpha: 0.08)
+                : (isDark
+                      ? Colors.grey.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.05)),
           ),
           child: Row(
             children: [
@@ -52,32 +52,27 @@ class PrivacyOptionCard extends StatelessWidget {
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected
-                          ? primary
-                          : (isDark
-                              ? Colors.grey.withValues(alpha: 0.2)
-                              : Colors.grey.withValues(alpha: 0.1)),
+                  color: isSelected
+                      ? primary
+                      : (isDark
+                            ? Colors.grey.withValues(alpha: 0.2)
+                            : Colors.grey.withValues(alpha: 0.1)),
                   shape: BoxShape.circle,
-                  boxShadow:
-                      isSelected
-                          ? [
-                            BoxShadow(
-                              color: primary.withValues(alpha: 0.4),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ]
-                          : null,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: primary.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Icon(
                   icon,
-                  color:
-                      isSelected
-                          ? Colors.white
-                          : (isDark
-                              ? Colors.grey.shade400
-                              : Colors.grey.shade700),
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
                   size: 22,
                 ),
               ),
@@ -90,8 +85,9 @@ class PrivacyOptionCard extends StatelessWidget {
                     Text(
                       title,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight:
-                            isSelected ? FontWeight.w800 : FontWeight.w600,
+                        fontWeight: isSelected
+                            ? FontWeight.w800
+                            : FontWeight.w600,
                         color: isSelected ? primary : null,
                       ),
                     ),
@@ -116,21 +112,19 @@ class PrivacyOptionCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: isSelected ? primary : Colors.transparent,
                   border: Border.all(
-                    color:
-                        isSelected
-                            ? primary
-                            : Colors.grey.withValues(alpha: 0.5),
+                    color: isSelected
+                        ? primary
+                        : Colors.grey.withValues(alpha: 0.5),
                     width: 2,
                   ),
                 ),
-                child:
-                    isSelected
-                        ? const Icon(
-                          Icons.check_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        )
-                        : null,
+                child: isSelected
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      )
+                    : null,
               ),
             ],
           ),

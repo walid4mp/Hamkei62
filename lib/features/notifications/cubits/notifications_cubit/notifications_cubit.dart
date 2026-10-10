@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../home/cubits/home_cubit/home_cubit.dart';
 import '../../../social_graph/services/follow_services.dart';
@@ -31,13 +32,10 @@ class NotificationsCubit extends Cubit<NotificationsState>
     try {
       final notifications = await _repository.fetchNotifications();
 
-      final followerIds =
-          notifications
-              .where(
-                (n) => n.type == NotificationType.follow && n.senderId != null,
-              )
-              .map((n) => n.senderId!)
-              .toSet();
+      final followerIds = notifications
+          .where((n) => n.type == NotificationType.follow && n.senderId != null)
+          .map((n) => n.senderId!)
+          .toSet();
 
       final alreadyFollowing = await _followServices.getFollowingSubset(
         followerIds.toList(),
@@ -61,10 +59,9 @@ class NotificationsCubit extends Cubit<NotificationsState>
 
   Future<void> markAsRead(String id) async {
     await _repository.markAsRead(id);
-    final updated =
-        state.notifications
-            .map((n) => n.id == id ? n.copyWith(isRead: true) : n)
-            .toList();
+    final updated = state.notifications
+        .map((n) => n.id == id ? n.copyWith(isRead: true) : n)
+        .toList();
     emit(state.copyWith(notifications: updated));
   }
 
@@ -76,8 +73,9 @@ class NotificationsCubit extends Cubit<NotificationsState>
 
   Future<void> markAllAsRead() async {
     await _repository.markAllAsRead();
-    final updated =
-        state.notifications.map((n) => n.copyWith(isRead: true)).toList();
+    final updated = state.notifications
+        .map((n) => n.copyWith(isRead: true))
+        .toList();
     emit(state.copyWith(notifications: updated));
   }
 

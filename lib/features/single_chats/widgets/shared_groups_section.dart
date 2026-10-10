@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../cubits/shared_groups_cubit/shared_groups_cubit.dart';
 import '../cubits/shared_groups_cubit/shared_groups_state.dart';
 import '../helpers/shared_groups_shimmer.dart';
@@ -42,9 +43,8 @@ class SharedGroupsSection extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.85),
+                      color: Theme.of(context).primaryColor
+                          .withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -56,8 +56,8 @@ class SharedGroupsSection extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: groups.length,
                 separatorBuilder: (_, _) => const Gap(4),
-                itemBuilder:
-                    (context, index) => SharedGroupTile(item: groups[index]),
+                itemBuilder: (context, index) =>
+                    SharedGroupTile(item: groups[index]),
               ),
             ],
           ),

@@ -50,19 +50,18 @@ class SelectedMembersSection extends StatelessWidget {
                         backgroundColor: primary.withValues(alpha: 0.12),
                         backgroundImage:
                             (imageUrl != null && imageUrl.isNotEmpty)
-                                ? CachedNetworkImageProvider(imageUrl)
-                                : null,
-                        child:
-                            (imageUrl == null || imageUrl.isEmpty)
-                                ? Text(
-                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                  style: TextStyle(
-                                    color: primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                )
-                                : null,
+                            ? CachedNetworkImageProvider(imageUrl)
+                            : null,
+                        child: (imageUrl == null || imageUrl.isEmpty)
+                            ? Text(
+                                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                style: TextStyle(
+                                  color: primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              )
+                            : null,
                       ),
                       Positioned(
                         bottom: -2,

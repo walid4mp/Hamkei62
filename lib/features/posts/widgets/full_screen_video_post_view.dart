@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../cubits/posts_cubit/posts_cubit.dart';
 import '../helpers/dismissible_video_overlay.dart';
@@ -272,10 +274,9 @@ class _FullScreenVideoPostViewState extends State<FullScreenVideoPostView> {
       child: Padding(
         padding: EdgeInsets.only(
           right: 14,
-          bottom:
-              hasCaption
-                  ? _rightColumnBottomWithCaption
-                  : _rightColumnBottomNoCaption,
+          bottom: hasCaption
+              ? _rightColumnBottomWithCaption
+              : _rightColumnBottomNoCaption,
         ),
         child: RightInteractionsPostVideoColumn(
           post: widget.post,

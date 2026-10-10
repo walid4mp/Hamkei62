@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../attachment/widgets/media_loading_placeholder.dart';
 import '../cache/repository/media_cache_repository.dart';
 
@@ -115,8 +117,8 @@ class _CachedCloudinaryImageState extends State<CachedCloudinaryImage> {
         fit: widget.fit,
         width: widget.width,
         height: widget.height,
-        errorBuilder:
-            (context, error, stackTrace) => _buildError(context, error),
+        errorBuilder: (context, error, stackTrace) =>
+            _buildError(context, error),
       );
     }
 
@@ -168,17 +170,16 @@ class _CachedCloudinaryImageState extends State<CachedCloudinaryImage> {
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
-      frameBuilder:
-          widget.onReady == null
-              ? null
-              : (context, child, frame, wasSynchronouslyLoaded) {
-                if (frame != null) {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => widget.onReady?.call(),
-                  );
-                }
-                return child;
-              },
+      frameBuilder: widget.onReady == null
+          ? null
+          : (context, child, frame, wasSynchronouslyLoaded) {
+              if (frame != null) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => widget.onReady?.call(),
+                );
+              }
+              return child;
+            },
       errorBuilder: (_, error, __) => _buildNetworkFallback(context),
     );
   }
@@ -190,25 +191,23 @@ class _CachedCloudinaryImageState extends State<CachedCloudinaryImage> {
       height: widget.height,
       fit: widget.fit,
       errorListener: (_) {},
-      placeholder:
-          widget.placeholder != null
-              ? (_, __) => widget.placeholder!(context)
-              : (_, __) => _buildDefaultPlaceholder(context),
+      placeholder: widget.placeholder != null
+          ? (_, __) => widget.placeholder!(context)
+          : (_, __) => _buildDefaultPlaceholder(context),
       errorWidget: (_, __, error) => _buildError(context, error),
-      imageBuilder:
-          widget.onReady != null
-              ? (_, imageProvider) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => widget.onReady?.call(),
-                );
-                return Image(
-                  image: imageProvider,
-                  width: widget.width,
-                  height: widget.height,
-                  fit: widget.fit,
-                );
-              }
-              : null,
+      imageBuilder: widget.onReady != null
+          ? (_, imageProvider) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => widget.onReady?.call(),
+              );
+              return Image(
+                image: imageProvider,
+                width: widget.width,
+                height: widget.height,
+                fit: widget.fit,
+              );
+            }
+          : null,
     );
   }
 
@@ -247,10 +246,9 @@ class _CachedCloudinaryImageState extends State<CachedCloudinaryImage> {
       width: widget.width,
       height: widget.height,
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[800]
-                : Colors.grey[200],
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.grey[200],
         shape: widget.isAvatar ? BoxShape.circle : BoxShape.rectangle,
       ),
       child: Icon(

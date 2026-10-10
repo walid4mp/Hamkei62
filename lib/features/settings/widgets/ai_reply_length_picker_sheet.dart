@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../ai_assistant/entities/ai_reply_length.dart';
 import 'ai_setting_option_card.dart';
 
@@ -98,18 +99,17 @@ class AiReplyLengthPickerSheet extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children:
-                        _options.entries.map((entry) {
-                          final length = entry.key;
-                          final (subtitle, icon) = entry.value;
-                          return AiSettingOptionCard<AiReplyLength>(
-                            value: length,
-                            currentValue: selected,
-                            title: length.displayLabel,
-                            subtitle: subtitle,
-                            icon: icon,
-                          );
-                        }).toList(),
+                    children: _options.entries.map((entry) {
+                      final length = entry.key;
+                      final (subtitle, icon) = entry.value;
+                      return AiSettingOptionCard<AiReplyLength>(
+                        value: length,
+                        currentValue: selected,
+                        title: length.displayLabel,
+                        subtitle: subtitle,
+                        icon: icon,
+                      );
+                    }).toList(),
                   ),
                 ),
               ),

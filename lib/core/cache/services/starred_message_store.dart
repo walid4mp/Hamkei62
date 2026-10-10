@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/adapters.dart';
+
 import '../constants/hive_box_names.dart';
 
 class StarredMessagesStore {

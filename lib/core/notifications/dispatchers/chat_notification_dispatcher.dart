@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -47,24 +48,25 @@ class ChatNotificationDispatcher {
 
     await _hydrateMessageCache(data, isGroup);
 
-    final String conversationId =
-        isGroup ? (data['groupId'] ?? '') : (data['senderId'] ?? '');
+    final String conversationId = isGroup
+        ? (data['groupId'] ?? '')
+        : (data['senderId'] ?? '');
 
     final String senderName =
         data['senderName'] ?? notification?.title ?? 'New Message';
 
-    final String conversationTitle =
-        isGroup ? (data['groupName'] ?? 'Group') : senderName;
+    final String conversationTitle = isGroup
+        ? (data['groupName'] ?? 'Group')
+        : senderName;
     final bool isForwarded = data['is_forwarded'] == 'true';
 
-    final String rawBody =
-        SettingsRepository.instance.messagePreviews
-            ? _buildStyleBody(
-              data['messageType'] ?? 'text',
-              data['messageBody'] ?? notification?.body ?? '',
-              fileName: data['fileName'] as String?,
-            )
-            : 'New message';
+    final String rawBody = SettingsRepository.instance.messagePreviews
+        ? _buildStyleBody(
+            data['messageType'] ?? 'text',
+            data['messageBody'] ?? notification?.body ?? '',
+            fileName: data['fileName'] as String?,
+          )
+        : 'New message';
 
     final String body = isForwarded ? '↪️ Forwarded: $rawBody' : rawBody;
     final String? avatarUrl = data['senderImageUrl'];
@@ -93,34 +95,28 @@ class ChatNotificationDispatcher {
     final Uint8List senderBitmap = await _avatarBuilder.getAvatarBitmap(
       avatarUrl,
     );
-    final Uint8List headerBitmap =
-        isGroup
-            ? await getGroupAvatarBitmap(
-              conversationTitle,
-              data['groupImageUrl'],
-            )
-            : senderBitmap;
+    final Uint8List headerBitmap = isGroup
+        ? await getGroupAvatarBitmap(conversationTitle, data['groupImageUrl'])
+        : senderBitmap;
 
     final ByteArrayAndroidIcon headerIcon = ByteArrayAndroidIcon(headerBitmap);
     final ByteArrayAndroidIcon senderIcon = ByteArrayAndroidIcon(senderBitmap);
 
     const Person me = Person(name: 'Me', important: true);
 
-    final Person remotePerson =
-        isGroup
-            ? Person(name: conversationTitle, icon: headerIcon)
-            : Person(name: senderName, icon: senderIcon);
+    final Person remotePerson = isGroup
+        ? Person(name: conversationTitle, icon: headerIcon)
+        : Person(name: senderName, icon: senderIcon);
 
-    final List<Message> styleMessages =
-        stored
-            .map(
-              (m) => Message(
-                isGroup ? '${m.senderName}: ${m.text}' : m.text,
-                DateTime.fromMillisecondsSinceEpoch(m.timestamp),
-                remotePerson,
-              ),
-            )
-            .toList();
+    final List<Message> styleMessages = stored
+        .map(
+          (m) => Message(
+            isGroup ? '${m.senderName}: ${m.text}' : m.text,
+            DateTime.fromMillisecondsSinceEpoch(m.timestamp),
+            remotePerson,
+          ),
+        )
+        .toList();
 
     final messagingStyle = MessagingStyleInformation(
       me,
@@ -180,10 +176,9 @@ class ChatNotificationDispatcher {
       body,
       NotificationDetails(android: androidDetails),
 
-      payload:
-          isGroup
-              ? 'group|$conversationId|$conversationTitle|${latestMessageId ?? ''}|${groupImageUrl ?? ''}'
-              : '$conversationId|$senderName|${avatarUrl ?? ''}|${latestMessageId ?? ''}',
+      payload: isGroup
+          ? 'group|$conversationId|$conversationTitle|${latestMessageId ?? ''}|${groupImageUrl ?? ''}'
+          : '$conversationId|$senderName|${avatarUrl ?? ''}|${latestMessageId ?? ''}',
     );
   }
 
@@ -299,20 +294,18 @@ class ChatNotificationDispatcher {
       return;
     }
 
-    final avatarUrl =
-        isGroup
-            ? (parts.length > 4 && parts[4].isNotEmpty ? parts[4] : null)
-            : (parts.length > 2 ? parts[2] : null);
+    final avatarUrl = isGroup
+        ? (parts.length > 4 && parts[4].isNotEmpty ? parts[4] : null)
+        : (parts.length > 2 ? parts[2] : null);
 
     try {
       final String newMessageId;
 
-      final userFuture =
-          Supabase.instance.client
-              .from('users')
-              .select('image_url')
-              .eq('id', currentUserId)
-              .maybeSingle();
+      final userFuture = Supabase.instance.client
+          .from('users')
+          .select('image_url')
+          .eq('id', currentUserId)
+          .maybeSingle();
       if (isGroup) {
         final result = await GroupChatServices().sendGroupMessage(
           groupId: conversationId,
@@ -322,15 +315,13 @@ class ChatNotificationDispatcher {
         );
         newMessageId = result.message.id;
       } else {
-        newMessageId =
-            (await ChatServices().sendMessage(
-              senderId: currentUserId,
-              receiverId: conversationId,
-              text: replyText,
-              clientMessageId: const Uuid().v4(),
-              replyToMessageId:
-                  latestMessageId.isEmpty ? null : latestMessageId,
-            )).id;
+        newMessageId = (await ChatServices().sendMessage(
+          senderId: currentUserId,
+          receiverId: conversationId,
+          text: replyText,
+          clientMessageId: const Uuid().v4(),
+          replyToMessageId: latestMessageId.isEmpty ? null : latestMessageId,
+        )).id;
       }
 
       final userData = await userFuture;
@@ -373,13 +364,12 @@ class ChatNotificationDispatcher {
       avatarUrl,
     );
 
-    final Uint8List headerBitmap =
-        isGroup
-            ? ((avatarUrl != null && avatarUrl.isNotEmpty)
-                ? (await _avatarBuilder.fetchBitmap(avatarUrl) ??
+    final Uint8List headerBitmap = isGroup
+        ? ((avatarUrl != null && avatarUrl.isNotEmpty)
+              ? (await _avatarBuilder.fetchBitmap(avatarUrl) ??
                     await _avatarBuilder.buildLetterAvatar(conversationTitle))
-                : await _avatarBuilder.buildLetterAvatar(conversationTitle))
-            : senderBitmap;
+              : await _avatarBuilder.buildLetterAvatar(conversationTitle))
+        : senderBitmap;
 
     final Uint8List myBitmap = await _avatarBuilder.getAvatarBitmap(
       myAvatarUrl,
@@ -396,17 +386,15 @@ class ChatNotificationDispatcher {
       icon: ByteArrayAndroidIcon(headerBitmap),
     );
 
-    final List<Message> styleMessages =
-        stored.map((m) {
-          final isMine = m.senderName == 'You';
-          final text =
-              (isGroup && !isMine) ? '${m.senderName}: ${m.text}' : m.text;
-          return Message(
-            text,
-            DateTime.fromMillisecondsSinceEpoch(m.timestamp),
-            isMine ? null : remotePerson,
-          );
-        }).toList();
+    final List<Message> styleMessages = stored.map((m) {
+      final isMine = m.senderName == 'You';
+      final text = (isGroup && !isMine) ? '${m.senderName}: ${m.text}' : m.text;
+      return Message(
+        text,
+        DateTime.fromMillisecondsSinceEpoch(m.timestamp),
+        isMine ? null : remotePerson,
+      );
+    }).toList();
 
     final messagingStyle = MessagingStyleInformation(
       me,
@@ -435,10 +423,9 @@ class ChatNotificationDispatcher {
       conversationTitle,
       replyText,
       NotificationDetails(android: androidDetails),
-      payload:
-          isGroup
-              ? 'group|$conversationId|$conversationTitle|$newMessageId|${avatarUrl ?? ''}'
-              : '$conversationId|$conversationTitle|${avatarUrl ?? ''}|$newMessageId',
+      payload: isGroup
+          ? 'group|$conversationId|$conversationTitle|$newMessageId|${avatarUrl ?? ''}'
+          : '$conversationId|$conversationTitle|${avatarUrl ?? ''}|$newMessageId',
     );
   }
 
@@ -463,18 +450,17 @@ class ChatNotificationDispatcher {
       }
     }
 
-    final history =
-        raw
-            .map(
-              (m) => _StoredMessage(
-                text: m['text'] as String? ?? '',
-                senderName: m['senderName'] as String? ?? '',
-                timestamp:
-                    (m['timestamp'] as num?)?.toInt() ??
-                    DateTime.now().millisecondsSinceEpoch,
-              ),
-            )
-            .toList();
+    final history = raw
+        .map(
+          (m) => _StoredMessage(
+            text: m['text'] as String? ?? '',
+            senderName: m['senderName'] as String? ?? '',
+            timestamp:
+                (m['timestamp'] as num?)?.toInt() ??
+                DateTime.now().millisecondsSinceEpoch,
+          ),
+        )
+        .toList();
 
     history.add(message);
 
@@ -588,12 +574,15 @@ class ChatNotificationDispatcher {
           MessagesColumns.isRead: false,
           MessagesColumns.isEdited: false,
           MessagesColumns.messageType: messageType,
-          MessagesColumns.imageUrl:
-              messageType == 'image' ? attachmentUrl : null,
-          MessagesColumns.videoUrl:
-              messageType == 'video' ? attachmentUrl : null,
-          MessagesColumns.voiceUrl:
-              messageType == 'voice' ? attachmentUrl : null,
+          MessagesColumns.imageUrl: messageType == 'image'
+              ? attachmentUrl
+              : null,
+          MessagesColumns.videoUrl: messageType == 'video'
+              ? attachmentUrl
+              : null,
+          MessagesColumns.voiceUrl: messageType == 'voice'
+              ? attachmentUrl
+              : null,
           MessagesColumns.durationSeconds: int.tryParse(
             data['durationSeconds'] ?? '',
           ),

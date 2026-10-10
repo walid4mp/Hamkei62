@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/router/app_routes.dart';
@@ -71,12 +73,11 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> with RouteAware {
     if (mounted) setState(() => _status = _VideoLoadStatus.loading);
 
     try {
-      final localPath =
-          ignoreCache
-              ? null
-              : await context.read<MediaCacheRepository>().resolveLocalPath(
-                widget.videoUrl,
-              );
+      final localPath = ignoreCache
+          ? null
+          : await context.read<MediaCacheRepository>().resolveLocalPath(
+              widget.videoUrl,
+            );
 
       if (localPath != null) {
         _controller = VideoPlayerController.file(File(localPath));
@@ -295,10 +296,9 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> with RouteAware {
                     return AnimatedOpacity(
                       opacity: showControls ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
-                      child:
-                          showControls
-                              ? _buildMinimalControls()
-                              : const SizedBox.shrink(),
+                      child: showControls
+                          ? _buildMinimalControls()
+                          : const SizedBox.shrink(),
                     );
                   },
                 ),
@@ -401,21 +401,16 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> with RouteAware {
         .push(
           PageRouteBuilder(
             opaque: false,
-            pageBuilder:
-                (_, __, ___) => FullScreenVideoPostView(
-                  post: widget.post,
-                  handle: _handle!,
-                  postsCubit: widget.postsCubit,
-                  currentUserId: widget.currentUserId,
-                ),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+            pageBuilder: (_, __, ___) => FullScreenVideoPostView(
+              post: widget.post,
+              handle: _handle!,
+              postsCubit: widget.postsCubit,
+              currentUserId: widget.currentUserId,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
           ),
         )
         .then((_) {

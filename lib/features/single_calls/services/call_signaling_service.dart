@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../models/call_model.dart';
 
@@ -48,22 +49,20 @@ class CallSignalingService {
 
   Future<bool> isUserBusy(String userId) async {
     try {
-      final activeSingleCall =
-          await _supabase
-              .from('calls')
-              .select('call_id')
-              .or('caller_id.eq.$userId,receiver_id.eq.$userId')
-              .inFilter('status', ['ringing', 'accepted'])
-              .maybeSingle();
+      final activeSingleCall = await _supabase
+          .from('calls')
+          .select('call_id')
+          .or('caller_id.eq.$userId,receiver_id.eq.$userId')
+          .inFilter('status', ['ringing', 'accepted'])
+          .maybeSingle();
       if (activeSingleCall != null) return true;
 
-      final activeGroupCallAsInitiator =
-          await _supabase
-              .from('group_calls')
-              .select('call_id')
-              .eq('initiator_id', userId)
-              .inFilter('status', ['ringing', 'accepted', 'ongoing'])
-              .maybeSingle();
+      final activeGroupCallAsInitiator = await _supabase
+          .from('group_calls')
+          .select('call_id')
+          .eq('initiator_id', userId)
+          .inFilter('status', ['ringing', 'accepted', 'ongoing'])
+          .maybeSingle();
       return activeGroupCallAsInitiator != null;
     } catch (e) {
       debugPrint('isUserBusy check failed: $e');

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,6 +8,7 @@ import 'package:social_media_app/core/services/file_picker_services.dart';
 import 'package:social_media_app/core/supabase/supabase_provider.dart';
 import 'package:social_media_app/core/toast/app_toast.dart';
 import 'package:social_media_app/features/social_graph/services/friendship_services.dart';
+
 import '../../../../core/cache/repository/media_cache_repository.dart';
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
@@ -82,10 +84,9 @@ class CreateStickerPackCubit extends Cubit<CreateStickerPackState>
     emit(
       current.copyWith(
         privacy: privacy,
-        selectedFriendIds:
-            privacy == StickerPackPrivacy.friends
-                ? current.selectedFriendIds
-                : {},
+        selectedFriendIds: privacy == StickerPackPrivacy.friends
+            ? current.selectedFriendIds
+            : {},
       ),
     );
     if (privacy == StickerPackPrivacy.friends) _loadFriendsIfNeeded();

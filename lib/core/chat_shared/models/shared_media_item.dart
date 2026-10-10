@@ -47,10 +47,9 @@ extension MessageModelSharedMediaX on MessageModel {
     String? receiverAvatar,
   }) {
     final isMe = senderId == currentUserId;
-    final String resolvedName =
-        isMe
-            ? 'You'
-            : (receiverName.trim().isNotEmpty ? receiverName : 'Someone');
+    final String resolvedName = isMe
+        ? 'You'
+        : (receiverName.trim().isNotEmpty ? receiverName : 'Someone');
 
     return SharedMediaItem(
       id: id,

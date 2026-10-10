@@ -31,10 +31,9 @@ class ReelsServices {
       },
     );
 
-    final pool =
-        (response as List)
-            .map((e) => ReelModel.fromMap(e as Map<String, dynamic>))
-            .toList();
+    final pool = (response as List)
+        .map((e) => ReelModel.fromMap(e as Map<String, dynamic>))
+        .toList();
 
     final shuffled = ReelsInterleaver.shuffle(pool);
     return shuffled.take(limit).toList();

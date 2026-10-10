@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utilities/file_size_formatter.dart';
 
 class MediaDurationBadge extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../chat_shared/models/conversation_item.dart';
 import '../../widgets/app_avatar.dart';
 
@@ -10,8 +11,9 @@ class RecentChatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isGroup = item.kind == ConversationKind.group;
-    final name =
-        isGroup ? (item.group!.title ?? item.group!.name) : item.chat!.name;
+    final name = isGroup
+        ? (item.group!.title ?? item.group!.name)
+        : item.chat!.name;
     final imageUrl = isGroup ? item.group!.avatarUrl : item.chat!.imageUrl;
 
     return Padding(
@@ -26,14 +28,13 @@ class RecentChatTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
-        trailing:
-            isGroup
-                ? Icon(
-                  Icons.groups_rounded,
-                  size: 20,
-                  color: Theme.of(context).primaryColor,
-                )
-                : null,
+        trailing: isGroup
+            ? Icon(
+                Icons.groups_rounded,
+                size: 20,
+                color: Theme.of(context).primaryColor,
+              )
+            : null,
       ),
     );
   }

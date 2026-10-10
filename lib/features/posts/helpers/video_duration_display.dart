@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import 'fade_dismiss_widget.dart';
 
 class VideoDurationDisplay extends StatelessWidget {

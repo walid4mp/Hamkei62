@@ -66,24 +66,22 @@ class _GeminiSparklePainter extends CustomPainter {
 
     // Official Google Gemini Cubic Bezier curve ratios (0.276 / 0.724)
     // for a plump, distinct body instead of needle-thin points.
-    final path =
-        Path()
-          ..moveTo(w * 0.5, 0)
-          // Top vertex to Right vertex
-          ..cubicTo(w * 0.5, h * 0.276, w * 0.724, h * 0.5, w, h * 0.5)
-          // Right vertex to Bottom vertex
-          ..cubicTo(w * 0.724, h * 0.5, w * 0.5, h * 0.724, w * 0.5, h)
-          // Bottom vertex to Left vertex
-          ..cubicTo(w * 0.5, h * 0.724, w * 0.276, h * 0.5, 0, h * 0.5)
-          // Left vertex back to Top vertex
-          ..cubicTo(w * 0.276, h * 0.5, w * 0.5, h * 0.276, w * 0.5, 0)
-          ..close();
+    final path = Path()
+      ..moveTo(w * 0.5, 0)
+      // Top vertex to Right vertex
+      ..cubicTo(w * 0.5, h * 0.276, w * 0.724, h * 0.5, w, h * 0.5)
+      // Right vertex to Bottom vertex
+      ..cubicTo(w * 0.724, h * 0.5, w * 0.5, h * 0.724, w * 0.5, h)
+      // Bottom vertex to Left vertex
+      ..cubicTo(w * 0.5, h * 0.724, w * 0.276, h * 0.5, 0, h * 0.5)
+      // Left vertex back to Top vertex
+      ..cubicTo(w * 0.276, h * 0.5, w * 0.5, h * 0.276, w * 0.5, 0)
+      ..close();
 
-    final paint =
-        Paint()
-          ..isAntiAlias = true
-          ..filterQuality = FilterQuality.high
-          ..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..isAntiAlias = true
+      ..filterQuality = FilterQuality.high
+      ..style = PaintingStyle.fill;
 
     if (gradient != null) {
       paint.shader = gradient!.createShader(Rect.fromLTWH(0, 0, w, h));

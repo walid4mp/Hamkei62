@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/audio/helpers/pulsing_mic_dot.dart';
 import '../../../core/presence/models/chat_action_type.dart';
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
@@ -43,15 +44,13 @@ class _ActionBubble extends StatelessWidget {
     final primary = Theme.of(context).primaryColor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bubbleColor =
-        isRecording
-            ? (isDark ? Colors.red.withValues(alpha: 0.2) : Colors.red.shade50)
-            : (isDark ? Colors.grey.shade800 : Colors.grey.shade200);
+    final bubbleColor = isRecording
+        ? (isDark ? Colors.red.withValues(alpha: 0.2) : Colors.red.shade50)
+        : (isDark ? Colors.grey.shade800 : Colors.grey.shade200);
 
-    final borderColor =
-        isRecording
-            ? (isDark ? Colors.red.shade700 : Colors.red.shade200)
-            : Colors.transparent;
+    final borderColor = isRecording
+        ? (isDark ? Colors.red.shade700 : Colors.red.shade200)
+        : Colors.transparent;
 
     final dotColor = isDark ? Colors.white70 : Colors.black54;
 
@@ -66,21 +65,21 @@ class _ActionBubble extends StatelessWidget {
         child: CircleAvatar(
           radius: 16,
           backgroundColor: primary.withValues(alpha: 0.12),
-          backgroundImage:
-              hasAvatar ? CachedNetworkImageProvider(user.userAvatar!) : null,
-          child:
-              !hasAvatar
-                  ? Text(
-                    user.userName.isNotEmpty
-                        ? user.userName[0].toUpperCase()
-                        : '?',
-                    style: TextStyle(
-                      color: primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                  : null,
+          backgroundImage: hasAvatar
+              ? CachedNetworkImageProvider(user.userAvatar!)
+              : null,
+          child: !hasAvatar
+              ? Text(
+                  user.userName.isNotEmpty
+                      ? user.userName[0].toUpperCase()
+                      : '?',
+                  style: TextStyle(
+                    color: primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
         ),
       );
     } else {
@@ -111,30 +110,27 @@ class _ActionBubble extends StatelessWidget {
                 bottomLeft: Radius.circular(4),
               ),
             ),
-            child:
-                isRecording
-                    ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const PulsingMicDot(),
-                        const SizedBox(width: 8),
-                        AnimatedActivityText(
-                          text:
-                              entries.length == 1
-                                  ? '${entries.first.userName} recording audio...'
-                                  : '${entries.length} people recording audio...',
-                          style: TextStyle(
-                            color:
-                                isDark
-                                    ? Colors.red.shade400
-                                    : Colors.red.shade700,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                          ),
+            child: isRecording
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const PulsingMicDot(),
+                      const SizedBox(width: 8),
+                      AnimatedActivityText(
+                        text: entries.length == 1
+                            ? '${entries.first.userName} recording audio...'
+                            : '${entries.length} people recording audio...',
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.red.shade400
+                              : Colors.red.shade700,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
                         ),
-                      ],
-                    )
-                    : TypingIndicatorWidget(color: dotColor, dotSize: 5),
+                      ),
+                    ],
+                  )
+                : TypingIndicatorWidget(color: dotColor, dotSize: 5),
           ),
         ],
       ),

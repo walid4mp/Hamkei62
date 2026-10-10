@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,12 +17,15 @@ import 'package:social_media_app/core/services/cloudinary_storage_services.dart'
 import 'package:social_media_app/core/services/file_picker_services.dart';
 import 'package:social_media_app/core/services/fcm_services.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
+
 import '../../../../core/connectivity/services/connectivity_banner_controller.dart';
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../../core/toast/app_toast.dart';
 import '../../../social_graph/models/content_privacy.dart';
+
 import 'package:social_media_app/core/mentions/mentions.dart';
+
 import '../../models/story_model.dart';
 import '../../services/stories_services.dart';
 part 'stories_state.dart';
@@ -49,18 +53,17 @@ class StoriesCubit extends Cubit<StoriesState>
   bool _isPickingMedia = false;
 
   void _monitorRealtimeStories() {
-    _storiesChannel =
-        SupabaseProvider.client
-            .channel('public_stories_changes')
-            .onPostgresChanges(
-              event: PostgresChangeEvent.all,
-              schema: 'public',
-              table: SupabaseConstants.stories,
-              callback: ((payload) {
-                _silentReconcile();
-              }),
-            )
-            .subscribe();
+    _storiesChannel = SupabaseProvider.client
+        .channel('public_stories_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: SupabaseConstants.stories,
+          callback: ((payload) {
+            _silentReconcile();
+          }),
+        )
+        .subscribe();
   }
 
   Future<void> _silentReconcile() async {
@@ -270,10 +273,10 @@ class StoriesCubit extends Cubit<StoriesState>
     try {
       final File uploadFile =
           (_stableVideoFile != null && await _stableVideoFile!.exists())
-              ? _stableVideoFile!
-              : (await file.exists()
-                  ? file
-                  : throw PathNotFoundException(
+          ? _stableVideoFile!
+          : (await file.exists()
+                ? file
+                : throw PathNotFoundException(
                     file.path,
                     const OSError('File not found', 2),
                   ));
@@ -375,10 +378,9 @@ class StoriesCubit extends Cubit<StoriesState>
     _isPickingMedia = true;
 
     try {
-      final XFile? pickedFile =
-          source == ImageSource.camera
-              ? await filePickerServices.takePhotoByCamera()
-              : await filePickerServices.pickImageFromGallery();
+      final XFile? pickedFile = source == ImageSource.camera
+          ? await filePickerServices.takePhotoByCamera()
+          : await filePickerServices.pickImageFromGallery();
 
       if (pickedFile == null) return;
 
@@ -399,10 +401,9 @@ class StoriesCubit extends Cubit<StoriesState>
     _isPickingMedia = true;
 
     try {
-      final XFile? pickedFile =
-          source == ImageSource.camera
-              ? await filePickerServices.takeVideoByCamera()
-              : await filePickerServices.pickVideoFromGallery();
+      final XFile? pickedFile = source == ImageSource.camera
+          ? await filePickerServices.takeVideoByCamera()
+          : await filePickerServices.pickVideoFromGallery();
 
       if (pickedFile == null) return;
 
@@ -458,10 +459,9 @@ class StoriesCubit extends Cubit<StoriesState>
       await _storiesServices.deleteStory(storyId);
       cachedStories = cachedStories.where((s) => s.id != storyId).toList();
       if (state is StoriesLoaded) {
-        final updateStories =
-            (state as StoriesLoaded).stories
-                .where((s) => s.id != storyId)
-                .toList();
+        final updateStories = (state as StoriesLoaded).stories
+            .where((s) => s.id != storyId)
+            .toList();
         emit(StoriesLoaded(updateStories, DateTime.now()));
       } else {
         emit(StoriesLoaded(cachedStories, DateTime.now()));
@@ -565,16 +565,15 @@ class StoriesCubit extends Cubit<StoriesState>
     required String? newImageUrl,
   }) {
     bool changed = false;
-    cachedStories =
-        cachedStories.map((story) {
-          if (story.authorId != authorId) return story;
-          changed = true;
-          return story.copyWith(
-            authorName: newName,
-            authorImageUrl: newImageUrl,
-            clearAuthorImageUrl: newImageUrl == null || newImageUrl.isEmpty,
-          );
-        }).toList();
+    cachedStories = cachedStories.map((story) {
+      if (story.authorId != authorId) return story;
+      changed = true;
+      return story.copyWith(
+        authorName: newName,
+        authorImageUrl: newImageUrl,
+        clearAuthorImageUrl: newImageUrl == null || newImageUrl.isEmpty,
+      );
+    }).toList();
 
     if (changed) {
       _persistStoriesSnapshot(cachedStories);

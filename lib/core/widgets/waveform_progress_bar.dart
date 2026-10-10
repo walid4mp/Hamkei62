@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class WaveformProgressBar extends StatefulWidget {
@@ -36,11 +37,12 @@ class _WaveformProgressBarState extends State<WaveformProgressBar>
   late Animation<double> _progressAnim;
   double _targetProgress = 0;
 
-  double get _rawProgress =>
-      widget.duration.inMilliseconds > 0
-          ? (widget.position.inMilliseconds / widget.duration.inMilliseconds)
-              .clamp(0.0, 1.0)
-          : 0.0;
+  double get _rawProgress => widget.duration.inMilliseconds > 0
+      ? (widget.position.inMilliseconds / widget.duration.inMilliseconds).clamp(
+          0.0,
+          1.0,
+        )
+      : 0.0;
 
   @override
   void initState() {
@@ -68,12 +70,10 @@ class _WaveformProgressBarState extends State<WaveformProgressBar>
       return;
     }
 
-    _progressAnim = Tween<double>(
-      begin: _progressAnim.value,
-      end: next,
-    ).animate(
-      CurvedAnimation(parent: _progressCtrl, curve: Curves.easeOutCubic),
-    );
+    _progressAnim = Tween<double>(begin: _progressAnim.value, end: next)
+        .animate(
+          CurvedAnimation(parent: _progressCtrl, curve: Curves.easeOutCubic),
+        );
     _targetProgress = next;
     _progressCtrl.forward(from: 0);
   }
@@ -175,17 +175,15 @@ class _WaveformPainter extends CustomPainter {
     final bars = _barsFor(count);
     if (bars.isEmpty) return;
 
-    final inactivePaint =
-        Paint()
-          ..color = inactiveColor
-          ..strokeWidth = barWidth
-          ..strokeCap = StrokeCap.round;
+    final inactivePaint = Paint()
+      ..color = inactiveColor
+      ..strokeWidth = barWidth
+      ..strokeCap = StrokeCap.round;
 
-    final activePaint =
-        Paint()
-          ..color = activeColor
-          ..strokeWidth = barWidth
-          ..strokeCap = StrokeCap.round;
+    final activePaint = Paint()
+      ..color = activeColor
+      ..strokeWidth = barWidth
+      ..strokeCap = StrokeCap.round;
 
     void drawBars(Paint paint) {
       for (var i = 0; i < bars.length; i++) {

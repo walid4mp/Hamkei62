@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+
 import '../../settings/widgets/settings_detail_sliver_app_bar.dart';
 import '../models/policy_section.dart';
 import '../utils/markdown_section_parser.dart';

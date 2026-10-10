@@ -20,10 +20,9 @@ class DynamicSplashLogo extends StatelessWidget {
     final dynamicPrimaryHex = _colorToHex(primaryColor);
     final dynamicBaseTextHex = _colorToHex(baseTextColor);
 
-    final String boxStyleReplacement =
-        isDark
-            ? 'fill="#FFFFFF" fill-opacity="1.0"'
-            : 'fill="$dynamicPrimaryHex" fill-opacity="0.1"';
+    final String boxStyleReplacement = isDark
+        ? 'fill="#FFFFFF" fill-opacity="1.0"'
+        : 'fill="$dynamicPrimaryHex" fill-opacity="0.1"';
 
     String modifiedSvg = _rawSvgString
         .replaceAll('#0779B8', dynamicPrimaryHex)

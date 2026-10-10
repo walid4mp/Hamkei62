@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/core/router/app_routes.dart';
 import 'package:social_media_app/features/profile/cubits/profile_cubit/profile_cubit.dart';
+
 import '../../../core/presence/models/presence_privacy.dart';
 import '../../../core/presence/widgets/presence_privacy_sheet.dart';
 import '../../../core/toast/app_toast.dart';
@@ -48,12 +49,11 @@ class _SettingsViewState extends State<SettingsView>
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) => SettingsCubit(
-            userService: context.read<UserService>(),
-            homeCubit: context.read<HomeCubit>(),
-            currentUser: context.read<HomeCubit>().currentUserData,
-          ),
+      create: (context) => SettingsCubit(
+        userService: context.read<UserService>(),
+        homeCubit: context.read<HomeCubit>(),
+        currentUser: context.read<HomeCubit>().currentUserData,
+      ),
       child: BlocConsumer<SettingsCubit, SettingsState>(
         listenWhen: (previous, current) => current.errorMessage != null,
         listener: (context, state) {
@@ -122,8 +122,8 @@ class _SettingsViewState extends State<SettingsView>
                         icon: CupertinoIcons.lock_fill,
                         label: 'Change Password',
                         subtitle: 'Update your account password',
-                        onTap:
-                            () => _showComingSoon(context, 'Change Password'),
+                        onTap: () =>
+                            _showComingSoon(context, 'Change Password'),
                       ),
                       SettingsItemData(
                         icon: CupertinoIcons.mail_solid,
@@ -144,30 +144,26 @@ class _SettingsViewState extends State<SettingsView>
                         label: 'Push Notifications',
                         subtitle: 'Enable all notifications',
                         toggle: settingsState.pushNotifications,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .setPushNotifications(v),
+                        onToggle: (v) => context
+                            .read<SettingsCubit>()
+                            .setPushNotifications(v),
                       ),
                       SettingsItemData(
                         icon: Icons.message_outlined,
                         label: 'Message Previews',
                         subtitle: 'Show content in notifications',
                         toggle: settingsState.messagePreviews,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .setMessagePreviews(v),
+                        onToggle: (v) =>
+                            context.read<SettingsCubit>().setMessagePreviews(v),
                       ),
                       SettingsItemData(
                         icon: Icons.call_outlined,
                         label: 'Call Notifications',
                         subtitle: 'Incoming call alerts',
                         toggle: settingsState.callNotifications,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .setCallNotifications(v),
+                        onToggle: (v) => context
+                            .read<SettingsCubit>()
+                            .setCallNotifications(v),
                       ),
                     ],
                   ),
@@ -182,20 +178,16 @@ class _SettingsViewState extends State<SettingsView>
                         label: 'Read Receipts',
                         subtitle: 'Show when you\'ve read messages',
                         toggle: settingsState.readReceipts,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .setReadReceipts(v),
+                        onToggle: (v) =>
+                            context.read<SettingsCubit>().setReadReceipts(v),
                       ),
                       SettingsItemData(
                         icon: Icons.circle_outlined,
                         label: 'Online Status',
                         subtitle: 'Let others see when you\'re active',
                         toggle: settingsState.onlineStatus,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .setOnlineStatus(v),
+                        onToggle: (v) =>
+                            context.read<SettingsCubit>().setOnlineStatus(v),
                       ),
 
                       SettingsItemData(
@@ -205,11 +197,10 @@ class _SettingsViewState extends State<SettingsView>
                           settingsState.presencePrivacy,
                         ),
                         enabled: settingsState.onlineStatus,
-                        onTap:
-                            () => _pickPresencePrivacy(
-                              context,
-                              settingsState.presencePrivacy,
-                            ),
+                        onTap: () => _pickPresencePrivacy(
+                          context,
+                          settingsState.presencePrivacy,
+                        ),
                       ),
 
                       SettingsItemData(
@@ -217,10 +208,9 @@ class _SettingsViewState extends State<SettingsView>
                         label: 'App Lock',
                         subtitle: 'Require fingerprint / Face ID to open app',
                         toggle: settingsState.biometricLock,
-                        onToggle:
-                            (v) => context
-                                .read<SettingsCubit>()
-                                .toggleBiometricLock(v),
+                        onToggle: (v) => context
+                            .read<SettingsCubit>()
+                            .toggleBiometricLock(v),
                       ),
                       SettingsItemData(
                         icon: CupertinoIcons.lock_shield_fill,
@@ -236,10 +226,9 @@ class _SettingsViewState extends State<SettingsView>
                         icon: Icons.block_outlined,
                         label: 'Blocked Users',
                         subtitle: 'Manage blocked accounts',
-                        onTap:
-                            () => Navigator.of(
-                              context,
-                            ).pushNamed(AppRoutes.blockedUsersViewRoute),
+                        onTap: () =>
+                            Navigator.of(context)
+                                .pushNamed(AppRoutes.blockedUsersViewRoute),
                       ),
                     ],
                   ),
@@ -254,10 +243,9 @@ class _SettingsViewState extends State<SettingsView>
 
                         label: 'AI Settings',
                         subtitle: 'Personalize your AI-powered experience',
-                        onTap:
-                            () => Navigator.of(
-                              context,
-                            ).pushNamed(AppRoutes.aiSettingsViewRoute),
+                        onTap: () =>
+                            Navigator.of(context)
+                                .pushNamed(AppRoutes.aiSettingsViewRoute),
                       ),
                     ],
                   ),
@@ -277,9 +265,8 @@ class _SettingsViewState extends State<SettingsView>
                         icon: Icons.language_rounded,
                         label: 'Language',
                         subtitle: 'English (US)',
-                        onTap:
-                            () =>
-                                _showComingSoon(context, 'Language selection'),
+                        onTap: () =>
+                            _showComingSoon(context, 'Language selection'),
                       ),
                     ],
                   ),
@@ -293,21 +280,19 @@ class _SettingsViewState extends State<SettingsView>
                         icon: Icons.info_outline_rounded,
                         label: 'About Us',
                         subtitle: 'Our story and mission',
-                        onTap:
-                            () => Navigator.pushNamed(
-                              context,
-                              AppRoutes.aboutUsViewRoute,
-                            ),
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.aboutUsViewRoute,
+                        ),
                       ),
                       SettingsItemData(
                         icon: Icons.help_outline_rounded,
                         label: 'Help & FAQ',
                         subtitle: 'Get answers to common questions',
-                        onTap:
-                            () => Navigator.pushNamed(
-                              context,
-                              AppRoutes.helpFaqViewRoute,
-                            ),
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.helpFaqViewRoute,
+                        ),
                       ),
                       SettingsItemData(
                         icon: Icons.feedback_outlined,
@@ -319,11 +304,10 @@ class _SettingsViewState extends State<SettingsView>
                         icon: Icons.policy_outlined,
                         label: 'Privacy Policy',
                         subtitle: 'How we handle your data',
-                        onTap:
-                            () => Navigator.pushNamed(
-                              context,
-                              AppRoutes.privacyPolicyViewRoute,
-                            ),
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.privacyPolicyViewRoute,
+                        ),
                       ),
                     ],
                   ),
@@ -368,10 +352,9 @@ class _SettingsViewState extends State<SettingsView>
     if (result == PresencePrivacy.specific && context.mounted) {
       final selected = await Navigator.of(context).push<Set<String>>(
         MaterialPageRoute(
-          builder:
-              (_) => AudiencePickerView(
-                initialSelectedIds: cubit.state.presenceVisibleTo.toSet(),
-              ),
+          builder: (_) => AudiencePickerView(
+            initialSelectedIds: cubit.state.presenceVisibleTo.toSet(),
+          ),
         ),
       );
       if (selected != null) {

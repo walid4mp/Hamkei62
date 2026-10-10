@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/custom_confirmation_dialog.dart';
 import '../../../core/widgets/custom_grey_container.dart';
@@ -15,22 +16,18 @@ class SocialSignSection extends StatelessWidget {
   Future<void> _handleFacebookTap(BuildContext context) async {
     final shouldContinue = await showDialog<bool>(
       context: context,
-      builder:
-          (dialogContext) => CustomConfirmationDialog(
-            title:
-                'Facebook log in is in Dev Mode (Test accounts and admin only). Continue?',
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              fontWeight: FontWeight.w500,
-              fontSize: 17,
-            ),
-            textAlign: TextAlign.center,
-            img: AppImages.alertAnimationLot,
-            cancelBtnText: 'Cancel',
-            confirmBtnText: 'Continue',
-            onConfirm: () {
-              Navigator.of(dialogContext, rootNavigator: true).pop(true);
-            },
-          ),
+      builder: (dialogContext) => CustomConfirmationDialog(
+        title: 'Facebook log in is in Dev Mode (Test accounts and admin only). Continue?',
+        style: Theme.of(context).textTheme.titleMedium!
+            .copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+        textAlign: TextAlign.center,
+        img: AppImages.alertAnimationLot,
+        cancelBtnText: 'Cancel',
+        confirmBtnText: 'Continue',
+        onConfirm: () {
+          Navigator.of(dialogContext, rootNavigator: true).pop(true);
+        },
+      ),
     );
 
     if (shouldContinue == true && context.mounted) {

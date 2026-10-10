@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/chat_shared/widgets/premium_selection_bar_pieces.dart';
 
 const Color kAiChatStarGold = Color(0xFFFFD700);
@@ -111,10 +112,9 @@ class AiChatSelectionHeaderBar extends StatelessWidget
                   child: IgnorePointer(
                     ignoring: !showStar,
                     child: PremiumSelectionActionIcon(
-                      state:
-                          isStarred
-                              ? PremiumActionVisualState.on
-                              : PremiumActionVisualState.off,
+                      state: isStarred
+                          ? PremiumActionVisualState.on
+                          : PremiumActionVisualState.off,
                       onIcon: Icons.star_rounded,
                       offIcon: Icons.star_border_rounded,
                       onLabel: 'Unstar',

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/supabase/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,10 +47,9 @@ class ChatMuteService {
           schema: 'public',
           table: 'chat_mutes',
           callback: (payload) {
-            final row =
-                payload.eventType == PostgresChangeEvent.delete
-                    ? payload.oldRecord
-                    : payload.newRecord;
+            final row = payload.eventType == PostgresChangeEvent.delete
+                ? payload.oldRecord
+                : payload.newRecord;
 
             final ownerId = row['owner_id'] as String?;
             final rowPeerId = row['peer_id'] as String?;

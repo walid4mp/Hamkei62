@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/widgets/app_avatar.dart';
 import '../services/connections_service.dart';
@@ -73,11 +74,10 @@ class _AudiencePickerViewState extends State<AudiencePickerView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final displayedConnections =
-        _connections.where((user) {
-          final name = (user['name'] as String? ?? '').toLowerCase();
-          return name.contains(_searchQuery.toLowerCase());
-        }).toList();
+    final displayedConnections = _connections.where((user) {
+      final name = (user['name'] as String? ?? '').toLowerCase();
+      return name.contains(_searchQuery.toLowerCase());
+    }).toList();
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -126,29 +126,27 @@ class _AudiencePickerViewState extends State<AudiencePickerView> {
                       color: Colors.grey,
                     ),
                     filled: true,
-                    fillColor:
-                        theme.brightness == Brightness.dark
-                            ? Colors.grey.shade900
-                            : Colors.grey.shade100,
+                    fillColor: theme.brightness == Brightness.dark
+                        ? Colors.grey.shade900
+                        : Colors.grey.shade100,
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
-                    suffixIcon:
-                        _searchQuery.isNotEmpty
-                            ? IconButton(
-                              icon: const Icon(
-                                Icons.clear,
-                                size: 18,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() => _searchQuery = '');
-                              },
-                            )
-                            : null,
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.clear,
+                              size: 18,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
@@ -294,10 +292,9 @@ class _AudiencePickerViewState extends State<AudiencePickerView> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color:
-                    isSelected
-                        ? theme.primaryColor.withValues(alpha: 0.08)
-                        : Colors.transparent,
+                color: isSelected
+                    ? theme.primaryColor.withValues(alpha: 0.08)
+                    : Colors.transparent,
               ),
               child: Row(
                 children: [
@@ -328,24 +325,23 @@ class _AudiencePickerViewState extends State<AudiencePickerView> {
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color:
-                          isSelected ? theme.primaryColor : Colors.transparent,
+                      color: isSelected
+                          ? theme.primaryColor
+                          : Colors.transparent,
                       border: Border.all(
-                        color:
-                            isSelected
-                                ? theme.primaryColor
-                                : Colors.grey.shade400,
+                        color: isSelected
+                            ? theme.primaryColor
+                            : Colors.grey.shade400,
                         width: 1.5,
                       ),
                     ),
-                    child:
-                        isSelected
-                            ? const Icon(
-                              Icons.check_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            )
-                            : null,
+                    child: isSelected
+                        ? const Icon(
+                            Icons.check_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
                 ],
               ),

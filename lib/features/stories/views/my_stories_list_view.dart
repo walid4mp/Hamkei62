@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/settings/repository/settings_repository.dart';
 import 'package:social_media_app/features/social_graph/models/content_privacy.dart';
 import 'package:social_media_app/features/social_graph/widgets/privacy_selector_sheet.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/toast/app_toast.dart';
@@ -51,16 +52,14 @@ class _MyStoriesListViewState extends State<MyStoriesListView> {
     final theme = Theme.of(context);
 
     return BlocProvider(
-      create:
-          (_) => MyStoriesCubit(
-            initialStories: widget.myStories,
-            storiesCubit: widget.storiesCubit,
-          ),
+      create: (_) => MyStoriesCubit(
+        initialStories: widget.myStories,
+        storiesCubit: widget.storiesCubit,
+      ),
       child: BlocListener<StoriesCubit, StoriesState>(
         bloc: widget.storiesCubit,
-        listenWhen:
-            (_, current) =>
-                current is StoryImagePicked || current is StoryVideoPicked,
+        listenWhen: (_, current) =>
+            current is StoryImagePicked || current is StoryVideoPicked,
         listener: (context, state) {
           if (ModalRoute.of(context)?.isCurrent != true) return;
 
@@ -113,41 +112,37 @@ class _MyStoriesListViewState extends State<MyStoriesListView> {
                             backgroundColor: theme.scaffoldBackgroundColor,
                             leading: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 220),
-                              transitionBuilder:
-                                  (child, anim) => ScaleTransition(
+                              transitionBuilder: (child, anim) =>
+                                  ScaleTransition(
                                     scale: anim,
                                     child: FadeTransition(
                                       opacity: anim,
                                       child: child,
                                     ),
                                   ),
-                              child:
-                                  loaded.isSelectionMode
-                                      ? InkWell(
-                                        key: const ValueKey('selection-close'),
-                                        onTap:
-                                            () =>
-                                                context
-                                                    .read<MyStoriesCubit>()
-                                                    .clearSelection(),
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: Icon(
-                                          Icons.close_rounded,
-                                          color: theme.primaryColor,
-                                          size: 24,
-                                        ),
-                                      )
-                                      : InkWell(
-                                        key: const ValueKey('back-arrow'),
-                                        onTap:
-                                            () => Navigator.of(context).pop(),
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: Icon(
-                                          Icons.arrow_back_ios_new_rounded,
-                                          color: theme.primaryColor,
-                                          size: 20,
-                                        ),
+                              child: loaded.isSelectionMode
+                                  ? InkWell(
+                                      key: const ValueKey('selection-close'),
+                                      onTap: () => context
+                                          .read<MyStoriesCubit>()
+                                          .clearSelection(),
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: theme.primaryColor,
+                                        size: 24,
                                       ),
+                                    )
+                                  : InkWell(
+                                      key: const ValueKey('back-arrow'),
+                                      onTap: () => Navigator.of(context).pop(),
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Icon(
+                                        Icons.arrow_back_ios_new_rounded,
+                                        color: theme.primaryColor,
+                                        size: 20,
+                                      ),
+                                    ),
                             ),
                             titleSpacing: 0,
                             title: AnimatedSwitcher(
@@ -199,63 +194,60 @@ class _MyStoriesListViewState extends State<MyStoriesListView> {
 
                               AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 220),
-                                transitionBuilder:
-                                    (child, anim) => ScaleTransition(
+                                transitionBuilder: (child, anim) =>
+                                    ScaleTransition(
                                       scale: anim,
                                       child: FadeTransition(
                                         opacity: anim,
                                         child: child,
                                       ),
                                     ),
-                                child:
-                                    loaded.isSelectionMode
-                                        ? IconButton(
-                                          key: const ValueKey(
-                                            'bulk-delete-action',
-                                          ),
-                                          icon: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Colors.red.withValues(
-                                                alpha: 0.1,
-                                              ),
-                                              shape: BoxShape.circle,
+                                child: loaded.isSelectionMode
+                                    ? IconButton(
+                                        key: const ValueKey(
+                                          'bulk-delete-action',
+                                        ),
+                                        icon: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withValues(
+                                              alpha: 0.1,
                                             ),
-                                            child: const Icon(
-                                              Icons.delete_outline_rounded,
-                                              color: Colors.redAccent,
-                                            ),
+                                            shape: BoxShape.circle,
                                           ),
-                                          onPressed: () async {
-                                            final cubit =
-                                                context.read<MyStoriesCubit>();
-                                            final currentState =
-                                                cubit.state as MyStoriesLoaded;
-                                            final confirm =
-                                                await showDeleteStoryDialog(
-                                                  context,
-                                                  count:
-                                                      currentState
-                                                          .selectedStoryIds
-                                                          .length,
-                                                );
-                                            if (confirm == true) {
-                                              cubit.deleteSelectedStories();
-                                            }
-                                          },
-                                        )
-                                        : IconButton(
-                                          onPressed:
-                                              () =>
-                                                  _openDefaultStoryPrivacySettings(
-                                                    context,
-                                                  ),
-                                          color: theme.primaryColor,
-                                          icon: Icon(
-                                            Icons.privacy_tip_outlined,
-                                            size: 20,
+                                          child: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            color: Colors.redAccent,
                                           ),
                                         ),
+                                        onPressed: () async {
+                                          final cubit = context
+                                              .read<MyStoriesCubit>();
+                                          final currentState =
+                                              cubit.state as MyStoriesLoaded;
+                                          final confirm =
+                                              await showDeleteStoryDialog(
+                                                context,
+                                                count: currentState
+                                                    .selectedStoryIds
+                                                    .length,
+                                              );
+                                          if (confirm == true) {
+                                            cubit.deleteSelectedStories();
+                                          }
+                                        },
+                                      )
+                                    : IconButton(
+                                        onPressed: () =>
+                                            _openDefaultStoryPrivacySettings(
+                                              context,
+                                            ),
+                                        color: theme.primaryColor,
+                                        icon: Icon(
+                                          Icons.privacy_tip_outlined,
+                                          size: 20,
+                                        ),
+                                      ),
                               ),
                             ],
                           ),

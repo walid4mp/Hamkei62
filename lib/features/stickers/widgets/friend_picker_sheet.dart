@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/social_graph/models/friend_list_item_model.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/widgets/app_avatar.dart';
 
@@ -34,11 +35,12 @@ class _FriendPickerSheetState extends State<FriendPickerSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final displayedFriends =
-        widget.friends.where((FriendListItemModel friendModel) {
-          final name = (friendModel.user.name).toLowerCase();
-          return name.contains(_searchQuery.toLowerCase());
-        }).toList();
+    final displayedFriends = widget.friends.where((
+      FriendListItemModel friendModel,
+    ) {
+      final name = (friendModel.user.name).toLowerCase();
+      return name.contains(_searchQuery.toLowerCase());
+    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -106,29 +108,27 @@ class _FriendPickerSheetState extends State<FriendPickerSheet> {
                         size: 20,
                       ),
                       filled: true,
-                      fillColor:
-                          theme.brightness == Brightness.dark
-                              ? Colors.grey.shade900
-                              : Colors.grey.shade100,
+                      fillColor: theme.brightness == Brightness.dark
+                          ? Colors.grey.shade900
+                          : Colors.grey.shade100,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
-                      suffixIcon:
-                          _searchQuery.isNotEmpty
-                              ? IconButton(
-                                icon: const Icon(
-                                  Icons.clear,
-                                  size: 18,
-                                  color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                              )
-                              : null,
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.clear,
+                                size: 18,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _searchQuery = '');
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -136,108 +136,101 @@ class _FriendPickerSheetState extends State<FriendPickerSheet> {
 
                 // Friends List
                 Expanded(
-                  child:
-                      displayedFriends.isEmpty
-                          ? const Center(
-                            child: Text(
-                              'No friends found.',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          )
-                          : ListView.builder(
-                            controller: scrollController,
-                            keyboardDismissBehavior:
-                                ScrollViewKeyboardDismissBehavior.manual,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: displayedFriends.length,
-                            itemBuilder: (context, i) {
-                              final user = displayedFriends[i];
-                              final id = user.user.id;
-                              final name = user.user.name;
-                              final imageUrl = user.user.imageUrl;
-                              final isSelected = widget.selectedIds.contains(
-                                id,
-                              );
+                  child: displayedFriends.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No friends found.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      : ListView.builder(
+                          controller: scrollController,
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.manual,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: displayedFriends.length,
+                          itemBuilder: (context, i) {
+                            final user = displayedFriends[i];
+                            final id = user.user.id;
+                            final name = user.user.name;
+                            final imageUrl = user.user.imageUrl;
+                            final isSelected = widget.selectedIds.contains(id);
 
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: InkWell(
-                                  onTap: () => widget.onToggle(id),
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      color:
-                                          isSelected
-                                              ? theme.primaryColor.withValues(
-                                                alpha: 0.08,
-                                              )
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: InkWell(
+                                onTap: () => widget.onToggle(id),
+                                borderRadius: BorderRadius.circular(14),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: isSelected
+                                        ? theme.primaryColor.withValues(
+                                            alpha: 0.08,
+                                          )
+                                        : Colors.transparent,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      PresenceAvatarWidget(
+                                        userId: id,
+                                        avatarSize: 46,
+                                        showDot: true,
+                                        showBorder: true,
+                                        child: AppAvatar(
+                                          imageUrl: imageUrl,
+                                          size: 46,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: isSelected
+                                              ? theme.primaryColor
                                               : Colors.transparent,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        PresenceAvatarWidget(
-                                          userId: id,
-                                          avatarSize: 46,
-                                          showDot: true,
-                                          showBorder: true,
-                                          child: AppAvatar(
-                                            imageUrl: imageUrl,
-                                            size: 46,
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? theme.primaryColor
+                                                : Colors.grey.shade400,
+                                            width: 1.5,
                                           ),
                                         ),
-                                        const SizedBox(width: 14),
-                                        Expanded(
-                                          child: Text(
-                                            name,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                        AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          curve: Curves.easeInOut,
-                                          width: 24,
-                                          height: 24,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color:
-                                                isSelected
-                                                    ? theme.primaryColor
-                                                    : Colors.transparent,
-                                            border: Border.all(
-                                              color:
-                                                  isSelected
-                                                      ? theme.primaryColor
-                                                      : Colors.grey.shade400,
-                                              width: 1.5,
-                                            ),
-                                          ),
-                                          child:
-                                              isSelected
-                                                  ? const Icon(
-                                                    Icons.check_rounded,
-                                                    size: 16,
-                                                    color: Colors.white,
-                                                  )
-                                                  : null,
-                                        ),
-                                      ],
-                                    ),
+                                        child: isSelected
+                                            ? const Icon(
+                                                Icons.check_rounded,
+                                                size: 16,
+                                                color: Colors.white,
+                                              )
+                                            : null,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
 
                 // Done Button

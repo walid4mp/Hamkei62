@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+
 import '../models/reel_model.dart';
 import 'reel_actions_column.dart';
 import 'reel_info_overlay.dart';
@@ -32,22 +33,21 @@ class ReelControlsOverlay extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTogglePlayback,
-            onVerticalDragUpdate:
-                (details) => onVerticalDragUpdate(details.delta.dy),
-            onVerticalDragEnd:
-                (details) => onVerticalDragEnd(details.primaryVelocity ?? 0),
+            onVerticalDragUpdate: (details) =>
+                onVerticalDragUpdate(details.delta.dy),
+            onVerticalDragEnd: (details) =>
+                onVerticalDragEnd(details.primaryVelocity ?? 0),
             child: Container(
               color: Colors.transparent,
-              child:
-                  isPaused
-                      ? const Center(
-                        child: Icon(
-                          Icons.play_arrow,
-                          color: Colors.white70,
-                          size: 64,
-                        ),
-                      )
-                      : null,
+              child: isPaused
+                  ? const Center(
+                      child: Icon(
+                        Icons.play_arrow,
+                        color: Colors.white70,
+                        size: 64,
+                      ),
+                    )
+                  : null,
             ),
           ),
         ),

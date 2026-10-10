@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../controllers/voice_playback_controller.dart';
 import '../cubits/shared_media_cubit/shared_media_cubit.dart';
 import '../widgets/media_tab_view_widget.dart';
 
-typedef ShowInChatCallback =
-    void Function(BuildContext context, String messageId);
+typedef ShowInChatCallback = void Function(
+  BuildContext context,
+  String messageId,
+);
 
 class SharedMediaView extends StatefulWidget {
   final SharedMediaCubit mediaCubit;
@@ -85,15 +88,12 @@ class _SharedMediaViewState extends State<SharedMediaView> {
         body: BlocProvider.value(
           value: widget.mediaCubit,
           child: TabBarView(
-            children:
-                _tabs
-                    .map(
-                      (tab) => MediaTabView(
-                        tab: tab,
-                        onShowInChat: widget.onShowInChat,
-                      ),
-                    )
-                    .toList(),
+            children: _tabs
+                .map(
+                  (tab) =>
+                      MediaTabView(tab: tab, onShowInChat: widget.onShowInChat),
+                )
+                .toList(),
           ),
         ),
       ),

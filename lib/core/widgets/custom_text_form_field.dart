@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
+
 import '../themes/app_colors.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -70,9 +71,8 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             alignment: Alignment.centerLeft,
             child: Text(
               widget.headerText!,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall!.copyWith(fontSize: 16),
+              style: Theme.of(context).textTheme.headlineSmall!
+                  .copyWith(fontSize: 16),
             ),
           ),
           const Gap(12),
@@ -94,65 +94,52 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             ),
             labelText: widget.labelText,
             floatingLabelBehavior: FloatingLabelBehavior.always,
-            floatingLabelStyle: Theme.of(
-              context,
-            ).textTheme.titleSmall!.copyWith(
-              color:
-                  _effectiveFocusNode.hasFocus
+            floatingLabelStyle: Theme.of(context).textTheme.titleSmall!
+                .copyWith(
+                  color: _effectiveFocusNode.hasFocus
                       ? Theme.of(context).primaryColor
                       : null,
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-            ),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
             hintText: widget.hintText,
             hintStyle: Theme.of(context).textTheme.titleSmall!.copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w300,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurfaceVariant
+                  .withValues(alpha: 0.5),
             ),
-            prefixIcon:
-                widget.isPassword && widget.prefixIcon != null
-                    ? Icon(
-                      _obscureText
-                          ? Icons.lock_rounded
-                          : Icons.lock_open_rounded,
-                      color:
-                          widget.prefixIcon is Icon
-                              ? (widget.prefixIcon as Icon).color
-                              : null,
-                      size:
-                          widget.prefixIcon is Icon
-                              ? (widget.prefixIcon as Icon).size
-                              : null,
-                    )
-                    : widget.prefixIcon,
-            prefixIconColor:
-                _effectiveFocusNode.hasFocus
-                    ? Theme.of(context).primaryColor
-                    : Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
-            suffixIcon:
-                widget.isPassword
-                    ? IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color:
-                            _effectiveFocusNode.hasFocus || !_obscureText
-                                ? Theme.of(context).primaryColor
-                                : Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    )
-                    : widget.suffixIcon,
+            prefixIcon: widget.isPassword && widget.prefixIcon != null
+                ? Icon(
+                    _obscureText ? Icons.lock_rounded : Icons.lock_open_rounded,
+                    color: widget.prefixIcon is Icon
+                        ? (widget.prefixIcon as Icon).color
+                        : null,
+                    size: widget.prefixIcon is Icon
+                        ? (widget.prefixIcon as Icon).size
+                        : null,
+                  )
+                : widget.prefixIcon,
+            prefixIconColor: _effectiveFocusNode.hasFocus
+                ? Theme.of(context).primaryColor
+                : Theme.of(context).colorScheme.onSurface
+                      .withValues(alpha: 0.5),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: _effectiveFocusNode.hasFocus || !_obscureText
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.5),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  )
+                : widget.suffixIcon,
             border: borderStyle,
             enabledBorder: borderStyle,
             focusedBorder: borderStyle.copyWith(

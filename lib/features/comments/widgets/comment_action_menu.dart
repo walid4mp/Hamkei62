@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../helpers/comment_menu_action.dart';
 
@@ -15,10 +16,9 @@ class CommentActionMenu extends StatelessWidget {
         width: 190,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color:
-              theme.brightness == Brightness.dark
-                  ? theme.colorScheme.surface
-                  : Colors.white,
+          color: theme.brightness == Brightness.dark
+              ? theme.colorScheme.surface
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(

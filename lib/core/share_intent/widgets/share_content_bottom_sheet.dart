@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../../features/ai_chat/views/ai_chat_view.dart';
 import '../../../features/chat_forwarding/models/forward_target_selection.dart';
 import '../../../features/chat_forwarding/models/forwardable_message.dart';
@@ -28,15 +29,14 @@ class ShareContentBottomSheet {
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder:
-          (_) => _ShareContentSheet(
-            url: url,
-            shareText: shareText,
-            originalAuthorId: originalAuthorId,
-            originalAuthorName: originalAuthorName,
-            originalAuthorAvatarUrl: originalAuthorAvatarUrl,
-            onShared: onShared,
-          ),
+      builder: (_) => _ShareContentSheet(
+        url: url,
+        shareText: shareText,
+        originalAuthorId: originalAuthorId,
+        originalAuthorName: originalAuthorName,
+        originalAuthorAvatarUrl: originalAuthorAvatarUrl,
+        onShared: onShared,
+      ),
     );
   }
 }

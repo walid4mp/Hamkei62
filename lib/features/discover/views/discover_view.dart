@@ -8,6 +8,7 @@ import 'package:social_media_app/core/widgets/custom_pull_to_refresh.dart';
 import 'package:social_media_app/core/widgets/custom_tab_wrapper.dart';
 import 'package:social_media_app/features/discover/cubits/discover_people_cubit.dart';
 import 'package:social_media_app/features/discover/views/discover_skeleton_view.dart';
+
 import '../../../core/connectivity/cubits/connectivity_cubit.dart';
 import '../../../core/connectivity/cubits/connectivity_state.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
@@ -50,8 +51,9 @@ class _DiscoverViewState extends State<DiscoverView> {
         listener: (context, connState) {
           if (connState is ConnectivityRestored ||
               connState is ConnectivityOnline) {
-            final currentDiscoverState =
-                context.read<DiscoverPeopleCubit>().state;
+            final currentDiscoverState = context
+                .read<DiscoverPeopleCubit>()
+                .state;
 
             if (currentDiscoverState is DiscoverPeopleFailure ||
                 currentDiscoverState is DiscoverPeopleInitial) {
@@ -74,16 +76,16 @@ class _DiscoverViewState extends State<DiscoverView> {
                   state is DiscoverPeopleLoading ||
                   state is DiscoverPeopleRefreshFeedback,
               loadingSkeleton: const DiscoverPeopleSkeleton(),
-              errorMessage:
-                  state is DiscoverPeopleFailure ? state.message : null,
-              onRetry:
-                  () => context.read<DiscoverPeopleCubit>().getDiscoverPeople(),
+              errorMessage: state is DiscoverPeopleFailure
+                  ? state.message
+                  : null,
+              onRetry: () =>
+                  context.read<DiscoverPeopleCubit>().getDiscoverPeople(),
 
               child: CustomPullToRefresh(
-                onRefresh:
-                    () async => await context
-                        .read<DiscoverPeopleCubit>()
-                        .getDiscoverPeople(isRefresh: true),
+                onRefresh: () async => await context
+                    .read<DiscoverPeopleCubit>()
+                    .getDiscoverPeople(isRefresh: true),
 
                 child: CustomScrollView(
                   controller: widget.scrollController,
@@ -123,10 +125,9 @@ class _DiscoverViewState extends State<DiscoverView> {
                                 return DiscoverPersonGridCardWidget(
                                   key: ValueKey(person.user.id),
                                   personData: person,
-                                  onDismiss:
-                                      () => context
-                                          .read<DiscoverPeopleCubit>()
-                                          .dismissSuggestion(person.user.id),
+                                  onDismiss: () => context
+                                      .read<DiscoverPeopleCubit>()
+                                      .dismissSuggestion(person.user.id),
                                 );
                               },
                             ),

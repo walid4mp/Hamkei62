@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../../../core/attachment/attachment_sheet/attachment_kind.dart';
 import '../../../core/attachment/attachment_sheet/attachment_picker_sheet.dart';
 import '../../../core/attachment/attachment_sheet/picked_attachment.dart';

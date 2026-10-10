@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:social_media_app/core/supabase/supabase_provider.dart';
+
 import '../../utilities/supabase_constants.dart';
 import '../models/mention_suggestion.dart';
 

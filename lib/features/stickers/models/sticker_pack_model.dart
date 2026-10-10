@@ -1,4 +1,5 @@
 import 'package:social_media_app/core/utilities/supabase_constants.dart';
+
 import 'sticker_pack_privacy.dart';
 
 class StickerPackModel {

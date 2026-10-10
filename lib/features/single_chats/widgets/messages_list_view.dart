@@ -8,6 +8,7 @@ import 'package:social_media_app/features/single_chats/widgets/chat_loading_skel
 import 'package:social_media_app/features/single_chats/widgets/date_separator_glassmorphism_widget.dart';
 import 'package:social_media_app/features/single_chats/widgets/empty_placeholder_state.dart';
 import 'package:social_media_app/features/single_chats/widgets/typing_bubble_widget.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/helpers/formatted_date.dart';
 import '../../../core/messaging/message_reconciler.dart';
@@ -72,11 +73,10 @@ class _MessagesListViewState extends State<MessagesListView> {
 
         return BlocConsumer<ChatDetailsCubit, ChatDetailsState>(
           listener: _handleMessagesLogic,
-          buildWhen:
-              (prev, curr) =>
-                  curr is MessagesSuccessLoaded ||
-                  curr is MessagesSending ||
-                  curr is ChatDetailsInitial,
+          buildWhen: (prev, curr) =>
+              curr is MessagesSuccessLoaded ||
+              curr is MessagesSending ||
+              curr is ChatDetailsInitial,
           builder: (context, state) {
             final cubit = context.read<ChatDetailsCubit>();
             final messages = cubit.cachedMessages;
@@ -110,13 +110,13 @@ class _MessagesListViewState extends State<MessagesListView> {
                     if (hasBubble && index == 0) {
                       return action == ChatActionType.recording
                           ? RecordingBubbleWidget(
-                            receiverUserId: widget.receiverUser.id,
-                            receiverUserImgUrl: widget.receiverUser.imageUrl,
-                          )
+                              receiverUserId: widget.receiverUser.id,
+                              receiverUserImgUrl: widget.receiverUser.imageUrl,
+                            )
                           : TypingBubbleWidget(
-                            receiverUserId: widget.receiverUser.id,
-                            receiverUserImgUrl: widget.receiverUser.imageUrl,
-                          );
+                              receiverUserId: widget.receiverUser.id,
+                              receiverUserImgUrl: widget.receiverUser.imageUrl,
+                            );
                     }
                     final msgIndex = hasBubble ? index - 1 : index;
                     if (msgIndex < 0 || msgIndex >= messages.length) {
@@ -182,8 +182,9 @@ class _MessagesListViewState extends State<MessagesListView> {
                             date: FormattedDate.getChatTime(msg.createdAt),
                           ),
                         ChatBubble(
-                          userImgUrl:
-                              isMe ? null : widget.receiverUser.imageUrl,
+                          userImgUrl: isMe
+                              ? null
+                              : widget.receiverUser.imageUrl,
                           receiverUser: widget.receiverUser,
                           message: msg,
                           onReply: widget.onReply,
@@ -196,9 +197,8 @@ class _MessagesListViewState extends State<MessagesListView> {
                       ],
                     );
                   },
-                  separatorBuilder:
-                      (context, index) =>
-                          __buildSeparator(index, messages, hasBubble),
+                  separatorBuilder: (context, index) =>
+                      __buildSeparator(index, messages, hasBubble),
                 ),
                 _buildScrollToBottomButton(context),
               ],
@@ -320,9 +320,8 @@ class _MessagesListViewState extends State<MessagesListView> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).primaryColor.withValues(alpha: 0.8),
+                            color: Theme.of(context).primaryColor
+                                .withValues(alpha: 0.8),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(

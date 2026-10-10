@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/design/tokens/typography.dart';
 
@@ -38,10 +39,9 @@ class CommentActionChip extends StatelessWidget {
       );
     }
 
-    final color =
-        isActive
-            ? (activeColor ?? Theme.of(context).primaryColor)
-            : AppColors.grey6;
+    final color = isActive
+        ? (activeColor ?? Theme.of(context).primaryColor)
+        : AppColors.grey6;
 
     return GestureDetector(
       onTap: onTap,

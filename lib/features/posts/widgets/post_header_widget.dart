@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/posts/widgets/post_actions_menu.dart';
+
 import '../../../core/helpers/formatted_date.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/supabase/supabase_provider.dart';
@@ -152,61 +153,57 @@ class PostHeaderWidget extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: AuthorImageWidget(
         post: post,
-        onTap:
-            shouldDisableTap
-                ? null
-                : () {
-                  if (isPostByMe) {
-                    if (navController != null) {
-                      navController.jumpToTab(3);
-                    }
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder:
-                          (context) => UserPreviewDialog(
-                            user: post.toChatUserModel(),
-                            showContactOptions: false,
-                          ),
-                    );
+        onTap: shouldDisableTap
+            ? null
+            : () {
+                if (isPostByMe) {
+                  if (navController != null) {
+                    navController.jumpToTab(3);
                   }
-                },
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => UserPreviewDialog(
+                      user: post.toChatUserModel(),
+                      showContactOptions: false,
+                    ),
+                  );
+                }
+              },
       ),
 
-      onTap:
-          isAlreadyOnSamePost
-              ? null
-              : () {
-                if (postsCubit.isPostGhost(post.id)) {
-                  AppToast.info('This post is no longer available.');
-                  return;
-                }
-                Navigator.of(context, rootNavigator: true).pushNamed(
-                  AppRoutes.postDetailsViewRoute,
-                  arguments: PostDetailsRouteArgs(
-                    post: post,
-                    initialActiveMode: PostDetailsActiveMode.comments,
-                    isProfileContext: isProfileContext,
-                  ),
-                );
-              },
+      onTap: isAlreadyOnSamePost
+          ? null
+          : () {
+              if (postsCubit.isPostGhost(post.id)) {
+                AppToast.info('This post is no longer available.');
+                return;
+              }
+              Navigator.of(context, rootNavigator: true).pushNamed(
+                AppRoutes.postDetailsViewRoute,
+                arguments: PostDetailsRouteArgs(
+                  post: post,
+                  initialActiveMode: PostDetailsActiveMode.comments,
+                  isProfileContext: isProfileContext,
+                ),
+              );
+            },
 
       title: GestureDetector(
-        onTap:
-            shouldDisableTap
-                ? null
-                : () {
-                  if (isPostByMe) {
-                    if (navController != null) {
-                      navController.jumpToTab(3);
-                    }
-                  } else {
-                    Navigator.of(context, rootNavigator: true).pushNamed(
-                      AppRoutes.profileViewRoute,
-                      arguments: post.authorId,
-                    );
+        onTap: shouldDisableTap
+            ? null
+            : () {
+                if (isPostByMe) {
+                  if (navController != null) {
+                    navController.jumpToTab(3);
                   }
-                },
+                } else {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    AppRoutes.profileViewRoute,
+                    arguments: post.authorId,
+                  );
+                }
+              },
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -214,10 +211,8 @@ class PostHeaderWidget extends StatelessWidget {
               child: Text(
                 post.authorName ?? 'Unknown',
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
+                style: Theme.of(context).textTheme.titleSmall!
+                    .copyWith(fontWeight: FontWeight.w500, fontSize: 16),
               ),
             ),
             if (post.isSuggestedForYou) _buildSuggestedBadge(context),
@@ -233,9 +228,8 @@ class PostHeaderWidget extends StatelessWidget {
             Icon(
               post.privacyType.icon,
               size: 11,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.4),
+              color: Theme.of(context).colorScheme.onSurface
+                  .withValues(alpha: 0.4),
             ),
 
             const SizedBox(width: 2.8),
@@ -246,9 +240,8 @@ class PostHeaderWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                 fontWeight: FontWeight.w500,
                 fontSize: 10.3,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.4),
+                color: Theme.of(context).colorScheme.onSurface
+                    .withValues(alpha: 0.4),
               ),
             ),
             if (showPinnedBadge) ...[

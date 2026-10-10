@@ -5,6 +5,7 @@ import 'package:social_media_app/core/design/tokens/dimensions.dart';
 import 'package:social_media_app/core/design/tokens/radii.dart';
 import 'package:social_media_app/core/design/tokens/spacing.dart';
 import 'package:social_media_app/core/design/tokens/typography.dart';
+
 import 'theme_extensions.dart';
 
 /// Master ThemeData builder for the Social Mate Design System.
@@ -58,8 +59,9 @@ abstract final class AppTheme {
         foregroundColor: palette.onSurface,
         centerTitle: false,
         titleSpacing: AppSpacing.space4,
-        systemOverlayStyle:
-            isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         iconTheme: IconThemeData(
           color: palette.onSurface,
           size: AppDimensions.iconLarge,
@@ -220,8 +222,9 @@ abstract final class AppTheme {
       bottomSheetTheme: BottomSheetThemeData(
         elevation: 0,
         backgroundColor: isDark ? palette.surfaceElevated : palette.surface,
-        modalBackgroundColor:
-            isDark ? palette.surfaceElevated : palette.surface,
+        modalBackgroundColor: isDark
+            ? palette.surfaceElevated
+            : palette.surface,
         shape: const RoundedRectangleBorder(borderRadius: AppRadii.bottomSheet),
         dragHandleColor: palette.onSurfaceVariant.withValues(alpha: 0.3),
         dragHandleSize: const Size(

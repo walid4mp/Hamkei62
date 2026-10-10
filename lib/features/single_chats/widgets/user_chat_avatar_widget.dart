@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/app_avatar.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 
 class UserChatAvatar extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../../features/profile/services/user_services.dart';
 import '../supabase/supabase_provider.dart';
 

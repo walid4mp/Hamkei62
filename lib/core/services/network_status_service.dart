@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+
 import '../secrets/app_secrets.dart';
 
 ///   1. DNS lookup against multiple independent public resolvers
@@ -49,9 +51,8 @@ class NetworkStatusService {
   Future<bool> _dnsReachable() async {
     for (final host in _dnsProbeHosts) {
       try {
-        final result = await InternetAddress.lookup(
-          host,
-        ).timeout(_lookupTimeout);
+        final result = await InternetAddress.lookup(host)
+            .timeout(_lookupTimeout);
         if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
           return true;
         }

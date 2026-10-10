@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/helpers/safe_emit_mixin.dart';
 import '../entities/ai_action_type.dart';
 import '../entities/ai_request_context.dart';
@@ -172,15 +174,13 @@ class AiTextFieldCubit extends Cubit<AiTextFieldState>
 
     emit(const AiFieldLoading());
 
-    final effectiveAction =
-        context.hasMediaAttached
-            ? AiActionType.autocompleteCaption
-            : generationAction;
+    final effectiveAction = context.hasMediaAttached
+        ? AiActionType.autocompleteCaption
+        : generationAction;
 
-    final result =
-        effectiveAction == AiActionType.replySuggestion
-            ? await _repository.suggestReply(context)
-            : await _repository.generateCaption(context);
+    final result = effectiveAction == AiActionType.replySuggestion
+        ? await _repository.suggestReply(context)
+        : await _repository.generateCaption(context);
 
     if (isClosed) return;
 

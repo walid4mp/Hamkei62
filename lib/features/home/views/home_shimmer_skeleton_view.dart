@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_unnecessary_containers
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../stories/widgets/stories_list_skeleton.dart';
 
 class HomeShimmerSkeleton extends StatelessWidget {
@@ -191,192 +192,56 @@ class HomeShimmerSkeleton extends StatelessWidget {
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 3,
-              itemBuilder:
-                  (_, __) => Container(
-                    margin: const EdgeInsets.only(bottom: 8),
+              itemBuilder: (_, __) => Container(
+                margin: const EdgeInsets.only(bottom: 8),
 
-                    decoration: BoxDecoration(
-                      color: cardBgColor,
-                      borderRadius: BorderRadius.all(Radius.circular(14)),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: buildShimmer(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Post Header
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: skeletonColor,
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: screenWidth * 0.35,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: skeletonColor,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          width: 10,
-                                          height: 10,
-                                          decoration: const BoxDecoration(
-                                            color: skeletonColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Container(
-                                          width: screenWidth * 0.15,
-                                          height: 10,
-                                          decoration: BoxDecoration(
-                                            color: skeletonColor,
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 14,
-                                        height: 14,
-                                        decoration: BoxDecoration(
-                                          color: skeletonColor,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Container(
-                                        width: 16,
-                                        height: 12,
-                                        decoration: BoxDecoration(
-                                          color: skeletonColor,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                decoration: BoxDecoration(
+                  color: cardBgColor,
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: buildShimmer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Post Header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const CircleAvatar(
+                              radius: 20,
+                              backgroundColor: skeletonColor,
                             ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Post Text Content
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
+                            const SizedBox(width: 10),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  width: double.infinity,
-                                  height: 10,
+                                  width: screenWidth * 0.35,
+                                  height: 12,
                                   decoration: BoxDecoration(
                                     color: skeletonColor,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
                                 const SizedBox(height: 6),
-                                Container(
-                                  width: screenWidth * 0.7,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: skeletonColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Post Media
-                          Container(
-                            height: screenWidth * 0.65,
-                            width: double.infinity,
-                            color: skeletonColor,
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Post Stats
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: screenWidth * 0.15,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: skeletonColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                Container(
-                                  width: screenWidth * 0.25,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: skeletonColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Divider
-                          Container(
-                            height: 1,
-                            width: double.infinity,
-                            color: skeletonColor,
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Post Actions
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(
-                                3,
-                                (index) => Row(
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    const CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: skeletonColor,
-                                    ),
-                                    const SizedBox(width: 8),
                                     Container(
-                                      width: 40,
+                                      width: 10,
+                                      height: 10,
+                                      decoration: const BoxDecoration(
+                                        color: skeletonColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      width: screenWidth * 0.15,
                                       height: 10,
                                       decoration: BoxDecoration(
                                         color: skeletonColor,
@@ -385,13 +250,141 @@ class HomeShimmerSkeleton extends StatelessWidget {
                                     ),
                                   ],
                                 ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 14,
+                                    height: 14,
+                                    decoration: BoxDecoration(
+                                      color: skeletonColor,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Container(
+                                    width: 16,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: skeletonColor,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+
+                      // Post Text Content
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: skeletonColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              width: screenWidth * 0.7,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: skeletonColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Post Media
+                      Container(
+                        height: screenWidth * 0.65,
+                        width: double.infinity,
+                        color: skeletonColor,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Post Stats
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: screenWidth * 0.15,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: skeletonColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            Container(
+                              width: screenWidth * 0.25,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: skeletonColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Divider
+                      Container(
+                        height: 1,
+                        width: double.infinity,
+                        color: skeletonColor,
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Post Actions
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(
+                            3,
+                            (index) => Row(
+                              children: [
+                                const CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: skeletonColor,
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  width: 40,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: skeletonColor,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+              ),
             ),
           ],
         ),

@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/widgets/full_screen_image_viewer.dart';
 import '../helpers/media_size_badge.dart';
@@ -94,8 +96,8 @@ class CreatePostImagePreview extends StatelessWidget {
                     child: Image.file(
                       File(imagePath),
                       fit: BoxFit.contain,
-                      errorBuilder:
-                          (context, error, stackTrace) => const Center(
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(
                             child: Icon(
                               Icons.broken_image,
                               size: 50,

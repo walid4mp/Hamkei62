@@ -49,10 +49,9 @@ class CancelProgressBubble extends StatelessWidget {
               child: Icon(
                 Icons.close_rounded,
                 size: size * .58,
-                color:
-                    theme.colorScheme
-                        .copyWith(onSurface: Colors.white)
-                        .onSurface,
+                color: theme.colorScheme
+                    .copyWith(onSurface: Colors.white)
+                    .onSurface,
               ),
             ),
           ),

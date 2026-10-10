@@ -1,4 +1,5 @@
 import 'package:hive_flutter/adapters.dart';
+
 import '../../../core/cache/constants/hive_box_names.dart';
 import '../entities/ai_autocomplete_language.dart';
 import '../entities/ai_reply_length.dart';

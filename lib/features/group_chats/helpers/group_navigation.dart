@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:social_media_app/core/services/active_screen_tracker.dart';
 
 /// Single decision point for "should we navigate to this group's chat

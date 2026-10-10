@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/empty_findings_animation_widget.dart';
 import '../../posts/cubits/posts_cubit/posts_cubit.dart';
@@ -39,8 +40,8 @@ class ProfilePostsListTab extends StatelessWidget {
               children: [
                 Text(profileState.message),
                 CupertinoButton(
-                  onPressed:
-                      () => context.read<ProfilePostsCubit>().loadInitial(),
+                  onPressed: () =>
+                      context.read<ProfilePostsCubit>().loadInitial(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -91,10 +92,9 @@ class ProfilePostsListTab extends StatelessWidget {
         return BlocBuilder<PostsCubit, PostsState>(
           buildWhen: (_, current) => current is PostsLoaded,
           builder: (context, feedState) {
-            final feed =
-                feedState is PostsLoaded
-                    ? feedState.posts
-                    : postsCubit.cachedPosts;
+            final feed = feedState is PostsLoaded
+                ? feedState.posts
+                : postsCubit.cachedPosts;
             final byId = {for (final p in feed) p.id: p};
             final posts = [
               for (final id in profileState.postIds)

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
@@ -224,10 +225,9 @@ class VoiceChunkRecorderService {
     if (fmtChunk == null || dataOffset == -1) return null;
 
     final actualRemaining = bytes.length - dataOffset;
-    final effectiveDataSize =
-        (dataSize <= 0 || dataSize > actualRemaining)
-            ? actualRemaining
-            : dataSize;
+    final effectiveDataSize = (dataSize <= 0 || dataSize > actualRemaining)
+        ? actualRemaining
+        : dataSize;
 
     return _WavHeaderInfo(
       fmtChunkBytes: fmtChunk,

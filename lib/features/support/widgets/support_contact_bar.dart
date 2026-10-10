@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/support_actions.dart';
 
 class SupportContactBar extends StatelessWidget {
@@ -14,10 +15,9 @@ class SupportContactBar extends StatelessWidget {
         color: theme.scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
-            color:
-                isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.black.withValues(alpha: 0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
       ),

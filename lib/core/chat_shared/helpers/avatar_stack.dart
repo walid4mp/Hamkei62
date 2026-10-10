@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
+
 import '../../constants/app_images.dart';
 import '../../themes/app_colors.dart';
 
@@ -48,22 +49,17 @@ class AvatarStack extends StatelessWidget {
               child: _AvatarCircle(
                 size: avatarSize,
                 borderColor: borderColor,
-                child:
-                    isNetworkImage
-                        ? CachedCloudinaryImage(
-                          secureUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          isAvatar: true,
-                          errorWidget:
-                              (context, error) => Image.asset(
-                                AppImages.defaultUserImg,
-                                fit: BoxFit.cover,
-                              ),
-                        )
-                        : Image.asset(
+                child: isNetworkImage
+                    ? CachedCloudinaryImage(
+                        secureUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        isAvatar: true,
+                        errorWidget: (context, error) => Image.asset(
                           AppImages.defaultUserImg,
                           fit: BoxFit.cover,
                         ),
+                      )
+                    : Image.asset(AppImages.defaultUserImg, fit: BoxFit.cover),
               ),
             );
           }),

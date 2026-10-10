@@ -58,10 +58,9 @@ class FcmPayloadBuilder {
             'aps': {
               'alert': {
                 'title': callerName,
-                'body':
-                    callType == 'video'
-                        ? 'Incoming video call...'
-                        : 'Incoming voice call...',
+                'body': callType == 'video'
+                    ? 'Incoming video call...'
+                    : 'Incoming voice call...',
               },
               'sound': 'default',
               'content-available': 1,

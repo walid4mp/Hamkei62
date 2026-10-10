@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/mentions/mentions.dart';
+
 import '../../../core/design/tokens/typography.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../ai_assistant/entities/ai_action_type.dart';

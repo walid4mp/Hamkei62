@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/attachment/models/media_transfer_state.dart';
 import '../../../core/attachment/widgets/file_message_bubble.dart';
 import '../../../core/attachment/widgets/media_state_overlay.dart';
@@ -89,10 +90,10 @@ class _AiChatBubbleState extends State<AiChatBubble> {
 
   double? get _fixedMediaWidth =>
       (widget.message.mediaType == AiChatMediaType.image ||
-              widget.message.mediaType == AiChatMediaType.video ||
-              widget.message.mediaType == AiChatMediaType.file)
-          ? 240
-          : null;
+          widget.message.mediaType == AiChatMediaType.video ||
+          widget.message.mediaType == AiChatMediaType.file)
+      ? 240
+      : null;
 
   bool get _isRtl =>
       ChatHelper.getTextDirection(widget.message.text) == TextDirection.rtl;
@@ -149,42 +150,39 @@ class _AiChatBubbleState extends State<AiChatBubble> {
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.74,
         ),
-        padding:
-            hasMedia
-                ? const EdgeInsets.all(4)
-                : const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: hasMedia
+            ? const EdgeInsets.all(4)
+            : const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          gradient:
-              isMe
-                  ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: AiChatColors.outgoingBubbleGradient(
-                      Theme.of(context).primaryColor,
-                    ),
-                  )
-                  : null,
+          gradient: isMe
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AiChatColors.outgoingBubbleGradient(
+                    Theme.of(context).primaryColor,
+                  ),
+                )
+              : null,
           color: isMe ? null : Colors.white.withValues(alpha: 0.08),
           borderRadius: _radius(isMe),
           border: Border.all(
             color: Colors.white.withValues(alpha: isMe ? 0.14 : 0.12),
           ),
-          boxShadow:
-              isMe
-                  ? [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.28),
-                      blurRadius: 14,
-                      offset: const Offset(0, 5),
-                    ),
-                  ]
-                  : null,
+          boxShadow: isMe
+              ? [
+                  BoxShadow(
+                    color: Theme.of(context).primaryColor
+                        .withValues(alpha: 0.28),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
-          crossAxisAlignment:
-              _isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: _isRtl
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (message.hasReply)
@@ -211,19 +209,18 @@ class _AiChatBubbleState extends State<AiChatBubble> {
                         child: Align(
                           alignment: _contentAlignmentGeometry,
 
-                          child:
-                              isMe
-                                  ? CustomLinkifyText(
-                                    text: message.text,
-                                    overflow: TextOverflow.visible,
+                          child: isMe
+                              ? CustomLinkifyText(
+                                  text: message.text,
+                                  overflow: TextOverflow.visible,
 
-                                    style: textStyle,
-                                    textDirection: ChatHelper.getTextDirection(
-                                      message.text,
-                                    ),
-                                    bubbleColor: Theme.of(context).primaryColor,
-                                  )
-                                  : _buildAssistantText(message, textStyle),
+                                  style: textStyle,
+                                  textDirection: ChatHelper.getTextDirection(
+                                    message.text,
+                                  ),
+                                  bubbleColor: Theme.of(context).primaryColor,
+                                )
+                              : _buildAssistantText(message, textStyle),
                         ),
                       ),
                     ),
@@ -246,9 +243,8 @@ class _AiChatBubbleState extends State<AiChatBubble> {
       ),
     );
 
-    final selectionColor = Theme.of(
-      context,
-    ).primaryColor.withValues(alpha: 0.16);
+    final selectionColor = Theme.of(context).primaryColor
+        .withValues(alpha: 0.16);
     final isRowSelected = _isSelectable && widget.isSelected;
 
     final messageRow = Padding(
@@ -257,30 +253,29 @@ class _AiChatBubbleState extends State<AiChatBubble> {
         color: isRowSelected ? selectionColor : Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Row(
-          mainAxisAlignment:
-              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isMe) ...[
               AnimatedSize(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
-                child:
-                    widget.isSelectionMode
-                        ? Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: Icon(
-                            widget.isSelected
-                                ? Icons.check_circle_rounded
-                                : Icons.circle_outlined,
-                            size: 20,
-                            color:
-                                widget.isSelected
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.white.withValues(alpha: 0.4),
-                          ),
-                        )
-                        : const SizedBox.shrink(),
+                child: widget.isSelectionMode
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: Icon(
+                          widget.isSelected
+                              ? Icons.check_circle_rounded
+                              : Icons.circle_outlined,
+                          size: 20,
+                          color: widget.isSelected
+                              ? Theme.of(context).primaryColor
+                              : Colors.white.withValues(alpha: 0.4),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
               _AssistantAvatar(model: message.model),
               const SizedBox(width: 8),
@@ -297,34 +292,31 @@ class _AiChatBubbleState extends State<AiChatBubble> {
                   curve: Curves.easeOutCubic,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color:
-                        widget.isHighlighted
-                            ? AiChatColors.highlightFill(
-                              Theme.of(context).primaryColor,
-                            )
-                            : Colors.transparent,
+                    color: widget.isHighlighted
+                        ? AiChatColors.highlightFill(
+                            Theme.of(context).primaryColor,
+                          )
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color:
-                          widget.isHighlighted
-                              ? AiChatColors.highlightStroke(
-                                Theme.of(context).primaryColor,
-                              )
-                              : Colors.transparent,
+                      color: widget.isHighlighted
+                          ? AiChatColors.highlightStroke(
+                              Theme.of(context).primaryColor,
+                            )
+                          : Colors.transparent,
                       width: 1.4,
                     ),
-                    boxShadow:
-                        widget.isHighlighted
-                            ? [
-                              BoxShadow(
-                                color: AiChatColors.highlightGlow(
-                                  Theme.of(context).primaryColor,
-                                ),
-                                blurRadius: 18,
-                                spreadRadius: 1,
+                    boxShadow: widget.isHighlighted
+                        ? [
+                            BoxShadow(
+                              color: AiChatColors.highlightGlow(
+                                Theme.of(context).primaryColor,
                               ),
-                            ]
-                            : const <BoxShadow>[],
+                              blurRadius: 18,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                        : const <BoxShadow>[],
                   ),
                   child: bubble,
                 ),
@@ -339,14 +331,13 @@ class _AiChatBubbleState extends State<AiChatBubble> {
       tween: Tween(begin: 0, end: 1),
       duration: _kEntranceDuration,
       curve: Curves.easeOutCubic,
-      builder:
-          (context, value, child) => Opacity(
-            opacity: value,
-            child: Transform.translate(
-              offset: Offset(0, (1 - value) * 10),
-              child: child,
-            ),
-          ),
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 10),
+          child: child,
+        ),
+      ),
       child: messageRow,
     );
   }
@@ -387,10 +378,9 @@ class _AiChatBubbleState extends State<AiChatBubble> {
   }
 
   Widget _buildStatusRow() {
-    final modelLabel =
-        (!widget.message.isMe && widget.message.model != null)
-            ? _truncate(widget.message.model!.fullLabel, 30)
-            : null;
+    final modelLabel = (!widget.message.isMe && widget.message.model != null)
+        ? _truncate(widget.message.model!.fullLabel, 30)
+        : null;
 
     final timeStyle = TextStyle(
       color: Colors.white.withValues(alpha: 0.55),
@@ -436,7 +426,10 @@ class _AiChatBubbleState extends State<AiChatBubble> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       textDirection: _isRtl ? TextDirection.ltr : TextDirection.rtl,
-      children: [timeGroup, Text(modelLabel, style: timeStyle)],
+      children: [
+        timeGroup,
+        Text(modelLabel, style: timeStyle),
+      ],
     );
   }
 
@@ -489,12 +482,9 @@ class _AiChatBubbleState extends State<AiChatBubble> {
     final message = widget.message;
     final origin = widget.replyOrigin;
 
-    final senderTitle =
-        message.replyToSenderRole == 'user'
-            ? 'You'
-            : (origin?.model?.fullLabel ??
-                message.model?.fullLabel ??
-                'Syncra');
+    final senderTitle = message.replyToSenderRole == 'user'
+        ? 'You'
+        : (origin?.model?.fullLabel ?? message.model?.fullLabel ?? 'Syncra');
 
     final replyText = message.replyToText?.trim() ?? '';
     final previewText = replyText.isNotEmpty ? replyText : _repliedMediaLabel();
@@ -524,10 +514,9 @@ class _AiChatBubbleState extends State<AiChatBubble> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
-          color:
-              isMe
-                  ? Colors.white.withValues(alpha: 0.16)
-                  : Theme.of(context).primaryColor.withValues(alpha: 0.12),
+          color: isMe
+              ? Colors.white.withValues(alpha: 0.16)
+              : Theme.of(context).primaryColor.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(8),
         ),
         clipBehavior: Clip.antiAlias,
@@ -557,10 +546,9 @@ class _AiChatBubbleState extends State<AiChatBubble> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color:
-                                isMe
-                                    ? Colors.white.withValues(alpha: 0.95)
-                                    : Theme.of(context).primaryColor,
+                            color: isMe
+                                ? Colors.white.withValues(alpha: 0.95)
+                                : Theme.of(context).primaryColor,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -626,12 +614,11 @@ class _AiChatBubbleState extends State<AiChatBubble> {
 
   Widget _buildMedia(BuildContext context, bool isMe) {
     final message = widget.message;
-    final transferState =
-        _isUploading
-            ? MediaTransferState.uploading(message.uploadProgress ?? 0)
-            : const MediaTransferState.completed(
-              direction: MediaTransferDirection.upload,
-            );
+    final transferState = _isUploading
+        ? MediaTransferState.uploading(message.uploadProgress ?? 0)
+        : const MediaTransferState.completed(
+            direction: MediaTransferDirection.upload,
+          );
 
     switch (message.mediaType) {
       case AiChatMediaType.image:
@@ -644,18 +631,16 @@ class _AiChatBubbleState extends State<AiChatBubble> {
             onCancelTap: widget.onCancelUpload,
             fileSizeBytes: message.fileSizeBytes,
 
-            child:
-                message.mediaUrl == null
-                    ? const SizedBox.shrink()
-                    : ImageMessageWidget(
-                      imageUrl: message.mediaUrl!,
-                      isMe: isMe,
-                      fileSizeBytes: message.fileSizeBytes,
-                      caption:
-                          message.text.trim().isEmpty
-                              ? null
-                              : message.text.trim(),
-                    ),
+            child: message.mediaUrl == null
+                ? const SizedBox.shrink()
+                : ImageMessageWidget(
+                    imageUrl: message.mediaUrl!,
+                    isMe: isMe,
+                    fileSizeBytes: message.fileSizeBytes,
+                    caption: message.text.trim().isEmpty
+                        ? null
+                        : message.text.trim(),
+                  ),
           ),
         );
 
@@ -670,15 +655,14 @@ class _AiChatBubbleState extends State<AiChatBubble> {
             durationSeconds: message.durationSeconds,
             onCancelTap: widget.onCancelUpload,
             fileSizeBytes: message.fileSizeBytes,
-            child:
-                message.mediaUrl == null
-                    ? const SizedBox.shrink()
-                    : VideoMessageWidget(
-                      videoUrl: message.mediaUrl!,
-                      isMe: isMe,
-                      fileSizeBytes: message.fileSizeBytes,
-                      durationSeconds: message.durationSeconds,
-                    ),
+            child: message.mediaUrl == null
+                ? const SizedBox.shrink()
+                : VideoMessageWidget(
+                    videoUrl: message.mediaUrl!,
+                    isMe: isMe,
+                    fileSizeBytes: message.fileSizeBytes,
+                    durationSeconds: message.durationSeconds,
+                  ),
           ),
         );
 
@@ -686,12 +670,12 @@ class _AiChatBubbleState extends State<AiChatBubble> {
         return message.mediaUrl == null
             ? const SizedBox.shrink()
             : VoiceMessageBubbleWidget(
-              voiceUrl: message.mediaUrl!,
-              isMe: isMe,
-              timestamp: message.createdAt,
-              isUploading: _isUploading,
-              initialDurationSeconds: message.durationSeconds,
-            );
+                voiceUrl: message.mediaUrl!,
+                isMe: isMe,
+                timestamp: message.createdAt,
+                isUploading: _isUploading,
+                initialDurationSeconds: message.durationSeconds,
+              );
 
       case AiChatMediaType.file:
         return SizedBox(

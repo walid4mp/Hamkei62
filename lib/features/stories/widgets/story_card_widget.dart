@@ -4,6 +4,7 @@ import 'package:social_media_app/core/helpers/emoji_helper.dart';
 import 'package:social_media_app/core/presence/widgets/presence_avatar_widget.dart';
 import 'package:social_media_app/core/themes/app_colors.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
+
 import '../../../core/cache/utils/cloudinary_url_extensions.dart';
 import '../../../core/helpers/chat_helper.dart';
 import '../../../core/widgets/app_avatar.dart';
@@ -79,19 +80,18 @@ class StoryCardWidget extends StatelessWidget {
                           ),
                         ),
                         child: ClipOval(
-                          child:
-                              story.authorImageUrl == null
-                                  ? AppAvatar(
-                                    imageUrl: story.authorImageUrl,
-                                    size: 34,
-                                  )
-                                  : CachedCloudinaryImage(
-                                    secureUrl: story.authorImageUrl!,
-                                    fit: BoxFit.cover,
-                                    width: 34,
-                                    height: 34,
-                                    isAvatar: true,
-                                  ),
+                          child: story.authorImageUrl == null
+                              ? AppAvatar(
+                                  imageUrl: story.authorImageUrl,
+                                  size: 34,
+                                )
+                              : CachedCloudinaryImage(
+                                  secureUrl: story.authorImageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 34,
+                                  height: 34,
+                                  isAvatar: true,
+                                ),
                         ),
                       ),
                     ),
@@ -179,10 +179,9 @@ class StoryCardWidget extends StatelessWidget {
       }
       return Container(color: Colors.black87);
     }
-    final bg =
-        story.backgroundColor != null
-            ? Color(int.parse(story.backgroundColor!, radix: 16))
-            : theme.primaryColor;
+    final bg = story.backgroundColor != null
+        ? Color(int.parse(story.backgroundColor!, radix: 16))
+        : theme.primaryColor;
     return Container(
       color: bg,
       alignment: Alignment.center,

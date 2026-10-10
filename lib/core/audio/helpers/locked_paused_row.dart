@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/waveform_progress_bar.dart';
 
 class LockedPausedRow extends StatelessWidget {
@@ -60,10 +61,9 @@ class LockedPausedRow extends StatelessWidget {
           child: WaveformProgressBar(
             seed: waveformSeed,
             position: previewPosition,
-            duration:
-                previewDuration > Duration.zero
-                    ? previewDuration
-                    : Duration(seconds: seconds),
+            duration: previewDuration > Duration.zero
+                ? previewDuration
+                : Duration(seconds: seconds),
             activeColor: primary,
             onSeek: onSeek,
           ),

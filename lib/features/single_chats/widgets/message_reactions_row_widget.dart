@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../reactions/widgets/reactions_summary_pill.dart';
 
 class MessageReactionsRow extends StatelessWidget {

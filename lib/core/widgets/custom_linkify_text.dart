@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../features/group_chats/widgets/group_invite_bottom_sheet.dart';
 import '../deep_link/services/deep_link_service.dart';
 import '../design/tokens/typography.dart';
@@ -56,10 +57,9 @@ class CustomLinkifyText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final linkColor =
-        bubbleColor == null
-            ? Colors.blue
-            : LinkColorHelper.forBubble(bubbleColor!);
+    final linkColor = bubbleColor == null
+        ? Colors.blue
+        : LinkColorHelper.forBubble(bubbleColor!);
 
     final normalizedText = EmojiHelper.normalize(text);
 
@@ -69,14 +69,13 @@ class CustomLinkifyText extends StatelessWidget {
       onOpen: _onOpen,
       maxLines: maxLines,
       overflow: overflow ?? TextOverflow.ellipsis,
-      style: (style ??
-              Theme.of(context).textTheme.bodyMedium ??
-              const TextStyle())
-          .copyWith(
-            fontSize: style?.fontSize ?? 15,
-            fontFamily: null,
-            fontFamilyFallback: AppTypography.fontFallback,
-          ),
+      style:
+          (style ?? Theme.of(context).textTheme.bodyMedium ?? const TextStyle())
+              .copyWith(
+                fontSize: style?.fontSize ?? 15,
+                fontFamily: null,
+                fontFamilyFallback: AppTypography.fontFallback,
+              ),
       linkStyle:
           linkStyle ??
           TextStyle(

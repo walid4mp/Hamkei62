@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../bootstrap/app_bootstrap.dart';
 import '../../../helpers/safe_emit_mixin.dart';
 import '../../../supabase/supabase_provider.dart';

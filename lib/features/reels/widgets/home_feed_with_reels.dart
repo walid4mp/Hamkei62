@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../../posts/cubits/posts_cubit/posts_cubit.dart';
 import '../../posts/models/post_model.dart';
@@ -42,8 +43,8 @@ class _HomeFeedWithReelsState extends State<HomeFeedWithReels> {
     _isInitializingReels = true;
     final reelsCubit = context.read<ReelsFeedCubit>();
 
-    final hasSeenOnboarding =
-        await ReelsPreferencesStore.instance.hasSeenOnboarding();
+    final hasSeenOnboarding = await ReelsPreferencesStore.instance
+        .hasSeenOnboarding();
 
     List<String> categories = [];
     if (hasSeenOnboarding) {
@@ -67,9 +68,8 @@ class _HomeFeedWithReelsState extends State<HomeFeedWithReels> {
 
     return BlocListener<PostsCubit, PostsState>(
       bloc: postsCubit,
-      listenWhen:
-          (previous, current) =>
-              current is PostsLoaded && previous is! PostsLoaded,
+      listenWhen: (previous, current) =>
+          current is PostsLoaded && previous is! PostsLoaded,
       listener: (context, state) {
         final reelsCubit = context.read<ReelsFeedCubit>();
         if (reelsCubit.state is ReelsFeedInitial) {
@@ -78,20 +78,14 @@ class _HomeFeedWithReelsState extends State<HomeFeedWithReels> {
       },
       child: BlocBuilder<PostsCubit, PostsState>(
         bloc: postsCubit,
-        buildWhen:
-            (previous, current) =>
-                current is PostsLoading ||
-                current is PostsLoaded ||
-                current is PostsError,
+        buildWhen: (previous, current) =>
+            current is PostsLoading ||
+            current is PostsLoaded ||
+            current is PostsError,
         builder: (context, postsState) {
           return BlocBuilder<ReelsFeedCubit, ReelsFeedState>(
-            builder:
-                (context, reelsState) => _buildMergedSliver(
-                  context,
-                  postsCubit,
-                  postsState,
-                  reelsState,
-                ),
+            builder: (context, reelsState) =>
+                _buildMergedSliver(context, postsCubit, postsState, reelsState),
           );
         },
       ),
@@ -119,14 +113,12 @@ class _HomeFeedWithReelsState extends State<HomeFeedWithReels> {
         );
       }
 
-      final injectionIndices =
-          reelsState is ReelsFeedLoaded
-              ? reelsState.injectionIndices
-              : const <int>[];
-      final sections =
-          reelsState is ReelsFeedLoaded
-              ? reelsState.sections
-              : const <List<ReelModel>>[];
+      final injectionIndices = reelsState is ReelsFeedLoaded
+          ? reelsState.injectionIndices
+          : const <int>[];
+      final sections = reelsState is ReelsFeedLoaded
+          ? reelsState.sections
+          : const <List<ReelModel>>[];
 
       final mergedItems = _mergeFeed(posts, injectionIndices, sections);
 

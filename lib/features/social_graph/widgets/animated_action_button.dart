@@ -29,8 +29,9 @@ class AnimatedActionButton extends StatefulWidget {
 enum _ButtonVisual { idle, loading, success, active }
 
 class _AnimatedActionButtonState extends State<AnimatedActionButton> {
-  late _ButtonVisual _visual =
-      widget.isActive ? _ButtonVisual.active : _ButtonVisual.idle;
+  late _ButtonVisual _visual = widget.isActive
+      ? _ButtonVisual.active
+      : _ButtonVisual.idle;
   bool _isBusy = false;
 
   static const _successGreen = Color(0xFF34C759);
@@ -96,8 +97,9 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton> {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final fullWidth =
-              constraints.maxWidth.isFinite ? constraints.maxWidth : 120.0;
+          final fullWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : 120.0;
           final targetWidth = isMorphed ? widget.height : fullWidth;
 
           return Center(

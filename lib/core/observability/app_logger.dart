@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import 'error_category.dart';
 import 'observability.dart';
 

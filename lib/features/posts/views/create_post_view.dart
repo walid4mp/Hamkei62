@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
 import 'package:social_media_app/features/home/cubits/home_cubit/home_cubit.dart';
 import 'package:social_media_app/features/social_graph/views/audience_picker_view.dart';
 import 'package:social_media_app/features/social_graph/widgets/privacy_selector_sheet.dart';
+
 import '../../../core/helpers/modern_circle_progress.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/toast/app_toast.dart';
@@ -64,15 +66,13 @@ class _CreatePostViewState extends State<CreatePostView> {
 
     if (result == ContentPrivacy.private) {
       if (!mounted) return;
-      final selected = await Navigator.of(
-        context,
-        rootNavigator: true,
-      ).push<Set<String>>(
-        MaterialPageRoute(
-          builder:
-              (_) => AudiencePickerView(initialSelectedIds: _selectedViewerIds),
-        ),
-      );
+      final selected = await Navigator.of(context, rootNavigator: true)
+          .push<Set<String>>(
+            MaterialPageRoute(
+              builder: (_) =>
+                  AudiencePickerView(initialSelectedIds: _selectedViewerIds),
+            ),
+          );
       if (selected == null || selected.isEmpty) return;
       setState(() {
         _selectedPrivacy = ContentPrivacy.private;
@@ -235,17 +235,16 @@ class _CreatePostViewState extends State<CreatePostView> {
                                     postsCubit.selectedVideo != null,
                                 targetMediaType:
                                     postsCubit.selectedImage != null
-                                        ? AiTargetMediaType.image
-                                        : postsCubit.selectedVideo != null
-                                        ? AiTargetMediaType.video
-                                        : AiTargetMediaType.none,
+                                    ? AiTargetMediaType.image
+                                    : postsCubit.selectedVideo != null
+                                    ? AiTargetMediaType.video
+                                    : AiTargetMediaType.none,
                                 imageBytesProvider:
                                     postsCubit.selectedImage == null
-                                        ? null
-                                        : () =>
-                                            File(
-                                              postsCubit.selectedImage!.path,
-                                            ).readAsBytes(),
+                                    ? null
+                                    : () =>
+                                          File(postsCubit.selectedImage!.path)
+                                              .readAsBytes(),
                               );
                             },
                           ),
@@ -312,9 +311,8 @@ class _CreatePostViewState extends State<CreatePostView> {
                 if (state is PostCreating)
                   Container(
                     key: const ValueKey('uploading_overlay'),
-                    color: Theme.of(
-                      context,
-                    ).scaffoldBackgroundColor.withValues(alpha: 0.02),
+                    color: Theme.of(context).scaffoldBackgroundColor
+                        .withValues(alpha: 0.02),
                     width: double.infinity,
                     height: double.infinity,
                     child: Center(
@@ -344,30 +342,30 @@ class _CreatePostViewState extends State<CreatePostView> {
                                       state.progress >= 1.0
                                           ? 'Posted'
                                           : (state.totalBytes > 0 &&
-                                                  state.sentBytes <
-                                                      state.totalBytes
-                                              ? formatMediaFileSizeRatio(
-                                                state.sentBytes,
-                                                state.totalBytes,
-                                              )
-                                              : "Publishing Post..."),
+                                                    state.sentBytes <
+                                                        state.totalBytes
+                                                ? formatMediaFileSizeRatio(
+                                                    state.sentBytes,
+                                                    state.totalBytes,
+                                                  )
+                                                : "Publishing Post..."),
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge?.copyWith(
-                                        color:
-                                            Theme.of(context).brightness ==
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            color:
+                                                Theme.of(context).brightness ==
                                                     Brightness.light
                                                 ? Theme.of(context).primaryColor
-                                                    .withValues(alpha: 0.7)
+                                                      .withValues(alpha: 0.7)
                                                 : Theme.of(context).primaryColor
-                                                    .withValues(alpha: 0.95),
-                                        fontSize: 18,
-                                        fontWeight:
-                                            state.progress >= 1.0
+                                                      .withValues(alpha: 0.95),
+                                            fontSize: 18,
+                                            fontWeight: state.progress >= 1.0
                                                 ? FontWeight.bold
                                                 : FontWeight.w600,
-                                      ),
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -391,11 +389,11 @@ class _CreatePostViewState extends State<CreatePostView> {
                                     size: 20,
                                     color:
                                         Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Theme.of(context).primaryColor
-                                                .withValues(alpha: 0.85)
-                                            : Theme.of(context).primaryColor
-                                                .withValues(alpha: 0.95),
+                                            Brightness.light
+                                        ? Theme.of(context).primaryColor
+                                              .withValues(alpha: 0.85)
+                                        : Theme.of(context).primaryColor
+                                              .withValues(alpha: 0.95),
                                   ),
                                 ),
                               ),

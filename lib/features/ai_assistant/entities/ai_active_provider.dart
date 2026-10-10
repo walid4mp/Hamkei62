@@ -1,4 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../../ai_chat/helpers/ai_model_iconography.dart';
 
 enum AiActiveProvider { gemini, groq, openRouter, unknown }

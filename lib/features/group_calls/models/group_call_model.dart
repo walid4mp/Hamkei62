@@ -88,8 +88,9 @@ class GroupCallModel {
     if (endedAt != null) 'ended_at': endedAt!.toIso8601String(),
     'participant_count': participantCount,
     if (duration != null) 'duration': duration,
-    'last_heartbeat_at':
-        (lastHeartbeatAt ?? startedAt).toUtc().toIso8601String(),
+    'last_heartbeat_at': (lastHeartbeatAt ?? startedAt)
+        .toUtc()
+        .toIso8601String(),
   };
 
   factory GroupCallModel.fromMap(Map<String, dynamic> map) => GroupCallModel(
@@ -103,23 +104,22 @@ class GroupCallModel {
     type: GroupCallType.values.byName(map['type'] as String),
     startedAt: DateTime.parse(map['started_at'] as String),
 
-    endedAt:
-        map['ended_at'] != null
-            ? DateTime.tryParse(map['ended_at'] as String)
-            : null,
+    endedAt: map['ended_at'] != null
+        ? DateTime.tryParse(map['ended_at'] as String)
+        : null,
     participantCount: (map['participant_count'] as int?) ?? 0,
     duration: map['duration'] as String?,
-    lastHeartbeatAt:
-        map['last_heartbeat_at'] != null
-            ? DateTime.tryParse(map['last_heartbeat_at'] as String)
-            : null,
+    lastHeartbeatAt: map['last_heartbeat_at'] != null
+        ? DateTime.tryParse(map['last_heartbeat_at'] as String)
+        : null,
   );
 
   String get lastMessagePreview {
     final typeIcon = type == GroupCallType.video ? '🎥' : '📞';
 
-    final typeLabel =
-        type == GroupCallType.video ? 'Group Video Call' : 'Group Voice Call';
+    final typeLabel = type == GroupCallType.video
+        ? 'Group Video Call'
+        : 'Group Voice Call';
 
     return switch (status) {
       GroupCallStatus.missed => '$typeIcon $typeLabel Missed',

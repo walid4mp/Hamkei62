@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/chat_shared/controllers/voice_playback_controller.dart';
 import '../../../core/helpers/formatted_date.dart';
 import '../../../core/themes/app_colors.dart';
@@ -140,10 +142,9 @@ class _GroupVoiceMessageBubbleWidgetState
 
     if (mounted) setState(() => _isLoading = true);
     try {
-      final controller =
-          _isLocalFile
-              ? VideoPlayerController.file(File(widget.voiceUrl))
-              : VideoPlayerController.networkUrl(Uri.parse(widget.voiceUrl));
+      final controller = _isLocalFile
+          ? VideoPlayerController.file(File(widget.voiceUrl))
+          : VideoPlayerController.networkUrl(Uri.parse(widget.voiceUrl));
 
       await controller.initialize();
 
@@ -222,8 +223,9 @@ class _GroupVoiceMessageBubbleWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final activeColor =
-        widget.isMe ? AppColors.white : Theme.of(context).primaryColor;
+    final activeColor = widget.isMe
+        ? AppColors.white
+        : Theme.of(context).primaryColor;
 
     final showLoadingIcon =
         widget.isUploading || _isLoading || widget.voiceUrl.isEmpty;
@@ -235,26 +237,23 @@ class _GroupVoiceMessageBubbleWidgetState
         IconButton(
           padding: EdgeInsets.zero,
           onPressed: showLoadingIcon ? null : _initAndPlay,
-          icon:
-              showLoadingIcon
-                  ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CustomLoadingIndicator(
-                      color:
-                          widget.isMe
-                              ? AppColors.white
-                              : Theme.of(context).primaryColor,
-                    ),
-                  )
-                  : Icon(
-                    _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                    color:
-                        widget.isMe
-                            ? AppColors.white
-                            : Theme.of(context).primaryColor,
-                    size: 32,
+          icon: showLoadingIcon
+              ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CustomLoadingIndicator(
+                    color: widget.isMe
+                        ? AppColors.white
+                        : Theme.of(context).primaryColor,
                   ),
+                )
+              : Icon(
+                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                  color: widget.isMe
+                      ? AppColors.white
+                      : Theme.of(context).primaryColor,
+                  size: 32,
+                ),
         ),
         Flexible(
           child: Column(
@@ -270,10 +269,9 @@ class _GroupVoiceMessageBubbleWidgetState
                       duration: _effectiveDuration ?? Duration.zero,
                       activeColor: activeColor,
                       inactiveColor: activeColor.withValues(alpha: 0.25),
-                      onSeek:
-                          _isInitialized && _controller != null
-                              ? (target) => _controller!.seekTo(target)
-                              : null,
+                      onSeek: _isInitialized && _controller != null
+                          ? (target) => _controller!.seekTo(target)
+                          : null,
                     ),
                   ),
                   const Gap(8),
@@ -310,12 +308,10 @@ class _GroupVoiceMessageBubbleWidgetState
                     _durationText,
 
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color:
-                          widget.isMe
-                              ? AppColors.white70
-                              : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: widget.isMe
+                          ? AppColors.white70
+                          : Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                       fontSize: 9,
                     ),
                   ),
@@ -325,16 +321,14 @@ class _GroupVoiceMessageBubbleWidgetState
                     children: [
                       Text(
                         FormattedDate.getMessageTime(widget.timestamp),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleMedium!.copyWith(
-                          color:
-                              widget.isMe
+                        style: Theme.of(context).textTheme.titleMedium!
+                            .copyWith(
+                              color: widget.isMe
                                   ? AppColors.white70
                                   : Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.5),
-                          fontSize: 9,
-                        ),
+                                        .withValues(alpha: 0.5),
+                              fontSize: 9,
+                            ),
                       ),
                       if (widget.isMe) ...[
                         const Gap(2),
@@ -343,10 +337,9 @@ class _GroupVoiceMessageBubbleWidgetState
                               ? Icons.done_all
                               : Icons.done,
                           size: 12,
-                          color:
-                              (widget.isRead ?? false)
-                                  ? Colors.blue[200]
-                                  : AppColors.white70,
+                          color: (widget.isRead ?? false)
+                              ? Colors.blue[200]
+                              : AppColors.white70,
                         ),
                       ],
                     ],

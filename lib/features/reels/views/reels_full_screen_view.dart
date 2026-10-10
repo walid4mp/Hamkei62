@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../cubits/reels_feed_cubit/reels_feed_cubit.dart';
 import '../models/reel_model.dart';
 import '../services/reel_player_controller_pool.dart';
@@ -146,14 +147,12 @@ class _ReelsFullScreenViewState extends State<ReelsFullScreenView> {
           if (previous is! ReelsFeedLoaded || current is! ReelsFeedLoaded) {
             return true;
           }
-          final prevLen =
-              widget.sectionIndex! < previous.sections.length
-                  ? previous.sections[widget.sectionIndex!].length
-                  : 0;
-          final currLen =
-              widget.sectionIndex! < current.sections.length
-                  ? current.sections[widget.sectionIndex!].length
-                  : 0;
+          final prevLen = widget.sectionIndex! < previous.sections.length
+              ? previous.sections[widget.sectionIndex!].length
+              : 0;
+          final currLen = widget.sectionIndex! < current.sections.length
+              ? current.sections[widget.sectionIndex!].length
+              : 0;
           return prevLen != currLen;
         },
         builder: (context, state) {

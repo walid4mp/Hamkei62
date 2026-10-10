@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../helpers/ai_model_display.dart';
 
 enum AiChatRole { user, assistant, system }
@@ -94,8 +95,9 @@ class AiChatMessage {
       fileName: fileName,
       fileSizeBytes: fileSizeBytes,
       durationSeconds: durationSeconds,
-      uploadProgress:
-          clearUploadProgress ? null : (uploadProgress ?? this.uploadProgress),
+      uploadProgress: clearUploadProgress
+          ? null
+          : (uploadProgress ?? this.uploadProgress),
       model: model,
       replyToMessageId: replyToMessageId ?? this.replyToMessageId,
       replyToText: replyToText ?? this.replyToText,

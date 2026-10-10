@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../helpers/ai_model_iconography.dart';
 import '../models/ai_model_option.dart';
 import 'syncra_backdrop.dart';
@@ -23,8 +25,8 @@ class AiModelSelector extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder:
-          (_) => _AiModelPickerSheet(selected: selected, onChanged: onChanged),
+      builder: (_) =>
+          _AiModelPickerSheet(selected: selected, onChanged: onChanged),
     );
   }
 
@@ -171,16 +173,14 @@ class _ModelTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? model.accentColor.withValues(alpha: 0.14)
-                  : Colors.white.withValues(alpha: 0.04),
+          color: isSelected
+              ? model.accentColor.withValues(alpha: 0.14)
+              : Colors.white.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color:
-                isSelected
-                    ? model.accentColor.withValues(alpha: 0.5)
-                    : Colors.white.withValues(alpha: 0.08),
+            color: isSelected
+                ? model.accentColor.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.08),
           ),
         ),
         child: Row(

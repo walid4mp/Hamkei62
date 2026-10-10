@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+
 import '../../../core/presence/models/chat_action_type.dart';
 
 class GroupPresenceEntry {

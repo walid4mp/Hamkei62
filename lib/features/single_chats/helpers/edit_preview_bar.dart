@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../models/message_model.dart';
 
@@ -16,8 +17,9 @@ class EditPreviewBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final preview = editingMessage.caption ?? editingMessage.text;
-    final trimmed =
-        preview.length > 60 ? '${preview.substring(0, 60)}...' : preview;
+    final trimmed = preview.length > 60
+        ? '${preview.substring(0, 60)}...'
+        : preview;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -17,10 +17,9 @@ class AiUsageState {
     this.activeModel,
   });
 
-  int? get used =>
-      (effectiveUserLimit != null && userRemaining != null)
-          ? effectiveUserLimit! - userRemaining!
-          : null;
+  int? get used => (effectiveUserLimit != null && userRemaining != null)
+      ? effectiveUserLimit! - userRemaining!
+      : null;
 
   double? get usedFraction {
     final limit = effectiveUserLimit;

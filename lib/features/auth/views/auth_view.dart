@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:social_media_app/core/themes/dynamic_splash_app.dart';
 import 'package:social_media_app/features/auth/widgets/login_view_widget.dart';
 import 'package:social_media_app/features/auth/widgets/register_view_widget.dart';
+
 import '../../../core/themes/background_theme_widget.dart';
 import '../widgets/custom_tab_bar.dart';
 

@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/helpers/chat_helper.dart';
 import 'ai_code_block_builder.dart';
 
@@ -201,8 +203,9 @@ class _AiTypewriterTextState extends State<AiTypewriterText> {
   Widget build(BuildContext context) {
     final safeLength = _revealedLength.clamp(0, widget.text.length);
 
-    final revealedText =
-        safeLength == 0 ? '' : widget.text.substring(0, safeLength);
+    final revealedText = safeLength == 0
+        ? ''
+        : widget.text.substring(0, safeLength);
 
     return Directionality(
       textDirection:

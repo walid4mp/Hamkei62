@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/post_reaction_model.dart';
 import '../../../core/design/tokens/typography.dart';
 
@@ -26,40 +27,39 @@ class PostReactionsSummary extends StatelessWidget {
           width: 16.0 + (top.length - 1) * 14.0,
           child: Stack(
             clipBehavior: Clip.none,
-            children:
-                List.generate(top.length, (i) {
-                  return Positioned(
-                    left: i * 14.0,
-                    child: Container(
-                      width: 18,
-                      height: 18,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border.all(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        reactionGlyph(top[i].emoji),
-                        style: TextStyle(
-                          fontSize: 9,
-                          height: 1,
-                          inherit: false,
-                          fontFamilyFallback: AppTypography.emojiFontFallback,
-                        ),
-                      ),
+            children: List.generate(top.length, (i) {
+              return Positioned(
+                left: i * 14.0,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    border: Border.all(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      width: 1.5,
                     ),
-                  );
-                }).reversed.toList(),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    reactionGlyph(top[i].emoji),
+                    style: TextStyle(
+                      fontSize: 9,
+                      height: 1,
+                      inherit: false,
+                      fontFamilyFallback: AppTypography.emojiFontFallback,
+                    ),
+                  ),
+                ),
+              );
+            }).reversed.toList(),
           ),
         ),
       ],

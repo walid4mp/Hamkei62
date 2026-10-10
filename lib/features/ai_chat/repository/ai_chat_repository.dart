@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/ai_chat_message_record.dart';
 import '../models/ai_chat_session.dart';
 
@@ -29,10 +30,9 @@ class AiChatRepository {
           .from('ai_chat_sessions')
           .select()
           .order('last_message_at', ascending: false, nullsFirst: false);
-      final fresh =
-          (rows as List)
-              .map((r) => AiChatSession.fromJson(r as Map<String, dynamic>))
-              .toList();
+      final fresh = (rows as List)
+          .map((r) => AiChatSession.fromJson(r as Map<String, dynamic>))
+          .toList();
       await _sessionsBox.clear();
       for (final s in fresh) {
         await _sessionsBox.put(s.id, s);
@@ -54,10 +54,9 @@ class AiChatRepository {
           .select()
           .order('last_message_at', ascending: false, nullsFirst: false);
 
-      final fresh =
-          (rows as List)
-              .map((r) => AiChatSession.fromJson(r as Map<String, dynamic>))
-              .toList();
+      final fresh = (rows as List)
+          .map((r) => AiChatSession.fromJson(r as Map<String, dynamic>))
+          .toList();
 
       await _sessionsBox.clear();
       for (final s in fresh) {
@@ -82,13 +81,12 @@ class AiChatRepository {
   }
 
   Future<AiChatSession> createSession({String? firstMessage}) async {
-    final row =
-        await _supabase
-            .rpc(
-              'create_ai_chat_session',
-              params: {'p_first_message': firstMessage},
-            )
-            .single();
+    final row = await _supabase
+        .rpc(
+          'create_ai_chat_session',
+          params: {'p_first_message': firstMessage},
+        )
+        .single();
 
     final session = AiChatSession.fromJson(row);
     await _sessionsBox.put(session.id, session);
@@ -122,10 +120,9 @@ class AiChatRepository {
 
     await _sessionsBox.delete(sessionId);
 
-    final keysToRemove =
-        _messagesBox.keys
-            .where((k) => k.toString().startsWith('$sessionId:'))
-            .toList();
+    final keysToRemove = _messagesBox.keys
+        .where((k) => k.toString().startsWith('$sessionId:'))
+        .toList();
     await _messagesBox.deleteAll(keysToRemove);
   }
 
@@ -134,8 +131,9 @@ class AiChatRepository {
   // --------------------------------------------------------------------
 
   List<AiChatMessageRecord> localMessages(String sessionId) {
-    final list =
-        _messagesBox.values.where((m) => m.sessionId == sessionId).toList();
+    final list = _messagesBox.values
+        .where((m) => m.sessionId == sessionId)
+        .toList();
     list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return list;
   }
@@ -150,22 +148,20 @@ class AiChatRepository {
         .eq('session_id', sessionId)
         .order('created_at', ascending: true)
         .limit(limit);
-    final fresh =
-        (rows as List)
-            .map((r) => AiChatMessageRecord.fromJson(r as Map<String, dynamic>))
-            .toList();
+    final fresh = (rows as List)
+        .map((r) => AiChatMessageRecord.fromJson(r as Map<String, dynamic>))
+        .toList();
     for (final m in fresh) {
       final local = _messagesBox.get('$sessionId:${m.id}');
-      final merged =
-          (local != null && local.replyToMessageId != null)
-              ? m.copyWith(
-                replyToMessageId: local.replyToMessageId,
-                replyToText: local.replyToText,
-                replyToSenderRole: local.replyToSenderRole,
-                replyToMediaType: local.replyToMediaType,
-                replyToMediaUrl: local.replyToMediaUrl,
-              )
-              : m;
+      final merged = (local != null && local.replyToMessageId != null)
+          ? m.copyWith(
+              replyToMessageId: local.replyToMessageId,
+              replyToText: local.replyToText,
+              replyToSenderRole: local.replyToSenderRole,
+              replyToMediaType: local.replyToMediaType,
+              replyToMediaUrl: local.replyToMediaUrl,
+            )
+          : m;
       await _messagesBox.put('$sessionId:${m.id}', merged);
     }
     return fresh;
@@ -190,31 +186,30 @@ class AiChatRepository {
     String? replyToMediaType,
     String? replyToMediaUrl,
   }) async {
-    final row =
-        await _supabase
-            .rpc(
-              'append_ai_chat_message',
-              params: {
-                'p_session_id': sessionId,
-                'p_role': role,
-                'p_content': text,
-                'p_attachment_type': mediaType == 'none' ? null : mediaType,
-                'p_attachment_url': mediaUrl,
-                'p_provider': provider,
-                'p_model': model,
-                'p_degraded': degraded,
-                'p_request_id': requestId,
-                'p_file_name': fileName,
-                'p_file_size_bytes': fileSizeBytes,
-                'p_duration_seconds': durationSeconds,
-                'p_reply_to_message_id': replyToMessageId,
-                'p_reply_to_message_text': replyToText,
-                'p_reply_to_sender_role': replyToSenderRole,
-                'p_reply_to_media_type': replyToMediaType,
-                'p_reply_to_media_url': replyToMediaUrl,
-              },
-            )
-            .single();
+    final row = await _supabase
+        .rpc(
+          'append_ai_chat_message',
+          params: {
+            'p_session_id': sessionId,
+            'p_role': role,
+            'p_content': text,
+            'p_attachment_type': mediaType == 'none' ? null : mediaType,
+            'p_attachment_url': mediaUrl,
+            'p_provider': provider,
+            'p_model': model,
+            'p_degraded': degraded,
+            'p_request_id': requestId,
+            'p_file_name': fileName,
+            'p_file_size_bytes': fileSizeBytes,
+            'p_duration_seconds': durationSeconds,
+            'p_reply_to_message_id': replyToMessageId,
+            'p_reply_to_message_text': replyToText,
+            'p_reply_to_sender_role': replyToSenderRole,
+            'p_reply_to_media_type': replyToMediaType,
+            'p_reply_to_media_url': replyToMediaUrl,
+          },
+        )
+        .single();
 
     final message = AiChatMessageRecord.fromJson(row);
     await _messagesBox.put('$sessionId:${message.id}', message);

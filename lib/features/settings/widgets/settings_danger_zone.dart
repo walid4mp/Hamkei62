@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/features/auth/cubits/auth_cubit/auth_cubit.dart';
+
 import '../../../core/toast/app_toast.dart';
 
 class SettingsDangerZone extends StatelessWidget {
@@ -17,14 +18,13 @@ class SettingsDangerZone extends StatelessWidget {
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(milliseconds: 700),
       curve: Curves.easeOut,
-      builder:
-          (ctx, val, child) => Opacity(
-            opacity: val,
-            child: Transform.translate(
-              offset: Offset(0, 18 * (1 - val)),
-              child: child,
-            ),
-          ),
+      builder: (ctx, val, child) => Opacity(
+        opacity: val,
+        child: Transform.translate(
+          offset: Offset(0, 18 * (1 - val)),
+          child: child,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,16 +52,14 @@ class SettingsDangerZone extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color:
-                  isDark
-                      ? Colors.red.withValues(alpha: 0.05)
-                      : Colors.red.shade50,
+              color: isDark
+                  ? Colors.red.withValues(alpha: 0.05)
+                  : Colors.red.shade50,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color:
-                    isDark
-                        ? Colors.red.withValues(alpha: 0.12)
-                        : Colors.red.shade100,
+                color: isDark
+                    ? Colors.red.withValues(alpha: 0.12)
+                    : Colors.red.shade100,
                 width: 0.8,
               ),
             ),
@@ -75,11 +73,10 @@ class SettingsDangerZone extends StatelessWidget {
                       AppToast.error(state.errMsg);
                     }
                   },
-                  buildWhen:
-                      (p, c) =>
-                          c is AuthSignedOut ||
-                          c is AuthFailure ||
-                          c is AuthLoading,
+                  buildWhen: (p, c) =>
+                      c is AuthSignedOut ||
+                      c is AuthFailure ||
+                      c is AuthLoading,
                   builder: (context, state) {
                     final isLoading = state is AuthLoading;
                     return _buildDangerItem(
@@ -91,20 +88,18 @@ class SettingsDangerZone extends StatelessWidget {
                       color: Colors.orange.shade600,
                       isLoading: isLoading,
                       isLast: false,
-                      onTap:
-                          isLoading
-                              ? null
-                              : () => context.read<AuthCubit>().signOut(),
+                      onTap: isLoading
+                          ? null
+                          : () => context.read<AuthCubit>().signOut(),
                     );
                   },
                 ),
                 Divider(
                   height: 1,
                   indent: 68,
-                  color:
-                      isDark
-                          ? Colors.red.withValues(alpha: 0.10)
-                          : Colors.red.shade100,
+                  color: isDark
+                      ? Colors.red.withValues(alpha: 0.10)
+                      : Colors.red.shade100,
                 ),
                 _buildDangerItem(
                   context,
@@ -137,13 +132,12 @@ class SettingsDangerZone extends StatelessWidget {
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap:
-          onTap == null
-              ? null
-              : () {
-                HapticFeedback.mediumImpact();
-                onTap();
-              },
+      onTap: onTap == null
+          ? null
+          : () {
+              HapticFeedback.mediumImpact();
+              onTap();
+            },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(
@@ -155,19 +149,18 @@ class SettingsDangerZone extends StatelessWidget {
                 color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(11),
               ),
-              child:
-                  isLoading
-                      ? Center(
-                        child: SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: color,
-                          ),
+              child: isLoading
+                  ? Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: color,
                         ),
-                      )
-                      : Icon(icon, color: color, size: 18),
+                      ),
+                    )
+                  : Icon(icon, color: color, size: 18),
             ),
             const Gap(14),
             Expanded(
@@ -208,31 +201,28 @@ class SettingsDangerZone extends StatelessWidget {
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Text(
-              'Feature Under Construction',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-            content: const Text(
-              "Account deletion isn't available yet. Please contact support if you need your account removed.",
-            ),
-            actions: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK', style: TextStyle(color: Colors.white)),
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Feature Under Construction',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+        content: const Text(
+          "Account deletion isn't available yet. Please contact support if you need your account removed.",
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK', style: TextStyle(color: Colors.white)),
           ),
+        ],
+      ),
     );
   }
 }

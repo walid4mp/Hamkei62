@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../design/tokens/typography.dart';
 
 const List<Map<String, String>> kChatReactions = [
@@ -49,28 +50,27 @@ class ChatReactionOverlay {
     final y = anchorRect.bottom + 6;
 
     return OverlayEntry(
-      builder:
-          (_) => Stack(
-            children: [
-              // Dismiss tap area
-              Positioned.fill(
-                child: Listener(
-                  onPointerDown: (_) => onDismiss(),
-                  behavior: HitTestBehavior.translucent,
-                  child: const SizedBox.expand(),
-                ),
-              ),
-              Positioned(
-                left: x,
-                top: y,
-                child: _ReactionPickerBubble(
-                  onSelect: onSelect,
-                  onDismiss: onDismiss,
-                  selectedEmoji: selectedEmoji,
-                ),
-              ),
-            ],
+      builder: (_) => Stack(
+        children: [
+          // Dismiss tap area
+          Positioned.fill(
+            child: Listener(
+              onPointerDown: (_) => onDismiss(),
+              behavior: HitTestBehavior.translucent,
+              child: const SizedBox.expand(),
+            ),
           ),
+          Positioned(
+            left: x,
+            top: y,
+            child: _ReactionPickerBubble(
+              onSelect: onSelect,
+              onDismiss: onDismiss,
+              selectedEmoji: selectedEmoji,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -176,28 +176,25 @@ class _ReactionPickerBubbleState extends State<_ReactionPickerBubble>
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color:
-                                isSelected
-                                    ? scheme.primary.withValues(alpha: 0.15)
-                                    : Colors.transparent,
-                            border:
-                                isSelected
-                                    ? Border.all(
-                                      color: scheme.primary.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      width: 1,
-                                    )
-                                    : null,
+                            color: isSelected
+                                ? scheme.primary.withValues(alpha: 0.15)
+                                : Colors.transparent,
+                            border: isSelected
+                                ? Border.all(
+                                    color: scheme.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    width: 1,
+                                  )
+                                : null,
                           ),
-                          transform:
-                              isSelected
-                                  ? (Matrix4.identity()..scale(1.18))
-                                  : isHov
-                                  ? (Matrix4.identity()
-                                    ..translate(0.0, -8.0)
-                                    ..scale(1.1))
-                                  : Matrix4.identity(),
+                          transform: isSelected
+                              ? (Matrix4.identity()..scale(1.18))
+                              : isHov
+                              ? (Matrix4.identity()
+                                  ..translate(0.0, -8.0)
+                                  ..scale(1.1))
+                              : Matrix4.identity(),
                           child: Tooltip(
                             message: r['label']!,
                             preferBelow: false,
@@ -216,17 +213,16 @@ class _ReactionPickerBubbleState extends State<_ReactionPickerBubble>
                                 inherit: false,
                                 fontFamilyFallback:
                                     AppTypography.emojiFontFallback,
-                                shadows:
-                                    isSelected
-                                        ? [
-                                          Shadow(
-                                            color: scheme.primary.withValues(
-                                              alpha: 0.4,
-                                            ),
-                                            blurRadius: 8,
+                                shadows: isSelected
+                                    ? [
+                                        Shadow(
+                                          color: scheme.primary.withValues(
+                                            alpha: 0.4,
                                           ),
-                                        ]
-                                        : [],
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                    : [],
                               ),
                             ),
                           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/toast/app_toast.dart';
 import '../../../core/widgets/custom_tab_wrapper.dart';
@@ -84,10 +85,9 @@ class _SavedPostsViewState extends State<SavedPostsView> {
               isTopSafeArea: false,
               errorMessage: state is SavedPostsError ? state.message : null,
               loadingSkeleton: const PostsSkeletonItems(),
-              onRetry:
-                  () => context.read<SavedPostsCubit>().fetchSavedPosts(
-                    widget.userId,
-                  ),
+              onRetry: () => context.read<SavedPostsCubit>().fetchSavedPosts(
+                widget.userId,
+              ),
               child: _SavedPostsList(state: state, postsCubit: postsCubit),
             );
           },
@@ -113,21 +113,21 @@ class _SavedPostsList extends StatelessWidget {
 
     return BlocBuilder<PostsCubit, PostsState>(
       builder: (context, postsState) {
-        final allPosts =
-            postsState is PostsLoaded ? postsState.posts : <PostModel>[];
+        final allPosts = postsState is PostsLoaded
+            ? postsState.posts
+            : <PostModel>[];
 
-        final visiblePosts =
-            loadedState.postIds
-                .map((id) {
-                  try {
-                    return allPosts.firstWhere((p) => p.id == id);
-                  } catch (_) {
-                    return null;
-                  }
-                })
-                .whereType<PostModel>()
-                .where((p) => p.isSavedByMe)
-                .toList();
+        final visiblePosts = loadedState.postIds
+            .map((id) {
+              try {
+                return allPosts.firstWhere((p) => p.id == id);
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<PostModel>()
+            .where((p) => p.isSavedByMe)
+            .toList();
 
         if (visiblePosts.isEmpty) {
           return const _EmptySavedPosts();
@@ -168,9 +168,8 @@ class _EmptySavedPosts extends StatelessWidget {
           const Gap(18),
           Text(
             'No saved posts yet',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const Gap(6),
           Padding(
@@ -178,9 +177,8 @@ class _EmptySavedPosts extends StatelessWidget {
             child: Text(
               'Tap the bookmark icon on any post to save it here for later.',
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: Colors.grey),
             ),
           ),
         ],

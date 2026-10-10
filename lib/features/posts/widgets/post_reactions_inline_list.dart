@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/supabase/supabase_provider.dart';
@@ -53,20 +54,18 @@ class _PostReactionsInlineListState extends State<PostReactionsInlineList> {
         .eq(LikeColumns.postId, widget.postId)
         .order(LikeColumns.createdAt, ascending: false);
 
-    final entries =
-        List<Map<String, dynamic>>.from(response).map((r) {
-          final user = r[SupabaseConstants.users] as Map<String, dynamic>?;
-          final lastSeenStr = user?[UserColumns.lastSeen] as String?;
-          return ReactionEntry(
-            userId: user?[UserColumns.id] ?? '',
-            userName: user?[UserColumns.name] ?? 'Unknown User',
-            userImageUrl: user?[UserColumns.imageUrl],
-            lastSeen:
-                lastSeenStr != null ? DateTime.tryParse(lastSeenStr) : null,
-            emoji: reactionGlyph(r[LikeColumns.reaction] as String? ?? 'like'),
-            createdAt: r[LikeColumns.createdAt] as String?,
-          );
-        }).toList();
+    final entries = List<Map<String, dynamic>>.from(response).map((r) {
+      final user = r[SupabaseConstants.users] as Map<String, dynamic>?;
+      final lastSeenStr = user?[UserColumns.lastSeen] as String?;
+      return ReactionEntry(
+        userId: user?[UserColumns.id] ?? '',
+        userName: user?[UserColumns.name] ?? 'Unknown User',
+        userImageUrl: user?[UserColumns.imageUrl],
+        lastSeen: lastSeenStr != null ? DateTime.tryParse(lastSeenStr) : null,
+        emoji: reactionGlyph(r[LikeColumns.reaction] as String? ?? 'like'),
+        createdAt: r[LikeColumns.createdAt] as String?,
+      );
+    }).toList();
     _entries = entries;
     return entries;
   }
@@ -167,9 +166,8 @@ class _PostReactionsInlineListState extends State<PostReactionsInlineList> {
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
                 'Failed to load reactions.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: AppColors.grey6),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: AppColors.grey6),
               ),
             );
           }
@@ -189,9 +187,8 @@ class _PostReactionsInlineListState extends State<PostReactionsInlineList> {
                     const SizedBox(height: 8),
                     Text(
                       'No reactions yet.',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: AppColors.grey6),
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: AppColors.grey6),
                     ),
                   ],
                 ),
@@ -207,14 +204,14 @@ class _PostReactionsInlineListState extends State<PostReactionsInlineList> {
                 children: [
                   Text(
                     '${entries.length} Reactions',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleMedium!.copyWith(color: AppColors.grey7),
+                    style: Theme.of(context).textTheme.titleMedium!
+                        .copyWith(color: AppColors.grey7),
                   ),
                   const SizedBox(width: 12),
                   AvatarStack(
-                    imageUrls:
-                        entries.map((e) => e.userImageUrl ?? '').toList(),
+                    imageUrls: entries
+                        .map((e) => e.userImageUrl ?? '')
+                        .toList(),
                   ),
                 ],
               ),
@@ -223,8 +220,8 @@ class _PostReactionsInlineListState extends State<PostReactionsInlineList> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: entries.length,
-                separatorBuilder:
-                    (context, index) => const SizedBox(height: 14),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   return _ReactionEntryTile(entry: entries[index]);
                 },
@@ -254,16 +251,15 @@ class _ReactionEntryTile extends StatelessWidget {
     } else {
       showDialog(
         context: context,
-        builder:
-            (context) => UserPreviewDialog(
-              user: ChatUserModel(
-                id: entry.userId,
-                name: entry.userName,
-                imageUrl: entry.userImageUrl,
-                lastSeen: entry.lastSeen,
-              ),
-              showContactOptions: false,
-            ),
+        builder: (context) => UserPreviewDialog(
+          user: ChatUserModel(
+            id: entry.userId,
+            name: entry.userName,
+            imageUrl: entry.userImageUrl,
+            lastSeen: entry.lastSeen,
+          ),
+          showContactOptions: false,
+        ),
       );
     }
   }
@@ -283,8 +279,9 @@ class _ReactionEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final createdAt =
-        entry.createdAt != null ? DateTime.tryParse(entry.createdAt!) : null;
+    final createdAt = entry.createdAt != null
+        ? DateTime.tryParse(entry.createdAt!)
+        : null;
 
     return Row(
       children: [
@@ -327,9 +324,8 @@ class _ReactionEntryTile extends StatelessWidget {
               entry.userName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -337,9 +333,8 @@ class _ReactionEntryTile extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             _formatRelativeTime(createdAt),
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.grey5),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: AppColors.grey5),
           ),
         ],
       ],

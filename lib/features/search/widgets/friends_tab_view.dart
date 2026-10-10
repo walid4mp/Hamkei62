@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/custom_pull_to_refresh.dart';
 import '../../../core/widgets/empty_findings_animation_widget.dart';
@@ -61,9 +62,8 @@ class _FriendsTabViewState extends State<FriendsTabView>
       builder: (context, query, _) {
         if (query.isNotEmpty) {
           return BlocBuilder<SearchFriendsCubit, SearchFriendsState>(
-            builder:
-                (context, state) =>
-                    _buildSearchResults(context, theme, state, query),
+            builder: (context, state) =>
+                _buildSearchResults(context, theme, state, query),
           );
         }
         return BlocBuilder<FriendsListCubit, FriendsListState>(
@@ -100,8 +100,8 @@ class _FriendsTabViewState extends State<FriendsTabView>
                       return false;
                     },
                     child: CustomPullToRefresh(
-                      onRefresh:
-                          () => context.read<FriendsListCubit>().loadFriends(),
+                      onRefresh: () =>
+                          context.read<FriendsListCubit>().loadFriends(),
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(
                           SearchViewMetrics.horizontalPadding,
@@ -111,20 +111,16 @@ class _FriendsTabViewState extends State<FriendsTabView>
                         ),
                         physics: const ClampingScrollPhysics(),
                         itemCount: friends.length,
-                        separatorBuilder:
-                            (_, __) => const Gap(SearchViewMetrics.itemGap),
+                        separatorBuilder: (_, __) =>
+                            const Gap(SearchViewMetrics.itemGap),
                         itemBuilder: (context, i) {
                           final friend = friends[i];
                           return FriendTileWidget(
                             key: ValueKey(friend.friendshipId),
                             friend: friend,
                             isMe: true,
-                            onUnfriend:
-                                () => _unfriend(
-                                  context,
-                                  friend.friendshipId,
-                                  false,
-                                ),
+                            onUnfriend: () =>
+                                _unfriend(context, friend.friendshipId, false),
                           );
                         },
                       ),

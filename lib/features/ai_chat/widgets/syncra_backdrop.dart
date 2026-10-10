@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../helpers/ai_chat_colors.dart';
 
 class SyncraBackdrop extends StatelessWidget {

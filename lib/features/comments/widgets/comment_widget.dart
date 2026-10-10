@@ -9,6 +9,7 @@ import 'package:social_media_app/features/comments/widgets/comment_media_bubble.
 import 'package:social_media_app/features/comments/widgets/comment_reaction_summary.dart';
 import 'package:social_media_app/features/comments/widgets/comment_reactions_bottom_sheet.dart';
 import 'package:social_media_app/features/comments/widgets/thread_painter.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/helpers/comment_helper.dart';
 import '../../../core/link/widgets/message_link_preview.dart';
@@ -173,22 +174,21 @@ class _CommentWidgetState extends State<CommentWidget>
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (ctx) => CustomConfirmationDialog(
-            title: 'Delete this comment ?',
-            textAlign: TextAlign.center,
-            img: AppImages.deleteFilesAnimationLot,
-            onConfirm: () async {
-              Navigator.pop(ctx);
-              context.read<CommentsCubit>().deleteComment(
-                commentId: widget.comment.id,
-                postId: widget.comment.postId,
-              );
-              if (context.mounted) {
-                AppToast.info('Comment deleted successfully');
-              }
-            },
-          ),
+      builder: (ctx) => CustomConfirmationDialog(
+        title: 'Delete this comment ?',
+        textAlign: TextAlign.center,
+        img: AppImages.deleteFilesAnimationLot,
+        onConfirm: () async {
+          Navigator.pop(ctx);
+          context.read<CommentsCubit>().deleteComment(
+            commentId: widget.comment.id,
+            postId: widget.comment.postId,
+          );
+          if (context.mounted) {
+            AppToast.info('Comment deleted successfully');
+          }
+        },
+      ),
     );
   }
 
@@ -198,9 +198,8 @@ class _CommentWidgetState extends State<CommentWidget>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
 
-      builder:
-          (context) =>
-              CommentReactionsBottomSheet(commentId: widget.comment.id),
+      builder: (context) =>
+          CommentReactionsBottomSheet(commentId: widget.comment.id),
     );
   }
 
@@ -246,8 +245,8 @@ class _CommentWidgetState extends State<CommentWidget>
       } else {
         final authorName =
             (widget.comment.authorName?.trim().isNotEmpty ?? false)
-                ? widget.comment.authorName!.trim()
-                : 'Someone';
+            ? widget.comment.authorName!.trim()
+            : 'Someone';
         AppToast.info('$authorName mentioned you in this comment');
       }
     } else {
@@ -305,8 +304,8 @@ class _CommentWidgetState extends State<CommentWidget>
     final bool isMe = widget.comment.authorId == currentUserId;
     final GlobalKey? effectiveHighlightKey =
         widget.comment.id == widget.highlightCommentId
-            ? widget.highlightKey
-            : null;
+        ? widget.highlightKey
+        : null;
 
     return AnimatedBuilder(
       animation: Listenable.merge([_anim, _highlightAnim]),
@@ -348,17 +347,72 @@ class _CommentWidgetState extends State<CommentWidget>
                         children: [
                           GestureDetector(
                             onLongPress: _showPicker,
-                            child:
-                                isMediaOnlyComment
-                                    ? Column(
+                            child: isMediaOnlyComment
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 2,
+                                          bottom: 4,
+                                        ),
+                                        child: Text(
+                                          widget.comment.authorName ?? 'User',
+                                          style: theme.textTheme.labelMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: theme.primaryColor,
+                                                fontSize: 13,
+                                              ),
+                                        ),
+                                      ),
+                                      CommentMediaBubble(
+                                        comment: widget.comment,
+                                      ),
+                                    ],
+                                  )
+                                : Container(
+                                    decoration: BoxDecoration(
+                                      color: widget.depth > 0
+                                          ? theme
+                                                .colorScheme
+                                                .surfaceContainerHighest
+                                                .withValues(alpha: 0.55)
+                                          : theme
+                                                .colorScheme
+                                                .surfaceContainerHighest
+                                                .withValues(alpha: 0.85),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(4),
+                                        topRight: Radius.circular(16),
+                                        bottomLeft: Radius.circular(16),
+                                        bottomRight: Radius.circular(16),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 2,
-                                            bottom: 4,
-                                          ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (isMe) {
+                                              navController?.jumpToTab(3);
+                                            } else {
+                                              Navigator.of(
+                                                context,
+                                                rootNavigator: true,
+                                              ).pushNamed(
+                                                AppRoutes.profileViewRoute,
+                                                arguments:
+                                                    widget.comment.authorId,
+                                              );
+                                            }
+                                          },
                                           child: Text(
                                             widget.comment.authorName ?? 'User',
                                             style: theme.textTheme.labelMedium
@@ -369,105 +423,45 @@ class _CommentWidgetState extends State<CommentWidget>
                                                 ),
                                           ),
                                         ),
-                                        CommentMediaBubble(
-                                          comment: widget.comment,
-                                        ),
-                                      ],
-                                    )
-                                    : Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            widget.depth > 0
-                                                ? theme
-                                                    .colorScheme
-                                                    .surfaceContainerHighest
-                                                    .withValues(alpha: 0.55)
-                                                : theme
-                                                    .colorScheme
-                                                    .surfaceContainerHighest
-                                                    .withValues(alpha: 0.85),
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(4),
-                                          topRight: Radius.circular(16),
-                                          bottomLeft: Radius.circular(16),
-                                          bottomRight: Radius.circular(16),
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (isMe) {
-                                                navController?.jumpToTab(3);
-                                              } else {
-                                                Navigator.of(
-                                                  context,
-                                                  rootNavigator: true,
-                                                ).pushNamed(
-                                                  AppRoutes.profileViewRoute,
-                                                  arguments:
-                                                      widget.comment.authorId,
-                                                );
-                                              }
-                                            },
-                                            child: Text(
-                                              widget.comment.authorName ??
-                                                  'User',
-                                              style: theme.textTheme.labelMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: theme.primaryColor,
-                                                    fontSize: 13,
-                                                  ),
-                                            ),
+                                        const SizedBox(height: 3),
+                                        if (widget.comment.hasMedia) ...[
+                                          CommentMediaBubble(
+                                            comment: widget.comment,
                                           ),
-                                          const SizedBox(height: 3),
-                                          if (widget.comment.hasMedia) ...[
-                                            CommentMediaBubble(
-                                              comment: widget.comment,
+                                          const SizedBox(height: 6),
+                                        ],
+                                        if (widget.comment.text.isNotEmpty)
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              minWidth: switch (widget
+                                                  .comment
+                                                  .commentType) {
+                                                CommentType.image ||
+                                                CommentType.video => 180,
+                                                CommentType.gif => 160,
+                                                CommentType.sticker => 96,
+                                                CommentType.voice => 195,
+                                                CommentType.file => 285,
+                                                CommentType.text => 0,
+                                              },
                                             ),
-                                            const SizedBox(height: 6),
-                                          ],
-                                          if (widget.comment.text.isNotEmpty)
-                                            ConstrainedBox(
-                                              constraints: BoxConstraints(
-                                                minWidth: switch (widget
-                                                    .comment
-                                                    .commentType) {
-                                                  CommentType.image ||
-                                                  CommentType.video => 180,
-                                                  CommentType.gif => 160,
-                                                  CommentType.sticker => 96,
-                                                  CommentType.voice => 195,
-                                                  CommentType.file => 285,
-                                                  CommentType.text => 0,
-                                                },
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  widget.comment.commentType ==
-                                                          CommentType.text
-                                                      ? MessageLinkPreview(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                widget.comment.commentType ==
+                                                        CommentType.text
+                                                    ? MessageLinkPreview(
                                                         text:
                                                             widget.comment.text,
                                                         textWidget: MentionRichText(
-                                                          text:
-                                                              widget
-                                                                  .comment
-                                                                  .text,
-                                                          mentions:
-                                                              widget
-                                                                  .comment
-                                                                  .mentions,
+                                                          text: widget
+                                                              .comment
+                                                              .text,
+                                                          mentions: widget
+                                                              .comment
+                                                              .mentions,
                                                           onMentionTap:
                                                               _openMentionPreview,
                                                           style: theme
@@ -476,20 +470,18 @@ class _CommentWidgetState extends State<CommentWidget>
                                                               ?.copyWith(
                                                                 fontSize: 14,
                                                                 height: 1.4,
-                                                                color:
-                                                                    theme
-                                                                        .colorScheme
-                                                                        .onSurface,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .onSurface,
                                                               ),
                                                         ),
                                                       )
-                                                      : MentionRichText(
+                                                    : MentionRichText(
                                                         text:
                                                             widget.comment.text,
-                                                        mentions:
-                                                            widget
-                                                                .comment
-                                                                .mentions,
+                                                        mentions: widget
+                                                            .comment
+                                                            .mentions,
                                                         onMentionTap:
                                                             _openMentionPreview,
                                                         style: theme
@@ -498,22 +490,22 @@ class _CommentWidgetState extends State<CommentWidget>
                                                             ?.copyWith(
                                                               fontSize: 14,
                                                               height: 1.4,
-                                                              color:
-                                                                  theme
-                                                                      .colorScheme
-                                                                      .onSurface,
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .onSurface,
                                                             ),
                                                       ),
-                                                ],
-                                              ),
+                                              ],
                                             ),
-                                        ],
-                                      ),
+                                          ),
+                                      ],
                                     ),
+                                  ),
                           ),
                           SizedBox(
-                            height:
-                                widget.comment.reactions.isNotEmpty ? 16 : 6,
+                            height: widget.comment.reactions.isNotEmpty
+                                ? 16
+                                : 6,
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 4),
@@ -545,12 +537,12 @@ class _CommentWidgetState extends State<CommentWidget>
                                   key: _reactionKey,
                                   label:
                                       widget.comment.reactions.any(
-                                            (r) => r.reactedByMe,
-                                          )
-                                          ? widget.comment.reactions
-                                              .firstWhere((r) => r.reactedByMe)
-                                              .emoji
-                                          : 'Like',
+                                        (r) => r.reactedByMe,
+                                      )
+                                      ? widget.comment.reactions
+                                            .firstWhere((r) => r.reactedByMe)
+                                            .emoji
+                                      : 'Like',
                                   isActive: widget.comment.reactions.any(
                                     (r) => r.reactedByMe,
                                   ),
@@ -573,11 +565,10 @@ class _CommentWidgetState extends State<CommentWidget>
                                 const SizedBox(width: 12),
                                 CommentActionChip(
                                   label: 'Reply',
-                                  onTap:
-                                      () => widget.onReplyTap?.call(
-                                        widget.comment.id,
-                                        widget.comment.authorName ?? 'User',
-                                      ),
+                                  onTap: () => widget.onReplyTap?.call(
+                                    widget.comment.id,
+                                    widget.comment.authorName ?? 'User',
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 CommentReactionsSummary(
@@ -599,10 +590,9 @@ class _CommentWidgetState extends State<CommentWidget>
                       left: visualDepth * kIndent + aR * 2 + 12,
                     ),
                     child: GestureDetector(
-                      onTap:
-                          () => context.read<CommentsCubit>().toggleReplies(
-                            widget.comment.id,
-                          ),
+                      onTap: () => context.read<CommentsCubit>().toggleReplies(
+                        widget.comment.id,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -637,58 +627,54 @@ class _CommentWidgetState extends State<CommentWidget>
                     onEnd: () {
                       if (isExpanded) _recalculateStem();
                     },
-                    child:
-                        isExpanded
-                            ? NotificationListener<
-                              SizeChangedLayoutNotification
-                            >(
-                              onNotification: (_) {
-                                _recalculateStem();
-                                return false;
-                              },
-                              child: SizeChangedLayoutNotifier(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: kRepliesTopPad,
-                                  ),
-                                  child: Column(
-                                    children:
-                                        widget.comment.replies.asMap().entries.map((
-                                          entry,
-                                        ) {
-                                          final isLast =
-                                              entry.key ==
-                                              widget.comment.replies.length - 1;
-                                          return Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom:
-                                                  isLast ? 0 : kReplySpacing,
+                    child: isExpanded
+                        ? NotificationListener<SizeChangedLayoutNotification>(
+                            onNotification: (_) {
+                              _recalculateStem();
+                              return false;
+                            },
+                            child: SizeChangedLayoutNotifier(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  top: kRepliesTopPad,
+                                ),
+                                child: Column(
+                                  children: widget.comment.replies
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                        final isLast =
+                                            entry.key ==
+                                            widget.comment.replies.length - 1;
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: isLast ? 0 : kReplySpacing,
+                                          ),
+                                          child: CommentWidget(
+                                            key: ValueKey(
+                                              '${entry.value.id}_${widget.depth}',
                                             ),
-                                            child: CommentWidget(
-                                              key: ValueKey(
-                                                '${entry.value.id}_${widget.depth}',
-                                              ),
-                                              comment: entry.value,
-                                              postId: widget.postId,
-                                              postAuthorId: widget.postAuthorId,
-                                              depth: widget.depth + 1,
-                                              onReplyTap: widget.onReplyTap,
-                                              onEditTap: widget.onEditTap,
-                                              lastAvatarKey:
-                                                  isLast
-                                                      ? _lastReplyAvatarKey
-                                                      : null,
-                                              highlightCommentId:
-                                                  widget.highlightCommentId,
-                                              highlightKey: widget.highlightKey,
-                                            ),
-                                          );
-                                        }).toList(),
-                                  ),
+                                            comment: entry.value,
+                                            postId: widget.postId,
+                                            postAuthorId: widget.postAuthorId,
+                                            depth: widget.depth + 1,
+                                            onReplyTap: widget.onReplyTap,
+                                            onEditTap: widget.onEditTap,
+                                            lastAvatarKey: isLast
+                                                ? _lastReplyAvatarKey
+                                                : null,
+                                            highlightCommentId:
+                                                widget.highlightCommentId,
+                                            highlightKey: widget.highlightKey,
+                                          ),
+                                        );
+                                      })
+                                      .toList(),
                                 ),
                               ),
-                            )
-                            : const SizedBox.shrink(),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ],

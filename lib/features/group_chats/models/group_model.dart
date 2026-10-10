@@ -1,4 +1,5 @@
 import 'package:social_media_app/features/group_chats/models/group_member_model.dart';
+
 import 'group_presence_entry.dart';
 
 const _unset = Object();
@@ -70,8 +71,9 @@ class GroupModel {
     return GroupModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      avatarUrl:
-          identical(avatarUrl, _unset) ? this.avatarUrl : avatarUrl as String?,
+      avatarUrl: identical(avatarUrl, _unset)
+          ? this.avatarUrl
+          : avatarUrl as String?,
       title: identical(title, _unset) ? this.title : title as String?,
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
@@ -108,10 +110,9 @@ class GroupModel {
       lastMessageSenderId: map['last_message_sender_id'],
       lastMessageSenderName: map['last_message_sender_name'],
       lastMessageType: map['last_message_type'] ?? 'text',
-      lastMessageAt:
-          map['last_message_at'] != null
-              ? DateTime.parse(map['last_message_at'])
-              : null,
+      lastMessageAt: map['last_message_at'] != null
+          ? DateTime.parse(map['last_message_at'])
+          : null,
       lastMessageTargetId: map['last_message_target_id'] as String?,
       lastMessageTargetName: map['last_message_target_name'] as String?,
       unreadCount: (map['unread_count'] as int?) ?? 0,
@@ -156,20 +157,18 @@ class GroupModel {
       avatarUrl: map['avatar_url'] as String?,
       title: map['title'] as String?,
       createdBy: map['created_by'] as String? ?? '',
-      createdAt:
-          map['created_at'] != null
-              ? DateTime.parse(map['created_at'] as String)
-              : DateTime.now(),
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'] as String)
+          : DateTime.now(),
       isMember: map['is_member'] as bool? ?? true,
 
       lastMessage: map['last_message'] as String?,
       lastMessageSenderId: map['last_message_sender_id'] as String?,
       lastMessageSenderName: map['last_message_sender_name'] as String?,
       lastMessageType: map['last_message_type'] as String?,
-      lastMessageAt:
-          map['last_message_at'] != null
-              ? DateTime.parse(map['last_message_at'] as String)
-              : null,
+      lastMessageAt: map['last_message_at'] != null
+          ? DateTime.parse(map['last_message_at'] as String)
+          : null,
       lastMessageTargetId: map['last_message_target_id'] as String?,
       lastMessageTargetName: map['last_message_target_name'] as String?,
       unreadCount: (map['unread_count'] as num?)?.toInt() ?? 0,

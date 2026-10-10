@@ -11,10 +11,9 @@ class BlockedUserItemModel {
     final userMap = map['blocked_user'] as Map<String, dynamic>? ?? const {};
     return BlockedUserItemModel(
       user: UserData.fromMap(userMap),
-      blockedAt:
-          map[BlockedUsersColumns.createdAt] != null
-              ? DateTime.parse(map[BlockedUsersColumns.createdAt].toString())
-              : DateTime.now(),
+      blockedAt: map[BlockedUsersColumns.createdAt] != null
+          ? DateTime.parse(map[BlockedUsersColumns.createdAt].toString())
+          : DateTime.now(),
     );
   }
 }

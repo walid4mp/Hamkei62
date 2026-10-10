@@ -6,6 +6,7 @@ import 'package:social_media_app/features/comments/models/comment_model.dart';
 import 'package:social_media_app/features/comments/services/comments_service.dart';
 import 'package:social_media_app/features/comments/widgets/new_comments_pill.dart';
 import 'package:social_media_app/features/comments/widgets/send_comment_section.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../../../core/mentions/widgets/mention_text_editing_controller.dart';
 import '../../../core/supabase/supabase_provider.dart';
@@ -191,8 +192,9 @@ class _PostDetailsViewState extends State<PostDetailsView> {
                 }
 
                 final bool isSharedPost = currentPost.isSharedPost;
-                final PostModel? displayPost =
-                    isSharedPost ? currentPost.originalPost : currentPost;
+                final PostModel? displayPost = isSharedPost
+                    ? currentPost.originalPost
+                    : currentPost;
 
                 if (isSharedPost && displayPost == null) {
                   return const Center(child: Text('Content not available'));
@@ -268,14 +270,12 @@ class _PostDetailsViewState extends State<PostDetailsView> {
                                       const Gap(16),
                                       PostInteractionsRow(
                                         postId: displayPost.id,
-                                        onCommentsTap:
-                                            () => _toggleView(
-                                              PostDetailsActiveMode.comments,
-                                            ),
-                                        onReactionsTap:
-                                            () => _toggleView(
-                                              PostDetailsActiveMode.reactions,
-                                            ),
+                                        onCommentsTap: () => _toggleView(
+                                          PostDetailsActiveMode.comments,
+                                        ),
+                                        onReactionsTap: () => _toggleView(
+                                          PostDetailsActiveMode.reactions,
+                                        ),
                                       ),
 
                                       const Gap(6),
@@ -324,11 +324,11 @@ class _PostDetailsViewState extends State<PostDetailsView> {
                                 child: SizedBox(
                                   height:
                                       _activeMode ==
-                                              PostDetailsActiveMode.comments
-                                          ? (_composerHeight > 0
-                                              ? _composerHeight
-                                              : 72)
-                                          : 24,
+                                          PostDetailsActiveMode.comments
+                                      ? (_composerHeight > 0
+                                            ? _composerHeight
+                                            : 72)
+                                      : 24,
                                 ),
                               ),
                             ],
@@ -339,17 +339,14 @@ class _PostDetailsViewState extends State<PostDetailsView> {
                               right: 12,
                               bottom: 16,
                               child: BlocBuilder<CommentsCubit, CommentsState>(
-                                buildWhen:
-                                    (previous, current) =>
-                                        current is CommentsPendingChanged ||
-                                        current is CommentsUiChanged,
+                                buildWhen: (previous, current) =>
+                                    current is CommentsPendingChanged ||
+                                    current is CommentsUiChanged,
                                 builder: (context, state) {
                                   return NewCommentsPill(
                                     count: _commentsCubit.pendingCommentsCount,
-                                    onTap:
-                                        () =>
-                                            _inlineSectionKey.currentState
-                                                ?.jumpToNewComments(),
+                                    onTap: () => _inlineSectionKey.currentState
+                                        ?.jumpToNewComments(),
                                   );
                                 },
                               ),
@@ -380,8 +377,8 @@ class _PostDetailsViewState extends State<PostDetailsView> {
                               });
                             },
                             onEditSaved: _cancelEdit,
-                            onControllerReady:
-                                (controller) => _commentController = controller,
+                            onControllerReady: (controller) =>
+                                _commentController = controller,
                           ),
                         ),
                       ),

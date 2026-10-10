@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../models/presence_privacy.dart';
 
 class PresencePrivacySheet extends StatelessWidget {
@@ -90,13 +91,12 @@ class PresencePrivacySheet extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-                trailing:
-                    isSelected
-                        ? Icon(
-                          Icons.check_circle_rounded,
-                          color: Theme.of(context).primaryColor,
-                        )
-                        : null,
+                trailing: isSelected
+                    ? Icon(
+                        Icons.check_circle_rounded,
+                        color: Theme.of(context).primaryColor,
+                      )
+                    : null,
                 onTap: () => Navigator.pop(context, privacy),
               );
             }),

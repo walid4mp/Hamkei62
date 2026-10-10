@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../discover/cubits/discover_people_cubit.dart';
 import '../../discover/services/discover_people_services.dart';
@@ -21,20 +22,18 @@ class SearchView extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create:
-              (context) => DiscoverPeopleCubit(
-                context.read<DiscoverPeopleServices>(),
-                friendshipServices: context.read<FriendshipServices>(),
-                followServices: context.read<FollowServices>(),
-                homeCubit: context.read<HomeCubit>(),
-              )..getDiscoverPeople(),
+          create: (context) => DiscoverPeopleCubit(
+            context.read<DiscoverPeopleServices>(),
+            friendshipServices: context.read<FriendshipServices>(),
+            followServices: context.read<FollowServices>(),
+            homeCubit: context.read<HomeCubit>(),
+          )..getDiscoverPeople(),
         ),
         BlocProvider(
-          create:
-              (context) => FriendsListCubit(
-                context.read<FriendshipServices>(),
-                userId: SupabaseProvider.id,
-              )..loadFriends(),
+          create: (context) => FriendsListCubit(
+            context.read<FriendshipServices>(),
+            userId: SupabaseProvider.id,
+          )..loadFriends(),
         ),
         BlocProvider(create: (context) => SearchReelsCubit()..getReels()),
         BlocProvider(create: (context) => SearchPostsCubit()),

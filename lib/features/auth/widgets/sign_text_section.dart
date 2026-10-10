@@ -23,9 +23,8 @@ class SignTextSection extends StatelessWidget {
         children: [
           TextSpan(
             text: clickableText,
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
-              color: Theme.of(context).primaryColor,
-            ),
+            style: Theme.of(context).textTheme.titleSmall!
+                .copyWith(color: Theme.of(context).primaryColor),
             recognizer: TapGestureRecognizer()..onTap = onTap,
           ),
         ],

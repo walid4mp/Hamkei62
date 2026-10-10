@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../../core/attachment/attachment_sheet/attachment_picker_sheet.dart';
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../../../core/router/app_routes.dart';
@@ -637,14 +639,13 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
         caption: text,
         replyToMessageId: replyTarget?.id,
         replyToMessageText: replyTarget?.text,
-        replyToSenderRole:
-            replyTarget == null
-                ? null
-                : (replyTarget.isMe ? 'user' : 'assistant'),
+        replyToSenderRole: replyTarget == null
+            ? null
+            : (replyTarget.isMe ? 'user' : 'assistant'),
         replyToMediaType:
             replyTarget != null && replyTarget.mediaType != AiChatMediaType.none
-                ? replyTarget.mediaType.name
-                : null,
+            ? replyTarget.mediaType.name
+            : null,
         replyToMediaUrl: replyTarget?.mediaUrl,
       );
       return;
@@ -666,8 +667,8 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
         replyToSenderRole: replyTarget?.isMe == true ? 'user' : 'assistant',
         replyToMediaType:
             replyTarget != null && replyTarget.mediaType != AiChatMediaType.none
-                ? replyTarget.mediaType.name
-                : null,
+            ? replyTarget.mediaType.name
+            : null,
         replyToMediaUrl: replyTarget?.mediaUrl,
       );
       _scheduleScrollToBottom();
@@ -685,14 +686,13 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
       durationSeconds,
       replyToMessageId: replyTarget?.id,
       replyToMessageText: replyTarget?.text,
-      replyToSenderRole:
-          replyTarget == null
-              ? null
-              : (replyTarget.isMe ? 'user' : 'assistant'),
+      replyToSenderRole: replyTarget == null
+          ? null
+          : (replyTarget.isMe ? 'user' : 'assistant'),
       replyToMediaType:
           replyTarget != null && replyTarget.mediaType != AiChatMediaType.none
-              ? replyTarget.mediaType.name
-              : null,
+          ? replyTarget.mediaType.name
+          : null,
       replyToMediaUrl: replyTarget?.mediaUrl,
     );
   }
@@ -826,11 +826,10 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
     if (_attachments.stagedMediaType == AiChatMediaType.image) {
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder:
-              (_) => AiPhotoPreviewScreen(
-                file: file,
-                captionController: _textController,
-              ),
+          builder: (_) => AiPhotoPreviewScreen(
+            file: file,
+            captionController: _textController,
+          ),
         ),
       );
       return;
@@ -864,10 +863,9 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
     final theme = Theme.of(context);
     final gradient = SyncraBackdrop.gradientColors(theme.primaryColor);
     final currentUser = context.read<HomeCubit>().currentUserData;
-    final firstName =
-        (currentUser?.name ?? '').trim().isEmpty
-            ? 'there'
-            : currentUser!.name.trim().split(' ').first;
+    final firstName = (currentUser?.name ?? '').trim().isEmpty
+        ? 'there'
+        : currentUser!.name.trim().split(' ').first;
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -946,42 +944,42 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
                               animation: _morphController,
                               child: BlocProvider.value(
                                 value: _chatCubit!,
-                                child: BlocConsumer<
-                                  AiChatCubit,
-                                  AiChatMessagesState
-                                >(
-                                  listener: _onChatStateChanged,
-                                  buildWhen: (previous, current) {
-                                    if (previous.runtimeType !=
-                                        current.runtimeType) {
-                                      return true;
-                                    }
-                                    if (previous is AiChatMessagesLoaded &&
-                                        current is AiChatMessagesLoaded) {
-                                      return !identical(
-                                            previous.messages,
-                                            current.messages,
-                                          ) ||
-                                          previous.error != current.error;
-                                    }
-                                    return true;
-                                  },
-                                  builder: (context, state) {
-                                    if (state is AiChatMessagesLoading) {
-                                      return const AiChatMessagesShimmerList();
-                                    }
-                                    if (state is AiChatMessagesError) {
-                                      return _buildLoadError(state.message);
-                                    }
-                                    final loaded =
-                                        state as AiChatMessagesLoaded;
-                                    return AiChatMessageList(
-                                      scrollAnchor: _scrollAnchor,
-                                      messages: loaded.messages,
-                                      replyPhase: _replyPhase,
-                                      activeModel: _selectedModel,
-                                      shouldAnimateText:
-                                          (m) =>
+                                child:
+                                    BlocConsumer<
+                                      AiChatCubit,
+                                      AiChatMessagesState
+                                    >(
+                                      listener: _onChatStateChanged,
+                                      buildWhen: (previous, current) {
+                                        if (previous.runtimeType !=
+                                            current.runtimeType) {
+                                          return true;
+                                        }
+                                        if (previous is AiChatMessagesLoaded &&
+                                            current is AiChatMessagesLoaded) {
+                                          return !identical(
+                                                previous.messages,
+                                                current.messages,
+                                              ) ||
+                                              previous.error != current.error;
+                                        }
+                                        return true;
+                                      },
+                                      builder: (context, state) {
+                                        if (state is AiChatMessagesLoading) {
+                                          return const AiChatMessagesShimmerList();
+                                        }
+                                        if (state is AiChatMessagesError) {
+                                          return _buildLoadError(state.message);
+                                        }
+                                        final loaded =
+                                            state as AiChatMessagesLoaded;
+                                        return AiChatMessageList(
+                                          scrollAnchor: _scrollAnchor,
+                                          messages: loaded.messages,
+                                          replyPhase: _replyPhase,
+                                          activeModel: _selectedModel,
+                                          shouldAnimateText: (m) =>
                                               m.role == AiChatRole.assistant &&
                                               !_historicalMessageIds.contains(
                                                 m.id,
@@ -989,27 +987,26 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
                                               !_animatedMessageIds.contains(
                                                 m.id,
                                               ),
-                                      onTypewriterDone: (messageId) {
-                                        _animatedMessageIds.add(messageId);
+                                          onTypewriterDone: (messageId) {
+                                            _animatedMessageIds.add(messageId);
+                                          },
+                                          onRetry: _handleRetry,
+                                          onCancelUpload: _handleCancelUpload,
+                                          selectedMessageIds:
+                                              _selection.selectedMessageIds,
+                                          onLongPressMessage:
+                                              _handleLongPressMessage,
+                                          onTapSelectMessage:
+                                              _handleTapSelectMessage,
+                                          starredMessageIds:
+                                              _selection.starredMessageIds,
+                                          onSwipeReply: _handleSwipeReply,
+                                          highlightedMessageId:
+                                              _reply.highlightedMessageId,
+                                          onTapReply: _handleTapReplyInBubble, // [FIX] ربط الـ Scroll بالـ Bubble
+                                        );
                                       },
-                                      onRetry: _handleRetry,
-                                      onCancelUpload: _handleCancelUpload,
-                                      selectedMessageIds:
-                                          _selection.selectedMessageIds,
-                                      onLongPressMessage:
-                                          _handleLongPressMessage,
-                                      onTapSelectMessage:
-                                          _handleTapSelectMessage,
-                                      starredMessageIds:
-                                          _selection.starredMessageIds,
-                                      onSwipeReply: _handleSwipeReply,
-                                      highlightedMessageId:
-                                          _reply.highlightedMessageId,
-                                      onTapReply:
-                                          _handleTapReplyInBubble, // [FIX] ربط الـ Scroll بالـ Bubble
-                                    );
-                                  },
-                                ),
+                                    ),
                               ),
                               builder: (context, child) {
                                 final morph = _morphController.value;
@@ -1075,9 +1072,9 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
                                     _attachments.stagedFileSizeBytes,
                                 stagedImageFile:
                                     _attachments.stagedMediaType ==
-                                            AiChatMediaType.image
-                                        ? _attachments.stagedMediaFile
-                                        : null,
+                                        AiChatMediaType.image
+                                    ? _attachments.stagedMediaFile
+                                    : null,
                                 onRemoveStagedFile:
                                     _attachments.removeStagedMedia,
                                 onTapStagedFile: _openStagedMediaPreview,
@@ -1169,16 +1166,15 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 220),
           switchInCurve: Curves.easeOut,
           switchOutCurve: Curves.easeIn,
-          child:
-              isSelectionMode
-                  ? KeyedSubtree(
-                    key: const ValueKey('ai-chat-header-selection'),
-                    child: _buildSelectionHeader(context, selectedIds),
-                  )
-                  : KeyedSubtree(
-                    key: const ValueKey('ai-chat-header-normal'),
-                    child: _buildNormalHeaderRow(context, currentUser),
-                  ),
+          child: isSelectionMode
+              ? KeyedSubtree(
+                  key: const ValueKey('ai-chat-header-selection'),
+                  child: _buildSelectionHeader(context, selectedIds),
+                )
+              : KeyedSubtree(
+                  key: const ValueKey('ai-chat-header-normal'),
+                  child: _buildNormalHeaderRow(context, currentUser),
+                ),
         );
       },
     );
@@ -1246,12 +1242,11 @@ class _AiChatViewState extends State<AiChatView> with TickerProviderStateMixin {
         GlassIconButton(
           iconSize: 18,
           size: 38,
-          onTap:
-              () => AiModelSelector.openPicker(
-                context,
-                selected: _selectedModel,
-                onChanged: _onModelChanged,
-              ),
+          onTap: () => AiModelSelector.openPicker(
+            context,
+            selected: _selectedModel,
+            onChanged: _onModelChanged,
+          ),
           child: AiModelIconography.buildBrandIcon(
             AiModelIconography.brandFromWire(_selectedModel.provider.name),
             size: 18,

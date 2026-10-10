@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../../../core/toast/app_toast.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_cubit.dart';
@@ -15,10 +16,9 @@ class CreateStickerPackView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (_) => CreateStickerPackCubit(
-            mediaCacheRepository: context.read<MediaCacheRepository>(),
-          ),
+      create: (_) => CreateStickerPackCubit(
+        mediaCacheRepository: context.read<MediaCacheRepository>(),
+      ),
       child: const _CreateStickerPackBody(),
     );
   }

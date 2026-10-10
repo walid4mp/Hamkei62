@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/single_chats/widgets/full_screen_media_view.dart';
+
 import '../models/shared_media_item.dart';
 import 'voice_full_screen_view.dart';
 

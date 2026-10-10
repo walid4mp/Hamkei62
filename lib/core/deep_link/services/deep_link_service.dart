@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../features/group_chats/widgets/group_invite_bottom_sheet.dart';
 import '../../helpers/content_deep_link_navigator.dart';
 import '../../notifications/notification_navigator_key.dart';
@@ -40,8 +42,9 @@ class DeepLinkService {
     if (uri.host == shareFunctionHost) {
       final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
       final shareIndex = segments.indexOf('share');
-      final rest =
-          shareIndex == -1 ? segments : segments.sublist(shareIndex + 1);
+      final rest = shareIndex == -1
+          ? segments
+          : segments.sublist(shareIndex + 1);
       return rest.length >= 2 ? (rest[0], rest[1]) : null;
     }
 

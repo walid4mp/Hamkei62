@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../cubits/conversations_cubit/conversations_cubit.dart';
 import '../models/conversation_ref.dart';
 import 'premium_selection_bar_pieces.dart';
@@ -37,12 +38,9 @@ class ArchivedSelectionHeaderBar extends StatelessWidget {
     final isMixed = flagState == SelectionFlagState.mixed;
     final isOn = flagState == SelectionFlagState.allOn;
     return PremiumSelectionActionIcon(
-      state:
-          isMixed
-              ? PremiumActionVisualState.mixed
-              : (isOn
-                  ? PremiumActionVisualState.on
-                  : PremiumActionVisualState.off),
+      state: isMixed
+          ? PremiumActionVisualState.mixed
+          : (isOn ? PremiumActionVisualState.on : PremiumActionVisualState.off),
       onIcon: onIcon,
       offIcon: offIcon,
       onLabel: onLabel,
@@ -97,11 +95,10 @@ class ArchivedSelectionHeaderBar extends StatelessWidget {
               offIcon: Icons.unarchive_rounded,
               onLabel: 'Unarchive',
               offLabel: 'Unarchive',
-              onTap:
-                  () => _runAndClose(
-                    context,
-                    () => cubit.bulkSetArchived(selectedRefs, false),
-                  ),
+              onTap: () => _runAndClose(
+                context,
+                () => cubit.bulkSetArchived(selectedRefs, false),
+              ),
             ),
 
             PremiumSelectionActionIcon(

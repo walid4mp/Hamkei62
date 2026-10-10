@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/cache/constants/hive_box_names.dart';
 import '../../../core/cache/constants/hive_type_ids.dart';
 import '../cubits/ai_chat_sessions_cubit/ai_chat_sessions_cubit.dart';

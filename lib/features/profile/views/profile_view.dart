@@ -6,6 +6,7 @@ import 'package:social_media_app/core/widgets/custom_tab_wrapper.dart';
 import 'package:social_media_app/features/profile/cubits/profile_cubit/profile_cubit.dart';
 import 'package:social_media_app/features/profile/views/profile_shimmer_view.dart';
 import 'package:social_media_app/features/profile/widgets/profile_body_content.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/widgets/global_refresh_indicator.dart';
 import '../../posts/cubits/posts_cubit/posts_cubit.dart';
@@ -161,8 +162,9 @@ class _ProfileViewState extends State<ProfileView> {
                     state is ProfileInitial ||
                     state is ProfileLoading ||
                     state is ProfileRefreshFeedback;
-                String? errorMessage =
-                    state is ProfileError ? state.message : null;
+                String? errorMessage = state is ProfileError
+                    ? state.message
+                    : null;
 
                 return CustomTabWrapper(
                   isLoading: isLoading,
@@ -177,59 +179,54 @@ class _ProfileViewState extends State<ProfileView> {
                       context.read<ProfileCubit>().getProfileData(retryId);
                     }
                   },
-                  child:
-                      state is ProfileLoaded
-                          ? NotificationListener<ScrollNotification>(
-                            onNotification: (notification) {
-                              if (_isScrollingToTop) return false;
+                  child: state is ProfileLoaded
+                      ? NotificationListener<ScrollNotification>(
+                          onNotification: (notification) {
+                            if (_isScrollingToTop) return false;
 
-                              if (notification is ScrollUpdateNotification) {
-                                final metrics = notification.metrics;
-                                double currentOffset = metrics.pixels;
+                            if (notification is ScrollUpdateNotification) {
+                              final metrics = notification.metrics;
+                              double currentOffset = metrics.pixels;
 
-                                bool isScrollingUp =
-                                    currentOffset < _lastOffset;
+                              bool isScrollingUp = currentOffset < _lastOffset;
 
-                                if (currentOffset > 450 && isScrollingUp) {
-                                  if (!_showBackToTop) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                          if (mounted && !_showBackToTop) {
-                                            setState(
-                                              () => _showBackToTop = true,
-                                            );
-                                          }
-                                        });
-                                  }
-                                } else if (!isScrollingUp ||
-                                    currentOffset < 10) {
-                                  if (_showBackToTop) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                          if (mounted && _showBackToTop) {
-                                            setState(
-                                              () => _showBackToTop = false,
-                                            );
-                                          }
-                                        });
-                                  }
+                              if (currentOffset > 450 && isScrollingUp) {
+                                if (!_showBackToTop) {
+                                  WidgetsBinding.instance.addPostFrameCallback((
+                                    _,
+                                  ) {
+                                    if (mounted && !_showBackToTop) {
+                                      setState(() => _showBackToTop = true);
+                                    }
+                                  });
                                 }
-
-                                _lastOffset = currentOffset;
+                              } else if (!isScrollingUp || currentOffset < 10) {
+                                if (_showBackToTop) {
+                                  WidgetsBinding.instance.addPostFrameCallback((
+                                    _,
+                                  ) {
+                                    if (mounted && _showBackToTop) {
+                                      setState(() => _showBackToTop = false);
+                                    }
+                                  });
+                                }
                               }
-                              return false;
-                            },
-                            child: ProfileBodyContent(
-                              state: state,
-                              scrollController: _scrollController,
-                              size: size,
-                              refreshProgress: _refreshProgress,
-                              isRefreshing: _isRefreshing,
-                              postsCubit: postsCubit,
-                              isCurrentUser: isCurrentUser,
-                            ),
-                          )
-                          : const SizedBox.shrink(),
+
+                              _lastOffset = currentOffset;
+                            }
+                            return false;
+                          },
+                          child: ProfileBodyContent(
+                            state: state,
+                            scrollController: _scrollController,
+                            size: size,
+                            refreshProgress: _refreshProgress,
+                            isRefreshing: _isRefreshing,
+                            postsCubit: postsCubit,
+                            isCurrentUser: isCurrentUser,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 );
               },
             ),
@@ -246,12 +243,11 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (context, progress, staticChild) {
         final brightness = Theme.of(context).brightness;
         final bool pastCover = progress >= 0.5;
-        final overlayStyle =
-            pastCover
-                ? (brightness == Brightness.dark
-                    ? SystemUiOverlayStyle.light
-                    : SystemUiOverlayStyle.dark)
-                : SystemUiOverlayStyle.light;
+        final overlayStyle = pastCover
+            ? (brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark)
+            : SystemUiOverlayStyle.light;
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlayStyle,

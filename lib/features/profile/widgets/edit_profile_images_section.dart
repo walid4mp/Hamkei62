@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/custom_user_profile_image_section.dart';
+
 import '../../auth/data/models/user_data.dart';
 
 class EditProfileImagesSection extends StatelessWidget {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/attachment/widgets/transfer_ring.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/utilities/file_size_formatter.dart';

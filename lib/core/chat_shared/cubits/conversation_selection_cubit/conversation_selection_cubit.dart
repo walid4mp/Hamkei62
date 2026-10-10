@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../models/conversation_ref.dart';
 
 class ConversationSelectionState {

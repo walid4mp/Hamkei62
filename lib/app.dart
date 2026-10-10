@@ -15,6 +15,7 @@ import 'package:social_media_app/features/single_calls/models/call_model.dart';
 import 'package:social_media_app/features/settings/widgets/app_lock_gate.dart';
 import 'package:social_media_app/di/cubit_providers.dart';
 import 'package:social_media_app/di/service_providers.dart';
+
 import 'core/connectivity/cubits/connectivity_cubit.dart';
 import 'core/connectivity/cubits/connectivity_state.dart';
 import 'core/connectivity/widgets/connectivity_banner.dart';
@@ -84,8 +85,8 @@ class MyApp extends StatelessWidget {
                                           callState.call.callerAvatar,
                                       'callType':
                                           callState.call.type == CallType.video
-                                              ? 'video'
-                                              : 'audio',
+                                          ? 'video'
+                                          : 'audio',
                                     },
                                   )
                                   .then(
@@ -108,14 +109,12 @@ class MyApp extends StatelessWidget {
                                   .read<ActiveCallSessionCubit>()
                                   .startSingleCallSession(
                                     callId: callState.call.callId,
-                                    title:
-                                        isCaller
-                                            ? callState.call.receiverName
-                                            : callState.call.callerName,
-                                    avatarUrl:
-                                        isCaller
-                                            ? callState.call.receiverAvatar
-                                            : callState.call.callerAvatar,
+                                    title: isCaller
+                                        ? callState.call.receiverName
+                                        : callState.call.callerName,
+                                    avatarUrl: isCaller
+                                        ? callState.call.receiverAvatar
+                                        : callState.call.callerAvatar,
                                     isVideo:
                                         callState.call.type == CallType.video,
                                     startedAt: DateTime.now(),
@@ -182,12 +181,11 @@ class MyApp extends StatelessWidget {
               title: 'Social Mate',
               theme: state.theme.themeData,
               initialRoute: AppRoutes.splashViewRoute,
-              onGenerateInitialRoutes:
-                  (initialRoute) => [
-                    AppRouter.generateRoute(
-                      const RouteSettings(name: AppRoutes.splashViewRoute),
-                    ),
-                  ],
+              onGenerateInitialRoutes: (initialRoute) => [
+                AppRouter.generateRoute(
+                  const RouteSettings(name: AppRoutes.splashViewRoute),
+                ),
+              ],
               onGenerateRoute: AppRouter.generateRoute,
               onUnknownRoute: AppRouter.generateRoute,
               navigatorKey: navigatorKey,

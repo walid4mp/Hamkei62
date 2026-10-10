@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../models/blocked_user_item_model.dart';
 
@@ -38,9 +39,9 @@ class BlockedUserTile extends StatelessWidget {
                       ),
                       backgroundImage:
                           (user.imageUrl != null && user.imageUrl!.isNotEmpty)
-                              ? NetworkImage(user.imageUrl!)
-                              : const AssetImage(AppImages.defaultUserImg)
-                                  as ImageProvider,
+                          ? NetworkImage(user.imageUrl!)
+                          : const AssetImage(AppImages.defaultUserImg)
+                                as ImageProvider,
                     ),
                     const SizedBox(width: 14),
                     Expanded(

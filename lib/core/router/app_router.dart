@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,6 +39,7 @@ import 'package:social_media_app/features/settings/views/ai_settings_view.dart';
 import 'package:social_media_app/features/settings/views/settings_view.dart';
 import 'package:social_media_app/features/splash/views/on_boarding_view.dart';
 import 'package:social_media_app/features/splash/views/splash_view.dart';
+
 import '../../features/ai_chat/views/ai_chat_view.dart';
 import '../../features/auth/data/models/user_data.dart';
 import '../../features/blocked_users/cubits/blocked_users_cubit/blocked_users_cubit.dart';
@@ -145,29 +147,28 @@ class AppRouter {
   static Route<dynamic> _errorRoute(RouteSettings settings, [String? reason]) {
     return MaterialPageRoute(
       settings: settings,
-      builder:
-          (_) => Scaffold(
-            appBar: AppBar(title: const Text('Navigation Error')),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    reason ?? 'Unable to open this screen due to missing data',
-                    style: const TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Route: ${settings.name}',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+      builder: (_) => Scaffold(
+        appBar: AppBar(title: const Text('Navigation Error')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                reason ?? 'Unable to open this screen due to missing data',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                'Route: ${settings.name}',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -258,19 +259,16 @@ class AppRouter {
           MultiBlocProvider(
             providers: [
               BlocProvider(
-                create:
-                    (context) => DiscoverPeopleCubit(
-                      context.read<DiscoverPeopleServices>(),
-                      friendshipServices: context.read<FriendshipServices>(),
-                      followServices: context.read<FollowServices>(),
-                      homeCubit: context.read<HomeCubit>(),
-                    )..getDiscoverPeople(),
+                create: (context) => DiscoverPeopleCubit(
+                  context.read<DiscoverPeopleServices>(),
+                  friendshipServices: context.read<FriendshipServices>(),
+                  followServices: context.read<FollowServices>(),
+                  homeCubit: context.read<HomeCubit>(),
+                )..getDiscoverPeople(),
               ),
               BlocProvider(
-                create:
-                    (context) =>
-                        ChatsCubit(context.read<ChatServices>())
-                          ..monitorChats(),
+                create: (context) =>
+                    ChatsCubit(context.read<ChatServices>())..monitorChats(),
               ),
             ],
             child: const CustomBottomNavBar(),
@@ -279,8 +277,9 @@ class AppRouter {
         );
       case AppRoutes.createPostViewRoute:
         final raw = settings.arguments;
-        final PostsCubit? cubit =
-            raw is Map ? raw['cubit'] as PostsCubit? : raw as PostsCubit?;
+        final PostsCubit? cubit = raw is Map
+            ? raw['cubit'] as PostsCubit?
+            : raw as PostsCubit?;
         final initialText = raw is Map ? raw['initialText'] as String? : null;
 
         if (cubit == null) {
@@ -297,15 +296,16 @@ class AppRouter {
         return _buildRoute(const PostThemesView(), settings: settings);
       case AppRoutes.fullScreenImageViewRoute:
         final rawArgs = settings.arguments;
-        final PostsCubit? postsCubit =
-            rawArgs is Map ? rawArgs['postsCubit'] as PostsCubit? : null;
+        final PostsCubit? postsCubit = rawArgs is Map
+            ? rawArgs['postsCubit'] as PostsCubit?
+            : null;
 
         return _buildRoute(
           postsCubit != null
               ? BlocProvider.value(
-                value: postsCubit,
-                child: const FullScreenImageViewer(),
-              )
+                  value: postsCubit,
+                  child: const FullScreenImageViewer(),
+                )
               : const FullScreenImageViewer(),
           typeOfRoute: TypeOfRoute.fade,
           settings: settings,
@@ -326,26 +326,23 @@ class AppRouter {
         }
         return MaterialPageRoute(
           settings: settings,
-          builder:
-              (_) => PostDetailsView(
-                post: post,
-                initialActiveMode: initialActiveMode,
-                isProfileContext: isProfileContext,
-              ),
+          builder: (_) => PostDetailsView(
+            post: post,
+            initialActiveMode: initialActiveMode,
+            isProfileContext: isProfileContext,
+          ),
         );
       case AppRoutes.friendsListViewRoute:
         final userId = settings.arguments as String;
         return MaterialPageRoute(
           settings: settings,
-          builder:
-              (_) => BlocProvider(
-                create:
-                    (BuildContext context) => FriendsListCubit(
-                      context.read<FriendshipServices>(),
-                      userId: userId,
-                    )..loadFriends(),
-                child: FriendsListView(userId: userId),
-              ),
+          builder: (_) => BlocProvider(
+            create: (BuildContext context) => FriendsListCubit(
+              context.read<FriendshipServices>(),
+              userId: userId,
+            )..loadFriends(),
+            child: FriendsListView(userId: userId),
+          ),
         );
       default:
         return _errorRoute(settings, 'Home route not found');
@@ -468,23 +465,24 @@ class AppRouter {
         return _buildRoute(const ChatsView(), settings: settings);
       case AppRoutes.chatDetailsViewRoute:
         final raw = settings.arguments;
-        final ChatUserModel? user =
-            raw is Map ? raw['user'] as ChatUserModel? : raw as ChatUserModel?;
-        final incomingShare =
-            raw is Map ? raw['incomingShare'] as IncomingSharePayload? : null;
+        final ChatUserModel? user = raw is Map
+            ? raw['user'] as ChatUserModel?
+            : raw as ChatUserModel?;
+        final incomingShare = raw is Map
+            ? raw['incomingShare'] as IncomingSharePayload?
+            : null;
         if (user == null) {
           return _errorRoute(settings, 'Missing ChatUserModel data');
         }
         return _buildRoute(
           BlocProvider(
-            create:
-                (context) => ChatDetailsCubit(
-                  context.read<ChatServices>(),
-                  user.name,
-                  context.read<MediaCacheRepository>(),
-                  chatsCubit: context.read<ChatsCubit>(),
-                  presenceService: context.read<ChatPresenceService>(),
-                )..loadCurrentUserInfo(),
+            create: (context) => ChatDetailsCubit(
+              context.read<ChatServices>(),
+              user.name,
+              context.read<MediaCacheRepository>(),
+              chatsCubit: context.read<ChatsCubit>(),
+              presenceService: context.read<ChatPresenceService>(),
+            )..loadCurrentUserInfo(),
             child: ChatDetailsView(
               receiverUser: user,
               incomingShare: incomingShare,
@@ -494,41 +492,39 @@ class AppRouter {
         );
       case AppRoutes.receiverProfileViewRoute:
         final rawArgs = settings.arguments;
-        final ChatUserModel? user =
-            rawArgs is Map
-                ? rawArgs['user'] as ChatUserModel?
-                : rawArgs as ChatUserModel?;
+        final ChatUserModel? user = rawArgs is Map
+            ? rawArgs['user'] as ChatUserModel?
+            : rawArgs as ChatUserModel?;
         if (user == null) {
           return _errorRoute(settings, 'Missing ChatUserModel data');
         }
-        final ChatDetailsCubit? existingCubit =
-            rawArgs is Map ? rawArgs['cubit'] as ChatDetailsCubit? : null;
-        final ItemScrollController? itemScrollController =
-            rawArgs is Map
-                ? rawArgs['itemScrollController'] as ItemScrollController?
-                : null;
+        final ChatDetailsCubit? existingCubit = rawArgs is Map
+            ? rawArgs['cubit'] as ChatDetailsCubit?
+            : null;
+        final ItemScrollController? itemScrollController = rawArgs is Map
+            ? rawArgs['itemScrollController'] as ItemScrollController?
+            : null;
         return _buildRoute(
           existingCubit != null
               ? BlocProvider<ChatDetailsCubit>.value(
-                value: existingCubit,
-                child: ReceiverProfileView(
-                  receiverUser: user,
-                  itemScrollController: itemScrollController,
-                ),
-              )
+                  value: existingCubit,
+                  child: ReceiverProfileView(
+                    receiverUser: user,
+                    itemScrollController: itemScrollController,
+                  ),
+                )
               : BlocProvider(
-                create:
-                    (context) => ChatDetailsCubit(
-                      context.read<ChatServices>(),
-                      user.name,
-                      context.read<MediaCacheRepository>(),
-                      presenceService: context.read<ChatPresenceService>(),
-                    )..watchReceiverAction(user.id),
-                child: ReceiverProfileView(
-                  receiverUser: user,
-                  itemScrollController: itemScrollController,
+                  create: (context) => ChatDetailsCubit(
+                    context.read<ChatServices>(),
+                    user.name,
+                    context.read<MediaCacheRepository>(),
+                    presenceService: context.read<ChatPresenceService>(),
+                  )..watchReceiverAction(user.id),
+                  child: ReceiverProfileView(
+                    receiverUser: user,
+                    itemScrollController: itemScrollController,
+                  ),
                 ),
-              ),
           settings: settings,
         );
       case AppRoutes.archivedChatsViewRoute:
@@ -546,11 +542,10 @@ class AppRouter {
       case AppRoutes.newChatViewRoute:
         return _buildRoute(
           BlocProvider(
-            create:
-                (context) => NewChatCubit(
-                  context.read<ConnectionsService>(),
-                  context.read<GroupChatServices>(),
-                )..loadNewChatCandidates(),
+            create: (context) => NewChatCubit(
+              context.read<ConnectionsService>(),
+              context.read<GroupChatServices>(),
+            )..loadNewChatCandidates(),
             child: const NewChatView(),
           ),
           settings: settings,
@@ -569,12 +564,11 @@ class AppRouter {
         }
         return _buildRoute(
           BlocProvider(
-            create:
-                ((context) => ConversationsCubit(
-                  chatsCubit: context.read<ChatsCubit>(),
-                  groupListCubit: context.read<GroupListCubit>(),
-                  groupChatServices: context.read<GroupChatServices>(),
-                )),
+            create: ((context) => ConversationsCubit(
+              chatsCubit: context.read<ChatsCubit>(),
+              groupListCubit: context.read<GroupListCubit>(),
+              groupChatServices: context.read<GroupChatServices>(),
+            )),
             child: IncomingShareTargetView(payload: payload),
           ),
           settings: settings,
@@ -591,22 +585,23 @@ class AppRouter {
         return _buildRoute(const CreateGroupView(), settings: settings);
       case AppRoutes.groupChatRoute:
         final raw = settings.arguments;
-        final GroupModel? group =
-            raw is Map ? raw['group'] as GroupModel? : raw as GroupModel?;
-        final incomingShare =
-            raw is Map ? raw['incomingShare'] as IncomingSharePayload? : null;
+        final GroupModel? group = raw is Map
+            ? raw['group'] as GroupModel?
+            : raw as GroupModel?;
+        final incomingShare = raw is Map
+            ? raw['incomingShare'] as IncomingSharePayload?
+            : null;
         if (group == null) {
           return _errorRoute(settings, 'Missing GroupModel data');
         }
         return _buildRoute(
           BlocProvider(
-            create:
-                (context) => GroupDetailsCubit(
-                  context.read<GroupChatServices>(),
-                  group,
-                  context.read<GroupListCubit>(),
-                  context.read<MediaCacheRepository>(),
-                )..init(),
+            create: (context) => GroupDetailsCubit(
+              context.read<GroupChatServices>(),
+              group,
+              context.read<GroupListCubit>(),
+              context.read<MediaCacheRepository>(),
+            )..init(),
             child: GroupChatDetailsView(
               group: group,
               incomingShare: incomingShare,
@@ -617,19 +612,18 @@ class AppRouter {
 
       case AppRoutes.groupInfoViewRoute:
         final rawArgs = settings.arguments;
-        final GroupModel? group =
-            rawArgs is Map
-                ? rawArgs['group'] as GroupModel?
-                : rawArgs as GroupModel?;
+        final GroupModel? group = rawArgs is Map
+            ? rawArgs['group'] as GroupModel?
+            : rawArgs as GroupModel?;
         if (group == null) {
           return _errorRoute(settings, 'Missing GroupModel data');
         }
-        final GroupDetailsCubit? existingCubit =
-            rawArgs is Map ? rawArgs['cubit'] as GroupDetailsCubit? : null;
-        final ItemScrollController? itemScrollController =
-            rawArgs is Map
-                ? rawArgs['itemScrollController'] as ItemScrollController?
-                : null;
+        final GroupDetailsCubit? existingCubit = rawArgs is Map
+            ? rawArgs['cubit'] as GroupDetailsCubit?
+            : null;
+        final ItemScrollController? itemScrollController = rawArgs is Map
+            ? rawArgs['itemScrollController'] as ItemScrollController?
+            : null;
         return _buildRoute(
           GroupInfoView(
             group: group,
@@ -657,10 +651,9 @@ class AppRouter {
           receiverName: '',
           receiverAvatar: '',
           status: CallStatus.ringing,
-          type:
-              (args['callType'] as String?) == 'video'
-                  ? CallType.video
-                  : CallType.audio,
+          type: (args['callType'] as String?) == 'video'
+              ? CallType.video
+              : CallType.audio,
         );
         return _buildRoute(
           IncomingCallView(call: call),
@@ -702,12 +695,11 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.editProfileViewRoute:
         final rawArgs = settings.arguments;
-        final EditProfileRouteArgs? editArgs =
-            rawArgs is EditProfileRouteArgs
-                ? rawArgs
-                : (rawArgs is UserData
-                    ? EditProfileRouteArgs(user: rawArgs)
-                    : _args<EditProfileRouteArgs>(settings));
+        final EditProfileRouteArgs? editArgs = rawArgs is EditProfileRouteArgs
+            ? rawArgs
+            : (rawArgs is UserData
+                  ? EditProfileRouteArgs(user: rawArgs)
+                  : _args<EditProfileRouteArgs>(settings));
         if (editArgs == null) {
           return _errorRoute(
             settings,
@@ -734,23 +726,21 @@ class AppRouter {
             body: MultiBlocProvider(
               providers: [
                 BlocProvider(
-                  create:
-                      (context) => ProfileCubit(
-                        context.read<UserService>(),
-                        friendshipServices: context.read<FriendshipServices>(),
-                        followServices: context.read<FollowServices>(),
-                        homeCubit: context.read<HomeCubit>(),
-                        connectivityCubit: context.read<ConnectivityCubit>(),
-                      )..getProfileData(userId),
+                  create: (context) => ProfileCubit(
+                    context.read<UserService>(),
+                    friendshipServices: context.read<FriendshipServices>(),
+                    followServices: context.read<FollowServices>(),
+                    homeCubit: context.read<HomeCubit>(),
+                    connectivityCubit: context.read<ConnectivityCubit>(),
+                  )..getProfileData(userId),
                 ),
 
                 BlocProvider(
-                  create:
-                      (context) => ProfilePostsCubit(
-                        userId: userId,
-                        postsServices: context.read<PostsServices>(),
-                        postsCubit: context.read<PostsCubit>(),
-                      )..loadInitial(),
+                  create: (context) => ProfilePostsCubit(
+                    userId: userId,
+                    postsServices: context.read<PostsServices>(),
+                    postsCubit: context.read<PostsCubit>(),
+                  )..loadInitial(),
                 ),
               ],
               child: ProfileView(userId: userId),
@@ -770,11 +760,10 @@ class AppRouter {
             providers: [
               BlocProvider.value(value: args['postsCubit'] as PostsCubit),
               BlocProvider(
-                create:
-                    (context) => SavedPostsCubit(
-                      postsServices: context.read<PostsServices>(),
-                      postsCubit: args['postsCubit'] as PostsCubit,
-                    ),
+                create: (context) => SavedPostsCubit(
+                  postsServices: context.read<PostsServices>(),
+                  postsCubit: args['postsCubit'] as PostsCubit,
+                ),
               ),
             ],
             child: SavedPostsView(userId: args['userId'] as String),

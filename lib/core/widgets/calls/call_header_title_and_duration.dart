@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'active_call_header_content.dart';
 
 class CallHeaderTitleAndDuration extends StatelessWidget {

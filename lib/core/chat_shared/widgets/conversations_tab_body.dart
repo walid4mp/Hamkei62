@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
 import '../../../features/single_chats/cubits/chats_cubit/chats_cubit.dart';
@@ -90,20 +91,20 @@ class _ConversationsTabBodyState extends State<ConversationsTabBody>
                   final item = items[index];
                   return item.kind == ConversationKind.single
                       ? ChatItemTile(
-                        user: item.chat!,
-                        isPinned: item.isPinned,
-                        isFavorite: item.isFavorite,
-                        isMuted: item.isMuted,
-                        enableHero: isActiveTab,
-                      )
+                          user: item.chat!,
+                          isPinned: item.isPinned,
+                          isFavorite: item.isFavorite,
+                          isMuted: item.isMuted,
+                          enableHero: isActiveTab,
+                        )
                       : GroupTileItem(
-                        group: item.group!,
-                        isPinned: item.isPinned,
-                        isFavorite: item.isFavorite,
-                      );
+                          group: item.group!,
+                          isPinned: item.isPinned,
+                          isFavorite: item.isFavorite,
+                        );
                 },
-                separatorBuilder:
-                    (_, __) => const Divider(color: AppColors.black12),
+                separatorBuilder: (_, __) =>
+                    const Divider(color: AppColors.black12),
               );
             },
           );
@@ -227,30 +228,27 @@ class _InteractiveEmptyState extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          isDark
-                              ? Colors.white.withValues(alpha: 0.03)
-                              : Colors.white,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.03)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color:
-                            isDark
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.05),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.05),
                         width: 1,
                       ),
-                      boxShadow:
-                          isDark
-                              ? null
-                              : [
-                                BoxShadow(
-                                  color: theme.primaryColor.withValues(
-                                    alpha: 0.08,
-                                  ),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 8),
+                      boxShadow: isDark
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: theme.primaryColor.withValues(
+                                  alpha: 0.08,
                                 ),
-                              ],
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

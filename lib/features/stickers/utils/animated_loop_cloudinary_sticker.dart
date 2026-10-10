@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import 'animated_loop_sticker.dart';
 

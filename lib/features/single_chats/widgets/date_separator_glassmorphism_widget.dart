@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class DateSeparatorGlassmorphismWidget extends StatelessWidget {
@@ -10,14 +11,12 @@ class DateSeparatorGlassmorphismWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
-    final Color textColor =
-        isDark
-            ? colorScheme.onSurface.withValues(alpha: 0.7)
-            : colorScheme.onSurfaceVariant.withValues(alpha: 0.65);
-    final Color containerColor =
-        isDark
-            ? Colors.white.withValues(alpha: 0.24)
-            : colorScheme.onSurfaceVariant.withValues(alpha: 0.03);
+    final Color textColor = isDark
+        ? colorScheme.onSurface.withValues(alpha: 0.7)
+        : colorScheme.onSurfaceVariant.withValues(alpha: 0.65);
+    final Color containerColor = isDark
+        ? Colors.white.withValues(alpha: 0.24)
+        : colorScheme.onSurfaceVariant.withValues(alpha: 0.03);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0),
       child: Center(
@@ -31,10 +30,9 @@ class DateSeparatorGlassmorphismWidget extends StatelessWidget {
                 color: containerColor,
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color:
-                      isDark
-                          ? Colors.white70.withValues(alpha: 0.15)
-                          : colorScheme.outlineVariant.withValues(alpha: 0.1),
+                  color: isDark
+                      ? Colors.white70.withValues(alpha: 0.15)
+                      : colorScheme.outlineVariant.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),

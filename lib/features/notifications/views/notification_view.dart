@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/home/cubits/home_cubit/home_cubit.dart';
 import 'package:social_media_app/features/social_graph/services/follow_services.dart';
 import 'package:social_media_app/features/social_graph/services/friendship_services.dart';
+
 import '../cubits/notifications_cubit/notifications_cubit.dart';
 import '../cubits/notifications_cubit/notifications_state.dart';
 import '../models/app_notification_model.dart';
@@ -46,16 +47,15 @@ class _NotificationsViewState extends State<NotificationsView>
     final primary = theme.primaryColor;
 
     return BlocProvider(
-      create:
-          (_) => NotificationsCubit(
-            friendshipServices: context.read<FriendshipServices>(),
-            followServices: context.read<FollowServices>(),
-            homeCubit: context.read<HomeCubit>(),
-          )..setFilter(widget.initialFilter),
+      create: (_) => NotificationsCubit(
+        friendshipServices: context.read<FriendshipServices>(),
+        followServices: context.read<FollowServices>(),
+        homeCubit: context.read<HomeCubit>(),
+      )..setFilter(widget.initialFilter),
 
       child: BlocConsumer<NotificationsCubit, NotificationsState>(
-        listenWhen:
-            (previous, current) => previous.isLoading && !current.isLoading,
+        listenWhen: (previous, current) =>
+            previous.isLoading && !current.isLoading,
         listener: (context, state) => _animController.forward(),
         builder: (context, state) {
           final cubit = context.read<NotificationsCubit>();
@@ -82,44 +82,43 @@ class _NotificationsViewState extends State<NotificationsView>
                     onFilterSelected: cubit.setFilter,
                   ),
                   Expanded(
-                    child:
-                        state.isLoading
-                            ? NotificationsShimmerList(isDark: isDark)
-                            : filtered.isEmpty
-                            ? NotificationsEmptyState(
-                              isDark: isDark,
-                              primary: primary,
-                              activeFilter: state.activeFilter,
-                            )
-                            : RefreshIndicator(
-                              onRefresh: cubit.loadNotifications,
-                              color: primary,
-                              child: ListView.builder(
-                                padding: const EdgeInsets.only(
-                                  top: 4,
-                                  bottom: 100,
-                                ),
-                                itemCount: filtered.length,
-                                itemBuilder: (context, i) {
-                                  final notif = filtered[i];
-                                  return NotificationListItem(
-                                    notification: notif,
-                                    isDark: isDark,
-                                    primary: primary,
-                                    index: i,
-                                    onMarkAsRead: cubit.markAsRead,
-                                    onDelete: cubit.deleteNotification,
-                                    onAcceptFriendRequest:
-                                        cubit.acceptFriendRequest,
-                                    onRejectFriendRequest:
-                                        cubit.rejectFriendRequest,
-                                    onFollowBack: cubit.followBack,
-                                    isFollowingBack: state.followingBackIds
-                                        .contains(notif.senderId),
-                                  );
-                                },
+                    child: state.isLoading
+                        ? NotificationsShimmerList(isDark: isDark)
+                        : filtered.isEmpty
+                        ? NotificationsEmptyState(
+                            isDark: isDark,
+                            primary: primary,
+                            activeFilter: state.activeFilter,
+                          )
+                        : RefreshIndicator(
+                            onRefresh: cubit.loadNotifications,
+                            color: primary,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.only(
+                                top: 4,
+                                bottom: 100,
                               ),
+                              itemCount: filtered.length,
+                              itemBuilder: (context, i) {
+                                final notif = filtered[i];
+                                return NotificationListItem(
+                                  notification: notif,
+                                  isDark: isDark,
+                                  primary: primary,
+                                  index: i,
+                                  onMarkAsRead: cubit.markAsRead,
+                                  onDelete: cubit.deleteNotification,
+                                  onAcceptFriendRequest:
+                                      cubit.acceptFriendRequest,
+                                  onRejectFriendRequest:
+                                      cubit.rejectFriendRequest,
+                                  onFollowBack: cubit.followBack,
+                                  isFollowingBack: state.followingBackIds
+                                      .contains(notif.senderId),
+                                );
+                              },
                             ),
+                          ),
                   ),
                 ],
               ),

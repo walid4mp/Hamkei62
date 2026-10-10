@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_media_app/core/mentions/widgets/mention_text_editing_controller.dart';
+
 import '../../../core/services/active_screen_tracker.dart';
 import '../../../core/share_intent/models/incoming_share_payload.dart';
 import '../../../core/toast/app_toast.dart';
@@ -31,10 +32,9 @@ class GroupChatDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (_) =>
-              GroupCallCubit(context.read<GroupCallSignalingService>())
-                ..watchActiveCall(group.id),
+      create: (_) =>
+          GroupCallCubit(context.read<GroupCallSignalingService>())
+            ..watchActiveCall(group.id),
       child: _GroupChatDetailsBody(group: group, incomingShare: incomingShare),
     );
   }
@@ -104,28 +104,27 @@ class _GroupChatDetailsBodyState extends State<_GroupChatDetailsBody> {
       case IncomingShareKind.video:
         final file = File(payload.files.first.path);
 
-        final type =
-            payload.kind == IncomingShareKind.image ? 'image' : 'video';
+        final type = payload.kind == IncomingShareKind.image
+            ? 'image'
+            : 'video';
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder:
-                (_) => BlocProvider.value(
-                  value: _groupDetailsCubit,
-                  child: GroupMediaPreviewScreen(
-                    file: file,
-                    type: type,
-                    onSend:
-                        (caption) => _groupDetailsCubit.sendMessage(
-                          text: '',
-                          messageType: type,
-                          imageFile: type == 'image' ? file : null,
-                          videoFile: type == 'video' ? file : null,
-                          fileSizeBytes: file.lengthSync(),
-                          caption: caption,
-                        ),
-                  ),
+            builder: (_) => BlocProvider.value(
+              value: _groupDetailsCubit,
+              child: GroupMediaPreviewScreen(
+                file: file,
+                type: type,
+                onSend: (caption) => _groupDetailsCubit.sendMessage(
+                  text: '',
+                  messageType: type,
+                  imageFile: type == 'image' ? file : null,
+                  videoFile: type == 'video' ? file : null,
+                  fileSizeBytes: file.lengthSync(),
+                  caption: caption,
                 ),
+              ),
+            ),
           ),
         );
         break;
@@ -314,10 +313,12 @@ class _GroupChatDetailsBodyState extends State<_GroupChatDetailsBody> {
 
     return BlocListener<GroupDetailsCubit, GroupDetailsState>(
       listenWhen: (previous, current) {
-        final prevMember =
-            previous is GroupDetailsLoaded ? previous.isMember : true;
-        final currMember =
-            current is GroupDetailsLoaded ? current.isMember : true;
+        final prevMember = previous is GroupDetailsLoaded
+            ? previous.isMember
+            : true;
+        final currMember = current is GroupDetailsLoaded
+            ? current.isMember
+            : true;
         return prevMember && !currMember;
       },
       listener: (context, state) {
@@ -356,21 +357,18 @@ class _GroupChatDetailsBodyState extends State<_GroupChatDetailsBody> {
                     top: false,
                     child: BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
                       buildWhen: (previous, current) {
-                        final prevMember =
-                            previous is GroupDetailsLoaded
-                                ? previous.isMember
-                                : true;
-                        final currMember =
-                            current is GroupDetailsLoaded
-                                ? current.isMember
-                                : true;
+                        final prevMember = previous is GroupDetailsLoaded
+                            ? previous.isMember
+                            : true;
+                        final currMember = current is GroupDetailsLoaded
+                            ? current.isMember
+                            : true;
                         return prevMember != currMember;
                       },
                       builder: (context, state) {
-                        final isMember =
-                            state is GroupDetailsLoaded
-                                ? state.isMember
-                                : widget.group.isMember;
+                        final isMember = state is GroupDetailsLoaded
+                            ? state.isMember
+                            : widget.group.isMember;
 
                         if (!isMember) {
                           return const GroupChatLockedBanner();
@@ -378,10 +376,9 @@ class _GroupChatDetailsBodyState extends State<_GroupChatDetailsBody> {
 
                         return GroupChatInputBarSection(
                           controller: _controller,
-                          mentionCandidateIds:
-                              widget.group.members
-                                  .map((m) => m.userId)
-                                  .toList(),
+                          mentionCandidateIds: widget.group.members
+                              .map((m) => m.userId)
+                              .toList(),
                           onSend: (text, mentions) {
                             cubit.sendMessage(text: text, mentions: mentions);
                             _scrollToBottom();

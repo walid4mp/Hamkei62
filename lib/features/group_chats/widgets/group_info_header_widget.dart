@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/directional_text_field.dart';
+
 import '../../../core/chat_shared/helpers/muted_badge_icon.dart';
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/full_screen_image_viewer.dart';
@@ -116,13 +118,18 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
     final hasAvatar = group.avatarUrl?.isNotEmpty == true;
 
     final hsl = HSLColor.fromColor(primary);
-    final bg1 =
-        hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor();
-    final bg2 =
-        hsl.withLightness((hsl.lightness + 0.05).clamp(0.0, 1.0)).toColor();
+    final bg1 = hsl
+        .withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0))
+        .toColor();
+    final bg2 = hsl
+        .withLightness((hsl.lightness + 0.05).clamp(0.0, 1.0))
+        .toColor();
 
-    final avatarSize =
-        lerpDouble(_avatarExpandedSize, _avatarCollapsedSize, t)!;
+    final avatarSize = lerpDouble(
+      _avatarExpandedSize,
+      _avatarCollapsedSize,
+      t,
+    )!;
     final avatarTop =
         topPadding +
         lerpDouble(
@@ -130,12 +137,11 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
           (_collapsedContentHeight - _avatarCollapsedSize) / 2,
           t,
         )!;
-    final avatarLeft =
-        lerpDouble(
-          (screenWidth - _avatarExpandedSize) / 2,
-          _avatarCollapsedLeft,
-          t,
-        )!;
+    final avatarLeft = lerpDouble(
+      (screenWidth - _avatarExpandedSize) / 2,
+      _avatarCollapsedLeft,
+      t,
+    )!;
 
     final bigTitleOpacity = (1 - (t / 0.6)).clamp(0.0, 1.0);
     final smallTitleOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
@@ -274,23 +280,21 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
               child: CircleAvatar(
                 radius: size / 2 - 3,
                 backgroundColor: primary,
-                backgroundImage:
-                    hasAvatar
-                        ? CachedNetworkImageProvider(group.avatarUrl!)
-                        : null,
-                child:
-                    !hasAvatar
-                        ? Container(
-                          padding: EdgeInsets.zero,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage(AppImages.defaultGroupImg),
-                              fit: BoxFit.cover,
-                            ),
+                backgroundImage: hasAvatar
+                    ? CachedNetworkImageProvider(group.avatarUrl!)
+                    : null,
+                child: !hasAvatar
+                    ? Container(
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: AssetImage(AppImages.defaultGroupImg),
+                            fit: BoxFit.cover,
                           ),
-                        )
-                        : null,
+                        ),
+                      )
+                    : null,
               ),
             ),
           ),
@@ -312,31 +316,26 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
                   ),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder:
-                        (child, animation) => ScaleTransition(
-                          scale: animation,
-                          child: FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                        ),
-                    child:
-                        isUploadingPhoto
-                            ? const SizedBox(
-                              key: ValueKey('header_loading'),
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                            : const Icon(
-                              Icons.camera_alt_rounded,
-                              key: ValueKey('header_camera_icon'),
-                              size: 14,
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(opacity: animation, child: child),
+                    ),
+                    child: isUploadingPhoto
+                        ? const SizedBox(
+                            key: ValueKey('header_loading'),
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
                               color: Colors.white,
+                              strokeWidth: 2,
                             ),
+                          )
+                        : const Icon(
+                            Icons.camera_alt_rounded,
+                            key: ValueKey('header_camera_icon'),
+                            size: 14,
+                            color: Colors.white,
+                          ),
                   ),
                 ),
               ),
@@ -378,19 +377,23 @@ class _GroupInfoHeaderDelegate extends SliverPersistentHeaderDelegate {
             const SizedBox(width: 6),
             isSavingName
                 ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
                 : IconButton(
-                  icon: const Icon(Icons.check, color: Colors.white, size: 20),
-                  onPressed: onSubmit,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
+                    icon: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    onPressed: onSubmit,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
           ],
         ),
       );

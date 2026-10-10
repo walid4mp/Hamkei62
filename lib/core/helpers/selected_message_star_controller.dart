@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../cache/services/starred_message_store.dart';
 
 class SelectedMessageStarController {

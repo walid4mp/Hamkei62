@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/constants/app_images.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
 import 'package:social_media_app/features/single_chats/models/chat_user_model.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/widgets/calls/call_icon_button.dart';
@@ -74,10 +76,9 @@ class _UserPreviewDialogState extends State<UserPreviewDialog> {
                 Navigator.of(context, rootNavigator: true).pushNamed(
                   AppRoutes.fullScreenImageViewRoute,
                   arguments: {
-                    'url':
-                        (user.imageUrl != null && user.imageUrl!.isNotEmpty)
-                            ? user.imageUrl!
-                            : AppImages.defaultUserImg,
+                    'url': (user.imageUrl != null && user.imageUrl!.isNotEmpty)
+                        ? user.imageUrl!
+                        : AppImages.defaultUserImg,
                     'tag': 'preview_dialog_${user.id}',
                     'isAsset': user.imageUrl == null || user.imageUrl!.isEmpty,
                   },
@@ -92,31 +93,29 @@ class _UserPreviewDialogState extends State<UserPreviewDialog> {
                     ClipRRect(
                       child:
                           (user.imageUrl != null && user.imageUrl!.isNotEmpty)
-                              ? CachedCloudinaryImage(
-                                secureUrl: user.imageUrl!,
-                                fit: BoxFit.cover,
+                          ? CachedCloudinaryImage(
+                              secureUrl: user.imageUrl!,
+                              fit: BoxFit.cover,
+                              height: imageHeight,
+                              width: double.infinity,
+                              isAvatar: true,
+                              placeholder: (context) => SizedBox(
                                 height: imageHeight,
-                                width: double.infinity,
-                                isAvatar: true,
-                                placeholder:
-                                    (context) => SizedBox(
-                                      height: imageHeight,
-                                      child: const Center(
-                                        child: CustomLoadingIndicator(),
-                                      ),
-                                    ),
-                                errorWidget:
-                                    (context, error) => Image.asset(
-                                      AppImages.defaultUserImg,
-                                      fit: BoxFit.fitWidth,
-                                    ),
-                              )
-                              : Image.asset(
+                                child: const Center(
+                                  child: CustomLoadingIndicator(),
+                                ),
+                              ),
+                              errorWidget: (context, error) => Image.asset(
                                 AppImages.defaultUserImg,
                                 fit: BoxFit.fitWidth,
-                                height: imageHeight,
-                                width: double.infinity,
                               ),
+                            )
+                          : Image.asset(
+                              AppImages.defaultUserImg,
+                              fit: BoxFit.fitWidth,
+                              height: imageHeight,
+                              width: double.infinity,
+                            ),
                     ),
                     Positioned(
                       top: 0,

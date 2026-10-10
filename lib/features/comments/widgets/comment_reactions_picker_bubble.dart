@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../../core/design/tokens/typography.dart';
 
 const List<Map<String, String>> kReactionsList = [
@@ -83,10 +84,9 @@ class _ReactionsPickerBubbleState extends State<ReactionsPickerBubble>
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color:
-                      isDark
-                          ? Colors.black.withValues(alpha: 0.6)
-                          : Colors.black.withValues(alpha: 0.22),
+                  color: isDark
+                      ? Colors.black.withValues(alpha: 0.6)
+                      : Colors.black.withValues(alpha: 0.22),
                   blurRadius: isDark ? 14 : 10,
                   spreadRadius: 1,
                   offset: const Offset(0, 3),
@@ -122,28 +122,25 @@ class _ReactionsPickerBubbleState extends State<ReactionsPickerBubble>
                           padding: const EdgeInsets.all(5.5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color:
-                                isSelected
-                                    ? scheme.primary.withValues(alpha: 0.15)
-                                    : Colors.transparent,
-                            border:
-                                isSelected
-                                    ? Border.all(
-                                      color: scheme.primary.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      width: 1,
-                                    )
-                                    : null,
+                            color: isSelected
+                                ? scheme.primary.withValues(alpha: 0.15)
+                                : Colors.transparent,
+                            border: isSelected
+                                ? Border.all(
+                                    color: scheme.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    width: 1,
+                                  )
+                                : null,
                           ),
-                          transform:
-                              isHovered
-                                  ? (Matrix4.identity()
-                                    ..translate(0.0, -8.0)
-                                    ..scale(1.30))
-                                  : isSelected
-                                  ? (Matrix4.identity()..scale(1.12))
-                                  : Matrix4.identity(),
+                          transform: isHovered
+                              ? (Matrix4.identity()
+                                  ..translate(0.0, -8.0)
+                                  ..scale(1.30))
+                              : isSelected
+                              ? (Matrix4.identity()..scale(1.12))
+                              : Matrix4.identity(),
                           child: Tooltip(
                             message: r['label']!,
                             decoration: BoxDecoration(
@@ -161,17 +158,16 @@ class _ReactionsPickerBubbleState extends State<ReactionsPickerBubble>
                                 fontSize: 26,
                                 fontFamilyFallback:
                                     AppTypography.emojiFontFallback,
-                                shadows:
-                                    isSelected
-                                        ? [
-                                          Shadow(
-                                            color: scheme.primary.withValues(
-                                              alpha: 0.4,
-                                            ),
-                                            blurRadius: 8,
+                                shadows: isSelected
+                                    ? [
+                                        Shadow(
+                                          color: scheme.primary.withValues(
+                                            alpha: 0.4,
                                           ),
-                                        ]
-                                        : [],
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                    : [],
                               ),
                             ),
                           ),

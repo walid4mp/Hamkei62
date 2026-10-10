@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'post_reactions_picker_bubble.dart';
 
 class PostReactionOverlay {
@@ -24,21 +25,20 @@ class PostReactionOverlay {
     y = y.clamp(12.0, overlayBox.size.height - bubbleHeight - 12);
 
     return OverlayEntry(
-      builder:
-          (_) => Stack(
-            children: [
-              Positioned.fill(child: GestureDetector(onTap: onDismiss)),
-              Positioned(
-                left: x,
-                top: y,
-                child: PostReactionsPickerBubble(
-                  onReactionSelected: onSelect,
-                  onDismiss: onDismiss,
-                  selectedEmoji: selectedEmoji,
-                ),
-              ),
-            ],
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(child: GestureDetector(onTap: onDismiss)),
+          Positioned(
+            left: x,
+            top: y,
+            child: PostReactionsPickerBubble(
+              onReactionSelected: onSelect,
+              onDismiss: onDismiss,
+              selectedEmoji: selectedEmoji,
+            ),
           ),
+        ],
+      ),
     );
   }
 }

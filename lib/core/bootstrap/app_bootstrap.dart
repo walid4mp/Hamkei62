@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,7 @@ import 'package:social_media_app/core/presence/services/presence_service.dart';
 import 'package:social_media_app/features/settings/repository/settings_repository.dart';
 import 'package:social_media_app/firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../features/home/cubits/home_cubit/home_cubit.dart';
 import '../../features/posts/cubits/posts_cubit/posts_cubit.dart';
 import '../../features/stories/cubits/stories_cubit/stories_cubit.dart';
@@ -335,8 +337,7 @@ void _initForegroundTask() {
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'ongoing_call_channel',
       channelName: 'Ongoing Call',
-      channelDescription:
-          'Shown while a voice or video call is active and the app is in the background.',
+      channelDescription: 'Shown while a voice or video call is active and the app is in the background.',
       channelImportance: NotificationChannelImportance.LOW,
       priority: NotificationPriority.LOW,
       onlyAlertOnce: true,

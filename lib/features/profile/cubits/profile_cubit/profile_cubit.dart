@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
@@ -6,6 +7,7 @@ import 'package:social_media_app/features/profile/models/profile_mutuals_model.d
 import 'package:social_media_app/features/profile/models/profile_overview_model.dart';
 import 'package:social_media_app/features/profile/models/profile_stats_model.dart';
 import 'package:social_media_app/features/social_graph/models/friendship_status.dart';
+
 import '../../../../core/connectivity/cubits/connectivity_cubit.dart';
 import '../../../../core/connectivity/cubits/connectivity_state.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';

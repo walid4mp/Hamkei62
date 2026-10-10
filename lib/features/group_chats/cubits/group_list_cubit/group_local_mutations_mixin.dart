@@ -14,8 +14,9 @@ mixin GroupLocalMutationsMixin on GroupListBase {
 
     if (state is! GroupListLoaded) return;
     final currentState = state as GroupListLoaded;
-    final newList =
-        currentState.groups.where((g) => !groupIds.contains(g.id)).toList();
+    final newList = currentState.groups
+        .where((g) => !groupIds.contains(g.id))
+        .toList();
     cached = newList;
     emit(GroupListLoaded(newList));
     persistGroupsSnapshot(newList);
@@ -223,10 +224,12 @@ mixin GroupLocalMutationsMixin on GroupListBase {
           lastMessageSenderId ?? newList[idx].lastMessageSenderId,
       lastMessageSenderName:
           lastMessageSenderName ?? newList[idx].lastMessageSenderName,
-      lastMessageTargetId:
-          lastMessageType == 'system_event' ? lastMessageTargetId : null,
-      lastMessageTargetName:
-          lastMessageType == 'system_event' ? lastMessageTargetName : null,
+      lastMessageTargetId: lastMessageType == 'system_event'
+          ? lastMessageTargetId
+          : null,
+      lastMessageTargetName: lastMessageType == 'system_event'
+          ? lastMessageTargetName
+          : null,
       unreadCount: unreadCount,
     );
 

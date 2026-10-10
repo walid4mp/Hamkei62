@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/helpers/chat_helper.dart';
 import '../models/reel_model.dart';
 
@@ -23,22 +24,18 @@ class ReelThumbnailCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: reel.thumbnailUrl,
                 fit: BoxFit.cover,
-                errorWidget:
-                    (context, url, error) => Container(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest
+                errorWidget: (context, url, error) => Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.5),
+                  child: Center(
+                    child: Icon(
+                      Icons.image_not_supported_rounded,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant
                           .withValues(alpha: 0.5),
-                      child: Center(
-                        child: Icon(
-                          Icons.image_not_supported_rounded,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                          size: 32,
-                        ),
-                      ),
+                      size: 32,
                     ),
+                  ),
+                ),
               ),
               const Positioned(
                 top: 4,

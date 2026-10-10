@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/core/services/cloudinary_upload_result.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
+
 import '../../../core/services/cloudinary_storage_services.dart';
 import '../../../core/supabase/supabase_provider.dart';
 
@@ -32,8 +34,11 @@ class EditProfileServices {
   }
 
   Future<UserData> fetchUpdatedUser(String userId) async {
-    final data =
-        await _supabase.from('users').select().eq('id', userId).single();
+    final data = await _supabase
+        .from('users')
+        .select()
+        .eq('id', userId)
+        .single();
     return UserData.fromMap(data);
   }
 

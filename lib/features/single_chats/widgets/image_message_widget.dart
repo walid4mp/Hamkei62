@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/attachment/widgets/media_download_gate.dart';
@@ -48,62 +49,48 @@ class ImageMessageWidget extends StatelessWidget {
       secureUrl: imageUrl,
       fileSizeBytes: fileSizeBytes,
       borderRadius: borderRadius,
-      previewBuilder:
-          (context) => CachedNetworkImage(
-            imageUrl: imageUrl.cloudinaryLowResPreviewUrl,
+      previewBuilder: (context) => CachedNetworkImage(
+        imageUrl: imageUrl.cloudinaryLowResPreviewUrl,
+        width: preferredWidth,
+        height: preferredHeight,
+        fit: BoxFit.cover,
+        placeholder: (context, _) => const MediaLoadingPlaceholder(
+          width: preferredWidth,
+          height: preferredHeight,
+        ),
+        errorWidget: (context, _, __) => const MediaLoadingPlaceholder(
+          width: preferredWidth,
+          height: preferredHeight,
+          isError: true,
+        ),
+      ),
+      completedBuilder: (context, localPath) => GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (_, __, ___) =>
+                FullScreenMediaView(imageUrl: imageUrl, caption: caption),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          ),
+        ),
+        child: CachedCloudinaryImage(
+          secureUrl: imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context) => const MediaLoadingPlaceholder(
             width: preferredWidth,
             height: preferredHeight,
-            fit: BoxFit.cover,
-            placeholder:
-                (context, _) => const MediaLoadingPlaceholder(
-                  width: preferredWidth,
-                  height: preferredHeight,
-                ),
-            errorWidget:
-                (context, _, __) => const MediaLoadingPlaceholder(
-                  width: preferredWidth,
-                  height: preferredHeight,
-                  isError: true,
-                ),
           ),
-      completedBuilder:
-          (context, localPath) => GestureDetector(
-            onTap:
-                () => Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    opaque: false,
-                    pageBuilder:
-                        (_, __, ___) => FullScreenMediaView(
-                          imageUrl: imageUrl,
-                          caption: caption,
-                        ),
-                    transitionsBuilder: (
-                      context,
-                      animation,
-                      secondaryAnimation,
-                      child,
-                    ) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                  ),
-                ),
-            child: CachedCloudinaryImage(
-              secureUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder:
-                  (context) => const MediaLoadingPlaceholder(
-                    width: preferredWidth,
-                    height: preferredHeight,
-                  ),
-              errorWidget:
-                  (context, error) => SizedBox(
-                    width: preferredWidth,
-                    height: preferredHeight,
-                    child: const Center(child: Icon(Icons.error)),
-                  ),
-            ),
+          errorWidget: (context, error) => SizedBox(
+            width: preferredWidth,
+            height: preferredHeight,
+            child: const Center(child: Icon(Icons.error)),
           ),
+        ),
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+
 import 'emoji_helper.dart';
 
 class EmojiTextInputFormatter extends TextInputFormatter {

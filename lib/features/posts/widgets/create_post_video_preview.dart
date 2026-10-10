@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../../../core/widgets/vertical_volume_indicator.dart';
 import '../../../core/widgets/video_progress_slider.dart';
@@ -44,13 +46,12 @@ class _CreatePostVideoPreviewState extends State<CreatePostVideoPreview>
   @override
   void initState() {
     super.initState();
-    _controller =
-        VideoPlayerController.file(File(widget.videoPath))
-          ..addListener(_onControllerUpdate)
-          ..initialize().then((_) {
-            if (!mounted) return;
-            setState(() => _isInitialized = true);
-          });
+    _controller = VideoPlayerController.file(File(widget.videoPath))
+      ..addListener(_onControllerUpdate)
+      ..initialize().then((_) {
+        if (!mounted) return;
+        setState(() => _isInitialized = true);
+      });
   }
 
   void _onControllerUpdate() {
@@ -118,21 +119,16 @@ class _CreatePostVideoPreviewState extends State<CreatePostVideoPreview>
         .push(
           PageRouteBuilder(
             opaque: false,
-            pageBuilder:
-                (_, __, ___) => FullScreenMediaView(
-                  videoUrl: widget.videoPath,
-                  isLocal: true,
-                  controller: _controller,
-                  showActions: false,
-                ),
-            transitionsBuilder: (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+            pageBuilder: (_, __, ___) => FullScreenMediaView(
+              videoUrl: widget.videoPath,
+              isLocal: true,
+              controller: _controller,
+              showActions: false,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
           ),
         )
         .then((_) {
@@ -154,8 +150,9 @@ class _CreatePostVideoPreviewState extends State<CreatePostVideoPreview>
           ),
           clipBehavior: Clip.antiAlias,
           child: AspectRatio(
-            aspectRatio:
-                _isInitialized ? _controller.value.aspectRatio : 16 / 9,
+            aspectRatio: _isInitialized
+                ? _controller.value.aspectRatio
+                : 16 / 9,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -178,10 +175,9 @@ class _CreatePostVideoPreviewState extends State<CreatePostVideoPreview>
                           child: GlassIconButton(
                             size: 38,
                             iconSize: 24,
-                            icon:
-                                _controller.value.isPlaying
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
+                            icon: _controller.value.isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
                             onTap: _togglePlayPause,
                           ),
                         ),
@@ -224,14 +220,13 @@ class _CreatePostVideoPreviewState extends State<CreatePostVideoPreview>
                   child: GlassIconButton(
                     size: 32,
                     iconSize: 15,
-                    icon:
-                        !_isInitialized
-                            ? Icons.volume_up_rounded
-                            : _controller.value.volume <= 0
-                            ? Icons.volume_off_rounded
-                            : _controller.value.volume < 0.5
-                            ? Icons.volume_down_rounded
-                            : Icons.volume_up_rounded,
+                    icon: !_isInitialized
+                        ? Icons.volume_up_rounded
+                        : _controller.value.volume <= 0
+                        ? Icons.volume_off_rounded
+                        : _controller.value.volume < 0.5
+                        ? Icons.volume_down_rounded
+                        : Icons.volume_up_rounded,
                     onTap: _isInitialized ? _toggleMute : null,
                   ),
                 ),

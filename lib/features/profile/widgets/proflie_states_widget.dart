@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/profile_stats_model.dart';
 import '../utils/profile_ui_tokens.dart';
 import 'state_item_widget.dart';
@@ -33,14 +34,11 @@ class ProfileStatsWidget extends StatelessWidget {
           for (var i = 0; i < items.length; i++)
             Expanded(
               child: Container(
-                decoration:
-                    i == 0
-                        ? null
-                        : BoxDecoration(
-                          border: Border(
-                            left: BorderSide(color: tokens.outline),
-                          ),
-                        ),
+                decoration: i == 0
+                    ? null
+                    : BoxDecoration(
+                        border: Border(left: BorderSide(color: tokens.outline)),
+                      ),
                 child: StatItemWidget(
                   label: items[i].label,
                   value: items[i].value,

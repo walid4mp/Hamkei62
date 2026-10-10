@@ -61,9 +61,8 @@ class CommentsShimmerSkeleton extends StatelessWidget {
                       height: 50,
                       decoration: BoxDecoration(
                         color: skeletonColor,
-                        borderRadius: BorderRadius.circular(
-                          16,
-                        ).copyWith(topLeft: const Radius.circular(4)),
+                        borderRadius: BorderRadius.circular(16)
+                            .copyWith(topLeft: const Radius.circular(4)),
                       ),
                     ),
                     if (hasMedia) ...[

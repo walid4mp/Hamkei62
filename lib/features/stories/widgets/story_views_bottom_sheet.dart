@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/design/tokens/typography.dart';
 import '../../../core/helpers/formatted_date.dart';
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
@@ -14,9 +15,8 @@ class StoryViewsBottomSheet extends StatelessWidget {
   const StoryViewsBottomSheet({super.key});
 
   void _navigateToProfile(BuildContext context, StoryViewerModel viewer) {
-    Navigator.of(
-      context,
-    ).pushNamed(AppRoutes.profileViewRoute, arguments: viewer.viewerId);
+    Navigator.of(context)
+        .pushNamed(AppRoutes.profileViewRoute, arguments: viewer.viewerId);
   }
 
   @override
@@ -55,8 +55,9 @@ class StoryViewsBottomSheet extends StatelessWidget {
                   const Gap(15),
                   BlocBuilder<StoryViewsCubit, StoryViewsState>(
                     builder: (context, state) {
-                      final count =
-                          state is StoryViewsLoaded ? state.viewers.length : 0;
+                      final count = state is StoryViewsLoaded
+                          ? state.viewers.length
+                          : 0;
                       return Text(
                         '$count Views',
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -95,8 +96,8 @@ class StoryViewsBottomSheet extends StatelessWidget {
                               final viewer = viewers[index];
                               return ListTile(
                                 leading: GestureDetector(
-                                  onTap:
-                                      () => _navigateToProfile(context, viewer),
+                                  onTap: () =>
+                                      _navigateToProfile(context, viewer),
                                   child: Stack(
                                     clipBehavior: Clip.none,
                                     children: [
@@ -144,8 +145,8 @@ class StoryViewsBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 title: GestureDetector(
-                                  onTap:
-                                      () => _navigateToProfile(context, viewer),
+                                  onTap: () =>
+                                      _navigateToProfile(context, viewer),
                                   child: Text(
                                     viewer.userName,
                                     style: const TextStyle(

@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:livekit_client/livekit_client.dart';
+
 import 'call_pip_state.dart';
 import 'livekit_group_call_solo_watchdog.dart';
 

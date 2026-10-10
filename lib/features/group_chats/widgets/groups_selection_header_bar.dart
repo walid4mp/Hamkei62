@@ -25,10 +25,8 @@ class GroupsSelectionHeaderBar extends StatelessWidget {
           Expanded(
             child: Text(
               '$selectedCount selected',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.titleLarge!
+                  .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           IconButton(

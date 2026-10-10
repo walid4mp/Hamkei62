@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../cache/utils/cloudinary_url_extensions.dart';
 import '../../supabase/supabase_provider.dart';
 import '../helpers/media_action_helper.dart' hide ShowInChatCallback;
@@ -21,34 +22,24 @@ class VideoThumbnailGrid extends StatelessWidget {
         final isMe = item.senderId == SupabaseProvider.id;
 
         return GestureDetector(
-          onTap:
-              () => MediaActionHelper.openFullScreenMedia(context, items, item),
-          onLongPressStart:
-              (details) => showSharedMediaActionMenu(
-                context: context,
-                globalPosition: details.globalPosition,
-                isMe: isMe,
-                onShowInChat:
-                    () => MediaActionHelper.handleShowInChat(
-                      context,
-                      item,
-                      onShowInChat,
-                    ),
-                onConfirmedDelete:
-                    () => MediaActionHelper.handleDelete(
-                      context,
-                      item,
-                      forEveryone: isMe,
-                    ),
-                onOpen:
-                    () => MediaActionHelper.openFullScreenMedia(
-                      context,
-                      items,
-                      item,
-                    ),
-                openLabel: 'Play video',
-                openIcon: Icons.play_circle_outline_rounded,
-              ),
+          onTap: () =>
+              MediaActionHelper.openFullScreenMedia(context, items, item),
+          onLongPressStart: (details) => showSharedMediaActionMenu(
+            context: context,
+            globalPosition: details.globalPosition,
+            isMe: isMe,
+            onShowInChat: () =>
+                MediaActionHelper.handleShowInChat(context, item, onShowInChat),
+            onConfirmedDelete: () => MediaActionHelper.handleDelete(
+              context,
+              item,
+              forEveryone: isMe,
+            ),
+            onOpen: () =>
+                MediaActionHelper.openFullScreenMedia(context, items, item),
+            openLabel: 'Play video',
+            openIcon: Icons.play_circle_outline_rounded,
+          ),
           child: Stack(
             fit: StackFit.expand,
             children: [

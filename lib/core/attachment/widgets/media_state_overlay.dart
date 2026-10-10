@@ -1,6 +1,8 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/attachment/widgets/transfer_ring.dart';
+
 import '../../utilities/file_size_formatter.dart';
 import '../models/media_transfer_state.dart';
 
@@ -150,10 +152,9 @@ class _TopLeftBadge extends StatelessWidget {
           left: inset,
           child: GlassPillBadge(
             leading: leading,
-            secondaryCaption:
-                isVideo && durationSeconds != null
-                    ? formatMediaDuration(durationSeconds)
-                    : null,
+            secondaryCaption: isVideo && durationSeconds != null
+                ? formatMediaDuration(durationSeconds)
+                : null,
             caption: caption,
           ),
         ),
@@ -186,8 +187,9 @@ class _StaticIconButton extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color:
-              tint != null ? tint!.withValues(alpha: 0.85) : Colors.transparent,
+          color: tint != null
+              ? tint!.withValues(alpha: 0.85)
+              : Colors.transparent,
         ),
         child: Icon(icon, size: size * 0.55, color: Colors.white),
       ),

@@ -16,10 +16,9 @@ class AboutUsVersionFooter extends StatelessWidget {
     return Column(
       children: [
         Divider(
-          color:
-              isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.grey.shade200,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.grey.shade200,
         ),
         const Gap(16),
         Row(

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_media_app/core/cache/constants/hive_box_names.dart';
+
 import '../constants/hive_type_ids.dart';
 import '../models/cached_media_model.dart';
 

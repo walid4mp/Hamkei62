@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../../services/network_status_service.dart';
 
 class ConnectivityBannerController {

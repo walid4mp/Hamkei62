@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../cubits/sticker_send_picker_cubit/sticker_send_picker_cubit.dart';
@@ -66,10 +67,7 @@ class _StickerSendPickerSheetBody extends StatelessWidget {
             ),
             const Gap(16),
             Expanded(
-              child: BlocBuilder<
-                StickerSendPickerCubit,
-                StickerSendPickerState
-              >(
+              child: BlocBuilder<StickerSendPickerCubit, StickerSendPickerState>(
                 builder: (context, state) {
                   if (state is StickerSendPickerLoading) {
                     return const Center(child: CustomLoadingIndicator());
@@ -108,17 +106,12 @@ class _StickerSendPickerSheetBody extends StatelessWidget {
                                       horizontal: 12,
                                     ),
                                     labelStyle: TextStyle(
-                                      fontWeight:
-                                          isSelected
-                                              ? FontWeight.bold
-                                              : FontWeight.w500,
-                                      color:
-                                          isSelected
-                                              ? Colors.white
-                                              : theme
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.color,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.w500,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : theme.textTheme.bodyMedium?.color,
                                     ),
                                     selectedColor: theme.primaryColor,
                                     backgroundColor: theme
@@ -128,16 +121,14 @@ class _StickerSendPickerSheetBody extends StatelessWidget {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       side: BorderSide(
-                                        color:
-                                            isSelected
-                                                ? theme.primaryColor
-                                                : Colors.transparent,
+                                        color: isSelected
+                                            ? theme.primaryColor
+                                            : Colors.transparent,
                                       ),
                                     ),
-                                    onSelected:
-                                        (_) => context
-                                            .read<StickerSendPickerCubit>()
-                                            .selectPack(index),
+                                    onSelected: (_) => context
+                                        .read<StickerSendPickerCubit>()
+                                        .selectPack(index),
                                   );
                                 },
                               ),
@@ -164,31 +155,28 @@ class _StickerSendPickerSheetBody extends StatelessWidget {
                       ),
                       const Gap(16),
                       Expanded(
-                        child:
-                            loaded.isLoadingSelectedPack
-                                ? const Center(child: CustomLoadingIndicator())
-                                : GridView.builder(
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: loaded.selectedStickers.length,
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 4,
-                                        mainAxisSpacing: 16,
-                                        crossAxisSpacing: 16,
-                                      ),
-                                  itemBuilder: (context, index) {
-                                    final sticker =
-                                        loaded.selectedStickers[index];
-                                    return InkWell(
-                                      borderRadius: BorderRadius.circular(16),
-                                      onTap:
-                                          () => Navigator.of(
-                                            context,
-                                          ).pop(sticker),
-                                      child: StickerThumbnail(sticker: sticker),
-                                    );
-                                  },
-                                ),
+                        child: loaded.isLoadingSelectedPack
+                            ? const Center(child: CustomLoadingIndicator())
+                            : GridView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: loaded.selectedStickers.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  final sticker =
+                                      loaded.selectedStickers[index];
+                                  return InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: () =>
+                                        Navigator.of(context).pop(sticker),
+                                    child: StickerThumbnail(sticker: sticker),
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   );

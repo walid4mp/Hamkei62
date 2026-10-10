@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/design/tokens/typography.dart';
 import '../cubits/story_reaction_cubit/story_reaction_cubit.dart';
 import '../widgets/story_reaction_picker.dart';
@@ -90,8 +91,8 @@ class _StoryReactionButtonState extends State<StoryReactionButton> {
           },
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 220),
-            transitionBuilder:
-                (child, anim) => ScaleTransition(scale: anim, child: child),
+            transitionBuilder: (child, anim) =>
+                ScaleTransition(scale: anim, child: child),
             child: Container(
               key: ValueKey('$_isOpen${active ?? 'default'}'),
               width: 44,
@@ -99,36 +100,33 @@ class _StoryReactionButtonState extends State<StoryReactionButton> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color:
-                    active != null
-                        ? Theme.of(context).primaryColor.withValues(alpha: 0.22)
-                        : Colors.white.withValues(alpha: _isOpen ? 0.25 : 0.15),
+                color: active != null
+                    ? Theme.of(context).primaryColor.withValues(alpha: 0.22)
+                    : Colors.white.withValues(alpha: _isOpen ? 0.25 : 0.15),
                 border: Border.all(
-                  color:
-                      active != null
-                          ? Theme.of(context).primaryColor
-                          : Colors.white.withValues(alpha: 0.4),
+                  color: active != null
+                      ? Theme.of(context).primaryColor
+                      : Colors.white.withValues(alpha: 0.4),
                   width: 1.4,
                 ),
               ),
-              child:
-                  active != null
-                      ? Text(
-                        active,
-                        style: TextStyle(
-                          fontSize: 20,
-                          inherit: false,
-                          fontFamilyFallback: AppTypography.emojiFontFallback,
-                          decoration: TextDecoration.none,
-                        ),
-                      )
-                      : Icon(
-                        _isOpen
-                            ? Icons.close_rounded
-                            : Icons.add_reaction_outlined,
-                        color: Colors.white,
-                        size: _isOpen ? 24 : 22,
+              child: active != null
+                  ? Text(
+                      active,
+                      style: TextStyle(
+                        fontSize: 20,
+                        inherit: false,
+                        fontFamilyFallback: AppTypography.emojiFontFallback,
+                        decoration: TextDecoration.none,
                       ),
+                    )
+                  : Icon(
+                      _isOpen
+                          ? Icons.close_rounded
+                          : Icons.add_reaction_outlined,
+                      color: Colors.white,
+                      size: _isOpen ? 24 : 22,
+                    ),
             ),
           ),
         );

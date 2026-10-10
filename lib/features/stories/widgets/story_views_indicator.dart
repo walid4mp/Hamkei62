@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../cubits/story_views_cubit/story_views_cubit.dart';
 import 'story_views_bottom_sheet.dart';
@@ -23,11 +24,10 @@ class StoryViewsIndicator extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (bottomSheetContext) => BlocProvider.value(
-            value: viewsCubit,
-            child: const StoryViewsBottomSheet(),
-          ),
+      builder: (bottomSheetContext) => BlocProvider.value(
+        value: viewsCubit,
+        child: const StoryViewsBottomSheet(),
+      ),
     );
 
     onClose();

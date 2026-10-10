@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:linkify/linkify.dart' as linkify_pkg;
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../helpers/formatted_date.dart';
 import '../../link/models/link_preview_data.dart';
 import '../../link/services/link_preview_service.dart';
@@ -23,14 +24,13 @@ class MediaLinksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final confirmed =
-        items
-            .where(
-              (m) => linkify_pkg
-                  .linkify(m.text)
-                  .any((el) => el is linkify_pkg.UrlElement),
-            )
-            .toList();
+    final confirmed = items
+        .where(
+          (m) => linkify_pkg
+              .linkify(m.text)
+              .any((el) => el is linkify_pkg.UrlElement),
+        )
+        .toList();
 
     if (confirmed.isEmpty) {
       return const Center(child: Text('No links shared yet'));
@@ -38,8 +38,8 @@ class MediaLinksList extends StatelessWidget {
 
     return SectionedMediaList(
       items: confirmed,
-      tileBuilder:
-          (context, item) => _LinkTile(item: item, onShowInChat: onShowInChat),
+      tileBuilder: (context, item) =>
+          _LinkTile(item: item, onShowInChat: onShowInChat),
     );
   }
 }
@@ -85,10 +85,12 @@ class _LinkTileState extends State<_LinkTile> {
 
               if (snapshot.connectionState != ConnectionState.done) {
                 final isDark = Theme.of(context).brightness == Brightness.dark;
-                final baseColor =
-                    isDark ? Colors.grey[800]! : Colors.grey[300]!;
-                final highlightColor =
-                    isDark ? Colors.grey[700]! : Colors.grey[100]!;
+                final baseColor = isDark
+                    ? Colors.grey[800]!
+                    : Colors.grey[300]!;
+                final highlightColor = isDark
+                    ? Colors.grey[700]!
+                    : Colors.grey[100]!;
 
                 return Shimmer.fromColors(
                   baseColor: baseColor,
@@ -107,44 +109,39 @@ class _LinkTileState extends State<_LinkTile> {
 
               final data = snapshot.data;
               return GestureDetector(
-                onLongPressStart:
-                    (details) => showSharedMediaActionMenu(
-                      context: context,
-                      globalPosition: details.globalPosition,
-                      isMe: isMe,
-                      onShowInChat:
-                          () => MediaActionHelper.handleShowInChat(
-                            context,
-                            widget.item,
-                            widget.onShowInChat,
-                          ),
-                      onConfirmedDelete:
-                          () => MediaActionHelper.handleDelete(
-                            context,
-                            widget.item,
-                            forEveryone: isMe,
-                          ),
-                      onOpen:
-                          (data == null || !data.hasContent)
-                              ? null
-                              : () => launchUrl(
-                                Uri.parse(data.url),
-                                mode: LaunchMode.externalApplication,
-                              ),
-                      openLabel: 'Open link',
-                      openIcon: Icons.open_in_new_rounded,
-                    ),
-                child:
-                    (data == null || !data.hasContent)
-                        ? ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.link_rounded),
-                          title: CustomLinkifyText(
-                            text: widget.item.text,
-                            maxLines: 2,
-                          ),
-                        )
-                        : LinkPreviewCard(data: data, onColoredBubble: false),
+                onLongPressStart: (details) => showSharedMediaActionMenu(
+                  context: context,
+                  globalPosition: details.globalPosition,
+                  isMe: isMe,
+                  onShowInChat: () => MediaActionHelper.handleShowInChat(
+                    context,
+                    widget.item,
+                    widget.onShowInChat,
+                  ),
+                  onConfirmedDelete: () => MediaActionHelper.handleDelete(
+                    context,
+                    widget.item,
+                    forEveryone: isMe,
+                  ),
+                  onOpen: (data == null || !data.hasContent)
+                      ? null
+                      : () => launchUrl(
+                          Uri.parse(data.url),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                  openLabel: 'Open link',
+                  openIcon: Icons.open_in_new_rounded,
+                ),
+                child: (data == null || !data.hasContent)
+                    ? ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.link_rounded),
+                        title: CustomLinkifyText(
+                          text: widget.item.text,
+                          maxLines: 2,
+                        ),
+                      )
+                    : LinkPreviewCard(data: data, onColoredBubble: false),
               );
             },
           ),

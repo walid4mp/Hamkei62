@@ -1,9 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:social_media_app/core/helpers/chat_helper.dart';
+
 import '../../helpers/file_icon_helper.dart';
 import '../../toast/app_toast.dart';
 import '../../router/app_routes.dart';
@@ -75,16 +77,14 @@ class ChatStagedFilePreview extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6, left: 16, right: 16),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color:
-              Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.04),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color:
-                Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: 0.14)
-                    : Colors.black.withValues(alpha: 0.08),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: 0.14)
+                : Colors.black.withValues(alpha: 0.08),
           ),
         ),
         child: Row(
@@ -96,32 +96,28 @@ class ChatStagedFilePreview extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 child:
                     (imageFile != null ||
-                            (file != null &&
-                                [
-                                  'PNG',
-                                  'JPG',
-                                  'JPEG',
-                                  'WEBP',
-                                  'GIF',
-                                ].contains(ext)))
-                        ? Image.file(
-                          (imageFile ?? file)!,
-                          width: 36,
-                          height: 36,
-                          fit: BoxFit.cover,
-                        )
-                        : Container(
-                          width: 36,
-                          height: 36,
-                          color: primary.withValues(alpha: 0.12),
-                          child: Center(
-                            child: FaIcon(
-                              fileIcon,
-                              color: iconAccent,
-                              size: 25,
-                            ),
-                          ),
+                        (file != null &&
+                            [
+                              'PNG',
+                              'JPG',
+                              'JPEG',
+                              'WEBP',
+                              'GIF',
+                            ].contains(ext)))
+                    ? Image.file(
+                        (imageFile ?? file)!,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        width: 36,
+                        height: 36,
+                        color: primary.withValues(alpha: 0.12),
+                        child: Center(
+                          child: FaIcon(fileIcon, color: iconAccent, size: 25),
                         ),
+                      ),
               ),
             ),
             const Gap(10),
@@ -146,9 +142,8 @@ class ChatStagedFilePreview extends StatelessWidget {
                         ? _formattedSize
                         : '$_extension · $_formattedSize',
                     style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                      color: Theme.of(context).textTheme.bodySmall?.color
+                          ?.withValues(alpha: 0.7),
                       fontSize: 11,
                     ),
                   ),
@@ -163,9 +158,8 @@ class ChatStagedFilePreview extends StatelessWidget {
                 child: Icon(
                   Icons.close_rounded,
                   size: 18,
-                  color: Theme.of(
-                    context,
-                  ).iconTheme.color?.withValues(alpha: 0.7),
+                  color: Theme.of(context).iconTheme.color
+                      ?.withValues(alpha: 0.7),
                 ),
               ),
             ),

@@ -90,28 +90,25 @@ class CommentModel {
     final authorName = map['users']?['name'] as String?;
     final authorImageUrl = map['users']?['image_url'] as String?;
 
-    final List<CommentModel> replies =
-        map['replies'] != null
-            ? List<CommentModel>.from(
-              (map['replies'] as List).map(
-                (x) => CommentModel.fromMap(x as Map<String, dynamic>),
-              ),
-            )
-            : [];
+    final List<CommentModel> replies = map['replies'] != null
+        ? List<CommentModel>.from(
+            (map['replies'] as List).map(
+              (x) => CommentModel.fromMap(x as Map<String, dynamic>),
+            ),
+          )
+        : [];
 
-    final List<CommentReaction> reactions =
-        map['comment_reactions'] != null
-            ? parseReactions(map['comment_reactions'] as List<dynamic>)
-            : [];
+    final List<CommentReaction> reactions = map['comment_reactions'] != null
+        ? parseReactions(map['comment_reactions'] as List<dynamic>)
+        : [];
 
-    final List<MentionRef> mentions =
-        map['comment_mentions'] != null
-            ? MentionRef.keepLatestBatch(
-              (map['comment_mentions'] as List<dynamic>)
-                  .map((m) => MentionRef.fromMap(m as Map<String, dynamic>))
-                  .toList(),
-            )
-            : [];
+    final List<MentionRef> mentions = map['comment_mentions'] != null
+        ? MentionRef.keepLatestBatch(
+            (map['comment_mentions'] as List<dynamic>)
+                .map((m) => MentionRef.fromMap(m as Map<String, dynamic>))
+                .toList(),
+          )
+        : [];
 
     return CommentModel(
       id: map['id'] as String,
@@ -255,27 +252,24 @@ class CommentModel {
       reactionCount: map['reaction_count'] as int? ?? 0,
       parentCommentId: map['parent_comment_id'] as String?,
       isEdited: map['is_edited'] as bool,
-      replies:
-          (map['replies'] as List<dynamic>? ?? [])
-              .map(
-                (reply) =>
-                    CommentModel.fromCacheJson(reply as Map<String, dynamic>),
-              )
-              .toList(),
-      reactions:
-          (map['reactions'] as List<dynamic>? ?? [])
-              .map(
-                (reaction) =>
-                    CommentReaction.fromMap(reaction as Map<String, dynamic>),
-              )
-              .toList(),
-      mentions:
-          (map['mentions'] as List<dynamic>? ?? [])
-              .map(
-                (mention) =>
-                    MentionRef.fromCacheJson(mention as Map<String, dynamic>),
-              )
-              .toList(),
+      replies: (map['replies'] as List<dynamic>? ?? [])
+          .map(
+            (reply) =>
+                CommentModel.fromCacheJson(reply as Map<String, dynamic>),
+          )
+          .toList(),
+      reactions: (map['reactions'] as List<dynamic>? ?? [])
+          .map(
+            (reaction) =>
+                CommentReaction.fromMap(reaction as Map<String, dynamic>),
+          )
+          .toList(),
+      mentions: (map['mentions'] as List<dynamic>? ?? [])
+          .map(
+            (mention) =>
+                MentionRef.fromCacheJson(mention as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 }

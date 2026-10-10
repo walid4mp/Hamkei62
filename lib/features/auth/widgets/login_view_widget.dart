@@ -6,6 +6,7 @@ import 'package:social_media_app/core/widgets/custom_text_form_field.dart';
 import 'package:social_media_app/features/auth/cubits/auth_cubit/auth_cubit.dart';
 import 'package:social_media_app/features/auth/widgets/sign_text_section.dart';
 import 'package:social_media_app/features/auth/widgets/social_sign_section.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../core/toast/app_toast.dart';
 import '../../../core/utilities/app_formatters.dart';
@@ -66,10 +67,9 @@ class _LoginViewWidgetState extends State<LoginViewWidget> {
               ),
               const Gap(42),
               BlocConsumer<AuthCubit, AuthState>(
-                listenWhen:
-                    (previous, current) =>
-                        (previous is! AuthSuccess && current is AuthSuccess) ||
-                        current is AuthFailure,
+                listenWhen: (previous, current) =>
+                    (previous is! AuthSuccess && current is AuthSuccess) ||
+                    current is AuthFailure,
                 listener: (context, state) async {
                   if (state is AuthSuccess) {
                     AppToast.success('Login Successfully');
@@ -87,13 +87,12 @@ class _LoginViewWidgetState extends State<LoginViewWidget> {
                     AppToast.error(state.errMsg);
                   }
                 },
-                buildWhen:
-                    (previous, current) =>
-                        current is AuthLoading ||
-                        current is AuthSuccess ||
-                        current is AuthFailure ||
-                        current is AuthInitial ||
-                        current is AuthSignedOut,
+                buildWhen: (previous, current) =>
+                    current is AuthLoading ||
+                    current is AuthSuccess ||
+                    current is AuthFailure ||
+                    current is AuthInitial ||
+                    current is AuthSignedOut,
                 builder: (context, state) {
                   return CustomElevatedButton(
                     txtBtn: 'Login',

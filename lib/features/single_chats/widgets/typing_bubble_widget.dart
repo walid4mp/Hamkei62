@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/single_chats/widgets/typing_indicator_widget.dart';
 import 'package:social_media_app/features/single_chats/widgets/user_chat_avatar_widget.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../helpers/chat_bubble_colors.dart';
 
@@ -45,9 +46,9 @@ class TypingBubbleWidget extends StatelessWidget {
             child: TypingIndicatorWidget(
               color:
                   ThemeData.estimateBrightnessForColor(bubbleColor) ==
-                          Brightness.dark
-                      ? Colors.white70
-                      : Colors.black54,
+                      Brightness.dark
+                  ? Colors.white70
+                  : Colors.black54,
               dotSize: 5,
             ),
           ),

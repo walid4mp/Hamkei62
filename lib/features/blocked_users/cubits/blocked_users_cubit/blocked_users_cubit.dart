@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../../core/supabase/supabase_provider.dart';
 import '../../../single_chats/services/chat_block_service.dart';
@@ -33,8 +34,9 @@ class BlockedUsersCubit extends Cubit<BlockedUsersState>
     if (currentState is! BlockedUsersLoaded) return;
 
     final previousItems = currentState.items;
-    final updatedItems =
-        previousItems.where((item) => item.user.id != blockedUserId).toList();
+    final updatedItems = previousItems
+        .where((item) => item.user.id != blockedUserId)
+        .toList();
     emit(BlockedUsersLoaded(updatedItems));
 
     try {

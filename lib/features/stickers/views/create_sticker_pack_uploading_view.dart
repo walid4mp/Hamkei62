@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_cubit.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_state.dart';
@@ -60,13 +61,11 @@ class CreateStickerPackUploadingView extends StatelessWidget {
                 child: Opacity(
                   opacity: 0.5,
                   child: SegmentedButton<StickerPackPrivacy>(
-                    segments:
-                        StickerPackPrivacy.values
-                            .map(
-                              (p) =>
-                                  ButtonSegment(value: p, label: Text(p.label)),
-                            )
-                            .toList(),
+                    segments: StickerPackPrivacy.values
+                        .map(
+                          (p) => ButtonSegment(value: p, label: Text(p.label)),
+                        )
+                        .toList(),
                     selected: {state.privacy},
                     onSelectionChanged: (_) {},
                   ),
@@ -92,15 +91,13 @@ class CreateStickerPackUploadingView extends StatelessWidget {
                 children: [
                   state.overallProgress < 1.0
                       ? CancelProgressBubble(
-                        size: 18,
-                        isPositioned: false,
-                        visible: state.overallProgress < 1.0,
-                        onCancel:
-                            () =>
-                                context
-                                    .read<CreateStickerPackCubit>()
-                                    .cancelUpload(),
-                      )
+                          size: 18,
+                          isPositioned: false,
+                          visible: state.overallProgress < 1.0,
+                          onCancel: () => context
+                              .read<CreateStickerPackCubit>()
+                              .cancelUpload(),
+                        )
                       : const SizedBox.shrink(),
 
                   Padding(

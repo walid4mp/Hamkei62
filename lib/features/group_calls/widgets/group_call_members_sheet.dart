@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:livekit_client/livekit_client.dart';
+
 import '../../../core/notifications/notification_navigator_key.dart';
 import '../../../core/services/active_call/pip/call_pip_cubit.dart';
 import '../../../core/supabase/supabase_provider.dart';
@@ -81,8 +83,10 @@ class _GroupCallMembersSheetState extends State<GroupCallMembersSheet> {
       ...room.remoteParticipants.values,
     ];
     final ids = participants.map((p) => p.identity).toSet();
-    final names =
-        participants.map((p) => p.name).where((n) => n.isNotEmpty).toSet();
+    final names = participants
+        .map((p) => p.name)
+        .where((n) => n.isNotEmpty)
+        .toSet();
     setState(() {
       _activeUserIds = ids;
       _activeNames = names;
@@ -138,13 +142,11 @@ class _GroupCallMembersSheetState extends State<GroupCallMembersSheet> {
   }
 
   List<GroupCallMemberEntry> _mergeAndSort(List<GroupMemberModel> members) {
-    final entries =
-        members
-            .map(
-              (m) =>
-                  GroupCallMemberEntry(member: m, isActive: _isMemberActive(m)),
-            )
-            .toList();
+    final entries = members
+        .map(
+          (m) => GroupCallMemberEntry(member: m, isActive: _isMemberActive(m)),
+        )
+        .toList();
 
     entries.sort((a, b) {
       if (a.isActive != b.isActive) return a.isActive ? -1 : 1;
@@ -312,10 +314,9 @@ class _MemberTile extends StatelessWidget {
             imageUrl: member.userAvatar,
             fallbackLabel: member.userName,
             diameter: 46,
-            borderColor:
-                entry.isActive
-                    ? Colors.greenAccent.withValues(alpha: 0.85)
-                    : Colors.white,
+            borderColor: entry.isActive
+                ? Colors.greenAccent.withValues(alpha: 0.85)
+                : Colors.white,
             borderWidth: entry.isActive ? 2.4 : 2,
           ),
           const SizedBox(width: 14),
@@ -374,15 +375,15 @@ class _MemberTile extends StatelessWidget {
           const SizedBox(width: 10),
           entry.isActive
               ? const CallStatusPill(
-                icon: Icons.graphic_eq_rounded,
-                label: 'In Call',
-                showLiveDot: true,
-              )
+                  icon: Icons.graphic_eq_rounded,
+                  label: 'In Call',
+                  showLiveDot: true,
+                )
               : _RingButton(
-                isRinging: isRinging,
-                primary: primary,
-                onTap: onRing,
-              ),
+                  isRinging: isRinging,
+                  primary: primary,
+                  onTap: onRing,
+                ),
         ],
       ),
     );
@@ -408,10 +409,9 @@ class _RingButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color:
-              isRinging
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : primary.withValues(alpha: 0.9),
+          color: isRinging
+              ? Colors.white.withValues(alpha: 0.08)
+              : primary.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
             color: Colors.white.withValues(alpha: isRinging ? 0.15 : 0.35),

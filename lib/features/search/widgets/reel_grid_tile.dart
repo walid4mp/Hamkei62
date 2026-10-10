@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../reels/models/reel_model.dart';
 
 class ReelGridTile extends StatelessWidget {
@@ -18,9 +19,8 @@ class ReelGridTile extends StatelessWidget {
           CachedNetworkImage(
             imageUrl: reel.thumbnailUrl,
             fit: BoxFit.cover,
-            placeholder:
-                (_, __) =>
-                    Container(color: Colors.black.withValues(alpha: 0.06)),
+            placeholder: (_, __) =>
+                Container(color: Colors.black.withValues(alpha: 0.06)),
             errorWidget: (_, __, ___) => Container(color: Colors.black26),
           ),
           const Positioned(

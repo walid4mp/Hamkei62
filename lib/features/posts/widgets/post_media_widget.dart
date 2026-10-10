@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
 import 'package:social_media_app/features/posts/widgets/post_video_player.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../core/widgets/blurred_media_placeholders.dart';
 import '../cubits/posts_cubit/posts_cubit.dart';
@@ -25,16 +26,15 @@ class PostMediaWidget extends StatelessWidget {
       children: [
         if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
           GestureDetector(
-            onTap:
-                () => Navigator.of(context, rootNavigator: true).pushNamed(
-                  AppRoutes.fullScreenImageViewRoute,
-                  arguments: {
-                    'url': post.imageUrl,
-                    'tag': 'post-image-${post.id}',
-                    'postId': post.id,
-                    'postsCubit': postsCubit,
-                  },
-                ),
+            onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
+              AppRoutes.fullScreenImageViewRoute,
+              arguments: {
+                'url': post.imageUrl,
+                'tag': 'post-image-${post.id}',
+                'postId': post.id,
+                'postsCubit': postsCubit,
+              },
+            ),
             child: AspectRatio(
               aspectRatio: post.mediaAspectRatio,
 
@@ -45,14 +45,12 @@ class PostMediaWidget extends StatelessWidget {
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.cover,
-                  placeholder:
-                      (context) =>
-                          BlurredImagePlaceholder(secureUrl: post.imageUrl!),
-                  errorWidget:
-                      (context, error) => SizedBox(
-                        height: MediaQuery.sizeOf(context).height * 0.3,
-                        child: const Icon(Icons.error),
-                      ),
+                  placeholder: (context) =>
+                      BlurredImagePlaceholder(secureUrl: post.imageUrl!),
+                  errorWidget: (context, error) => SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.3,
+                    child: const Icon(Icons.error),
+                  ),
                 ),
               ),
             ),

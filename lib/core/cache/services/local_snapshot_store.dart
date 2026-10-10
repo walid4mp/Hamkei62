@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+
 import '../constants/hive_box_names.dart';
 
 class LocalSnapshotStore {

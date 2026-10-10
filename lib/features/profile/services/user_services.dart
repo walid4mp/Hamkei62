@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_media_app/core/utilities/supabase_constants.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/services/network_status_service.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/presence/models/presence_privacy.dart';
@@ -20,12 +21,11 @@ class UserService {
       throw Exception("No internet connection. Please check your network.");
     }
     try {
-      final data =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select()
-              .eq(UserColumns.id, userId)
-              .maybeSingle();
+      final data = await _supabase
+          .from(SupabaseConstants.users)
+          .select()
+          .eq(UserColumns.id, userId)
+          .maybeSingle();
 
       if (data == null) throw 'User not found';
 
@@ -108,12 +108,11 @@ class UserService {
 
   Future<String?> fetchUserName(String userId) async {
     try {
-      final data =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select(UserColumns.name)
-              .eq(UserColumns.id, userId)
-              .maybeSingle();
+      final data = await _supabase
+          .from(SupabaseConstants.users)
+          .select(UserColumns.name)
+          .eq(UserColumns.id, userId)
+          .maybeSingle();
       return data?[UserColumns.name] as String?;
     } catch (e) {
       debugPrint('fetchUserName error: $e');
@@ -125,12 +124,11 @@ class UserService {
     String userId,
   ) async {
     try {
-      final data =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select('${UserColumns.name}, ${UserColumns.imageUrl}')
-              .eq(UserColumns.id, userId)
-              .maybeSingle();
+      final data = await _supabase
+          .from(SupabaseConstants.users)
+          .select('${UserColumns.name}, ${UserColumns.imageUrl}')
+          .eq(UserColumns.id, userId)
+          .maybeSingle();
       return (
         name: data?[UserColumns.name] as String?,
         avatarUrl: data?[UserColumns.imageUrl] as String?,

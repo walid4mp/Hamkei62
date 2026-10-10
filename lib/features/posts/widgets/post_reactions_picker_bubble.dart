@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../../core/design/tokens/typography.dart';
 
 const List<Map<String, String>> kPostReactionsList = [
@@ -71,10 +72,9 @@ class _PostReactionsPickerBubbleState extends State<PostReactionsPickerBubble>
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color:
-                    isDark
-                        ? Colors.black.withValues(alpha: 0.6)
-                        : Colors.black.withValues(alpha: 0.25),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.6)
+                    : Colors.black.withValues(alpha: 0.25),
                 blurRadius: isDark ? 14 : 10,
                 spreadRadius: 1,
                 offset: const Offset(2, 2),
@@ -108,24 +108,21 @@ class _PostReactionsPickerBubbleState extends State<PostReactionsPickerBubble>
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color:
-                            isSelected
-                                ? scheme.primary.withValues(alpha: 0.15)
-                                : Colors.transparent,
-                        border:
-                            isSelected
-                                ? Border.all(
-                                  color: scheme.primary.withValues(alpha: 0.4),
-                                  width: 1,
-                                )
-                                : null,
+                        color: isSelected
+                            ? scheme.primary.withValues(alpha: 0.15)
+                            : Colors.transparent,
+                        border: isSelected
+                            ? Border.all(
+                                color: scheme.primary.withValues(alpha: 0.4),
+                                width: 1,
+                              )
+                            : null,
                       ),
-                      transform:
-                          isHovered
-                              ? (Matrix4.identity()
-                                ..translate(0.0, -8.0)
-                                ..scale(1.35))
-                              : Matrix4.identity(),
+                      transform: isHovered
+                          ? (Matrix4.identity()
+                              ..translate(0.0, -8.0)
+                              ..scale(1.35))
+                          : Matrix4.identity(),
                       child: Tooltip(
                         message: r['label']!,
                         decoration: BoxDecoration(
@@ -142,17 +139,16 @@ class _PostReactionsPickerBubbleState extends State<PostReactionsPickerBubble>
                           style: TextStyle(
                             fontSize: 26,
                             fontFamilyFallback: AppTypography.emojiFontFallback,
-                            shadows:
-                                isSelected
-                                    ? [
-                                      Shadow(
-                                        color: scheme.primary.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        blurRadius: 8,
+                            shadows: isSelected
+                                ? [
+                                    Shadow(
+                                      color: scheme.primary.withValues(
+                                        alpha: 0.4,
                                       ),
-                                    ]
-                                    : [],
+                                      blurRadius: 8,
+                                    ),
+                                  ]
+                                : [],
                           ),
                         ),
                       ),

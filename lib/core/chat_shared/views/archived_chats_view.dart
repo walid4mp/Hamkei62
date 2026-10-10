@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../constants/app_images.dart';
 import '../../themes/app_colors.dart';
 import '../../widgets/custom_loading_indicator.dart';
@@ -41,48 +42,45 @@ class _ArchivedChatsViewState extends State<ArchivedChatsView> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: BlocBuilder<
-            ConversationSelectionCubit,
-            ConversationSelectionState
-          >(
-            builder: (context, selection) {
-              final refs = selection.selectedRefs;
+          child:
+              BlocBuilder<
+                ConversationSelectionCubit,
+                ConversationSelectionState
+              >(
+                builder: (context, selection) {
+                  final refs = selection.selectedRefs;
 
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 260),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) {
-                  final slide = Tween<Offset>(
-                    begin: const Offset(0, -0.2),
-                    end: Offset.zero,
-                  ).animate(animation);
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(position: slide, child: child),
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 260),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final slide = Tween<Offset>(
+                        begin: const Offset(0, -0.2),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(position: slide, child: child),
+                      );
+                    },
+                    child: selection.isSelecting
+                        ? ArchivedSelectionHeaderBar(
+                            key: const ValueKey('archive_selection'),
+                            selectedRefs: refs,
+                            onCancel: () => context
+                                .read<ConversationSelectionCubit>()
+                                .clear(),
+                            onDelete: () =>
+                                confirmAndDeleteConversations(context, refs),
+                          )
+                        : AppBar(
+                            key: const ValueKey('archive_normal'),
+                            title: const Text('Archived Chats'),
+                          ),
                   );
                 },
-                child:
-                    selection.isSelecting
-                        ? ArchivedSelectionHeaderBar(
-                          key: const ValueKey('archive_selection'),
-                          selectedRefs: refs,
-                          onCancel:
-                              () =>
-                                  context
-                                      .read<ConversationSelectionCubit>()
-                                      .clear(),
-                          onDelete:
-                              () =>
-                                  confirmAndDeleteConversations(context, refs),
-                        )
-                        : AppBar(
-                          key: const ValueKey('archive_normal'),
-                          title: const Text('Archived Chats'),
-                        ),
-              );
-            },
-          ),
+              ),
         ),
         body: BlocBuilder<ConversationsCubit, ConversationsState>(
           builder: (context, state) {
@@ -113,20 +111,20 @@ class _ArchivedChatsViewState extends State<ArchivedChatsView> {
                 final item = items[index];
                 return item.kind == ConversationKind.single
                     ? ChatItemTile(
-                      user: item.chat!,
-                      isPinned: item.flags.isPinnedInArchive,
-                      isFavorite: item.isFavorite,
-                      isMuted: item.isMuted,
-                      enableHero: false,
-                    )
+                        user: item.chat!,
+                        isPinned: item.flags.isPinnedInArchive,
+                        isFavorite: item.isFavorite,
+                        isMuted: item.isMuted,
+                        enableHero: false,
+                      )
                     : GroupTileItem(
-                      group: item.group!,
-                      isPinned: item.flags.isPinnedInArchive,
-                      isFavorite: item.isFavorite,
-                    );
+                        group: item.group!,
+                        isPinned: item.flags.isPinnedInArchive,
+                        isFavorite: item.isFavorite,
+                      );
               },
-              separatorBuilder:
-                  (_, __) => const Divider(color: AppColors.black12),
+              separatorBuilder: (_, __) =>
+                  const Divider(color: AppColors.black12),
             );
           },
         ),

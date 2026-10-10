@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:social_media_app/core/helpers/chat_helper.dart';
 import 'package:social_media_app/core/themes/app_colors.dart';
+
 import '../../../core/helpers/file_icon_helper.dart';
 import '../../../core/utilities/file_size_formatter.dart';
 
@@ -32,19 +33,17 @@ class CreatePostFilePreview extends StatelessWidget {
     final ext = _getFileExtension();
     final (fileIcon, iconAccent) = FileIconHelper.getIconAndColor(ext, primary);
 
-    final sizeStr =
-        fileSizeBytes != null && fileSizeBytes! > 0
-            ? formatMediaFileSize(fileSizeBytes)
-            : '';
+    final sizeStr = fileSizeBytes != null && fileSizeBytes! > 0
+        ? formatMediaFileSize(fileSizeBytes)
+        : '';
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color:
-            isDark
-                ? iconAccent.withValues(alpha: 0.12)
-                : iconAccent.withValues(alpha: 0.06),
+        color: isDark
+            ? iconAccent.withValues(alpha: 0.12)
+            : iconAccent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: iconAccent.withValues(alpha: isDark ? 0.3 : 0.18),

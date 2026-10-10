@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -6,6 +7,7 @@ import 'package:social_media_app/core/services/network_status_service.dart';
 import 'package:social_media_app/core/cache/constants/snapshot_keys.dart';
 import 'package:social_media_app/core/cache/services/local_snapshot_store.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
+
 import '../../../../core/connectivity/services/connectivity_banner_controller.dart';
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/supabase/supabase_provider.dart';

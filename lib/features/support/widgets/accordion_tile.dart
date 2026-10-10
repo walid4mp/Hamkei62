@@ -28,14 +28,14 @@ class _AccordionTileState extends State<AccordionTile> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color:
-            isDark ? Colors.white.withValues(alpha: 0.04) : Colors.grey.shade50,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color:
-              isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.05),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -68,13 +68,12 @@ class _AccordionTileState extends State<AccordionTile> {
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
             alignment: Alignment.topCenter,
-            child:
-                _expanded
-                    ? Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: widget.child,
-                    )
-                    : const SizedBox(width: double.infinity),
+            child: _expanded
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: widget.child,
+                  )
+                : const SizedBox(width: double.infinity),
           ),
         ],
       ),

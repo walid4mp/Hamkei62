@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/profile/services/user_services.dart';
 import 'package:social_media_app/features/single_chats/services/chat_services.dart';
+
 import '../../../../core/bootstrap/app_bootstrap.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../../core/services/current_user_name_resolver.dart';
@@ -196,12 +198,11 @@ class CallCubit extends Cubit<CallState> with SafeEmitMixin<CallState> {
 
   Future<void> _sendCallFcm(CallModel call) async {
     try {
-      final data =
-          await SupabaseProvider.client
-              .from('users')
-              .select('fcm_token')
-              .eq('id', call.receiverId)
-              .maybeSingle();
+      final data = await SupabaseProvider.client
+          .from('users')
+          .select('fcm_token')
+          .eq('id', call.receiverId)
+          .maybeSingle();
 
       final token = data?['fcm_token'] as String?;
       if (token == null || token.isEmpty) return;
@@ -221,12 +222,11 @@ class CallCubit extends Cubit<CallState> with SafeEmitMixin<CallState> {
 
   Future<void> _sendCancelFcm(CallModel call) async {
     try {
-      final data =
-          await SupabaseProvider.client
-              .from('users')
-              .select('fcm_token')
-              .eq('id', call.receiverId)
-              .maybeSingle();
+      final data = await SupabaseProvider.client
+          .from('users')
+          .select('fcm_token')
+          .eq('id', call.receiverId)
+          .maybeSingle();
 
       final token = data?['fcm_token'] as String?;
       if (token == null || token.isEmpty) return;
@@ -242,12 +242,11 @@ class CallCubit extends Cubit<CallState> with SafeEmitMixin<CallState> {
 
   Future<void> ringOfflineMember(GroupCallModel call, String memberId) async {
     try {
-      final data =
-          await SupabaseProvider.client
-              .from('users')
-              .select('fcm_token')
-              .eq('id', memberId)
-              .maybeSingle();
+      final data = await SupabaseProvider.client
+          .from('users')
+          .select('fcm_token')
+          .eq('id', memberId)
+          .maybeSingle();
 
       final token = data?['fcm_token'] as String?;
       if (token == null || token.isEmpty) return;
@@ -271,17 +270,17 @@ class CallCubit extends Cubit<CallState> with SafeEmitMixin<CallState> {
   Future<void> _handleCallEnded(CallModel? call) async {
     if (call == null) return;
 
-    final duration =
-        _callAcceptedAt != null
-            ? DateTime.now().difference(_callAcceptedAt!)
-            : null;
+    final duration = _callAcceptedAt != null
+        ? DateTime.now().difference(_callAcceptedAt!)
+        : null;
 
     final durationStr = duration != null ? _formatDuration(duration) : '';
     final callType = call.type == CallType.video ? 'video' : 'audio';
 
     final currentUserId = SupabaseProvider.id;
-    final otherUserId =
-        call.callerId == currentUserId ? call.receiverId : call.callerId;
+    final otherUserId = call.callerId == currentUserId
+        ? call.receiverId
+        : call.callerId;
 
     final status = duration != null ? 'completed' : 'missed';
 
@@ -294,10 +293,9 @@ class CallCubit extends Cubit<CallState> with SafeEmitMixin<CallState> {
         duration: durationStr,
       );
       if (duration == null && _activeCall != null) {
-        final otherUserId =
-            _isCaller(_activeCall!)
-                ? _activeCall!.receiverId
-                : _activeCall!.callerId;
+        final otherUserId = _isCaller(_activeCall!)
+            ? _activeCall!.receiverId
+            : _activeCall!.callerId;
 
         await NotificationRepository.instance.notifyMissedCall(
           receiverId: otherUserId,

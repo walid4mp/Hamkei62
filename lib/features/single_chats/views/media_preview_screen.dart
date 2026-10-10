@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/widgets/directional_text_field.dart';
 import '../../ai_assistant/entities/ai_action_type.dart';
@@ -194,23 +196,21 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
           children: [
             Expanded(
               child: Center(
-                child:
-                    widget.type == 'image'
-                        ? Image.file(widget.file, fit: BoxFit.contain)
-                        : _videoPlayerController != null &&
-                            _videoPlayerController!.value.isInitialized
-                        ? AspectRatio(
-                          aspectRatio:
-                              _videoPlayerController!.value.aspectRatio,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              VideoPlayer(_videoPlayerController!),
-                              _buildVideoControls(),
-                            ],
-                          ),
-                        )
-                        : const CustomLoadingIndicator(),
+                child: widget.type == 'image'
+                    ? Image.file(widget.file, fit: BoxFit.contain)
+                    : _videoPlayerController != null &&
+                          _videoPlayerController!.value.isInitialized
+                    ? AspectRatio(
+                        aspectRatio: _videoPlayerController!.value.aspectRatio,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            VideoPlayer(_videoPlayerController!),
+                            _buildVideoControls(),
+                          ],
+                        ),
+                      )
+                    : const CustomLoadingIndicator(),
               ),
             ),
             Container(
@@ -243,14 +243,12 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
                             actionContext: AiActionContext.mediaCaption,
                             generationAction: AiActionType.autocompleteCaption,
                             hasMediaAttached: true,
-                            targetMediaType:
-                                widget.type == 'image'
-                                    ? AiTargetMediaType.image
-                                    : AiTargetMediaType.video,
-                            imageBytesProvider:
-                                widget.type == 'image'
-                                    ? () => widget.file.readAsBytes()
-                                    : null,
+                            targetMediaType: widget.type == 'image'
+                                ? AiTargetMediaType.image
+                                : AiTargetMediaType.video,
+                            imageBytesProvider: widget.type == 'image'
+                                ? () => widget.file.readAsBytes()
+                                : null,
                           ),
                         ),
                       ),

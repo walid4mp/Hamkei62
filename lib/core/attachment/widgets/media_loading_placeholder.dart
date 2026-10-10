@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/custom_loading_indicator.dart';
 
 class MediaLoadingPlaceholder extends StatelessWidget {
@@ -19,14 +20,13 @@ class MediaLoadingPlaceholder extends StatelessWidget {
       width: width,
       height: height,
       child: Center(
-        child:
-            isError
-                ? Icon(
-                  Icons.image_not_supported_rounded,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  size: 26,
-                )
-                : const CustomLoadingIndicator(color: Colors.white),
+        child: isError
+            ? Icon(
+                Icons.image_not_supported_rounded,
+                color: Colors.white.withValues(alpha: 0.7),
+                size: 26,
+              )
+            : const CustomLoadingIndicator(color: Colors.white),
       ),
     );
   }

@@ -14,8 +14,7 @@ class CloudinaryUploadResult {
   });
 
   /// Null when dimensions aren't available (e.g. raw/document uploads)
-  double? get aspectRatio =>
-      (width != null && height != null && height! > 0)
-          ? width! / height!
-          : null;
+  double? get aspectRatio => (width != null && height != null && height! > 0)
+      ? width! / height!
+      : null;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/themes/app_colors.dart';
@@ -115,11 +116,10 @@ class _DiscoverPersonGridCardWidgetState
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap:
-                    () => Navigator.of(context, rootNavigator: true).pushNamed(
-                      AppRoutes.profileViewRoute,
-                      arguments: userData.id,
-                    ),
+                onTap: () => Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed(AppRoutes.profileViewRoute, arguments: userData.id),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
                   child: Column(
@@ -143,16 +143,12 @@ class _DiscoverPersonGridCardWidgetState
                           child: AppAvatar(
                             imageUrl: userData.imageUrl,
                             size: 64,
-                            onTap:
-                                () => showDialog(
-                                  context: context,
-                                  builder:
-                                      (context) => UserPreviewDialog(
-                                        user: ChatUserModel.fromEntity(
-                                          userData,
-                                        ),
-                                      ),
-                                ),
+                            onTap: () => showDialog(
+                              context: context,
+                              builder: (context) => UserPreviewDialog(
+                                user: ChatUserModel.fromEntity(userData),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -514,10 +510,9 @@ class _GridStaticChip extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border:
-                  filled
-                      ? null
-                      : Border.all(color: colorScheme.outlineVariant, width: 1),
+              border: filled
+                  ? null
+                  : Border.all(color: colorScheme.outlineVariant, width: 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

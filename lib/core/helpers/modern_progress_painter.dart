@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class ModernProgressPainter extends CustomPainter {
@@ -21,23 +22,22 @@ class ModernProgressPainter extends CustomPainter {
 
     if (radius <= 0) return;
 
-    final backgroundPaint =
-        Paint()
-          ..color = backgroundColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth;
+    final backgroundPaint = Paint()
+      ..color = backgroundColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
 
     canvas.drawCircle(center, radius, backgroundPaint);
 
     final safeProgress = progress.clamp(0.001, 1.0);
 
-    final progressPaint =
-        Paint()
-          ..color = progressColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round
-          ..shader = SweepGradient(
+    final progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..shader =
+          SweepGradient(
             colors: [progressColor.withValues(alpha: 0.8), progressColor],
             startAngle: -pi / 2,
             endAngle: (pi * 2 * safeProgress) - pi / 2,

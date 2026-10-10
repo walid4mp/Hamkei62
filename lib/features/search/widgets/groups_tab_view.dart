@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/empty_findings_animation_widget.dart';
 import '../../group_chats/cubits/group_list_cubit/group_list_cubit.dart';
@@ -85,8 +86,9 @@ class _GroupsTabViewState extends State<GroupsTabView>
               return _buildErrorState(context, theme, state.message, query);
             }
 
-            final groups =
-                state is SearchGroupsLoaded ? state.groups : <GroupModel>[];
+            final groups = state is SearchGroupsLoaded
+                ? state.groups
+                : <GroupModel>[];
 
             if (groups.isEmpty) {
               return _buildEmptyState(theme, query);
@@ -139,8 +141,8 @@ class _GroupsTabViewState extends State<GroupsTabView>
             Text(
               query.isEmpty
                   ? (isMyGroupsEmpty
-                      ? 'You haven\'t joined any groups yet'
-                      : 'Search for groups')
+                        ? 'You haven\'t joined any groups yet'
+                        : 'Search for groups')
                   : 'No groups found for "$query"',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium!.copyWith(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 
 class StoryColorPicker extends StatelessWidget {
@@ -35,10 +36,9 @@ class StoryColorPicker extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
-                border:
-                    selected == color
-                        ? Border.all(color: AppColors.white, width: 3)
-                        : null,
+                border: selected == color
+                    ? Border.all(color: AppColors.white, width: 3)
+                    : null,
               ),
             ),
           );

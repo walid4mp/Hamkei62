@@ -1,8 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:local_auth/local_auth.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../repository/settings_repository.dart';
+
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:local_auth/error_codes.dart' as auth_error;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/services/active_call/cubits/active_call_session_cubit.dart';
 import '../../../core/services/current_user_name_resolver.dart';
 import '../../../core/services/permissions/app_permissions_service.dart';
@@ -42,12 +43,11 @@ class GroupCallJoinHelper {
     if (!context.mounted) return;
     await navigator.push(
       MaterialPageRoute(
-        builder:
-            (_) => LiveKitGroupCallView(
-              call: callToJoin,
-              currentUserId: user.id,
-              currentUserName: userName,
-            ),
+        builder: (_) => LiveKitGroupCallView(
+          call: callToJoin,
+          currentUserId: user.id,
+          currentUserName: userName,
+        ),
       ),
     );
   }

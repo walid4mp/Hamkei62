@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:social_media_app/core/services/fcm_services.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import 'chat_list_service.dart';
 
@@ -44,10 +45,9 @@ class ChatFcmPushDispatcher {
     try {
       final muted =
           await _supabase.rpc(
-                'is_chat_muted',
-                params: {'p_owner': receiverId, 'p_peer': senderId},
-              )
-              as bool? ??
+            'is_chat_muted',
+            params: {'p_owner': receiverId, 'p_peer': senderId},
+          ) as bool? ??
           false;
       if (muted) return;
 

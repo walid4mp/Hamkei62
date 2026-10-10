@@ -38,8 +38,9 @@ mixin PostCreationMixin on Cubit<PostsState> {
     try {
       void updateProgress(int sentBytes, int totalBytes) {
         if (state is! PostCreating) return;
-        final rawRatio =
-            totalBytes > 0 ? (sentBytes / totalBytes).clamp(0.0, 1.0) : 0.0;
+        final rawRatio = totalBytes > 0
+            ? (sentBytes / totalBytes).clamp(0.0, 1.0)
+            : 0.0;
         final scaledRatio = (rawRatio * 0.95).clamp(0.0, 0.95);
         emit(
           PostCreating(
@@ -94,10 +95,9 @@ mixin PostCreationMixin on Cubit<PostsState> {
         final docFile = File(selectedDocument!.path);
         if (await docFile.exists()) {
           final originalName = docFile.path.split('/').last.split('\\').last;
-          final nameWithoutExt =
-              originalName.contains('.')
-                  ? originalName.substring(0, originalName.lastIndexOf('.'))
-                  : originalName;
+          final nameWithoutExt = originalName.contains('.')
+              ? originalName.substring(0, originalName.lastIndexOf('.'))
+              : originalName;
           final safeName = nameWithoutExt.replaceAll(
             RegExp(r'[^a-zA-Z0-9\-_]'),
             '_',
@@ -191,8 +191,9 @@ mixin PostCreationMixin on Cubit<PostsState> {
 
     final PostModel targetPost = post.displayPost;
     final bool wasShared = targetPost.isSharedByMe;
-    final int rawCount =
-        wasShared ? targetPost.sharesCount - 1 : targetPost.sharesCount + 1;
+    final int rawCount = wasShared
+        ? targetPost.sharesCount - 1
+        : targetPost.sharesCount + 1;
     final int newCount = rawCount < 0 ? 0 : rawCount;
 
     final PostModel updatedTarget = targetPost.copyWith(
@@ -203,14 +204,13 @@ mixin PostCreationMixin on Cubit<PostsState> {
     final String tempWrapperId =
         'temp_share_${DateTime.now().microsecondsSinceEpoch}';
 
-    List<PostModel> updatedPosts =
-        oldState.posts.map((p) {
-          if (p.id == targetPost.id) return updatedTarget;
-          if (p.originalPost?.id == targetPost.id) {
-            return p.copyWith(originalPost: updatedTarget);
-          }
-          return p;
-        }).toList();
+    List<PostModel> updatedPosts = oldState.posts.map((p) {
+      if (p.id == targetPost.id) return updatedTarget;
+      if (p.originalPost?.id == targetPost.id) {
+        return p.copyWith(originalPost: updatedTarget);
+      }
+      return p;
+    }).toList();
 
     if (!wasShared) {
       final wrapperCard = PostModel(
@@ -225,13 +225,11 @@ mixin PostCreationMixin on Cubit<PostsState> {
       );
       updatedPosts = [wrapperCard, ...updatedPosts];
     } else {
-      updatedPosts =
-          updatedPosts
-              .where(
-                (p) =>
-                    !(p.sharedPostId == targetPost.id && p.authorId == userId),
-              )
-              .toList();
+      updatedPosts = updatedPosts
+          .where(
+            (p) => !(p.sharedPostId == targetPost.id && p.authorId == userId),
+          )
+          .toList();
     }
 
     cachedPosts = updatedPosts;
@@ -256,17 +254,15 @@ mixin PostCreationMixin on Cubit<PostsState> {
           (p) => p.id == realWrapperId,
         );
 
-        cachedPosts =
-            realCardAlreadyArrived
-                ? cachedPosts.where((p) => p.id != tempWrapperId).toList()
-                : cachedPosts
-                    .map(
-                      (p) =>
-                          p.id == tempWrapperId
-                              ? p.copyWith(id: realWrapperId)
-                              : p,
-                    )
-                    .toList();
+        cachedPosts = realCardAlreadyArrived
+            ? cachedPosts.where((p) => p.id != tempWrapperId).toList()
+            : cachedPosts
+                  .map(
+                    (p) => p.id == tempWrapperId
+                        ? p.copyWith(id: realWrapperId)
+                        : p,
+                  )
+                  .toList();
         emit(PostsLoaded(cachedPosts, DateTime.now()));
       }
 
@@ -307,20 +303,19 @@ mixin PostCreationMixin on Cubit<PostsState> {
     if (state is! PostsLoaded) return;
     final oldState = state as PostsLoaded;
 
-    final updatedPosts =
-        oldState.posts.map((p) {
-          if (p.id == postId) {
-            return p.copyWith(linkShareCount: p.linkShareCount + 1);
-          }
-          if (p.originalPost?.id == postId) {
-            return p.copyWith(
-              originalPost: p.originalPost!.copyWith(
-                linkShareCount: p.originalPost!.linkShareCount + 1,
-              ),
-            );
-          }
-          return p;
-        }).toList();
+    final updatedPosts = oldState.posts.map((p) {
+      if (p.id == postId) {
+        return p.copyWith(linkShareCount: p.linkShareCount + 1);
+      }
+      if (p.originalPost?.id == postId) {
+        return p.copyWith(
+          originalPost: p.originalPost!.copyWith(
+            linkShareCount: p.originalPost!.linkShareCount + 1,
+          ),
+        );
+      }
+      return p;
+    }).toList();
 
     cachedPosts = updatedPosts;
     emit(PostsLoaded(updatedPosts, DateTime.now()));
@@ -344,10 +339,9 @@ mixin PostCreationMixin on Cubit<PostsState> {
     try {
       await _postsServices.deletePost(postId);
       if (state is PostsLoaded) {
-        final updatePosts =
-            (state as PostsLoaded).posts
-                .where((p) => p.id != postId && p.sharedPostId != postId)
-                .toList();
+        final updatePosts = (state as PostsLoaded).posts
+            .where((p) => p.id != postId && p.sharedPostId != postId)
+            .toList();
         cachedPosts = updatePosts;
         emit(PostsLoaded(updatePosts, DateTime.now()));
       }

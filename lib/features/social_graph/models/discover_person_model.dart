@@ -1,4 +1,5 @@
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
+
 import 'friendship_status.dart';
 
 class DiscoverPersonModel {

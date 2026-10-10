@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/mentions/widgets/mention_aware_text_field.dart';
+
 import '../../../core/audio/voice_recorder/widgets/voice_recorder_input_section.dart';
 import '../../../core/mentions/models/mention_ref.dart';
 import '../../../core/mentions/widgets/mention_text_editing_controller.dart';
@@ -94,10 +96,9 @@ class GroupInputBar extends StatelessWidget {
             mediaCaption: mediaCaption,
             targetUserName: targetUserName,
             targetMediaType: targetMediaType,
-            targetImageBytesProvider:
-                targetImageUrl != null
-                    ? () => RemoteMediaFetcher.fetchBytes(targetImageUrl!)
-                    : null,
+            targetImageBytesProvider: targetImageUrl != null
+                ? () => RemoteMediaFetcher.fetchBytes(targetImageUrl!)
+                : null,
           ),
           onSlashAiTrigger: onSlashAiTrigger,
         ),

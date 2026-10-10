@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/helpers/chat_helper.dart';
 import '../../../core/helpers/file_icon_helper.dart';
 
@@ -53,25 +55,23 @@ class AiChatStagedFilePreview extends StatelessWidget {
             onTap: onTapLeading,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child:
-                  imageFile != null
-                      ? Image.file(
-                        imageFile!,
-                        width: 36,
-                        height: 36,
-                        fit: BoxFit.cover,
-                      )
-                      : Container(
-                        width: 36,
-                        height: 36,
-                        color: Theme.of(
-                          context,
-                        ).primaryColor.withValues(alpha: 0.12),
+              child: imageFile != null
+                  ? Image.file(
+                      imageFile!,
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 36,
+                      height: 36,
+                      color: Theme.of(context).primaryColor
+                          .withValues(alpha: 0.12),
 
-                        child: Center(
-                          child: FaIcon(fileIcon, color: iconAccent, size: 25),
-                        ),
+                      child: Center(
+                        child: FaIcon(fileIcon, color: iconAccent, size: 25),
                       ),
+                    ),
             ),
           ),
           const Gap(10),

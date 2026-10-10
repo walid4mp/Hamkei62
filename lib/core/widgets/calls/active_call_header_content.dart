@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../features/group_calls/services/group_call_signaling_service.dart';
 import '../../../features/single_calls/cubits/single_call_cubit/call_cubit.dart';
 import '../../services/active_call/active_call_session_data.dart';
@@ -106,17 +108,15 @@ class _ActiveCallHeaderContentState extends State<ActiveCallHeaderContent> {
       await CallTerminationService.endActiveCall(
         pipCubit: pipCubit,
         sessionCubit: sessionCubit,
-        signalEnd:
-            () => GroupCallLeaveOrEndResolver.signal(
-              remainingAfterLeave: remainingAfterLeave,
-              signaling: signaling,
-              callId: session.callId,
-              durationIfEnding: durationText,
-            ),
-        endMessage:
-            endForEveryone
-                ? CallControlMessage.groupEnded(session.callId)
-                : null,
+        signalEnd: () => GroupCallLeaveOrEndResolver.signal(
+          remainingAfterLeave: remainingAfterLeave,
+          signaling: signaling,
+          callId: session.callId,
+          durationIfEnding: durationText,
+        ),
+        endMessage: endForEveryone
+            ? CallControlMessage.groupEnded(session.callId)
+            : null,
       );
     } else {
       final sessionCubit = context.read<ActiveCallSessionCubit>();
@@ -252,20 +252,15 @@ class _ActiveCallHeaderContentState extends State<ActiveCallHeaderContent> {
             ),
           ],
         ),
-        child:
-            _isEnding
-                ? SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CustomLoadingIndicator(
-                    color: Colors.red.withValues(alpha: 0.25),
-                  ),
-                )
-                : const Icon(
-                  Icons.call_end_rounded,
-                  color: Colors.white,
-                  size: 18,
+        child: _isEnding
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CustomLoadingIndicator(
+                  color: Colors.red.withValues(alpha: 0.25),
                 ),
+              )
+            : const Icon(Icons.call_end_rounded, color: Colors.white, size: 18),
       ),
     );
   }

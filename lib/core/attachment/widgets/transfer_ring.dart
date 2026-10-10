@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../helpers/modern_progress_painter.dart';
 
 class GlassPillBadge extends StatelessWidget {

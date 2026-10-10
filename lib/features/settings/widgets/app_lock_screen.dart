@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../services/app_lock_service.dart';
 
@@ -73,28 +74,28 @@ class _AppLockScreenState extends State<AppLockScreen> {
                   const SizedBox(height: 32),
                   _authenticating
                       ? SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CustomLoadingIndicator(
-                          color: theme.primaryColor,
-                        ),
-                      )
+                          width: 28,
+                          height: 28,
+                          child: CustomLoadingIndicator(
+                            color: theme.primaryColor,
+                          ),
+                        )
                       : ElevatedButton.icon(
-                        onPressed: _tryUnlock,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 14,
+                          onPressed: _tryUnlock,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                          icon: const Icon(Icons.fingerprint_rounded),
+                          label: const Text('Open the app'),
                         ),
-                        icon: const Icon(Icons.fingerprint_rounded),
-                        label: const Text('Open the app'),
-                      ),
                   const Spacer(flex: 4),
                 ],
               ),

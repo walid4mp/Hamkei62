@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/toast/app_toast.dart';
 import '../../posts/cubits/posts_cubit/posts_cubit.dart';
@@ -32,14 +33,13 @@ class _ReelActionsColumnState extends State<ReelActionsColumn> {
     if (isCurrentlyShared) {
       final state = postsCubit.state;
       if (state is PostsLoaded && currentUserId != null) {
-        final wrapperPosts =
-            state.posts
-                .where(
-                  (p) =>
-                      p.authorId == currentUserId &&
-                      p.sharedReelId == widget.reel.id,
-                )
-                .toList();
+        final wrapperPosts = state.posts
+            .where(
+              (p) =>
+                  p.authorId == currentUserId &&
+                  p.sharedReelId == widget.reel.id,
+            )
+            .toList();
 
         if (wrapperPosts.isNotEmpty) {
           await postsCubit.deletePost(wrapperPosts.first.id);
@@ -108,8 +108,9 @@ class _ReelActionsColumnState extends State<ReelActionsColumn> {
         const SizedBox(height: 20),
         ActionButton(
           icon: Icons.repeat_rounded,
-          iconColor:
-              isSharedByMe ? Theme.of(context).primaryColor : Colors.white,
+          iconColor: isSharedByMe
+              ? Theme.of(context).primaryColor
+              : Colors.white,
           label: 'Reshare',
           onTap: () => _toggleReshare(isSharedByMe),
         ),

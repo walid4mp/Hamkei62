@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../design/tokens/typography.dart';
 import '../../helpers/bidi_text_helper.dart';
 import '../../themes/app_colors.dart';
@@ -196,10 +198,9 @@ class _MentionAwareTextFieldState extends State<MentionAwareTextField> {
 
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final bottomInset =
-        mediaQuery.viewInsets.bottom > 0
-            ? mediaQuery.viewInsets.bottom
-            : mediaQuery.padding.bottom;
+    final bottomInset = mediaQuery.viewInsets.bottom > 0
+        ? mediaQuery.viewInsets.bottom
+        : mediaQuery.padding.bottom;
 
     const gap = 8.0;
     final spaceBelow = screenHeight - bottomInset - fieldBottom - gap;
@@ -263,23 +264,20 @@ class _MentionAwareTextFieldState extends State<MentionAwareTextField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final effectiveDirection =
-        widget.controller.text.trim().isEmpty
-            ? BidiTextHelper.detectDirection(widget.hintText)
-            : _direction;
+    final effectiveDirection = widget.controller.text.trim().isEmpty
+        ? BidiTextHelper.detectDirection(widget.hintText)
+        : _direction;
 
-    final effectiveTextAlign =
-        widget.textAlign == TextAlign.start
-            ? BidiTextHelper.alignFor(_direction)
-            : widget.textAlign;
+    final effectiveTextAlign = widget.textAlign == TextAlign.start
+        ? BidiTextHelper.alignFor(_direction)
+        : widget.textAlign;
 
-    final effectiveStyle = (widget.style ??
-            theme.textTheme.bodyLarge ??
-            const TextStyle())
-        .copyWith(
-          fontFamily: null,
-          fontFamilyFallback: AppTypography.fontFallback,
-        );
+    final effectiveStyle =
+        (widget.style ?? theme.textTheme.bodyLarge ?? const TextStyle())
+            .copyWith(
+              fontFamily: null,
+              fontFamilyFallback: AppTypography.fontFallback,
+            );
 
     return TapRegion(
       groupId: _fieldKey,
@@ -316,15 +314,14 @@ class _MentionAwareTextFieldState extends State<MentionAwareTextField> {
                       fontWeight: FontWeight.w400,
                       fontSize: 15,
                     ),
-                suffixIcon:
-                    widget.trailingIcon == null
-                        ? null
-                        : Padding(
-                          padding: EdgeInsets.only(
-                            right: widget.border == InputBorder.none ? 0 : 10,
-                          ),
-                          child: widget.trailingIcon,
+                suffixIcon: widget.trailingIcon == null
+                    ? null
+                    : Padding(
+                        padding: EdgeInsets.only(
+                          right: widget.border == InputBorder.none ? 0 : 10,
                         ),
+                        child: widget.trailingIcon,
+                      ),
                 suffixIconConstraints: const BoxConstraints(
                   minWidth: 0,
                   minHeight: 0,
@@ -334,8 +331,8 @@ class _MentionAwareTextFieldState extends State<MentionAwareTextField> {
                     widget.fillColor ??
                     (widget.filled
                         ? theme.colorScheme.surfaceContainerHighest.withValues(
-                          alpha: 0.4,
-                        )
+                            alpha: 0.4,
+                          )
                         : null),
                 counterText: widget.counterText,
                 counterStyle: widget.counterStyle,
@@ -444,15 +441,14 @@ class _MentionSuggestionsCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
-                border:
-                    isLast
-                        ? null
-                        : Border(
-                          bottom: BorderSide(
-                            color: AppColors.grey4.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
+                border: isLast
+                    ? null
+                    : Border(
+                        bottom: BorderSide(
+                          color: AppColors.grey4.withValues(alpha: 0.3),
+                          width: 1,
                         ),
+                      ),
               ),
               child: Row(
                 children: [
@@ -510,8 +506,9 @@ class _MentionSuggestionsCard extends StatelessWidget {
             child: AnimatedSize(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
-              alignment:
-                  openBelow ? Alignment.topCenter : Alignment.bottomCenter,
+              alignment: openBelow
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
 
               child: SizedBox(
                 height: bodyHeight,
@@ -550,10 +547,8 @@ class _MentionStatusRow extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.grey6,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(color: AppColors.grey6, fontWeight: FontWeight.w500),
           ),
         ],
       ),

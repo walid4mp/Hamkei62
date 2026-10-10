@@ -1,7 +1,9 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/design/tokens/typography.dart';
 import 'package:social_media_app/core/mentions/mentions.dart';
+
 import '../../ai_assistant/entities/ai_action_type.dart';
 import '../../ai_assistant/entities/ai_request_context.dart';
 import '../../ai_assistant/widgets/ai_action_icon.dart';

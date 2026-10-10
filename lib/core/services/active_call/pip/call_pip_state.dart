@@ -26,8 +26,9 @@ class CallPipState {
       room: room ?? this.room,
       isMinimized: isMinimized ?? this.isMinimized,
       isVideo: isVideo ?? this.isVideo,
-      previewTrack:
-          clearPreviewTrack ? null : (previewTrack ?? this.previewTrack),
+      previewTrack: clearPreviewTrack
+          ? null
+          : (previewTrack ?? this.previewTrack),
     );
   }
 }

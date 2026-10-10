@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'profile_ui_tokens.dart';
 
 class CircularIconButton extends StatefulWidget {
@@ -49,15 +50,14 @@ class _CircularIconButtonState extends State<CircularIconButton> {
             width: widget.size,
             height: widget.size,
             child: Center(
-              child:
-                  widget.assetPath != null
-                      ? Image.asset(
-                        widget.assetPath!,
-                        width: iconSize,
-                        height: iconSize,
-                        color: iconColor,
-                      )
-                      : Icon(widget.icon, color: iconColor, size: iconSize),
+              child: widget.assetPath != null
+                  ? Image.asset(
+                      widget.assetPath!,
+                      width: iconSize,
+                      height: iconSize,
+                      color: iconColor,
+                    )
+                  : Icon(widget.icon, color: iconColor, size: iconSize),
             ),
           ),
         ),

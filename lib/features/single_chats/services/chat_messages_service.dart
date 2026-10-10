@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../../core/helpers/chat_helper.dart';
 import '../../../core/services/media_cleanup_service.dart';
 import '../../../core/supabase/supabase_provider.dart';
@@ -24,11 +26,10 @@ class ChatMessagesService {
         .eq(MessagesColumns.conversationId, conversationId)
         .order(MessagesColumns.createdAt, ascending: false)
         .map(
-          (data) =>
-              data
-                  .map(MessageModel.fromJson)
-                  .where((m) => !m.deletedFor.contains(senderId))
-                  .toList(),
+          (data) => data
+              .map(MessageModel.fromJson)
+              .where((m) => !m.deletedFor.contains(senderId))
+              .toList(),
         );
   }
 
@@ -225,13 +226,12 @@ class ChatMessagesService {
       );
       isNewInsert = true;
     } else {
-      final existing =
-          await _supabase
-              .from(SupabaseConstants.messages)
-              .select('${MessagesColumns.id}, ${MessagesColumns.createdAt}')
-              .eq(MessagesColumns.senderId, senderId)
-              .eq(MessagesColumns.clientMessageId, clientMessageId)
-              .single();
+      final existing = await _supabase
+          .from(SupabaseConstants.messages)
+          .select('${MessagesColumns.id}, ${MessagesColumns.createdAt}')
+          .eq(MessagesColumns.senderId, senderId)
+          .eq(MessagesColumns.clientMessageId, clientMessageId)
+          .single();
       newMessageId = existing[MessagesColumns.id] as String;
       serverCreatedAt = DateTime.parse(
         existing[MessagesColumns.createdAt] as String,
@@ -304,12 +304,11 @@ class ChatMessagesService {
     required String messageId,
     required String currentUserId,
   }) async {
-    final row =
-        await _supabase
-            .from(SupabaseConstants.messages)
-            .select(MessagesColumns.deletedFor)
-            .eq(MessagesColumns.id, messageId)
-            .maybeSingle();
+    final row = await _supabase
+        .from(SupabaseConstants.messages)
+        .select(MessagesColumns.deletedFor)
+        .eq(MessagesColumns.id, messageId)
+        .maybeSingle();
 
     final current =
         (row?[MessagesColumns.deletedFor] as List?)?.cast<String>() ?? [];
@@ -357,12 +356,11 @@ class ChatMessagesService {
 
   Future<Map<String, String?>> getCurrentUserInfo(String userId) async {
     try {
-      final data =
-          await _supabase
-              .from(SupabaseConstants.users)
-              .select('${UserColumns.name}, ${UserColumns.imageUrl}')
-              .eq(UserColumns.id, userId)
-              .single();
+      final data = await _supabase
+          .from(SupabaseConstants.users)
+          .select('${UserColumns.name}, ${UserColumns.imageUrl}')
+          .eq(UserColumns.id, userId)
+          .single();
       return {
         'name': data[UserColumns.name] as String?,
         'imageUrl': data[UserColumns.imageUrl] as String?,
@@ -388,13 +386,12 @@ class ChatMessagesService {
       'duration': duration,
     });
 
-    final existing =
-        await _supabase
-            .from(SupabaseConstants.messages)
-            .select(MessagesColumns.id)
-            .eq(MessagesColumns.messageType, 'call')
-            .ilike(MessagesColumns.messageText, '%$callId%')
-            .maybeSingle();
+    final existing = await _supabase
+        .from(SupabaseConstants.messages)
+        .select(MessagesColumns.id)
+        .eq(MessagesColumns.messageType, 'call')
+        .ilike(MessagesColumns.messageText, '%$callId%')
+        .maybeSingle();
 
     if (existing != null) {
       await _supabase

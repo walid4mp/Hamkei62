@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/core/themes/app_colors.dart';
+
 import '../utils/profile_header_back_btn_container.dart';
 
 class ProfileShimmerLoading extends StatelessWidget {
@@ -84,24 +85,19 @@ class ProfileShimmerLoading extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
-                    children:
-                        isCurrentUser
-                            ? [
-                              Expanded(
-                                child: _shimmerRect(double.infinity, 46),
-                              ),
-                              const Gap(8),
-                              _shimmerRect(46, 46),
-                            ]
-                            : [
-                              Expanded(
-                                child: _shimmerRect(double.infinity, 46),
-                              ),
-                              const Gap(8),
-                              _shimmerRect(104, 46),
-                              const Gap(8),
-                              _shimmerRect(46, 46),
-                            ],
+                    children: isCurrentUser
+                        ? [
+                            Expanded(child: _shimmerRect(double.infinity, 46)),
+                            const Gap(8),
+                            _shimmerRect(46, 46),
+                          ]
+                        : [
+                            Expanded(child: _shimmerRect(double.infinity, 46)),
+                            const Gap(8),
+                            _shimmerRect(104, 46),
+                            const Gap(8),
+                            _shimmerRect(46, 46),
+                          ],
                   ),
                 ),
                 const Gap(20),

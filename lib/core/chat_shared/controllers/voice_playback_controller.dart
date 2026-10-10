@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 
@@ -59,10 +60,9 @@ class VoicePlaybackController {
     VideoPlayerController? temp;
     try {
       final isLocal = url.startsWith('/');
-      temp =
-          isLocal
-              ? VideoPlayerController.file(File(url))
-              : VideoPlayerController.networkUrl(Uri.parse(url));
+      temp = isLocal
+          ? VideoPlayerController.file(File(url))
+          : VideoPlayerController.networkUrl(Uri.parse(url));
       await temp.initialize();
       final duration = temp.value.duration;
       await temp.dispose();

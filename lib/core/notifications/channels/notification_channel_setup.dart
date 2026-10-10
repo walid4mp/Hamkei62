@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -40,11 +41,10 @@ class NotificationChannelSetup {
   Future<void> createAllChannels(
     FlutterLocalNotificationsPlugin localNotifications,
   ) async {
-    final androidPlugin =
-        localNotifications
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+    final androidPlugin = localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     await androidPlugin?.createNotificationChannel(messageChannel);
     await androidPlugin?.createNotificationChannel(callChannel);

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class LiveWaveform extends StatelessWidget {
@@ -18,10 +19,9 @@ class LiveWaveform extends StatelessWidget {
             1,
             (constraints.maxWidth / (_barWidth + _barGap)).floor(),
           );
-          final visible =
-              amplitudes.length > maxBars
-                  ? amplitudes.sublist(amplitudes.length - maxBars)
-                  : amplitudes;
+          final visible = amplitudes.length > maxBars
+              ? amplitudes.sublist(amplitudes.length - maxBars)
+              : amplitudes;
 
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,

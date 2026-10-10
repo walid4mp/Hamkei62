@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../../../core/widgets/blurred_media_placeholders.dart';
 import '../models/story_model.dart';
@@ -147,20 +149,19 @@ class _StoryMediaViewState extends State<StoryMediaView> {
 
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 280),
-          child:
-              !_videoReady
-                  ? BlurredVideoPlaceholder(
-                    key: const ValueKey('video-loading'),
-                    videoUrl: widget.story.videoUrl!,
-                    localThumbnailBytes: _localThumbnailBytes,
-                  )
-                  : Center(
-                    key: const ValueKey('video-ready'),
-                    child: AspectRatio(
-                      aspectRatio: _videoController!.value.aspectRatio,
-                      child: VideoPlayer(_videoController!),
-                    ),
+          child: !_videoReady
+              ? BlurredVideoPlaceholder(
+                  key: const ValueKey('video-loading'),
+                  videoUrl: widget.story.videoUrl!,
+                  localThumbnailBytes: _localThumbnailBytes,
+                )
+              : Center(
+                  key: const ValueKey('video-ready'),
+                  child: AspectRatio(
+                    aspectRatio: _videoController!.value.aspectRatio,
+                    child: VideoPlayer(_videoController!),
                   ),
+                ),
         );
 
       case StoryType.image:
@@ -168,9 +169,8 @@ class _StoryMediaViewState extends State<StoryMediaView> {
           secureUrl: widget.story.imageUrl!,
           fit: BoxFit.contain,
           onReady: () => widget.onMediaReady(null),
-          placeholder:
-              (context) =>
-                  BlurredImagePlaceholder(secureUrl: widget.story.imageUrl!),
+          placeholder: (context) =>
+              BlurredImagePlaceholder(secureUrl: widget.story.imageUrl!),
         );
 
       case StoryType.text:

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 const Color _micAccentRed = Color(0xFFE53935);

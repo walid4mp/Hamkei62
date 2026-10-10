@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../profile/cubits/profile_cubit/profile_cubit.dart';
 import '../cubits/discover_people_cubit.dart';
@@ -48,21 +49,24 @@ class DiscoverPeopleHeaderSection extends StatelessWidget {
 
               Navigator.of(context, rootNavigator: true).push(
                 PageRouteBuilder(
-                  pageBuilder:
-                      (_, animation, __) => BlocProvider.value(
-                        value: discoverCubit,
-                        child: const DiscoverPeopleSearchView(),
-                      ),
+                  pageBuilder: (_, animation, __) => BlocProvider.value(
+                    value: discoverCubit,
+                    child: const DiscoverPeopleSearchView(),
+                  ),
                   transitionsBuilder: (_, anim, __, child) {
                     return FadeTransition(
                       opacity: anim,
                       child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.05),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(parent: anim, curve: Curves.easeOut),
-                        ),
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0, 0.05),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: anim,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
                         child: child,
                       ),
                     );

@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/widgets/calls/call_avatar_backdrop.dart';
 import '../../../core/widgets/calls/call_layout_metrics.dart';
 import '../../../core/widgets/calls/calls.dart';
@@ -78,10 +79,9 @@ class _DialingViewState extends State<DialingView>
                     SizedBox(height: metrics.topGap),
 
                     CallStatusPill(
-                      icon:
-                          isVideo
-                              ? Icons.videocam_rounded
-                              : Icons.phone_rounded,
+                      icon: isVideo
+                          ? Icons.videocam_rounded
+                          : Icons.phone_rounded,
                       label: isVideo ? 'Video Call' : 'Voice Call',
                     ),
 

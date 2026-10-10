@@ -36,9 +36,8 @@ class GroupMembersHeaderWidget extends StatelessWidget {
                   'Add',
 
                   style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).primaryColor.withValues(alpha: 0.85),
+                    color: Theme.of(context).primaryColor
+                        .withValues(alpha: 0.85),
                   ),
                 ),
               ),

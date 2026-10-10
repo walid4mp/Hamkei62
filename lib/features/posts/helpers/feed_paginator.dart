@@ -118,8 +118,9 @@ class FeedPaginator<T> {
   /// cursor — a new post must never move the pagination boundary.
   FeedPaginationState<T> prepend(FeedPaginationState<T> current, T item) {
     final id = idOf(item);
-    final withoutDuplicate =
-        current.items.where((existing) => idOf(existing) != id).toList();
+    final withoutDuplicate = current.items
+        .where((existing) => idOf(existing) != id)
+        .toList();
     final merged = sort([item, ...withoutDuplicate]);
 
     return FeedPaginationState<T>(

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:social_media_app/core/router/app_routes.dart';
 
 class ActiveScreenTracker {

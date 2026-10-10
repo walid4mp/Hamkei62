@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../social_graph/models/content_privacy.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_cubit.dart';
 import '../cubits/create_sticker_pack_cubit/create_sticker_pack_state.dart';
@@ -11,18 +12,17 @@ Future<void> showCreatePackFriendPicker(BuildContext context) async {
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder:
-        (_) => BlocBuilder<CreateStickerPackCubit, CreateStickerPackState>(
-          bloc: cubit,
-          builder: (context, latest) {
-            final form = latest as CreateStickerPackForm;
-            return FriendPickerSheet(
-              friends: form.allFriends,
-              selectedIds: form.selectedFriendIds,
-              onToggle: cubit.toggleFriend,
-            );
-          },
-        ),
+    builder: (_) => BlocBuilder<CreateStickerPackCubit, CreateStickerPackState>(
+      bloc: cubit,
+      builder: (context, latest) {
+        final form = latest as CreateStickerPackForm;
+        return FriendPickerSheet(
+          friends: form.allFriends,
+          selectedIds: form.selectedFriendIds,
+          onToggle: cubit.toggleFriend,
+        );
+      },
+    ),
   );
 }
 

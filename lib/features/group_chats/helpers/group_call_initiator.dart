@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/connectivity/services/connectivity_banner_controller.dart';
 import '../../../core/services/current_user_name_resolver.dart';
 import '../../../core/services/incoming_call_navigation_guard.dart';
@@ -68,13 +69,12 @@ class GroupCallInitiator {
       outgoingFlagRaised = false;
       await navigator.push(
         MaterialPageRoute(
-          builder:
-              (_) => OutgoingGroupCallScreen(
-                groupId: group.id,
-                groupName: group.name,
-                groupAvatarUrl: group.avatarUrl,
-                callType: type,
-              ),
+          builder: (_) => OutgoingGroupCallScreen(
+            groupId: group.id,
+            groupName: group.name,
+            groupAvatarUrl: group.avatarUrl,
+            callType: type,
+          ),
         ),
       );
     } catch (e) {

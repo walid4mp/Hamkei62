@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:social_media_app/core/services/network_status_service.dart';
 import 'package:social_media_app/core/supabase/supabase_provider.dart';

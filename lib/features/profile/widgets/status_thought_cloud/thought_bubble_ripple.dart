@@ -1,6 +1,8 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'thought_bubble_shape.dart';
 
 class ThoughtBubbleRipple extends StatefulWidget {
@@ -96,13 +98,12 @@ class _CloudGlowPainter extends CustomPainter {
     if (color.a == 0) return;
 
     final path = cloud.build(size);
-    final paint =
-        Paint()
-          ..color = color
-          ..maskFilter = MaskFilter.blur(
-            BlurStyle.normal,
-            ui.Shadow.convertRadiusToSigma(blurRadius),
-          );
+    final paint = Paint()
+      ..color = color
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        ui.Shadow.convertRadiusToSigma(blurRadius),
+      );
 
     canvas.drawPath(path, paint);
 

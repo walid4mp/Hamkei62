@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../../core/helpers/chat_helper.dart';
 import '../../ai_assistant/cubits/ai_preferences_cubit/ai_preferences_cubit.dart';
 import '../../ai_assistant/data/repositories/ai_repository_impl.dart';
@@ -55,8 +56,10 @@ class _AiCommentSuggestionsRowState extends State<AiCommentSuggestionsRow> {
   }
 
   Future<void> _load() async {
-    final enabled =
-        context.read<AiPreferencesCubit>().state.commentSuggestionsEnabled;
+    final enabled = context
+        .read<AiPreferencesCubit>()
+        .state
+        .commentSuggestionsEnabled;
     if (!enabled || _isMediaOnlyUnsupported) {
       setState(() {
         _loading = false;
@@ -100,10 +103,9 @@ class _AiCommentSuggestionsRowState extends State<AiCommentSuggestionsRow> {
     if (!_loading && _chips.isEmpty) return const SizedBox.shrink();
 
     return BlocBuilder<AiPreferencesCubit, AiPreferencesState>(
-      buildWhen:
-          (previous, current) =>
-              previous.commentSuggestionsEnabled !=
-              current.commentSuggestionsEnabled,
+      buildWhen: (previous, current) =>
+          previous.commentSuggestionsEnabled !=
+          current.commentSuggestionsEnabled,
       builder: (context, prefs) {
         if (!prefs.commentSuggestionsEnabled) return const SizedBox.shrink();
         if (!_loading && _chips.isEmpty) return const SizedBox.shrink();

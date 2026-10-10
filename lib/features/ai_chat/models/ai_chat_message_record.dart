@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+
 import '../../../core/cache/constants/hive_type_ids.dart';
 import 'ai_chat_message.dart';
 import '../helpers/ai_model_display.dart';
@@ -183,10 +184,9 @@ extension AiChatMessageRecordMapping on AiChatMessageRecord {
       fileName: fileName,
       fileSizeBytes: fileSizeBytes,
       durationSeconds: durationSeconds,
-      model:
-          (provider != null && provider!.isNotEmpty && model != null)
-              ? AiModelDisplay.fromRaw(provider!, model!)
-              : null,
+      model: (provider != null && provider!.isNotEmpty && model != null)
+          ? AiModelDisplay.fromRaw(provider!, model!)
+          : null,
       replyToMessageId: replyToMessageId,
       replyToText: replyToText,
       replyToSenderRole: replyToSenderRole,

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../helpers/chat_helper.dart';
 
-typedef ReadMoreContentBuilder =
-    Widget Function(BuildContext context, int? maxLines, TextOverflow overflow);
+typedef ReadMoreContentBuilder = Widget Function(
+  BuildContext context,
+  int? maxLines,
+  TextOverflow overflow,
+);
 
 class ReadMoreText extends StatefulWidget {
   final String text;
@@ -60,8 +64,9 @@ class _ReadMoreTextState extends State<ReadMoreText> {
 
       final isOverflowing = textPainter.didExceedMaxLines;
       final effectiveMaxLines = _isExpanded ? null : widget.collapsedMaxLines;
-      final effectiveOverflow =
-          _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis;
+      final effectiveOverflow = _isExpanded
+          ? TextOverflow.visible
+          : TextOverflow.ellipsis;
 
       return Column(
         crossAxisAlignment: crossAxis,

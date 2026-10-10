@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/themes/app_colors.dart';
@@ -37,20 +38,19 @@ class SharedGroupTile extends StatelessWidget {
                 width: 44,
                 height: 44,
                 color: primary.withValues(alpha: 0.12),
-                child:
-                    hasAvatar
-                        ? CachedCloudinaryImage(
-                          secureUrl: group.avatarUrl!,
+                child: hasAvatar
+                    ? CachedCloudinaryImage(
+                        secureUrl: group.avatarUrl!,
+                        fit: BoxFit.cover,
+                        isAvatar: true,
+                      )
+                    : Center(
+                        child: Image.asset(
+                          AppImages.defaultGroupImg,
                           fit: BoxFit.cover,
-                          isAvatar: true,
-                        )
-                        : Center(
-                          child: Image.asset(
-                            AppImages.defaultGroupImg,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
+                          width: double.infinity,
                         ),
+                      ),
               ),
             ),
             const Gap(12),

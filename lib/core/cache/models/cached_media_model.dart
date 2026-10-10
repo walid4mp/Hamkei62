@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+
 import '../constants/hive_type_ids.dart';
 part 'cached_media_model.g.dart';
 

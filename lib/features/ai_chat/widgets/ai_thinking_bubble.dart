@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../ai_assistant/widgets/animated_ai_stars_icon.dart';
 import '../../single_chats/widgets/typing_indicator_widget.dart';
 import '../helpers/ai_model_iconography.dart';
@@ -17,14 +18,13 @@ class AiThinkingBubble extends StatelessWidget {
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
-      builder:
-          (context, value, child) => Opacity(
-            opacity: value,
-            child: Transform.translate(
-              offset: Offset(0, (1 - value) * 8),
-              child: child,
-            ),
-          ),
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 8),
+          child: child,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
@@ -128,17 +128,16 @@ class _ShimmerPhaseLabelState extends State<_ShimmerPhaseLabel>
       duration: const Duration(milliseconds: 260),
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
-      transitionBuilder:
-          (child, animation) => FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.25),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          ),
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.25),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        ),
+      ),
       child: AnimatedBuilder(
         key: ValueKey(widget.phase),
         animation: _shimmerController,

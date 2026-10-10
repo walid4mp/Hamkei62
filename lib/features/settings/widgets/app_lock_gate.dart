@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/settings/widgets/app_lock_screen.dart';
+
 import '../services/app_lock_service.dart';
 
 class AppLockGate extends StatefulWidget {

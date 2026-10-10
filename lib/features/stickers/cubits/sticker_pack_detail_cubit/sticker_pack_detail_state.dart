@@ -23,8 +23,9 @@ class StickerPackDetailLoaded extends StickerPackDetailState {
     return StickerPackDetailLoaded(
       stickers: stickers,
       isDownloaded: isDownloaded ?? this.isDownloaded,
-      downloadProgress:
-          clearProgress ? null : (downloadProgress ?? this.downloadProgress),
+      downloadProgress: clearProgress
+          ? null
+          : (downloadProgress ?? this.downloadProgress),
     );
   }
 }

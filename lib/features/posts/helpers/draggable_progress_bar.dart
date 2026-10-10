@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import 'playback_time_display.dart';
 
 class DraggableProgressBar extends StatefulWidget {
@@ -107,18 +108,16 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
                   animation: widget.controller,
                   builder: (context, __) {
                     final duration = _duration;
-                    final position =
-                        _isDragging
-                            ? _dragPosition
-                            : widget.controller.value.position;
+                    final position = _isDragging
+                        ? _dragPosition
+                        : widget.controller.value.position;
 
                     final durationMs = duration.inMilliseconds;
                     final positionMs = position.inMilliseconds;
 
-                    final fraction =
-                        durationMs > 0
-                            ? (positionMs / durationMs).clamp(0.0, 1.0)
-                            : 0.0;
+                    final fraction = durationMs > 0
+                        ? (positionMs / durationMs).clamp(0.0, 1.0)
+                        : 0.0;
 
                     final dotLeft = (fraction * width - _dotSize / 2).clamp(
                       0.0,

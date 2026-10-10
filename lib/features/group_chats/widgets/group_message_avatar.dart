@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../profile/widgets/user_preview_dialog.dart';
@@ -30,8 +31,8 @@ class GroupMessageAvatar extends StatelessWidget {
         showDialog(
           context: context,
           barrierColor: Colors.black54,
-          builder:
-              (_) => UserPreviewDialog(user: user, showContactOptions: true),
+          builder: (_) =>
+              UserPreviewDialog(user: user, showContactOptions: true),
         );
       },
       child: PresenceAvatarWidget(
@@ -41,20 +42,18 @@ class GroupMessageAvatar extends StatelessWidget {
         child: CircleAvatar(
           radius: 16,
           backgroundColor: primary.withValues(alpha: 0.12),
-          backgroundImage:
-              hasAvatar
-                  ? CachedNetworkImageProvider(message.senderAvatar!)
-                  : null,
-          child:
-              !hasAvatar
-                  ? ClipOval(
-                    child: Image.asset(
-                      AppImages.defaultUserImg,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  )
-                  : null,
+          backgroundImage: hasAvatar
+              ? CachedNetworkImageProvider(message.senderAvatar!)
+              : null,
+          child: !hasAvatar
+              ? ClipOval(
+                  child: Image.asset(
+                    AppImages.defaultUserImg,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
+                )
+              : null,
         ),
       ),
     );

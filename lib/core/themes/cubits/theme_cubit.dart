@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_media_app/core/utilities/supabase_constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../bootstrap/app_bootstrap.dart';
 import '../../supabase/supabase_provider.dart';
 import '../models/app_theme_model.dart';
@@ -55,12 +56,11 @@ class ThemeCubit extends Cubit<ThemeState> {
 
     if (userId != null && userId.isNotEmpty) {
       try {
-        final row =
-            await SupabaseProvider.client
-                .from(SupabaseConstants.users)
-                .select(UserColumns.theme)
-                .eq(UserColumns.id, userId)
-                .maybeSingle();
+        final row = await SupabaseProvider.client
+            .from(SupabaseConstants.users)
+            .select(UserColumns.theme)
+            .eq(UserColumns.id, userId)
+            .maybeSingle();
 
         final serverTheme = row?[UserColumns.theme] as String?;
         if (serverTheme != null) {

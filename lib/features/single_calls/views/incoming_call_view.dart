@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:audioplayers/audioplayers.dart';
+
 import '../../../core/notifications/dispatchers/call_notification_dispatcher.dart';
 import '../../../core/services/permissions/app_permissions_service.dart';
 import '../../../core/widgets/calls/call_avatar_backdrop.dart';
@@ -132,14 +134,12 @@ class _IncomingCallViewState extends State<IncomingCallView>
                     SizedBox(height: metrics.topGap),
 
                     CallStatusPill(
-                      icon:
-                          isVideo
-                              ? Icons.videocam_rounded
-                              : Icons.phone_callback_rounded,
-                      label:
-                          isVideo
-                              ? 'Incoming Video Call'
-                              : 'Incoming Voice Call',
+                      icon: isVideo
+                          ? Icons.videocam_rounded
+                          : Icons.phone_callback_rounded,
+                      label: isVideo
+                          ? 'Incoming Video Call'
+                          : 'Incoming Voice Call',
                       shake: _shakeAnim,
                     ),
 
@@ -206,10 +206,9 @@ class _IncomingCallViewState extends State<IncomingCallView>
                             },
                           ),
                           GlassCallActionButton(
-                            icon:
-                                isVideo
-                                    ? Icons.videocam_rounded
-                                    : Icons.call_rounded,
+                            icon: isVideo
+                                ? Icons.videocam_rounded
+                                : Icons.call_rounded,
                             label: 'Accept',
                             color: Colors.green.shade600,
                             size: metrics.buttonSize,

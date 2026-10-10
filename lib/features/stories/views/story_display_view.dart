@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/stories/models/story_model.dart';
+
 import '../cubits/stories_cubit/stories_cubit.dart';
 import '../widgets/user_story_group_container.dart';
 
@@ -51,10 +52,9 @@ class _StoryDisplayViewState extends State<StoryDisplayView> {
             userStories: widget.allUserGroups[index],
             storiesCubit: widget.storiesCubit,
             onClose: _safeClose,
-            initialStoryIndex:
-                index == widget.initialGroupIndex
-                    ? widget.initialStoryIndex
-                    : 0,
+            initialStoryIndex: index == widget.initialGroupIndex
+                ? widget.initialStoryIndex
+                : 0,
             onAllStoriesComplete: () {
               if (index < widget.allUserGroups.length - 1) {
                 _groupPageController.nextPage(

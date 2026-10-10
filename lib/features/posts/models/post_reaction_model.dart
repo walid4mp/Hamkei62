@@ -48,14 +48,13 @@ List<PostReactionModel> parsePostReactions(List<dynamic> rows) {
     }
   }
 
-  final list =
-      counts.entries.map((e) {
-        return PostReactionModel(
-          emoji: e.key,
-          count: e.value,
-          reactedByMe: myEmoji == e.key,
-        );
-      }).toList();
+  final list = counts.entries.map((e) {
+    return PostReactionModel(
+      emoji: e.key,
+      count: e.value,
+      reactedByMe: myEmoji == e.key,
+    );
+  }).toList();
 
   list.sort((a, b) => b.count.compareTo(a.count));
   return list;

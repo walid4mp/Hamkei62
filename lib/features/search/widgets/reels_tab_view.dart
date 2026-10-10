@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/empty_findings_animation_widget.dart';
 import '../../reels/models/reel_model.dart';
@@ -176,10 +177,8 @@ class _ReelsTabViewState extends State<ReelsTabView>
     String query,
   ) => ErrorSearchState(
     message: message,
-    onRetry:
-        () =>
-            query.isEmpty
-                ? context.read<SearchReelsCubit>().getReels()
-                : context.read<SearchReelsCubit>().searchReels(query),
+    onRetry: () => query.isEmpty
+        ? context.read<SearchReelsCubit>().getReels()
+        : context.read<SearchReelsCubit>().searchReels(query),
   );
 }

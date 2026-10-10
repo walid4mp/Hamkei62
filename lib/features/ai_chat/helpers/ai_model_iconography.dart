@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../widgets/gemini_sparkle_icon.dart';
 
 enum AiModelBrand { gemini, groq, openRouter, unknown }
@@ -19,13 +20,13 @@ class AiModelIconography {
   static const FaIconData openRouterIcon = FontAwesomeIcons.shuffle;
   static const FaIconData unknownIcon = FontAwesomeIcons.robot;
 
-  static AiModelBrand brandFromWire(String? provider) => switch (provider
-      ?.toLowerCase()) {
-    'gemini' => AiModelBrand.gemini,
-    'groq' || 'llama' => AiModelBrand.groq,
-    'openrouter' => AiModelBrand.openRouter,
-    _ => AiModelBrand.unknown,
-  };
+  static AiModelBrand brandFromWire(String? provider) =>
+      switch (provider?.toLowerCase()) {
+        'gemini' => AiModelBrand.gemini,
+        'groq' || 'llama' => AiModelBrand.groq,
+        'openrouter' => AiModelBrand.openRouter,
+        _ => AiModelBrand.unknown,
+      };
 
   static FaIconData iconFor(AiModelBrand brand) => switch (brand) {
     AiModelBrand.gemini => geminiFallbackIcon,
@@ -59,6 +60,8 @@ class AiModelIconography {
 
     final iconData = iconFor(brand);
     final iconColor = color ?? colorFor(brand);
-    return Center(child: FaIcon(iconData, size: size, color: iconColor));
+    return Center(
+      child: FaIcon(iconData, size: size, color: iconColor),
+    );
   }
 }

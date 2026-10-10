@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../design/tokens/typography.dart';
 import '../helpers/bidi_text_helper.dart';
 import '../helpers/emoji_text_input_formatter.dart';
@@ -59,19 +60,20 @@ class DirectionalTextField extends StatelessWidget {
           );
         }
 
-        final effectiveStyle = (style ??
-                Theme.of(context).textTheme.bodyLarge ??
-                const TextStyle())
-            .copyWith(
-              fontFamily: null,
-              fontFamilyFallback: AppTypography.fontFallback,
-              color:
-                  style?.color ??
-                  (Theme.of(context).brightness == Brightness.light
-                      ? Colors.black87
-                      : Colors.white),
-              fontWeight: style?.fontWeight ?? FontWeight.w400,
-            );
+        final effectiveStyle =
+            (style ??
+                    Theme.of(context).textTheme.bodyLarge ??
+                    const TextStyle())
+                .copyWith(
+                  fontFamily: null,
+                  fontFamilyFallback: AppTypography.fontFallback,
+                  color:
+                      style?.color ??
+                      (Theme.of(context).brightness == Brightness.light
+                          ? Colors.black87
+                          : Colors.white),
+                  fontWeight: style?.fontWeight ?? FontWeight.w400,
+                );
 
         return TextField(
           controller: controller,

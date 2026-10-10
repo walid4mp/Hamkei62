@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/chat_shared/widgets/reply_preview_thumbnail.dart';
 import '../../../core/mentions/widgets/mention_rich_text.dart';
 import '../models/groupe_message_model.dart';
@@ -95,20 +96,20 @@ class GroupReplyPreviewBar extends StatelessWidget {
                 const Gap(2),
                 _isPlainText && reply.text.isNotEmpty
                     ? MentionRichText(
-                      text: reply.text,
-                      mentions: reply.mentions,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textStyle,
-                      mentionColor: primary,
-                      onMentionTap: (_, __) {},
-                    )
+                        text: reply.text,
+                        mentions: reply.mentions,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle,
+                        mentionColor: primary,
+                        onMentionTap: (_, __) {},
+                      )
                     : Text(
-                      _fallbackLabel(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textStyle,
-                    ),
+                        _fallbackLabel(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle,
+                      ),
               ],
             ),
           ),

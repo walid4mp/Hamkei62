@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/loop_limited_gif.dart';
 
 class GifMessageBubble extends StatelessWidget {

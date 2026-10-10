@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
 import 'package:social_media_app/core/themes/app_colors.dart';
+
 import '../helpers/circle_default_user_img.dart';
 
 class CreateStoryCardWidget extends StatelessWidget {
@@ -51,26 +52,24 @@ class CreateStoryCardWidget extends StatelessWidget {
                 SizedBox(
                   width: cardWidth,
                   height: topHeight,
-                  child:
-                      avatarUrl == null || avatarUrl!.isEmpty
-                          ? CircleDefaultUserImage(
+                  child: avatarUrl == null || avatarUrl!.isEmpty
+                      ? CircleDefaultUserImage(
+                          theme: theme,
+                          cardWidth: cardWidth,
+                        )
+                      : CachedCloudinaryImage(
+                          secureUrl: avatarUrl!,
+                          fit: BoxFit.cover,
+                          width: cardWidth,
+                          height: topHeight,
+                          isAvatar: true,
+                          placeholder: (_) =>
+                              Container(color: theme.dividerColor),
+                          errorWidget: (_, __) => CircleDefaultUserImage(
                             theme: theme,
                             cardWidth: cardWidth,
-                          )
-                          : CachedCloudinaryImage(
-                            secureUrl: avatarUrl!,
-                            fit: BoxFit.cover,
-                            width: cardWidth,
-                            height: topHeight,
-                            isAvatar: true,
-                            placeholder:
-                                (_) => Container(color: theme.dividerColor),
-                            errorWidget:
-                                (_, __) => CircleDefaultUserImage(
-                                  theme: theme,
-                                  cardWidth: cardWidth,
-                                ),
                           ),
+                        ),
                 ),
 
                 Positioned(
@@ -111,17 +110,16 @@ class CreateStoryCardWidget extends StatelessWidget {
                         width: borderWidth,
                       ),
                     ),
-                    child:
-                        isUploading
-                            ? const CustomLoadingIndicator(
-                              radius: 6,
-                              color: AppColors.white,
-                            )
-                            : const Icon(
-                              Icons.add,
-                              color: AppColors.white,
-                              size: 18,
-                            ),
+                    child: isUploading
+                        ? const CustomLoadingIndicator(
+                            radius: 6,
+                            color: AppColors.white,
+                          )
+                        : const Icon(
+                            Icons.add,
+                            color: AppColors.white,
+                            size: 18,
+                          ),
                   ),
                 ),
               ],

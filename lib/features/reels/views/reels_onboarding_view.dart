@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/widgets/custom_elevated_button.dart';
 import '../models/reel_category.dart';
@@ -178,8 +179,9 @@ class _ReelsOnboardingViewState extends State<ReelsOnboardingView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextButton(
-                      onPressed:
-                          _isSaving ? null : () => _finish(skipped: true),
+                      onPressed: _isSaving
+                          ? null
+                          : () => _finish(skipped: true),
                       style: TextButton.styleFrom(
                         foregroundColor: colorScheme.onSurfaceVariant
                             .withValues(alpha: 0.7),
@@ -203,10 +205,9 @@ class _ReelsOnboardingViewState extends State<ReelsOnboardingView> {
                     const SizedBox(height: 12),
 
                     CustomElevatedButton(
-                      txtBtn:
-                          _selected.isEmpty
-                              ? 'Done'
-                              : 'Done (${_selected.length} selected)',
+                      txtBtn: _selected.isEmpty
+                          ? 'Done'
+                          : 'Done (${_selected.length} selected)',
                       isLoading: _isSaving,
                       bgColor: AppColors.primaryColor,
                       onPressed: () => _finish(skipped: false),

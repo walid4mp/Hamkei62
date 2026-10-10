@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:social_media_app/core/constants/app_images.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../cubits/sticker_packs_cubit/sticker_packs_cubit.dart';
 import '../cubits/sticker_packs_cubit/sticker_packs_state.dart';
@@ -16,10 +17,9 @@ class StickerPacksBrowserView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (_) => StickerPacksCubit(
-            mediaCacheRepository: context.read<MediaCacheRepository>(),
-          ),
+      create: (_) => StickerPacksCubit(
+        mediaCacheRepository: context.read<MediaCacheRepository>(),
+      ),
       child: const _StickerPacksBrowserSheetBody(),
     );
   }
@@ -128,14 +128,12 @@ class _StickerPacksBrowserSheetBody extends StatelessWidget {
                         );
                         cubit.loadPacks();
                       },
-                      onToggleDownload:
-                          () => context
-                              .read<StickerPacksCubit>()
-                              .togglePackDownloaded(pack.id),
-                      onCancelDownload:
-                          () => context
-                              .read<StickerPacksCubit>()
-                              .cancelDownload(pack.id),
+                      onToggleDownload: () => context
+                          .read<StickerPacksCubit>()
+                          .togglePackDownloaded(pack.id),
+                      onCancelDownload: () => context
+                          .read<StickerPacksCubit>()
+                          .cancelDownload(pack.id),
                     );
                   }, childCount: packs.length + 1),
                 ),

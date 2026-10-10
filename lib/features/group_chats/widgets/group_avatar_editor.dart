@@ -1,7 +1,9 @@
 import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/widgets/full_screen_image_viewer.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/themes/app_colors.dart';
 
@@ -71,25 +73,21 @@ class GroupAvatarEditor extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 72,
                       backgroundColor: AppColors.black12,
-                      backgroundImage:
-                          currentAvatarUrl != null
-                              ? CachedNetworkImageProvider(currentAvatarUrl!)
-                              : null,
-                      child:
-                          currentAvatarUrl == null
-                              ? Container(
-                                padding: EdgeInsets.zero,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                      AppImages.defaultGroupImg,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
+                      backgroundImage: currentAvatarUrl != null
+                          ? CachedNetworkImageProvider(currentAvatarUrl!)
+                          : null,
+                      child: currentAvatarUrl == null
+                          ? Container(
+                              padding: EdgeInsets.zero,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage(AppImages.defaultGroupImg),
+                                  fit: BoxFit.cover,
                                 ),
-                              )
-                              : null,
+                              ),
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -115,31 +113,30 @@ class GroupAvatarEditor extends StatelessWidget {
                         ),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (child, animation) => ScaleTransition(
+                          transitionBuilder: (child, animation) =>
+                              ScaleTransition(
                                 scale: animation,
                                 child: FadeTransition(
                                   opacity: animation,
                                   child: child,
                                 ),
                               ),
-                          child:
-                              isUploadingPhoto
-                                  ? const SizedBox(
-                                    key: ValueKey('loading'),
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                  : const Icon(
-                                    Icons.camera_alt_rounded,
-                                    key: ValueKey('camera_icon'),
-                                    size: 18,
+                          child: isUploadingPhoto
+                              ? const SizedBox(
+                                  key: ValueKey('loading'),
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
                                     color: Colors.white,
+                                    strokeWidth: 2,
                                   ),
+                                )
+                              : const Icon(
+                                  Icons.camera_alt_rounded,
+                                  key: ValueKey('camera_icon'),
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
                         ),
                       ),
                     ),
@@ -168,31 +165,30 @@ class GroupAvatarEditor extends StatelessWidget {
                           ),
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (child, animation) => ScaleTransition(
+                            transitionBuilder: (child, animation) =>
+                                ScaleTransition(
                                   scale: animation,
                                   child: FadeTransition(
                                     opacity: animation,
                                     child: child,
                                   ),
                                 ),
-                            child:
-                                isRemovingPhoto
-                                    ? const SizedBox(
-                                      key: ValueKey('loading_remove'),
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                    : const Icon(
-                                      Icons.delete_outline_rounded,
-                                      key: ValueKey('delete_icon'),
-                                      size: 18,
+                            child: isRemovingPhoto
+                                ? const SizedBox(
+                                    key: ValueKey('loading_remove'),
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
                                       color: Colors.white,
+                                      strokeWidth: 2,
                                     ),
+                                  )
+                                : const Icon(
+                                    Icons.delete_outline_rounded,
+                                    key: ValueKey('delete_icon'),
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ),
                       ),
@@ -208,10 +204,8 @@ class GroupAvatarEditor extends StatelessWidget {
         Center(
           child: Text(
             liveGroupName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: Theme.of(context).textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold, fontSize: 22),
             textAlign: TextAlign.center,
           ),
         ),

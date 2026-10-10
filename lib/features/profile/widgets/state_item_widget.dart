@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/profile_ui_tokens.dart';
 
 class StatItemWidget extends StatelessWidget {

@@ -78,13 +78,12 @@ class AppAvatar extends StatelessWidget {
       fit: BoxFit.cover,
       isAvatar: true,
       placeholder: placeholder,
-      errorWidget:
-          (_, __) => Image.asset(
-            AppImages.defaultUserImg,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-          ),
+      errorWidget: (_, __) => Image.asset(
+        AppImages.defaultUserImg,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/errors/network_error_utils.dart';
 
 class AuthExceptionHandler {

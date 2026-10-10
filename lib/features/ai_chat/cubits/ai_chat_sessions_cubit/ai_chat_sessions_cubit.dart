@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../models/ai_chat_session.dart';
@@ -11,9 +13,8 @@ class AiChatSessionsCubit extends Cubit<AiChatSessionsState>
   AiChatSessionsCubit(this._repository) : super(AiChatSessionsLoading()) {
     _subscription = _repository.watchSessions().listen(
       (sessions) => emit(AiChatSessionsLoaded(sessions)),
-      onError:
-          (Object e, StackTrace _) =>
-              emit(AiChatSessionsError(SupabaseErrorMapper.toUserMessage(e))),
+      onError: (Object e, StackTrace _) =>
+          emit(AiChatSessionsError(SupabaseErrorMapper.toUserMessage(e))),
     );
   }
 

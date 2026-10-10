@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../cache/services/starred_message_store.dart';
 
 class StarredMessagesRow extends StatelessWidget {
@@ -58,9 +59,8 @@ class StarredMessagesRow extends StatelessWidget {
             Expanded(
               child: Text(
                 'Starred Messages',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
             if (currentUserId != null && chatMessageIds != null)
@@ -73,31 +73,31 @@ class StarredMessagesRow extends StatelessWidget {
                       final count = snapshot.data ?? 0;
                       return count > 0
                           ? Container(
-                            constraints: const BoxConstraints(
-                              minWidth: 24,
-                              minHeight: 24,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 3,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: primary.withValues(
-                                alpha: isDark ? 0.18 : 0.12,
+                              constraints: const BoxConstraints(
+                                minWidth: 24,
+                                minHeight: 24,
                               ),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              '$count',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: primary,
-                                height: 1.1,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 3,
                               ),
-                            ),
-                          )
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: primary.withValues(
+                                  alpha: isDark ? 0.18 : 0.12,
+                                ),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                '$count',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: primary,
+                                  height: 1.1,
+                                ),
+                              ),
+                            )
                           : SizedBox.shrink();
                     },
                   );

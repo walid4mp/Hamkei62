@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../../core/errors/supabase_error_mapper.dart';
 import '../../../core/toast/app_toast.dart';
 import '../cubits/group_details_cubit/group_details_cubit.dart';
@@ -203,10 +205,9 @@ class _GroupSettingsViewState extends State<GroupSettingsView> {
     final confirm = await GroupConfirmDialog.show(
       context,
       title: 'Block Group',
-      body:
-          liveGroup.isMember
-              ? 'You will leave "${liveGroup.name}", the chat history on this device will be cleared, and you won\'t be able to be re-added to this group. Continue?'
-              : 'The chat history on this device will be cleared, and you won\'t be able to be re-added to this group. Continue?',
+      body: liveGroup.isMember
+          ? 'You will leave "${liveGroup.name}", the chat history on this device will be cleared, and you won\'t be able to be re-added to this group. Continue?'
+          : 'The chat history on this device will be cleared, and you won\'t be able to be re-added to this group. Continue?',
       confirmLabel: 'Block',
       confirmColor: Colors.red,
     );
@@ -293,10 +294,9 @@ class _GroupSettingsViewState extends State<GroupSettingsView> {
       return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
         bloc: detailsCubit,
         builder: (context, detailsState) {
-          final isMemberLive =
-              detailsState is GroupDetailsLoaded
-                  ? detailsState.isMember
-                  : widget.group.isMember;
+          final isMemberLive = detailsState is GroupDetailsLoaded
+              ? detailsState.isMember
+              : widget.group.isMember;
           return _buildBody(context, isMemberOverride: isMemberLive);
         },
       );
@@ -308,13 +308,12 @@ class _GroupSettingsViewState extends State<GroupSettingsView> {
     return BlocBuilder<GroupListCubit, GroupListState>(
       bloc: widget.groupListCubit,
       builder: (context, listState) {
-        final liveGroup =
-            (listState is GroupListLoaded)
-                ? listState.groups.firstWhere(
-                  (g) => g.id == widget.group.id,
-                  orElse: () => widget.group,
-                )
-                : widget.group;
+        final liveGroup = (listState is GroupListLoaded)
+            ? listState.groups.firstWhere(
+                (g) => g.id == widget.group.id,
+                orElse: () => widget.group,
+              )
+            : widget.group;
         final isMember = isMemberOverride ?? liveGroup.isMember;
 
         return GestureDetector(
@@ -379,9 +378,8 @@ class _GroupSettingsViewState extends State<GroupSettingsView> {
                           membersCubit: widget.membersCubit,
                           currentUserId: widget.currentUserId,
                           isOwner: widget.isOwner,
-                          onAdminAction:
-                              (admin, action) =>
-                                  _handleAdminAction(context, admin, action),
+                          onAdminAction: (admin, action) =>
+                              _handleAdminAction(context, admin, action),
                         ),
                         const SizedBox(height: 32),
                         const Divider(height: 1),

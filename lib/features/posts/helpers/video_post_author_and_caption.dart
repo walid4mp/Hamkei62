@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../home/cubits/home_cubit/home_cubit.dart';
 import '../cubits/posts_cubit/posts_cubit.dart';
@@ -28,10 +29,9 @@ class VideoPostAuthorAndCaption extends StatelessWidget {
       bloc: postsCubit,
       buildWhen: (prev, curr) => prev is PostsLoaded && curr is PostsLoaded,
       builder: (context, state) {
-        final currentPost =
-            (state is PostsLoaded)
-                ? state.posts.findById(post.id) ?? post
-                : post;
+        final currentPost = (state is PostsLoaded)
+            ? state.posts.findById(post.id) ?? post
+            : post;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/widgets/custom_pull_to_refresh.dart';
@@ -77,10 +78,12 @@ class _FriendsListViewState extends State<FriendsListView> {
         actions: [
           BlocBuilder<FriendsListCubit, FriendsListState>(
             buildWhen: (previous, current) {
-              final previousTotal =
-                  previous is FriendsListLoaded ? previous.total : null;
-              final currentTotal =
-                  current is FriendsListLoaded ? current.total : null;
+              final previousTotal = previous is FriendsListLoaded
+                  ? previous.total
+                  : null;
+              final currentTotal = current is FriendsListLoaded
+                  ? current.total
+                  : null;
               return previousTotal != currentTotal ||
                   (previous is FriendsListLoaded) !=
                       (current is FriendsListLoaded);
@@ -117,10 +120,8 @@ class _FriendsListViewState extends State<FriendsListView> {
           final hasFooter = loaded.isLoadingMore || loaded.loadMoreFailed;
 
           return CustomPullToRefresh(
-            onRefresh:
-                () => context.read<FriendsListCubit>().loadFriends(
-                  isRefresh: true,
-                ),
+            onRefresh: () =>
+                context.read<FriendsListCubit>().loadFriends(isRefresh: true),
             child: ListView.separated(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -133,12 +134,9 @@ class _FriendsListViewState extends State<FriendsListView> {
                 if (i >= friends.length) {
                   return loaded.loadMoreFailed
                       ? _LoadMoreRetry(
-                        onRetry:
-                            () =>
-                                context
-                                    .read<FriendsListCubit>()
-                                    .retryLoadMore(),
-                      )
+                          onRetry: () =>
+                              context.read<FriendsListCubit>().retryLoadMore(),
+                        )
                       : _LoadingMoreFooter(isMe: isMe);
                 }
 
@@ -147,10 +145,9 @@ class _FriendsListViewState extends State<FriendsListView> {
                   key: ValueKey(friend.friendshipId),
                   friend: friend,
                   isMe: isMe,
-                  onUnfriend:
-                      () => context.read<FriendsListCubit>().unfriend(
-                        friend.friendshipId,
-                      ),
+                  onUnfriend: () => context.read<FriendsListCubit>().unfriend(
+                    friend.friendshipId,
+                  ),
                 );
               },
             ),

@@ -5,6 +5,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:social_media_app/core/constants/app_images.dart';
 import 'package:social_media_app/features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
 import 'package:social_media_app/features/single_chats/cubits/chats_cubit/chats_cubit.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/themes/dynamic_logo_app.dart';
 import '../../../core/widgets/custom_badge.dart';
@@ -69,12 +70,16 @@ class _HomeViewHeaderSectionState extends State<HomeViewHeaderSection> {
                     return FadeTransition(
                       opacity: anim,
                       child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.05),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(parent: anim, curve: Curves.easeOut),
-                        ),
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0, 0.05),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: anim,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
                         child: child,
                       ),
                     );
@@ -101,12 +106,16 @@ class _HomeViewHeaderSectionState extends State<HomeViewHeaderSection> {
                     return FadeTransition(
                       opacity: anim,
                       child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.05),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(parent: anim, curve: Curves.easeOut),
-                        ),
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0, 0.05),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: anim,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
                         child: child,
                       ),
                     );
@@ -123,10 +132,9 @@ class _HomeViewHeaderSectionState extends State<HomeViewHeaderSection> {
                 Image.asset(
                   AppImages.notificationIcon,
                   width: 24,
-                  color:
-                      _unreadCount > 0
-                          ? iconColor
-                          : iconColor.withValues(alpha: isDark ? 0.6 : 0.5),
+                  color: _unreadCount > 0
+                      ? iconColor
+                      : iconColor.withValues(alpha: isDark ? 0.6 : 0.5),
                 ),
                 if (_unreadCount > 0)
                   Positioned(

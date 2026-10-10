@@ -17,10 +17,9 @@ mixin GroupSelectionMixin on Cubit<GroupDetailsState> {
 
   bool get isInSelectionMode => selectedMessageIds.value.isNotEmpty;
 
-  List<GroupMessageModel> get selectedMessages =>
-      cachedMessages
-          .where((m) => selectedMessageIds.value.contains(m.id))
-          .toList();
+  List<GroupMessageModel> get selectedMessages => cachedMessages
+      .where((m) => selectedMessageIds.value.contains(m.id))
+      .toList();
 
   bool get canDeleteSelectedForEveryone =>
       selectedMessages.isNotEmpty &&
@@ -84,16 +83,21 @@ mixin GroupSelectionMixin on Cubit<GroupDetailsState> {
     if (ids.isEmpty) return;
 
     final selectedSet = ids.toSet();
-    final selected =
-        cachedMessages.where((m) => selectedSet.contains(m.id)).toList();
+    final selected = cachedMessages
+        .where((m) => selectedSet.contains(m.id))
+        .toList();
 
     bool isStillSending(GroupMessageModel m) =>
         m.clientMessageId != null && m.id == m.clientMessageId;
 
-    final stillSendingIds =
-        selected.where(isStillSending).map((m) => m.id).toList();
-    final realIds =
-        selected.where((m) => !isStillSending(m)).map((m) => m.id).toList();
+    final stillSendingIds = selected
+        .where(isStillSending)
+        .map((m) => m.id)
+        .toList();
+    final realIds = selected
+        .where((m) => !isStillSending(m))
+        .map((m) => m.id)
+        .toList();
 
     var updated = cachedMessages;
     for (final id in selectedSet) {

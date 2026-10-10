@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -34,8 +35,9 @@ class CallNotificationDispatcher {
       profileBitmap = await _avatarBuilder.defaultBitmap();
     }
 
-    final subtitle =
-        callType == 'video' ? 'Incoming video call' : 'Incoming voice call';
+    final subtitle = callType == 'video'
+        ? 'Incoming video call'
+        : 'Incoming voice call';
 
     final androidDetails = AndroidNotificationDetails(
       NotificationChannelSetup.callChannel.id,

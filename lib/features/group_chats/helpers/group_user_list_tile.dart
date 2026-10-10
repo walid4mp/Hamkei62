@@ -33,20 +33,18 @@ class GroupUserListTile extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: primary.withValues(alpha: 0.1),
-              backgroundImage:
-                  (imageUrl != null && imageUrl.isNotEmpty)
-                      ? CachedNetworkImageProvider(imageUrl)
-                      : null,
-              child:
-                  (imageUrl == null || imageUrl.isEmpty)
-                      ? Text(
-                        name.isNotEmpty ? name[0].toUpperCase() : '?',
-                        style: TextStyle(
-                          color: primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                      : null,
+              backgroundImage: (imageUrl != null && imageUrl.isNotEmpty)
+                  ? CachedNetworkImageProvider(imageUrl)
+                  : null,
+              child: (imageUrl == null || imageUrl.isEmpty)
+                  ? Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        color: primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
             ),
             const Gap(16),
             Expanded(
@@ -80,14 +78,13 @@ class GroupUserListTile extends StatelessWidget {
                     ),
                 ],
               ),
-              child:
-                  isSelected
-                      ? const Icon(
-                        Icons.check_rounded,
-                        size: 16,
-                        color: Colors.white,
-                      )
-                      : null,
+              child: isSelected
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    )
+                  : null,
             ),
           ],
         ),

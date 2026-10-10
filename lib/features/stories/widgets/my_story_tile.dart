@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/features/stories/cubits/stories_cubit/stories_cubit.dart';
+
 import '../../../core/cache/utils/cloudinary_url_extensions.dart';
 import '../../../core/design/tokens/typography.dart';
 import '../../../core/helpers/chat_helper.dart';
@@ -57,10 +59,9 @@ class MyStoryTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? theme.colorScheme.surface : Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border:
-              isSelected
-                  ? Border.all(color: theme.primaryColor, width: 2)
-                  : Border.all(color: Colors.transparent, width: 2),
+          border: isSelected
+              ? Border.all(color: theme.primaryColor, width: 2)
+              : Border.all(color: Colors.transparent, width: 2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
@@ -97,15 +98,16 @@ class MyStoryTile extends StatelessWidget {
                               textDirection: ChatHelper.getTextDirection(
                                 titleText,
                               ),
-                              style: (theme.textTheme.titleSmall ??
-                                      const TextStyle())
-                                  .copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 15,
-                                    fontFamily: null,
-                                    fontFamilyFallback:
-                                        AppTypography.fontFallback,
-                                  ),
+                              style:
+                                  (theme.textTheme.titleSmall ??
+                                          const TextStyle())
+                                      .copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                        fontFamily: null,
+                                        fontFamilyFallback:
+                                            AppTypography.fontFallback,
+                                      ),
                             );
                           },
                         ),
@@ -162,51 +164,49 @@ class MyStoryTile extends StatelessWidget {
 
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 220),
-                    transitionBuilder:
-                        (child, anim) => ScaleTransition(
-                          scale: anim,
-                          child: FadeTransition(opacity: anim, child: child),
-                        ),
-                    child:
-                        isPending
-                            ? UploadingIndicatorStory(
-                              key: const ValueKey('uploading'),
-                              storyId: story.id,
-                              fileSizeBytes: story.fileSizeBytes,
-                              storiesCubit: storiesCubit,
-                            )
-                            : isDeleting
-                            ? const Padding(
-                              key: ValueKey('deleting'),
-                              padding: EdgeInsets.all(12.0),
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CustomLoadingIndicator(),
+                    transitionBuilder: (child, anim) => ScaleTransition(
+                      scale: anim,
+                      child: FadeTransition(opacity: anim, child: child),
+                    ),
+                    child: isPending
+                        ? UploadingIndicatorStory(
+                            key: const ValueKey('uploading'),
+                            storyId: story.id,
+                            fileSizeBytes: story.fileSizeBytes,
+                            storiesCubit: storiesCubit,
+                          )
+                        : isDeleting
+                        ? const Padding(
+                            key: ValueKey('deleting'),
+                            padding: EdgeInsets.all(12.0),
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CustomLoadingIndicator(),
+                            ),
+                          )
+                        : isSelectionMode
+                        ? Padding(
+                            key: const ValueKey('checkbox'),
+                            padding: const EdgeInsets.all(12.0),
+                            child: _buildCircularCheckbox(theme),
+                          )
+                        : IconButton(
+                            key: const ValueKey('delete-trash'),
+                            onPressed: onDelete,
+                            icon: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
                               ),
-                            )
-                            : isSelectionMode
-                            ? Padding(
-                              key: const ValueKey('checkbox'),
-                              padding: const EdgeInsets.all(12.0),
-                              child: _buildCircularCheckbox(theme),
-                            )
-                            : IconButton(
-                              key: const ValueKey('delete-trash'),
-                              onPressed: onDelete,
-                              icon: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withValues(alpha: 0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.delete_outline_rounded,
-                                  color: Colors.redAccent,
-                                  size: 20,
-                                ),
+                              child: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.redAccent,
+                                size: 20,
                               ),
                             ),
+                          ),
                   ),
                 ],
               ),
@@ -241,10 +241,9 @@ class MyStoryTile extends StatelessWidget {
             width: 2,
           ),
         ),
-        child:
-            isSelected
-                ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
-                : null,
+        child: isSelected
+            ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+            : null,
       ),
     );
   }
@@ -299,13 +298,13 @@ class MyStoryTile extends StatelessWidget {
           children: [
             thumbUrl != null
                 ? CachedCloudinaryImage(
-                  secureUrl: thumbUrl,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  errorWidget:
-                      (_, __) => Container(color: Colors.grey.shade800),
-                )
+                    secureUrl: thumbUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, __) =>
+                        Container(color: Colors.grey.shade800),
+                  )
                 : Container(color: Colors.grey.shade800),
           ],
         );
@@ -349,8 +348,8 @@ class MyStoryTile extends StatelessWidget {
       counts[r.reaction] = (counts[r.reaction] ?? 0) + 1;
     }
 
-    final entries =
-        counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final entries = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     return Text.rich(
       TextSpan(

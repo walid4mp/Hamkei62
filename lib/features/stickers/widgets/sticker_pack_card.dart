@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/widgets/cached_cloudinary_image.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
@@ -29,12 +30,11 @@ class StickerPackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final status =
-        isDownloaded
-            ? DownloadButtonStatus.downloaded
-            : (progress != null
-                ? DownloadButtonStatus.downloading
-                : DownloadButtonStatus.idle);
+    final status = isDownloaded
+        ? DownloadButtonStatus.downloaded
+        : (progress != null
+              ? DownloadButtonStatus.downloading
+              : DownloadButtonStatus.idle);
     final isDownloading = status == DownloadButtonStatus.downloading;
 
     return InkWell(
@@ -47,10 +47,9 @@ class StickerPackCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color:
-                isDownloaded
-                    ? theme.primaryColor.withValues(alpha: 0.5)
-                    : Colors.transparent,
+            color: isDownloaded
+                ? theme.primaryColor.withValues(alpha: 0.5)
+                : Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -66,17 +65,17 @@ class StickerPackCard extends StatelessWidget {
                     secureUrl: pack.coverUrl,
                     fit: BoxFit.contain,
                     placeholder: (context) => const CustomLoadingIndicator(),
-                    errorWidget:
-                        (context, error) => Container(
-                          color: theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.2),
-                          child: Icon(
-                            Icons.image_not_supported_rounded,
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.5),
-                            size: 32,
-                          ),
+                    errorWidget: (context, error) => Container(
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.2),
+                      child: Icon(
+                        Icons.image_not_supported_rounded,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
                         ),
+                        size: 32,
+                      ),
+                    ),
                   ),
                 ),
               ),

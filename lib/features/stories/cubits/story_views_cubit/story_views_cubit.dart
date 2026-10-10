@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/cache/constants/snapshot_keys.dart';
 import 'package:social_media_app/core/cache/services/local_snapshot_store.dart';
+
 import '../../models/story_viewer_model.dart';
 import '../../services/stories_services.dart';
 part 'story_views_state.dart';
@@ -60,10 +62,9 @@ class StoryViewsCubit extends Cubit<StoryViewsState> {
     _liveViewsSub = _storiesServices.getStoryViewsStream(storyId).listen((
       rows,
     ) {
-      final currentCount =
-          state is StoryViewsLoaded
-              ? (state as StoryViewsLoaded).viewers.length
-              : 0;
+      final currentCount = state is StoryViewsLoaded
+          ? (state as StoryViewsLoaded).viewers.length
+          : 0;
       if (rows.length > currentCount) {
         _loadViewers();
       }

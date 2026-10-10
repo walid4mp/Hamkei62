@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linkify/linkify.dart' as linkify_pkg;
+
 import '../models/link_preview_data.dart';
 import '../services/link_preview_service.dart';
 import 'link_preview_card.dart';
@@ -75,8 +76,9 @@ class _MessageLinkPreviewState extends State<MessageLinkPreview>
 
     final url = urlElements.first.url;
     _url = url;
-    final withoutUrl =
-        widget.text.replaceFirst(urlElements.first.text, '').trim();
+    final withoutUrl = widget.text
+        .replaceFirst(urlElements.first.text, '')
+        .trim();
     _isOnlyUrl = withoutUrl.isEmpty;
 
     final cached = LinkPreviewService.instance.peek(url);

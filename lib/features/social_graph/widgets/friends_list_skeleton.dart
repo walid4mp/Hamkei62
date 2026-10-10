@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/widgets/skeleton_shapes.dart';
 
 class FriendsListSkeleton extends StatelessWidget {

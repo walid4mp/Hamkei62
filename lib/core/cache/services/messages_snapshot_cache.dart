@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+
 import 'local_snapshot_store.dart';
 
 class MessagesSnapshotCache<T> {

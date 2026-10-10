@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'cached_cloudinary_image.dart';
 
 class OverlappingAvatarStack extends StatelessWidget {
@@ -65,24 +66,23 @@ class _Bubble extends StatelessWidget {
         color: Colors.grey.shade300,
       ),
       child: ClipOval(
-        child:
-            extraCount != null
-                ? Center(
-                  child: Text(
-                    '+$extraCount',
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
+        child: extraCount != null
+            ? Center(
+                child: Text(
+                  '+$extraCount',
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
                   ),
-                )
-                : (url != null
-                    ? CachedCloudinaryImage(
+                ),
+              )
+            : (url != null
+                  ? CachedCloudinaryImage(
                       secureUrl: url!,
                       fit: BoxFit.cover,
                       isAvatar: true,
                     )
-                    : const Icon(Icons.person, size: 12)),
+                  : const Icon(Icons.person, size: 12)),
       ),
     );
   }

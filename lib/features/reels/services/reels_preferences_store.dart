@@ -1,4 +1,5 @@
 import 'package:hive_flutter/adapters.dart';
+
 import '../../../core/cache/constants/hive_box_names.dart';
 
 class ReelsPreferencesStore {
@@ -51,10 +52,9 @@ class ReelsPreferencesStore {
     );
 
     final merged = <String>{...existing, ...newlyViewedIds}.toList();
-    final trimmed =
-        merged.length > maxStoredSeenIds
-            ? merged.sublist(merged.length - maxStoredSeenIds)
-            : merged;
+    final trimmed = merged.length > maxStoredSeenIds
+        ? merged.sublist(merged.length - maxStoredSeenIds)
+        : merged;
 
     await box.put(_recentlyViewedIdsKey, trimmed);
   }

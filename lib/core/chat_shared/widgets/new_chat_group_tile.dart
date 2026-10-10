@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../core/widgets/app_avatar.dart';
 import '../../../features/group_chats/models/group_model.dart';
@@ -67,9 +68,8 @@ class NewChatGroupTile extends StatelessWidget {
     );
     final afterMatch = text.substring(matchIndex + searchQuery.length);
 
-    final highlightColor = Theme.of(
-      context,
-    ).primaryColor.withValues(alpha: 0.25);
+    final highlightColor = Theme.of(context).primaryColor
+        .withValues(alpha: 0.25);
 
     return Text.rich(
       TextSpan(
@@ -95,28 +95,27 @@ class NewChatGroupTile extends StatelessWidget {
     final tile = ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: onTap,
-      leading:
-          _hasRealImage
-              ? AppAvatar(
-                imageUrl: group.avatarUrl,
-                size: 48,
-                heroTag: 'new_chat_group_avatar_${group.id}',
-                onTap: () => _openFullScreenAvatar(context),
-              )
-              : GestureDetector(
-                onTap: () => _openFullScreenAvatar(context),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(AppImages.defaultGroupImg),
-                      fit: BoxFit.cover,
-                    ),
+      leading: _hasRealImage
+          ? AppAvatar(
+              imageUrl: group.avatarUrl,
+              size: 48,
+              heroTag: 'new_chat_group_avatar_${group.id}',
+              onTap: () => _openFullScreenAvatar(context),
+            )
+          : GestureDetector(
+              onTap: () => _openFullScreenAvatar(context),
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(AppImages.defaultGroupImg),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
+            ),
       title: _buildHighlightedText(
         context,
         group.name,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../helpers/formatted_date.dart';
 import '../../widgets/app_avatar.dart';
 import '../models/starred_message_entry.dart';
@@ -41,9 +42,8 @@ class StarredMessageTile extends StatelessWidget {
                       child: Text(
                         entry.isMe ? 'You' : entry.senderName,
                         maxLines: 1,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),

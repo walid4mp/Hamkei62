@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/reel_model.dart';
 import 'channel_avatar.dart';
 

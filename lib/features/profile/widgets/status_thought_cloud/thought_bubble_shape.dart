@@ -1,10 +1,9 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
-
 class ThoughtCloudPath {
-
   final double crown;
   final double belly;
   final double inset;
@@ -14,7 +13,6 @@ class ThoughtCloudPath {
     this.belly = 2.5,
     this.inset = 1.0,
   });
-
 
   static const List<(double, double, double)> _crownPuffs = [
     (0.25, 0.15, 0.72),
@@ -37,16 +35,16 @@ class ThoughtCloudPath {
     final double bodyWidth = right - left;
     final double bodyHeight = bottom - top;
 
-    Path path =
-        Path()..addRRect(
-          RRect.fromLTRBR(
-            left,
-            top,
-            right,
-            bottom,
-            Radius.circular(bodyHeight / 2),
-          ),
-        );
+    Path path = Path()
+      ..addRRect(
+        RRect.fromLTRBR(
+          left,
+          top,
+          right,
+          bottom,
+          Radius.circular(bodyHeight / 2),
+        ),
+      );
 
     final double ridge = bodyHeight * 0.22;
 
@@ -133,13 +131,12 @@ class ThoughtCloudShadowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = cloud.build(size).shift(offset);
-    final paint =
-        Paint()
-          ..color = color
-          ..maskFilter = MaskFilter.blur(
-            BlurStyle.normal,
-            ui.Shadow.convertRadiusToSigma(blurRadius),
-          );
+    final paint = Paint()
+      ..color = color
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        ui.Shadow.convertRadiusToSigma(blurRadius),
+      );
     canvas.drawPath(path, paint);
   }
 
@@ -170,23 +167,21 @@ class ThoughtBubbleBorderPainter extends CustomPainter {
 
     canvas.save();
     canvas.clipPath(path);
-    final highlightPaint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0
-          ..shader = ui.Gradient.linear(
-            Offset(0, cloud.inset),
-            Offset(0, size.height * 0.62),
-            [highlightColor, highlightColor.withValues(alpha: 0)],
-          );
+    final highlightPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..shader = ui.Gradient.linear(
+        Offset(0, cloud.inset),
+        Offset(0, size.height * 0.62),
+        [highlightColor, highlightColor.withValues(alpha: 0)],
+      );
     canvas.drawPath(path.shift(const Offset(0, 1.4)), highlightPaint);
     canvas.restore();
 
-    final borderPaint =
-        Paint()
-          ..color = borderColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth;
+    final borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
     canvas.drawPath(path, borderPaint);
   }
 

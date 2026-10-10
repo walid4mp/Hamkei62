@@ -1,10 +1,12 @@
 import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/core/services/media_cleanup_service.dart';
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
 import 'package:social_media_app/features/profile/services/edit_profile_services.dart';
+
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../../core/utilities/supabase_constants.dart';
@@ -38,17 +40,17 @@ class EditProfileCubit extends Cubit<EditProfileState>
       final uploadResults = await Future.wait([
         profileImage != null
             ? _editProfileServices.uploadImage(
-              file: profileImage,
-              userId: oldUser.id,
-              folder: 'avatars',
-            )
+                file: profileImage,
+                userId: oldUser.id,
+                folder: 'avatars',
+              )
             : Future.value(null),
         backgroundImage != null
             ? _editProfileServices.uploadImage(
-              file: backgroundImage,
-              userId: oldUser.id,
-              folder: 'backgrounds',
-            )
+                file: backgroundImage,
+                userId: oldUser.id,
+                folder: 'backgrounds',
+              )
             : Future.value(null),
       ]);
 
@@ -65,8 +67,8 @@ class EditProfileCubit extends Cubit<EditProfileState>
         'bio': bio,
         UserColumns.tagline:
             (normalizedTagline == null || normalizedTagline.isEmpty)
-                ? null
-                : normalizedTagline,
+            ? null
+            : normalizedTagline,
         UserColumns.isTaglineHidden: isTaglineHidden,
         if (socialLinks != null) UserColumns.socialLinks: socialLinks,
       };
@@ -108,10 +110,9 @@ class EditProfileCubit extends Cubit<EditProfileState>
           userName: userName,
           title: title,
           bio: bio,
-          tagline:
-              (normalizedTagline == null || normalizedTagline.isEmpty)
-                  ? null
-                  : normalizedTagline,
+          tagline: (normalizedTagline == null || normalizedTagline.isEmpty)
+              ? null
+              : normalizedTagline,
           isTaglineHidden: isTaglineHidden,
           imageUrl: profileUploadResult?.secureUrl ?? oldUser.imageUrl,
           backgroundImageUrl:

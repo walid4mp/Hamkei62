@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../cache/repository/media_cache_repository.dart';
 import '../models/media_transfer_state.dart';
 import 'media_state_overlay.dart';
@@ -99,9 +100,9 @@ class _MediaDownloadGateState extends State<MediaDownloadGate> {
       if (!mounted) return;
       final wasCancelled = e is DioException && CancelToken.isCancel(e);
       setState(
-        () =>
-            _phase =
-                wasCancelled ? _GatePhase.notDownloaded : _GatePhase.failed,
+        () => _phase = wasCancelled
+            ? _GatePhase.notDownloaded
+            : _GatePhase.failed,
       );
     }
   }
@@ -132,10 +133,9 @@ class _MediaDownloadGateState extends State<MediaDownloadGate> {
 
   @override
   Widget build(BuildContext context) {
-    final content =
-        _phase == _GatePhase.completed && _localPath != null
-            ? widget.completedBuilder(context, _localPath!)
-            : widget.previewBuilder(context);
+    final content = _phase == _GatePhase.completed && _localPath != null
+        ? widget.completedBuilder(context, _localPath!)
+        : widget.previewBuilder(context);
 
     return MediaStateOverlay(
       state: _overlayState,

@@ -6,6 +6,7 @@ import 'package:social_media_app/core/widgets/custom_user_profile_image_section.
 import 'package:social_media_app/features/auth/data/models/user_data.dart';
 import 'package:social_media_app/features/profile/cubits/profile_cubit/profile_cubit.dart';
 import 'package:social_media_app/features/profile/models/edit_profile_route_args.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../posts/cubits/posts_cubit/posts_cubit.dart';
@@ -71,9 +72,8 @@ class ProfileHeader extends StatelessWidget {
                 screenWidth: screenWidth,
                 backgroundHeight: bgHeight,
                 avatarSize: avatarSize,
-                onEditRequested:
-                    () =>
-                        _navigateToEditProfile(context, autofocusTagline: true),
+                onEditRequested: () =>
+                    _navigateToEditProfile(context, autofocusTagline: true),
               ),
             ),
 
@@ -89,10 +89,9 @@ class ProfileHeader extends StatelessWidget {
                 children: [
                   _buildCircularIconButton(
                     theme: theme,
-                    icon:
-                        isMe
-                            ? Icons.bookmark_outline_outlined
-                            : Icons.people_alt_outlined,
+                    icon: isMe
+                        ? Icons.bookmark_outline_outlined
+                        : Icons.people_alt_outlined,
                     tooltip: isMe ? 'Saved Posts' : 'Friends List',
                     onPressed: () {
                       if (isMe) {
@@ -141,10 +140,9 @@ class ProfileHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: ProfileUiTokens.screenPadding,
           ),
-          child:
-              isMe
-                  ? _buildMyProfileActions(context)
-                  : _buildOtherProfileActions(context),
+          child: isMe
+              ? _buildMyProfileActions(context)
+              : _buildOtherProfileActions(context),
         ),
       ],
     );
@@ -257,11 +255,9 @@ class ProfileHeader extends StatelessWidget {
           activeIcon: Icons.hourglass_top_rounded,
           idleStyle: ProfileActionStyle.primary,
           activeStyle: ProfileActionStyle.outlineMuted,
-          onPressed:
-              () =>
-                  isRequested
-                      ? cubit.cancelFriendRequest()
-                      : cubit.sendFriendRequest(),
+          onPressed: () => isRequested
+              ? cubit.cancelFriendRequest()
+              : cubit.sendFriendRequest(),
         );
       case FriendshipStatus.pendingReceived:
         return ProfileActionButton(

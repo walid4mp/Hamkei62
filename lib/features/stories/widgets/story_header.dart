@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/deep_link/services/deep_link_service.dart';
 import '../../../core/helpers/formatted_date.dart';
@@ -45,18 +46,17 @@ class StoryHeader extends StatelessWidget {
         ),
         const Gap(10),
         GestureDetector(
-          onTap:
-              isMyStory
-                  ? null
-                  : () async {
-                    onPause();
-                    await Navigator.pushNamed(
-                      context,
-                      AppRoutes.profileViewRoute,
-                      arguments: story.authorId,
-                    );
-                    onResume();
-                  },
+          onTap: isMyStory
+              ? null
+              : () async {
+                  onPause();
+                  await Navigator.pushNamed(
+                    context,
+                    AppRoutes.profileViewRoute,
+                    arguments: story.authorId,
+                  );
+                  onResume();
+                },
           child: Row(
             children: [
               PresenceAvatarWidget(
@@ -65,11 +65,10 @@ class StoryHeader extends StatelessWidget {
 
                 showBorder: false,
                 child: CircleAvatar(
-                  backgroundImage:
-                      story.authorImageUrl?.isNotEmpty == true
-                          ? CachedNetworkImageProvider(story.authorImageUrl!)
-                          : const AssetImage(AppImages.defaultUserImg)
-                              as ImageProvider,
+                  backgroundImage: story.authorImageUrl?.isNotEmpty == true
+                      ? CachedNetworkImageProvider(story.authorImageUrl!)
+                      : const AssetImage(AppImages.defaultUserImg)
+                            as ImageProvider,
                 ),
               ),
               const Gap(10),
@@ -82,9 +81,9 @@ class StoryHeader extends StatelessWidget {
                   ),
                   Text(
                     FormattedDate.getFormattedDate(
-                      DateTime.parse(
-                        story.createdAt,
-                      ).toLocal().toIso8601String(),
+                      DateTime.parse(story.createdAt)
+                          .toLocal()
+                          .toIso8601String(),
                     ),
                     style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
@@ -139,17 +138,16 @@ class StoryHeader extends StatelessWidget {
                 onResume();
               }
             },
-            itemBuilder:
-                (_) => const [
-                  PopupMenuItem(value: 'share', child: Text('Share Story')),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text(
-                      'Delete Story',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'share', child: Text('Share Story')),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text(
+                  'Delete Story',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
       ],
     );

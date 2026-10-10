@@ -1,9 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/router/app_routes.dart';
 import 'package:social_media_app/features/home/cubits/home_cubit/home_cubit.dart';
 import 'package:social_media_app/features/stories/models/story_model.dart';
+
 import '../../../core/supabase/supabase_provider.dart';
 import '../../posts/helpers/global_video_pause_gate.dart';
 import '../cubits/stories_cubit/stories_cubit.dart';
@@ -97,10 +99,9 @@ class _StoryItemWidgetState extends State<StoryItemWidget> {
     final currentUserId = SupabaseProvider.id;
 
     return BlocListener<StoriesCubit, StoriesState>(
-      listenWhen:
-          (_, current) =>
-              widget.story == null &&
-              (current is StoryImagePicked || current is StoryVideoPicked),
+      listenWhen: (_, current) =>
+          widget.story == null &&
+          (current is StoryImagePicked || current is StoryVideoPicked),
       listener: (context, state) {
         if (ModalRoute.of(context)?.isCurrent != true) return;
         if (state is StoryImagePicked) {
@@ -125,9 +126,8 @@ class _StoryItemWidgetState extends State<StoryItemWidget> {
   Widget _buildCard(BuildContext context, String? currentUserId) {
     if (widget.isOwnTile && !_hasOwnStories) {
       return BlocBuilder<StoriesCubit, StoriesState>(
-        buildWhen:
-            (_, current) =>
-                current is StoriesLoaded || current is AddStoryError,
+        buildWhen: (_, current) =>
+            current is StoriesLoaded || current is AddStoryError,
         builder: (context, state) {
           final currentUser = context.read<HomeCubit>().currentUserData;
           final storiesCubit = context.read<StoriesCubit>();
@@ -154,10 +154,9 @@ class _StoryItemWidgetState extends State<StoryItemWidget> {
 
     return StoryCardWidget(
       story: widget.story!,
-      label:
-          widget.story!.authorId == currentUserId
-              ? 'You'
-              : widget.story!.authorName,
+      label: widget.story!.authorId == currentUserId
+          ? 'You'
+          : widget.story!.authorName,
       onTap: () => _openOtherUserStory(context),
     );
   }

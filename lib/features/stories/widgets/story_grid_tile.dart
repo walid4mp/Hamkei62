@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+
 import '../../../core/cache/utils/cloudinary_url_extensions.dart';
 import '../../../core/helpers/chat_helper.dart';
 import '../../../core/mentions/widgets/mention_rich_text.dart';
@@ -113,10 +115,10 @@ class StoryGridTile extends StatelessWidget {
         final thumbUrl = story.videoUrl?.cloudinaryVideoThumbnailUrl;
         return thumbUrl != null
             ? CachedCloudinaryImage(
-              secureUrl: thumbUrl,
-              fit: BoxFit.cover,
-              errorWidget: (_, __) => Container(color: Colors.grey.shade800),
-            )
+                secureUrl: thumbUrl,
+                fit: BoxFit.cover,
+                errorWidget: (_, __) => Container(color: Colors.grey.shade800),
+              )
             : Container(color: Colors.grey.shade800);
 
       case StoryType.text:

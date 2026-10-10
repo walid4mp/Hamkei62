@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../../core/chat_shared/helpers/avatar_stack.dart';
 import '../../social_graph/models/content_privacy.dart';
@@ -167,8 +168,8 @@ class CreateStickerPackPrivacySection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  onPressed:
-                      () async => await showCreatePackFriendPicker(context),
+                  onPressed: () async =>
+                      await showCreatePackFriendPicker(context),
                   child: Text(
                     'Edit',
                     style: TextStyle(

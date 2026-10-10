@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/cache/repository/media_cache_repository.dart';
+
 import '../../../../core/errors/supabase_error_mapper.dart';
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../repository/stickers_repository.dart';
@@ -52,16 +54,15 @@ class StickerPacksCubit extends Cubit<StickerPacksState>
       final fileProgress = <String, double>{};
 
       void report() {
-        final overall =
-            totalWeight > 0
-                ? stickers.fold<double>(0, (sum, s) {
-                  return sum +
-                      (s.sizeBytes / totalWeight) *
-                          (fileProgress[s.imageUrl] ?? 0);
-                })
-                : (fileProgress.values.isEmpty
-                    ? 0.0
-                    : fileProgress.values.fold<double>(0, (a, b) => a + b) /
+        final overall = totalWeight > 0
+            ? stickers.fold<double>(0, (sum, s) {
+                return sum +
+                    (s.sizeBytes / totalWeight) *
+                        (fileProgress[s.imageUrl] ?? 0);
+              })
+            : (fileProgress.values.isEmpty
+                  ? 0.0
+                  : fileProgress.values.fold<double>(0, (a, b) => a + b) /
                         stickers.length);
 
         final latest = state;

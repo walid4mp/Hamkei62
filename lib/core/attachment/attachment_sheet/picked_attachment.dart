@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'attachment_kind.dart';
 
 class PickedAttachment {

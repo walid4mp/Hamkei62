@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/router/app_routes.dart';
@@ -46,41 +47,39 @@ class GroupInfoMembersList extends StatelessWidget {
             vertical: 4,
           ),
           leading: GestureDetector(
-            onTap:
-                isCurrentUser
-                    ? () {
-                      Navigator.of(context, rootNavigator: true).pushNamed(
-                        AppRoutes.fullScreenImageViewRoute,
-                        arguments: {
-                          'url':
-                              (member.userAvatar != null &&
-                                      member.userAvatar!.isNotEmpty)
-                                  ? member.userAvatar!
-                                  : AppImages.defaultUserImg,
-                          'tag': member.id,
-                          'isAsset':
-                              member.userAvatar == null ||
-                              member.userAvatar!.isEmpty,
-                        },
-                      );
-                    }
-                    : () {
-                      final user = ChatUserModel(
-                        id: member.userId,
-                        name: member.userName,
-                        imageUrl: member.userAvatar,
-                      );
+            onTap: isCurrentUser
+                ? () {
+                    Navigator.of(context, rootNavigator: true).pushNamed(
+                      AppRoutes.fullScreenImageViewRoute,
+                      arguments: {
+                        'url':
+                            (member.userAvatar != null &&
+                                member.userAvatar!.isNotEmpty)
+                            ? member.userAvatar!
+                            : AppImages.defaultUserImg,
+                        'tag': member.id,
+                        'isAsset':
+                            member.userAvatar == null ||
+                            member.userAvatar!.isEmpty,
+                      },
+                    );
+                  }
+                : () {
+                    final user = ChatUserModel(
+                      id: member.userId,
+                      name: member.userName,
+                      imageUrl: member.userAvatar,
+                    );
 
-                      showDialog(
-                        context: context,
-                        barrierColor: Colors.black54,
-                        builder:
-                            (_) => UserPreviewDialog(
-                              user: user,
-                              showContactOptions: true,
-                            ),
-                      );
-                    },
+                    showDialog(
+                      context: context,
+                      barrierColor: Colors.black54,
+                      builder: (_) => UserPreviewDialog(
+                        user: user,
+                        showContactOptions: true,
+                      ),
+                    );
+                  },
             child: Hero(
               tag: member.id,
               child: PresenceAvatarWidget(
@@ -90,22 +89,20 @@ class GroupInfoMembersList extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 24,
                   backgroundColor: primary.withValues(alpha: 0.12),
-                  backgroundImage:
-                      member.userAvatar?.isNotEmpty == true
-                          ? CachedNetworkImageProvider(member.userAvatar!)
-                          : null,
-                  child:
-                      member.userAvatar?.isEmpty != false
-                          ? Text(
-                            member.userName.isNotEmpty
-                                ? member.userName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                          : null,
+                  backgroundImage: member.userAvatar?.isNotEmpty == true
+                      ? CachedNetworkImageProvider(member.userAvatar!)
+                      : null,
+                  child: member.userAvatar?.isEmpty != false
+                      ? Text(
+                          member.userName.isNotEmpty
+                              ? member.userName[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                            color: primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -220,23 +217,19 @@ class GroupInfoMembersList extends StatelessWidget {
           if (value == 'demote') onDemote(member);
           if (value == 'remove') onRemove(member);
         },
-        itemBuilder:
-            (context) => [
-              if (!isMemberAdmin)
-                const PopupMenuItem(value: 'promote', child: Text('Make Admin'))
-              else
-                const PopupMenuItem(
-                  value: 'demote',
-                  child: Text('Remove Admin'),
-                ),
-              const PopupMenuItem(
-                value: 'remove',
-                child: Text(
-                  'Remove from group',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-              ),
-            ],
+        itemBuilder: (context) => [
+          if (!isMemberAdmin)
+            const PopupMenuItem(value: 'promote', child: Text('Make Admin'))
+          else
+            const PopupMenuItem(value: 'demote', child: Text('Remove Admin')),
+          const PopupMenuItem(
+            value: 'remove',
+            child: Text(
+              'Remove from group',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
       );
     }
 

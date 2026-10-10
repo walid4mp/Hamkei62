@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/cache/utils/cloudinary_url_extensions.dart';
 import 'package:social_media_app/core/widgets/cached_cloudinary_image.dart';
@@ -86,19 +87,18 @@ class BlurredVideoPlaceholder extends StatelessWidget {
         Container(color: Colors.black.withValues(alpha: 0.25)),
         if (hasThumbnail)
           Center(
-            child:
-                localThumbnailBytes != null
-                    ? Image.memory(
-                      localThumbnailBytes!,
-                      fit: BoxFit.contain,
-                      gaplessPlayback: true,
-                    )
-                    : CachedCloudinaryImage(
-                      secureUrl: networkThumbnailUrl!,
-                      fit: BoxFit.contain,
-                      placeholder: (_) => const SizedBox.shrink(),
-                      errorWidget: (_, __) => const SizedBox.shrink(),
-                    ),
+            child: localThumbnailBytes != null
+                ? Image.memory(
+                    localThumbnailBytes!,
+                    fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                  )
+                : CachedCloudinaryImage(
+                    secureUrl: networkThumbnailUrl!,
+                    fit: BoxFit.contain,
+                    placeholder: (_) => const SizedBox.shrink(),
+                    errorWidget: (_, __) => const SizedBox.shrink(),
+                  ),
           ),
         const Center(
           child: CustomLoadingIndicator(radius: 14, color: Colors.white),

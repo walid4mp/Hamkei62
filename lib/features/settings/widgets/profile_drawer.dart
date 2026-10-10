@@ -6,6 +6,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:social_media_app/features/auth/cubits/auth_cubit/auth_cubit.dart';
 import 'package:social_media_app/features/profile/cubits/profile_cubit/profile_cubit.dart';
 import 'package:social_media_app/features/settings/widgets/drawer_item_widget.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../core/toast/app_toast.dart';
 import '../../discover/views/discover_people_search_view.dart';
@@ -72,22 +73,22 @@ class ProfileDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context, rootNavigator: true).push(
                       PageRouteBuilder(
-                        pageBuilder:
-                            (_, animation, __) =>
-                                const DiscoverPeopleSearchView(),
+                        pageBuilder: (_, animation, __) =>
+                            const DiscoverPeopleSearchView(),
                         transitionsBuilder: (_, anim, __, child) {
                           return FadeTransition(
                             opacity: anim,
                             child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0, 0.05),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: anim,
-                                  curve: Curves.easeOut,
-                                ),
-                              ),
+                              position:
+                                  Tween<Offset>(
+                                    begin: const Offset(0, 0.05),
+                                    end: Offset.zero,
+                                  ).animate(
+                                    CurvedAnimation(
+                                      parent: anim,
+                                      curve: Curves.easeOut,
+                                    ),
+                                  ),
                               child: child,
                             ),
                           );
@@ -124,12 +125,11 @@ class ProfileDrawer extends StatelessWidget {
                 DrawerItemWidget(
                   icon: Icons.settings_outlined,
                   title: "Settings",
-                  onTap:
-                      () =>
-                          Navigator.of(context, rootNavigator: true).pushNamed(
-                            AppRoutes.settingsViewRoute,
-                            arguments: context.read<ProfileCubit>(),
-                          ),
+                  onTap: () =>
+                      Navigator.of(context, rootNavigator: true).pushNamed(
+                        AppRoutes.settingsViewRoute,
+                        arguments: context.read<ProfileCubit>(),
+                      ),
                 ),
                 DrawerItemWidget(
                   icon: Icons.info_outline,
@@ -150,20 +150,18 @@ class ProfileDrawer extends StatelessWidget {
                       AppToast.error(state.errMsg);
                     }
                   },
-                  buildWhen:
-                      (previous, current) =>
-                          current is AuthSignedOut ||
-                          current is AuthFailure ||
-                          current is AuthLoading,
+                  buildWhen: (previous, current) =>
+                      current is AuthSignedOut ||
+                      current is AuthFailure ||
+                      current is AuthLoading,
                   builder: (context, state) {
                     return DrawerItemWidget(
                       icon: Icons.logout,
                       color: Colors.red.withValues(alpha: 0.92),
                       title: "Log Out",
-                      onTap:
-                          state is AuthLoading
-                              ? () {}
-                              : () => context.read<AuthCubit>().signOut(),
+                      onTap: state is AuthLoading
+                          ? () {}
+                          : () => context.read<AuthCubit>().signOut(),
                     );
                   },
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/themes/app_colors.dart';
 import 'package:social_media_app/core/widgets/custom_loading_indicator.dart';
+
 import '../../../core/cache/repository/media_cache_repository.dart';
 import '../cubits/sticker_pack_detail_cubit/sticker_pack_detail_cubit.dart';
 import '../cubits/sticker_pack_detail_cubit/sticker_pack_detail_state.dart';
@@ -17,11 +18,10 @@ class StickerPackDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (_) => StickerPackDetailCubit(
-            packId: pack.id,
-            mediaCacheRepository: context.read<MediaCacheRepository>(),
-          ),
+      create: (_) => StickerPackDetailCubit(
+        packId: pack.id,
+        mediaCacheRepository: context.read<MediaCacheRepository>(),
+      ),
       child: _StickerPackDetailSheetBody(pack: pack),
     );
   }

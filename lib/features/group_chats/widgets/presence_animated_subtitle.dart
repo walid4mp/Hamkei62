@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/widgets/animated_activity_text.dart';
 import '../helpers/group_presence_text_formatter.dart';
 import '../helpers/presence_rotation_controller.dart';
@@ -56,30 +57,29 @@ class _PresenceAnimatedSubtitleState extends State<PresenceAnimatedSubtitle> {
           child: Align(
             key: ValueKey(phrase == null ? 'fallback' : phrase.text),
             alignment: AlignmentDirectional.centerStart,
-            child:
-                phrase == null
-                    ? widget.fallback
-                    : FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: AnimatedActivityText(
-                        text: phrase.text,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: (widget.activeStyle ??
-                                const TextStyle(
-                                  fontSize: 11,
-                                  fontStyle: FontStyle.italic,
-                                ))
-                            .copyWith(
-                              color:
-                                  phrase.action == ChatActionType.recording
-                                      ? Colors.red.shade700
-                                      : (widget.activeStyle?.color ??
+            child: phrase == null
+                ? widget.fallback
+                : FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: AnimatedActivityText(
+                      text: phrase.text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          (widget.activeStyle ??
+                                  const TextStyle(
+                                    fontSize: 11,
+                                    fontStyle: FontStyle.italic,
+                                  ))
+                              .copyWith(
+                                color: phrase.action == ChatActionType.recording
+                                    ? Colors.red.shade700
+                                    : (widget.activeStyle?.color ??
                                           Colors.green.shade600),
-                            ),
-                      ),
+                              ),
                     ),
+                  ),
           ),
         );
       },

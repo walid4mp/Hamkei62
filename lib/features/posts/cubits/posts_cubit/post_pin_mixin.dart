@@ -13,8 +13,9 @@ mixin PostPinMixin on Cubit<PostsState> {
     final userId = SupabaseProvider.idOrNull;
     if (userId == null) return PinResult.ignored;
 
-    final feed =
-        state is PostsLoaded ? (state as PostsLoaded).posts : cachedPosts;
+    final feed = state is PostsLoaded
+        ? (state as PostsLoaded).posts
+        : cachedPosts;
     final post = feed.where((p) => p.id == postId).firstOrNull;
     if (post == null || post.authorId != userId) return PinResult.ignored;
     if (!_pinInFlight.add(postId)) return PinResult.ignored; // double tap
@@ -53,12 +54,12 @@ mixin PostPinMixin on Cubit<PostsState> {
   }
 
   void _setPinned(String postId, bool value) {
-    final base =
-        state is PostsLoaded ? (state as PostsLoaded).posts : cachedPosts;
-    final updated =
-        base
-            .map((p) => p.id == postId ? p.copyWith(isPinned: value) : p)
-            .toList();
+    final base = state is PostsLoaded
+        ? (state as PostsLoaded).posts
+        : cachedPosts;
+    final updated = base
+        .map((p) => p.id == postId ? p.copyWith(isPinned: value) : p)
+        .toList();
     cachedPosts = updated;
     emit(PostsLoaded(updated, DateTime.now()));
   }

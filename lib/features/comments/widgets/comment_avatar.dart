@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/presence/widgets/presence_avatar_widget.dart';
 import '../../../core/router/app_routes.dart';
@@ -39,8 +40,9 @@ class CommentAvatar extends StatelessWidget {
   }
 
   void _openMyAvatar(BuildContext context) {
-    final url =
-        imageUrl?.isNotEmpty == true ? imageUrl! : AppImages.defaultUserImg;
+    final url = imageUrl?.isNotEmpty == true
+        ? imageUrl!
+        : AppImages.defaultUserImg;
 
     Navigator.of(context, rootNavigator: true).pushNamed(
       AppRoutes.fullScreenImageViewRoute,

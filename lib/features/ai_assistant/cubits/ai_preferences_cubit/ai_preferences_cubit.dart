@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../entities/ai_autocomplete_language.dart';
 import '../../entities/ai_reply_length.dart';

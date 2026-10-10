@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../utils/search_view_metrics.dart';
 import 'accounts_tab_view.dart';
 import 'for_you_tab_view.dart';
@@ -162,20 +164,19 @@ class _SearchViewBodyWidgetState extends State<SearchViewBodyWidget>
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
-                        tabs:
-                            _tabLabels
-                                .map(
-                                  (label) => Tab(
-                                    height: 36,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 13.0,
-                                      ),
-                                      child: Text(label),
-                                    ),
+                        tabs: _tabLabels
+                            .map(
+                              (label) => Tab(
+                                height: 36,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13.0,
                                   ),
-                                )
-                                .toList(),
+                                  child: Text(label),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
                   ),

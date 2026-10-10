@@ -38,20 +38,18 @@ class UsersList extends StatelessWidget {
               CircleAvatar(
                 radius: 22,
                 backgroundColor: primary.withValues(alpha: 0.12),
-                backgroundImage:
-                    (imageUrl != null && imageUrl.isNotEmpty)
-                        ? CachedNetworkImageProvider(imageUrl)
-                        : null,
-                child:
-                    (imageUrl == null || imageUrl.isEmpty)
-                        ? Text(
-                          name.isNotEmpty ? name[0].toUpperCase() : '?',
-                          style: TextStyle(
-                            color: primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                        : null,
+                backgroundImage: (imageUrl != null && imageUrl.isNotEmpty)
+                    ? CachedNetworkImageProvider(imageUrl)
+                    : null,
+                child: (imageUrl == null || imageUrl.isEmpty)
+                    ? Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          color: primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null,
               ),
               if (selected)
                 Positioned(
@@ -80,14 +78,13 @@ class UsersList extends StatelessWidget {
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
-          trailing:
-              selected
-                  ? Icon(Icons.check_circle, color: primary, size: 22)
-                  : Icon(
-                    Icons.circle_outlined,
-                    color: isDark ? Colors.white38 : Colors.black26,
-                    size: 22,
-                  ),
+          trailing: selected
+              ? Icon(Icons.check_circle, color: primary, size: 22)
+              : Icon(
+                  Icons.circle_outlined,
+                  color: isDark ? Colors.white38 : Colors.black26,
+                  size: 22,
+                ),
           onTap: () => onToggle(uid),
         );
       },

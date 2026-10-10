@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../../discover/cubits/discover_people_cubit.dart';
 import '../../discover/widgets/discover_person_card_widget.dart';
 import '../utils/search_view_metrics.dart';
@@ -52,10 +53,9 @@ class SuggestedAccountsSection extends StatelessWidget {
                           isCompact: true,
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  theme.brightness == Brightness.dark
-                                      ? Colors.black.withValues(alpha: 0.25)
-                                      : Colors.black.withValues(alpha: 0.04),
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.black.withValues(alpha: 0.25)
+                                  : Colors.black.withValues(alpha: 0.04),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

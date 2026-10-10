@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../features/posts/models/post_details_route_args.dart';
 import '../../features/posts/services/posts_services.dart';
 import '../../features/posts/views/post_details_view.dart';

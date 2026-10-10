@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/core/services/file_picker_services.dart';
@@ -7,6 +8,7 @@ import 'package:social_media_app/features/gifs/models/gif_result_model.dart';
 import 'package:social_media_app/features/gifs/widgets/gif_picker_sheet.dart';
 import 'package:social_media_app/features/stickers/models/sticker_model.dart';
 import 'package:social_media_app/features/stickers/widgets/sticker_send_picker_sheet.dart';
+
 import '../utils/video_attachment_meta.dart';
 import 'attachment_kind.dart';
 import 'picked_attachment.dart';
@@ -45,16 +47,15 @@ class AttachmentPickerSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (_) => AttachmentPickerSheet(
-            showVoiceOption: showVoiceOption,
-            showFileOption: showFileOption,
-            showCameraOption: showCameraOption,
-            showVideoOption: showVideoOption,
-            showGifOption: showGifOption,
-            showStickerOption: showStickerOption,
-            onRecordVoice: onRecordVoice,
-          ),
+      builder: (_) => AttachmentPickerSheet(
+        showVoiceOption: showVoiceOption,
+        showFileOption: showFileOption,
+        showCameraOption: showCameraOption,
+        showVideoOption: showVideoOption,
+        showGifOption: showGifOption,
+        showStickerOption: showStickerOption,
+        onRecordVoice: onRecordVoice,
+      ),
     );
   }
 
@@ -173,9 +174,8 @@ class AttachmentPickerSheet extends StatelessWidget {
           const Gap(6),
           Text(
             option.label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

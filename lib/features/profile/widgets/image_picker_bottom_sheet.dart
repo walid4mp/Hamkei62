@@ -26,10 +26,8 @@ class ImagePickerBottomSheet extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 18,
-              ),
+              style: Theme.of(context).textTheme.titleMedium!
+                  .copyWith(fontWeight: FontWeight.w500, fontSize: 18),
             ),
             Gap(20),
             ListTile(

@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:flutter/material.dart';
 import 'package:social_media_app/core/services/cloudinary_upload_result.dart';
 import 'package:social_media_app/core/services/network_status_service.dart';
+
 import '../../../core/services/cloudinary_storage_services.dart';
 import '../../../core/services/media_cleanup_service.dart';
 import '../../../core/services/supabase_database_services.dart';
@@ -98,11 +100,10 @@ class StoriesServices {
             'story_mentions(${StoryMentionColumns.mentionedUserId},${StoryMentionColumns.startIndex},${StoryMentionColumns.endIndex}),'
             '${SupabaseConstants.users}!stories_author_id_fkey'
             '(${UserColumns.name}, ${UserColumns.imageUrl})',
-        filter:
-            (query) => query
-                .eq(StoryColumns.authorId, authorId)
-                .or(orParts.join(','))
-                .order(StoryColumns.createdAt, ascending: false),
+        filter: (query) => query
+            .eq(StoryColumns.authorId, authorId)
+            .or(orParts.join(','))
+            .order(StoryColumns.createdAt, ascending: false),
         builder: (data, id) => StoryModel.fromMap(data),
         primaryKey: StoryColumns.id,
       );
@@ -141,10 +142,9 @@ class StoriesServices {
             'story_mentions(${StoryMentionColumns.mentionedUserId},${StoryMentionColumns.startIndex},${StoryMentionColumns.endIndex}),'
             '${SupabaseConstants.users}!stories_author_id_fkey'
             '(${UserColumns.name}, ${UserColumns.imageUrl})',
-        filter:
-            (query) => query
-                .or(orParts.join(','))
-                .order(StoryColumns.createdAt, ascending: false),
+        filter: (query) => query
+            .or(orParts.join(','))
+            .order(StoryColumns.createdAt, ascending: false),
         builder: (data, id) => StoryModel.fromMap(data),
         primaryKey: StoryColumns.id,
       );
@@ -178,8 +178,8 @@ class StoriesServices {
             '*,'
             '${SupabaseConstants.users}!stories_author_id_fkey'
             '(${UserColumns.name}, ${UserColumns.imageUrl})',
-        filter:
-            (query) => query.eq(StoryColumns.id, storyId).or(orParts.join(',')),
+        filter: (query) =>
+            query.eq(StoryColumns.id, storyId).or(orParts.join(',')),
         builder: (data, id) => StoryModel.fromMap(data),
         primaryKey: StoryColumns.id,
       );
@@ -192,13 +192,12 @@ class StoriesServices {
 
   Future<String?> getMyReaction(String storyId) async {
     final userId = _supabase.auth.currentUser!.id;
-    final row =
-        await _supabase
-            .from(SupabaseConstants.storyReactions)
-            .select(StoryReactionColumns.reaction)
-            .eq(StoryReactionColumns.storyId, storyId)
-            .eq(StoryReactionColumns.userId, userId)
-            .maybeSingle();
+    final row = await _supabase
+        .from(SupabaseConstants.storyReactions)
+        .select(StoryReactionColumns.reaction)
+        .eq(StoryReactionColumns.storyId, storyId)
+        .eq(StoryReactionColumns.userId, userId)
+        .maybeSingle();
     return row?[StoryReactionColumns.reaction] as String?;
   }
 

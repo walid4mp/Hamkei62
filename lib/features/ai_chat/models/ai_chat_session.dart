@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+
 import '../../../core/cache/constants/hive_type_ids.dart';
 part 'ai_chat_session.g.dart';
 
@@ -54,10 +55,9 @@ class AiChatSession extends HiveObject {
     activeProvider: json['active_provider'] as String?,
     activeModel: json['active_model'] as String?,
     lastMessagePreview: json['last_message_preview'] as String?,
-    lastMessageAt:
-        json['last_message_at'] == null
-            ? null
-            : DateTime.parse(json['last_message_at'] as String),
+    lastMessageAt: json['last_message_at'] == null
+        ? null
+        : DateTime.parse(json['last_message_at'] as String),
     messageCount: json['message_count'] as int? ?? 0,
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),

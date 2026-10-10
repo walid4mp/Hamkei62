@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/router/app_routes.dart';
 import '../../../features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
 import '../../../features/group_chats/helpers/group_navigation.dart';
@@ -140,8 +141,9 @@ class _NewChatViewState extends State<NewChatView> {
                 child: InkWell(
                   onTap: () {
                     Navigator.of(context).popUntil((route) => route.isFirst);
-                    final navController =
-                        context.read<HomeCubit>().navController;
+                    final navController = context
+                        .read<HomeCubit>()
+                        .navController;
                     if (navController != null) {
                       navController.jumpToTab(1);
                     }
@@ -155,30 +157,27 @@ class _NewChatViewState extends State<NewChatView> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          isDark
-                              ? Colors.white.withValues(alpha: 0.03)
-                              : Colors.white,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.03)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color:
-                            isDark
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.05),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.05),
                         width: 1,
                       ),
-                      boxShadow:
-                          isDark
-                              ? null
-                              : [
-                                BoxShadow(
-                                  color: theme.primaryColor.withValues(
-                                    alpha: 0.08,
-                                  ),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 8),
+                      boxShadow: isDark
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: theme.primaryColor.withValues(
+                                  alpha: 0.08,
                                 ),
-                              ],
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -307,10 +306,9 @@ class _NewChatViewState extends State<NewChatView> {
                             color: Colors.grey,
                           ),
                           filled: true,
-                          fillColor:
-                              theme.brightness == Brightness.dark
-                                  ? Colors.grey.shade900
-                                  : Colors.grey.shade100,
+                          fillColor: theme.brightness == Brightness.dark
+                              ? Colors.grey.shade900
+                              : Colors.grey.shade100,
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 0,
                           ),
@@ -318,21 +316,20 @@ class _NewChatViewState extends State<NewChatView> {
                             borderRadius: BorderRadius.circular(20),
                             borderSide: BorderSide.none,
                           ),
-                          suffixIcon:
-                              _searchQuery.isNotEmpty
-                                  ? IconButton(
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      size: 18,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() => _searchQuery = '');
-                                      context.read<NewChatCubit>().search('');
-                                    },
-                                  )
-                                  : null,
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    size: 18,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                    context.read<NewChatCubit>().search('');
+                                  },
+                                )
+                              : null,
                         ),
                       ),
                     ),
@@ -348,47 +345,55 @@ class _NewChatViewState extends State<NewChatView> {
                 else if (state is NewChatLoaded)
                   state.rows.isEmpty
                       ? SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: _buildPremiumEmptyState(context),
-                      )
+                          hasScrollBody: false,
+                          child: _buildPremiumEmptyState(context),
+                        )
                       : SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final row = state.rows[index];
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final row = state.rows[index];
 
-                          if (row is NewChatSectionHeaderRow) {
-                            return Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
-                              child: Text(
-                                row.title,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).hintColor,
+                            if (row is NewChatSectionHeaderRow) {
+                              return Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  6,
                                 ),
-                              ),
-                            );
-                          }
-
-                          final itemRow = row as NewChatItemRow;
-                          final item = itemRow.item;
-
-                          return item.isGroup
-                              ? NewChatGroupTile(
-                                key: ValueKey('g_${item.id}'),
-                                group: item.group!,
-                                isBlocked: itemRow.isBlocked,
-                                searchQuery: _searchQuery,
-                                onTap: () => _openChat(context, item),
-                              )
-                              : NewChatContactTile(
-                                key: ValueKey('p_${item.id}'),
-                                user: item.person!,
-                                isBlocked: itemRow.isBlocked,
-                                searchQuery: _searchQuery,
-                                onTap: () => _openChat(context, item),
+                                child: Text(
+                                  row.title,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
                               );
-                        }, childCount: state.rows.length),
-                      ),
+                            }
+
+                            final itemRow = row as NewChatItemRow;
+                            final item = itemRow.item;
+
+                            return item.isGroup
+                                ? NewChatGroupTile(
+                                    key: ValueKey('g_${item.id}'),
+                                    group: item.group!,
+                                    isBlocked: itemRow.isBlocked,
+                                    searchQuery: _searchQuery,
+                                    onTap: () => _openChat(context, item),
+                                  )
+                                : NewChatContactTile(
+                                    key: ValueKey('p_${item.id}'),
+                                    user: item.person!,
+                                    isBlocked: itemRow.isBlocked,
+                                    searchQuery: _searchQuery,
+                                    onTap: () => _openChat(context, item),
+                                  );
+                          }, childCount: state.rows.length),
+                        ),
               ],
             );
           },

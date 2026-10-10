@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../router/app_routes.dart';
 import '../../services/active_screen_tracker.dart';
 import '../cubits/connectivity_cubit.dart';
@@ -115,20 +117,19 @@ class _ConnectivityBannerState extends State<ConnectivityBanner>
           bottom: false,
           child: Align(
             alignment: Alignment.topCenter,
-            child:
-                _mode == _BannerMode.hidden
-                    ? const SizedBox.shrink()
-                    : SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: _FloatingStatusCard(
-                          key: ValueKey(_mode),
-                          isOffline: _mode == _BannerMode.offline,
-                          onDismiss: _hide,
-                        ),
+            child: _mode == _BannerMode.hidden
+                ? const SizedBox.shrink()
+                : SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: _FloatingStatusCard(
+                        key: ValueKey(_mode),
+                        isOffline: _mode == _BannerMode.offline,
+                        onDismiss: _hide,
                       ),
                     ),
+                  ),
           ),
         ),
       ),
@@ -151,20 +152,21 @@ class _FloatingStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Color background =
-        isOffline ? theme.colorScheme.error : _restoredColor;
-    final Color onBackground =
-        isOffline ? theme.colorScheme.onError : Colors.white;
+    final Color background = isOffline
+        ? theme.colorScheme.error
+        : _restoredColor;
+    final Color onBackground = isOffline
+        ? theme.colorScheme.onError
+        : Colors.white;
 
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 14, right: 14),
       child: Material(
         color: Colors.transparent,
         child: GestureDetector(
-          onTap:
-              isOffline
-                  ? () => context.read<ConnectivityCubit>().checkNow()
-                  : null,
+          onTap: isOffline
+              ? () => context.read<ConnectivityCubit>().checkNow()
+              : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(

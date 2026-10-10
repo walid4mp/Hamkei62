@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../models/content_privacy.dart';
 
 class PrivacyChip extends StatelessWidget {

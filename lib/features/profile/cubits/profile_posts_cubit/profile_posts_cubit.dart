@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../posts/cubits/posts_cubit/posts_cubit.dart';
 import '../../../posts/models/post_model.dart';
@@ -322,10 +324,9 @@ class ProfilePostsCubit extends Cubit<ProfilePostsState>
     return newest == null || t.isAfter(newest);
   }
 
-  String _errorMessage(Object e) =>
-      e.toString().contains('no-internet')
-          ? 'No internet connection. Please check your network.'
-          : 'Failed to load posts.';
+  String _errorMessage(Object e) => e.toString().contains('no-internet')
+      ? 'No internet connection. Please check your network.'
+      : 'Failed to load posts.';
 
   @override
   Future<void> close() {

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +22,7 @@ import 'package:social_media_app/features/posts/views/post_details_view.dart';
 import 'package:social_media_app/features/single_chats/models/chat_user_model.dart';
 import 'package:social_media_app/features/stories/cubits/stories_cubit/stories_cubit.dart';
 import 'package:social_media_app/features/stories/models/story_model.dart';
+
 import '../../../features/group_chats/helpers/group_navigation.dart';
 
 class TapActionHandler {
@@ -343,10 +345,9 @@ class TapActionHandler {
     try {
       await storiesCubit.fetchStories(isRefresh: true);
       final myUserId = SupabaseProvider.idOrNull;
-      final myStories =
-          storiesCubit.cachedStories
-              .where((s) => s.authorId == myUserId)
-              .toList();
+      final myStories = storiesCubit.cachedStories
+          .where((s) => s.authorId == myUserId)
+          .toList();
       final storyIndex = myStories.indexWhere((s) => s.id == storyId);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -389,12 +390,11 @@ class TapActionHandler {
       await storiesCubit.fetchStories(isRefresh: true);
       final match = storiesCubit.cachedStories.where((s) => s.id == storyId);
       final authorId = match.isNotEmpty ? match.first.authorId : null;
-      final authorGroup =
-          authorId == null
-              ? <StoryModel>[]
-              : storiesCubit.cachedStories
-                  .where((s) => s.authorId == authorId)
-                  .toList();
+      final authorGroup = authorId == null
+          ? <StoryModel>[]
+          : storiesCubit.cachedStories
+                .where((s) => s.authorId == authorId)
+                .toList();
       final storyIndex = authorGroup.indexWhere((s) => s.id == storyId);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import 'package:social_media_app/features/discover/views/discover_view.dart';
 import 'package:social_media_app/features/profile/services/user_services.dart';
 import 'package:social_media_app/features/profile/views/profile_view.dart';
 import 'package:social_media_app/features/settings/widgets/profile_drawer.dart';
+
 import '../../features/group_chats/cubits/group_list_cubit/group_list_cubit.dart';
 import '../../features/home/cubits/home_cubit/home_cubit.dart';
 import '../../features/home/views/home_view.dart';
@@ -135,15 +137,13 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   Future<bool?> _showExitConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      builder:
-          (context) => CustomConfirmationDialog(
-            title: 'Are you sure you want to quit ?',
-            textAlign: TextAlign.center,
-            img: AppImages.exitAnimationLot,
+      builder: (context) => CustomConfirmationDialog(
+        title: 'Are you sure you want to quit ?',
+        textAlign: TextAlign.center,
+        img: AppImages.exitAnimationLot,
 
-            onConfirm:
-                () => Navigator.of(context, rootNavigator: true).pop(true),
-          ),
+        onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
+      ),
     );
   }
 
@@ -182,37 +182,35 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           child: MultiBlocProvider(
             providers: [
               BlocProvider(
-                create:
-                    (context) => ProfileCubit(
-                      context.read<UserService>(),
-                      friendshipServices: context.read<FriendshipServices>(),
-                      followServices: context.read<FollowServices>(),
-                      homeCubit: context.read<HomeCubit>(),
-                      connectivityCubit: context.read<ConnectivityCubit>(),
-                    )..getProfileData(userId),
+                create: (context) => ProfileCubit(
+                  context.read<UserService>(),
+                  friendshipServices: context.read<FriendshipServices>(),
+                  followServices: context.read<FollowServices>(),
+                  homeCubit: context.read<HomeCubit>(),
+                  connectivityCubit: context.read<ConnectivityCubit>(),
+                )..getProfileData(userId),
               ),
 
               BlocProvider(
-                create:
-                    (context) => ProfilePostsCubit(
-                      userId: userId,
-                      postsServices: context.read<PostsServices>(),
-                      postsCubit: context.read<PostsCubit>(),
-                    )..loadInitial(),
+                create: (context) => ProfilePostsCubit(
+                  userId: userId,
+                  postsServices: context.read<PostsServices>(),
+                  postsCubit: context.read<PostsCubit>(),
+                )..loadInitial(),
               ),
             ],
             child: AnnotatedRegion<SystemUiOverlayStyle>(
-              value: (currentTheme.isDark
-                      ? SystemUiOverlayStyle.light
-                      : SystemUiOverlayStyle.dark)
-                  .copyWith(
-                    statusBarColor: Colors.transparent,
-                    systemNavigationBarColor: currentTheme.bgBase,
-                    systemNavigationBarIconBrightness:
-                        currentTheme.isDark
+              value:
+                  (currentTheme.isDark
+                          ? SystemUiOverlayStyle.light
+                          : SystemUiOverlayStyle.dark)
+                      .copyWith(
+                        statusBarColor: Colors.transparent,
+                        systemNavigationBarColor: currentTheme.bgBase,
+                        systemNavigationBarIconBrightness: currentTheme.isDark
                             ? Brightness.light
                             : Brightness.dark,
-                  ),
+                      ),
               child: Scaffold(
                 backgroundColor: currentTheme.bgBase,
                 key: _scaffoldKey,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/chat_shared/widgets/reply_preview_thumbnail.dart';
 import '../../../core/themes/app_colors.dart';
 import '../models/message_model.dart';

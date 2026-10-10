@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/profile_mutuals_model.dart';
 import '../utils/profile_ui_tokens.dart';
 import 'profile_avatar_stack.dart';
@@ -25,8 +26,10 @@ class FriendsCountBadge extends StatelessWidget {
 
     final tokens = ProfileUiTokens.of(context);
     final showMutual = !isMe && mutualFriendsCount > 0;
-    final avatarUrls =
-        mutualPreviews.take(2).map((friend) => friend.imageUrl).toList();
+    final avatarUrls = mutualPreviews
+        .take(2)
+        .map((friend) => friend.imageUrl)
+        .toList();
 
     return Material(
       color: tokens.surfaceVariant,

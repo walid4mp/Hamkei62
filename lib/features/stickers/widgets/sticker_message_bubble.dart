@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../utils/animated_loop_cloudinary_sticker.dart';
 
 class StickerMessageBubble extends StatelessWidget {

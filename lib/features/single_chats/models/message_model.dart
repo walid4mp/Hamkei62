@@ -194,20 +194,19 @@ class MessageModel {
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     final reactionsRaw = json['reactions'];
-    final Map<String, String> reactionsMap =
-        reactionsRaw is Map
-            ? reactionsRaw.map(
-              (key, value) => MapEntry(key.toString(), value.toString()),
-            )
-            : {};
+    final Map<String, String> reactionsMap = reactionsRaw is Map
+        ? reactionsRaw.map(
+            (key, value) => MapEntry(key.toString(), value.toString()),
+          )
+        : {};
 
     final reactionsCreatedAtRaw = json['reactionsCreatedAt'];
     final Map<String, String>? reactionsCreatedAtMap =
         reactionsCreatedAtRaw is Map
-            ? reactionsCreatedAtRaw.map(
-              (key, value) => MapEntry(key.toString(), value.toString()),
-            )
-            : null;
+        ? reactionsCreatedAtRaw.map(
+            (key, value) => MapEntry(key.toString(), value.toString()),
+          )
+        : null;
     return MessageModel(
       id: json[MessagesColumns.id],
       clientMessageId: _nullIfEmpty(json[MessagesColumns.clientMessageId]),
@@ -223,33 +222,27 @@ class MessageModel {
       voiceUrl: _nullIfEmpty(json[MessagesColumns.voiceUrl]),
       durationSeconds: (json[MessagesColumns.durationSeconds] as num?)?.toInt(),
       fileUrl: _nullIfEmpty(json[MessagesColumns.fileUrl]),
-      fileName:
-          json[MessagesColumns.fileName] == ''
-              ? null
-              : json[MessagesColumns.fileName],
+      fileName: json[MessagesColumns.fileName] == ''
+          ? null
+          : json[MessagesColumns.fileName],
       fileSizeBytes: (json[MessagesColumns.fileSizeBytes] as num?)?.toInt(),
-      caption:
-          json[MessagesColumns.caption] == ''
-              ? null
-              : json[MessagesColumns.caption],
+      caption: json[MessagesColumns.caption] == ''
+          ? null
+          : json[MessagesColumns.caption],
       reactions: reactionsMap,
       reactionsCreatedAt: reactionsCreatedAtMap,
-      replyToMessageId:
-          json[MessagesColumns.replyToMessageId] == ''
-              ? null
-              : json[MessagesColumns.replyToMessageId],
-      replyToText:
-          json[MessagesColumns.replyToText] == ''
-              ? null
-              : json[MessagesColumns.replyToText],
-      replyToMessageType:
-          json[MessagesColumns.replyToMessageType] == ''
-              ? null
-              : json[MessagesColumns.replyToMessageType],
-      replyToSenderId:
-          json[MessagesColumns.replyToSenderId] == ''
-              ? null
-              : json[MessagesColumns.replyToSenderId],
+      replyToMessageId: json[MessagesColumns.replyToMessageId] == ''
+          ? null
+          : json[MessagesColumns.replyToMessageId],
+      replyToText: json[MessagesColumns.replyToText] == ''
+          ? null
+          : json[MessagesColumns.replyToText],
+      replyToMessageType: json[MessagesColumns.replyToMessageType] == ''
+          ? null
+          : json[MessagesColumns.replyToMessageType],
+      replyToSenderId: json[MessagesColumns.replyToSenderId] == ''
+          ? null
+          : json[MessagesColumns.replyToSenderId],
       replyToMediaUrl: _nullIfEmpty(
         json[MessagesColumns.replyToMediaUrl],
       ), // NEW
@@ -259,44 +252,36 @@ class MessageModel {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
-      replyToStoryId:
-          json[MessagesColumns.replyToStoryId] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryId],
-      replyToStoryAuthorId:
-          json[MessagesColumns.replyToStoryAuthorId] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryAuthorId],
-      replyToStoryType:
-          json[MessagesColumns.replyToStoryType] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryType],
-      replyToStoryMediaUrl:
-          json[MessagesColumns.replyToStoryMediaUrl] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryMediaUrl],
-      replyToStoryText:
-          json[MessagesColumns.replyToStoryText] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryText],
-      replyToStoryBgColor:
-          json[MessagesColumns.replyToStoryBgColor] == ''
-              ? null
-              : json[MessagesColumns.replyToStoryBgColor],
+      replyToStoryId: json[MessagesColumns.replyToStoryId] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryId],
+      replyToStoryAuthorId: json[MessagesColumns.replyToStoryAuthorId] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryAuthorId],
+      replyToStoryType: json[MessagesColumns.replyToStoryType] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryType],
+      replyToStoryMediaUrl: json[MessagesColumns.replyToStoryMediaUrl] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryMediaUrl],
+      replyToStoryText: json[MessagesColumns.replyToStoryText] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryText],
+      replyToStoryBgColor: json[MessagesColumns.replyToStoryBgColor] == ''
+          ? null
+          : json[MessagesColumns.replyToStoryBgColor],
       replyToStoryDurationSeconds:
           (json[MessagesColumns.replyToStoryDurationSeconds] as num?)?.toInt(),
-      forwardedFromUserId:
-          json[MessagesColumns.forwardedFromUserId] == ''
-              ? null
-              : json[MessagesColumns.forwardedFromUserId],
-      forwardedFromUserName:
-          json[MessagesColumns.forwardedFromUserName] == ''
-              ? null
-              : json[MessagesColumns.forwardedFromUserName],
+      forwardedFromUserId: json[MessagesColumns.forwardedFromUserId] == ''
+          ? null
+          : json[MessagesColumns.forwardedFromUserId],
+      forwardedFromUserName: json[MessagesColumns.forwardedFromUserName] == ''
+          ? null
+          : json[MessagesColumns.forwardedFromUserName],
       forwardedFromUserAvatar:
           json[MessagesColumns.forwardedFromUserAvatar] == ''
-              ? null
-              : json[MessagesColumns.forwardedFromUserAvatar],
+          ? null
+          : json[MessagesColumns.forwardedFromUserAvatar],
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../controllers/ai_chat_scroll_anchor.dart';
 import '../models/ai_chat_message.dart';
 import '../models/ai_model_option.dart';
@@ -101,17 +102,16 @@ class AiChatMessageList extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
           alignment: Alignment.topCenter,
-          child:
-              showThinking
-                  ? Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: AiThinkingBubble(
-                      key: const ValueKey('ai-thinking-bubble'),
-                      phase: phase,
-                      model: activeModel!,
-                    ),
-                  )
-                  : const SizedBox(width: double.infinity),
+          child: showThinking
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: AiThinkingBubble(
+                    key: const ValueKey('ai-thinking-bubble'),
+                    phase: phase,
+                    model: activeModel!,
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
         );
       },
     );
@@ -170,10 +170,9 @@ class _MessageSlot extends StatelessWidget {
                     replyOrigin: replyOrigin,
                     animate: animate,
                     onTypewriterDone: onTypewriterDone,
-                    onCancelUpload:
-                        onCancelUpload == null
-                            ? null
-                            : () => onCancelUpload!(message),
+                    onCancelUpload: onCancelUpload == null
+                        ? null
+                        : () => onCancelUpload!(message),
                     onRetry: onRetry == null ? null : () => onRetry!(message),
                     isSelectionMode: selectedIds.isNotEmpty,
                     isSelected: selectedIds.contains(message.id),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../models/reel_model.dart';
 
 class ReelUnavailableFallback extends StatelessWidget {
@@ -27,11 +28,10 @@ class ReelUnavailableFallback extends StatelessWidget {
               ),
               const Gap(14),
               TextButton.icon(
-                onPressed:
-                    () => launchUrl(
-                      Uri.parse(reel.youtubeWatchUrl),
-                      mode: LaunchMode.externalApplication,
-                    ),
+                onPressed: () => launchUrl(
+                  Uri.parse(reel.youtubeWatchUrl),
+                  mode: LaunchMode.externalApplication,
+                ),
                 icon: const Icon(Icons.open_in_new, color: Colors.white),
                 label: const Text(
                   'Open on YouTube',

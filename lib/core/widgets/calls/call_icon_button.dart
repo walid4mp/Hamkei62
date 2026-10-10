@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../features/single_calls/cubits/single_call_cubit/call_cubit.dart';
 import '../../../features/single_calls/models/call_model.dart';
 import '../../../features/single_calls/services/call_signaling_service.dart';
@@ -43,19 +44,17 @@ class CallIconButton extends StatelessWidget {
           constraints: const BoxConstraints(),
           style: style,
           padding: padding ?? EdgeInsets.zero,
-          tooltip:
-              isBlocked
-                  ? 'Unavailable'
-                  : (type == CallType.video ? 'Video call' : 'Voice call'),
+          tooltip: isBlocked
+              ? 'Unavailable'
+              : (type == CallType.video ? 'Video call' : 'Voice call'),
           icon: Icon(
             size: size ?? 25,
             type == CallType.video
                 ? Icons.videocam_outlined
                 : Icons.call_outlined,
-            color:
-                isDisabled
-                    ? Colors.grey
-                    : Theme.of(context).primaryColor.withValues(alpha: 0.85),
+            color: isDisabled
+                ? Colors.grey
+                : Theme.of(context).primaryColor.withValues(alpha: 0.85),
           ),
           onPressed: isDisabled ? null : () => _startCall(context),
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/helpers/comment_helper.dart';
 import 'comment_constants.dart';
 
@@ -21,12 +22,11 @@ class ThreadPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = lineColor
-          ..strokeWidth = 1.6
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
+    final paint = Paint()
+      ..color = lineColor
+      ..strokeWidth = 1.6
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
     final double avatarCenterY = currentAvatarRadius;
 
@@ -37,20 +37,19 @@ class ThreadPainter extends CustomPainter {
       final double cornerR = (avatarCenterY * 0.6).clamp(4.0, 10.0);
       const double avatarCurveGap = 4;
 
-      final path =
-          Path()
-            ..moveTo(parentLineX, 0)
-            ..lineTo(parentLineX, avatarCenterY - cornerR)
-            ..quadraticBezierTo(
-              parentLineX,
-              avatarCenterY,
-              parentLineX + cornerR,
-              avatarCenterY,
-            )
-            ..lineTo(
-              avatarCenterX - currentAvatarRadius - avatarCurveGap,
-              avatarCenterY,
-            );
+      final path = Path()
+        ..moveTo(parentLineX, 0)
+        ..lineTo(parentLineX, avatarCenterY - cornerR)
+        ..quadraticBezierTo(
+          parentLineX,
+          avatarCenterY,
+          parentLineX + cornerR,
+          avatarCenterY,
+        )
+        ..lineTo(
+          avatarCenterX - currentAvatarRadius - avatarCurveGap,
+          avatarCenterY,
+        );
 
       canvas.drawPath(path, paint);
     }
@@ -61,10 +60,9 @@ class ThreadPainter extends CustomPainter {
 
       final bool isDeepLevel = depth >= 2;
 
-      final double stemBottom =
-          isDeepLevel
-              ? stemEndY! - (currentAvatarRadius * 1.4)
-              : stemEndY! - (currentAvatarRadius * 0.7);
+      final double stemBottom = isDeepLevel
+          ? stemEndY! - (currentAvatarRadius * 1.4)
+          : stemEndY! - (currentAvatarRadius * 0.7);
 
       if (stemBottom > stemTop + 4) {
         canvas.drawLine(

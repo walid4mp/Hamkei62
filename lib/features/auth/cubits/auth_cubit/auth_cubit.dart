@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:social_media_app/core/services/network_status_service.dart';
 import 'package:social_media_app/features/auth/handlers/auth_exception_handler.dart';
 import 'package:social_media_app/features/auth/services/supabase_auth_services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../../core/helpers/safe_emit_mixin.dart';
 import '../../../../core/presence/services/presence_service.dart';
 import '../../../../core/supabase/supabase_provider.dart';
@@ -61,10 +63,9 @@ class AuthCubit extends Cubit<AuthState> with SafeEmitMixin<AuthState> {
     }
 
     final message = AuthExceptionHandler.handle(e);
-    final displayMessage =
-        message == 'no-internet'
-            ? 'No internet connection. Please check your network.'
-            : message;
+    final displayMessage = message == 'no-internet'
+        ? 'No internet connection. Please check your network.'
+        : message;
 
     if (displayMessage.isEmpty) {
       emit(AuthInitial());

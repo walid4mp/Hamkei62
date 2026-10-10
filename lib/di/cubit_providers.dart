@@ -29,54 +29,46 @@ class CubitProviders {
 
   static final primary = [
     BlocProvider(
-      create:
-          (context) =>
-              AuthCubit(context.read<SupabaseAuthServices>())
-                ..checkAuthStatus(),
+      create: (context) =>
+          AuthCubit(context.read<SupabaseAuthServices>())..checkAuthStatus(),
     ),
     BlocProvider(create: (_) => CallPipCubit()),
     BlocProvider(create: (_) => AiPreferencesCubit()..init(), lazy: false),
     BlocProvider(
-      create:
-          (context) => PostsCubit(
-            postsServices: context.read<PostsServices>(),
-            storage: context.read<CloudinaryStorageServices>(),
-            mediaCacheRepository: context.read<MediaCacheRepository>(),
-          )..fetchPosts(),
+      create: (context) => PostsCubit(
+        postsServices: context.read<PostsServices>(),
+        storage: context.read<CloudinaryStorageServices>(),
+        mediaCacheRepository: context.read<MediaCacheRepository>(),
+      )..fetchPosts(),
     ),
     BlocProvider(
-      create:
-          (context) => HomeCubit(
-            userService: context.read<UserService>(),
-            postsCubit: context.read<PostsCubit>(),
-          )..getCurrentUserData(),
+      create: (context) => HomeCubit(
+        userService: context.read<UserService>(),
+        postsCubit: context.read<PostsCubit>(),
+      )..getCurrentUserData(),
     ),
     BlocProvider(create: (context) => StoriesCubit()..fetchStories()),
     BlocProvider(create: (context) => ReelsFeedCubit()),
     BlocProvider(
-      create:
-          (context) =>
-              GroupListCubit(context.read<GroupChatServices>())
-                ..monitorGroups(),
+      create: (context) =>
+          GroupListCubit(context.read<GroupChatServices>())..monitorGroups(),
     ),
     BlocProvider(
-      create:
-          (context) => CallCubit(
-            signalingService: context.read<CallSignalingService>(),
-            chatServices: context.read<ChatServices>(),
-          ),
+      create: (context) => CallCubit(
+        signalingService: context.read<CallSignalingService>(),
+        chatServices: context.read<ChatServices>(),
+      ),
     ),
     BlocProvider(
-      create:
-          (context) => ChatsCubit(context.read<ChatServices>())..monitorChats(),
+      create: (context) =>
+          ChatsCubit(context.read<ChatServices>())..monitorChats(),
     ),
   ];
 
   static final themeScoped = [
     BlocProvider(
-      create:
-          (context) =>
-              ConnectivityCubit(networkStatus: NetworkStatusService.instance),
+      create: (context) =>
+          ConnectivityCubit(networkStatus: NetworkStatusService.instance),
     ),
     BlocProvider(create: (_) => PresenceCubit(), lazy: false),
     BlocProvider(create: (_) => ActiveCallSessionCubit()),

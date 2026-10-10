@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_images.dart';
 import '../../../core/widgets/custom_badge.dart';
 
@@ -45,9 +46,8 @@ class _NewCommentsPillState extends State<NewCommentsPill> {
           curve: Curves.easeOutCubic,
           offset: isVisible ? Offset.zero : const Offset(0, 0.8),
           child: Theme(
-            data: Theme.of(
-              context,
-            ).copyWith(primaryColor: const Color(0xFFE53935)),
+            data: Theme.of(context)
+                .copyWith(primaryColor: const Color(0xFFE53935)),
             child: CustomBadge(
               count: _displayCount,
               top: -8,

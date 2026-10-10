@@ -19,12 +19,11 @@ class AnimatedCheckPainter extends CustomPainter {
     final radius = (size.width - strokeWidth) / 2;
     final safeProgress = progress.clamp(0.0, 1.0);
 
-    final circlePaint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round;
+    final circlePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
@@ -35,13 +34,12 @@ class AnimatedCheckPainter extends CustomPainter {
     );
 
     if (safeProgress > 0.4) {
-      final checkPaint =
-          Paint()
-            ..color = color
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = strokeWidth
-            ..strokeCap = StrokeCap.round
-            ..strokeJoin = StrokeJoin.round;
+      final checkPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
 
       final path = Path();
       path.moveTo(size.width * 0.28, size.height * 0.52);

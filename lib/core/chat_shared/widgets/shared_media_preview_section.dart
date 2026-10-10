@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+
 import '../cubits/shared_media_cubit/shared_media_cubit.dart';
 import '../helpers/shared_media_preview_skeleton.dart';
 import '../views/shared_media_view.dart';
@@ -19,10 +20,9 @@ class SharedMediaPreviewSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SharedMediaCubit, SharedMediaState>(
-      bloc:
-          mediaCubit
-            ..loadPreview()
-            ..loadTab(SharedMediaTab.all),
+      bloc: mediaCubit
+        ..loadPreview()
+        ..loadTab(SharedMediaTab.all),
       builder: (context, state) {
         if (!state.previewLoading && state.preview.isEmpty) {
           return const SizedBox.shrink();
@@ -44,22 +44,19 @@ class SharedMediaPreviewSection extends StatelessWidget {
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed:
-                        () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder:
-                                (_) => SharedMediaView(
-                                  mediaCubit: mediaCubit,
-                                  onShowInChat: onShowInChat,
-                                ),
-                          ),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => SharedMediaView(
+                          mediaCubit: mediaCubit,
+                          onShowInChat: onShowInChat,
                         ),
+                      ),
+                    ),
                     child: Text(
                       'See all',
                       style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).primaryColor.withValues(alpha: 0.85),
+                        color: Theme.of(context).primaryColor
+                            .withValues(alpha: 0.85),
                       ),
                     ),
                   ),
@@ -79,11 +76,10 @@ class SharedMediaPreviewSection extends StatelessWidget {
                     mainAxisSpacing: 6,
                     crossAxisSpacing: 6,
                   ),
-                  itemBuilder:
-                      (context, index) => MediaPreviewTile(
-                        item: state.preview[index],
-                        items: allItems,
-                      ),
+                  itemBuilder: (context, index) => MediaPreviewTile(
+                    item: state.preview[index],
+                    items: allItems,
+                  ),
                 ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:social_media_app/features/posts/widgets/build_option_item.dart';
+
 import '../../../core/toast/app_toast.dart';
 import '../cubits/posts_cubit/posts_cubit.dart';
 
@@ -129,9 +130,8 @@ class AddPostOptionsBottomSheet extends StatelessWidget {
                       Icons.color_lens_rounded,
                       'Background Color',
                       const Color(0xFFE91E63),
-                      onTap:
-                          () =>
-                              AppToast.info('Background Color is coming soon'),
+                      onTap: () =>
+                          AppToast.info('Background Color is coming soon'),
                     ),
                     BuildOptionItem(
                       Icons.gif_box_rounded,

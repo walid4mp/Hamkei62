@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../cache/utils/cloudinary_url_extensions.dart';
 import '../../widgets/blurred_media_placeholders.dart';
 import '../../widgets/cached_cloudinary_image.dart';
@@ -29,10 +30,9 @@ class ReplyPreviewThumbnail extends StatelessWidget {
 
     final bool isVideo = messageType == 'video';
     final bool isSticker = messageType == 'sticker';
-    final displayUrl =
-        isVideo
-            ? (mediaUrl!.cloudinaryVideoThumbnailUrl ?? mediaUrl!)
-            : mediaUrl!;
+    final displayUrl = isVideo
+        ? (mediaUrl!.cloudinaryVideoThumbnailUrl ?? mediaUrl!)
+        : mediaUrl!;
 
     if (isSticker) {
       return ClipRRect(
@@ -65,15 +65,11 @@ class ReplyPreviewThumbnail extends StatelessWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
-              placeholder:
-                  (_) =>
-                      isVideo
-                          ? CompactBlurredVideoPlaceholder(videoUrl: mediaUrl!)
-                          : CompactBlurredImagePlaceholder(
-                            secureUrl: displayUrl,
-                          ),
-              errorWidget:
-                  (context, error) => Container(color: Colors.grey.shade400),
+              placeholder: (_) => isVideo
+                  ? CompactBlurredVideoPlaceholder(videoUrl: mediaUrl!)
+                  : CompactBlurredImagePlaceholder(secureUrl: displayUrl),
+              errorWidget: (context, error) =>
+                  Container(color: Colors.grey.shade400),
             ),
             if (isVideo)
               const Center(

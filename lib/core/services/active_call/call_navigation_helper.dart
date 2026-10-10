@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../features/group_calls/views/livekit_group_call_view.dart';
 import '../../notifications/notification_navigator_key.dart';
 import '../../router/app_routes.dart';
@@ -21,12 +22,11 @@ class CallNavigationHelper {
       pip.restore();
       navigatorKey.currentState?.push(
         MaterialPageRoute(
-          builder:
-              (_) => LiveKitGroupCallView(
-                call: session.groupCall!,
-                currentUserId: session.currentUserId!,
-                currentUserName: session.currentUserName!,
-              ),
+          builder: (_) => LiveKitGroupCallView(
+            call: session.groupCall!,
+            currentUserId: session.currentUserId!,
+            currentUserName: session.currentUserName!,
+          ),
         ),
       );
       return;

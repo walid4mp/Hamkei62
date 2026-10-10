@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -6,6 +7,7 @@ import 'package:social_media_app/core/presence/widgets/presence_avatar_widget.da
 import 'package:social_media_app/core/router/app_routes.dart';
 import 'package:social_media_app/core/widgets/main_user_avatar.dart';
 import 'package:social_media_app/features/home/cubits/home_cubit/home_cubit.dart';
+
 import '../cubits/posts_cubit/posts_cubit.dart';
 
 class PostWritingCard extends StatelessWidget {
@@ -47,10 +49,9 @@ class PostWritingCard extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color:
-                        theme.brightness == Brightness.dark
-                            ? Colors.black.withValues(alpha: 0.35)
-                            : Colors.black.withValues(alpha: 0.05),
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.35)
+                        : Colors.black.withValues(alpha: 0.05),
                     blurRadius: 14,
                     offset: const Offset(0, 5),
                   ),
@@ -254,16 +255,14 @@ class _MiniIcon extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5.5),
       decoration: BoxDecoration(
-        color:
-            isDark
-                ? color.withValues(alpha: 0.18)
-                : color.withValues(alpha: 0.12),
+        color: isDark
+            ? color.withValues(alpha: 0.18)
+            : color.withValues(alpha: 0.12),
         shape: BoxShape.circle,
         border: Border.all(
-          color:
-              isDark
-                  ? color.withValues(alpha: 0.4)
-                  : color.withValues(alpha: 0.3),
+          color: isDark
+              ? color.withValues(alpha: 0.4)
+              : color.withValues(alpha: 0.3),
           width: 0.8,
         ),
         boxShadow: [

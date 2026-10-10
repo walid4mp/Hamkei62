@@ -17,8 +17,9 @@ class MentionRef {
       mentionedUserId: map['mentioned_user_id'] as String,
       startIndex: map['start_index'] as int,
       endIndex: map['end_index'] as int,
-      createdAt:
-          rawCreatedAt is String ? DateTime.tryParse(rawCreatedAt) : null,
+      createdAt: rawCreatedAt is String
+          ? DateTime.tryParse(rawCreatedAt)
+          : null,
     );
   }
 
@@ -58,15 +59,16 @@ class MentionRef {
       });
     }
 
-    final sortedByNewest = List<MentionRef>.from(candidates)..sort((a, b) {
-      final aTs = a.createdAt?.toUtc();
-      final bTs = b.createdAt?.toUtc();
-      if (aTs != null && bTs != null) {
-        final cmp = bTs.compareTo(aTs);
-        if (cmp != 0) return cmp;
-      }
-      return a.startIndex.compareTo(b.startIndex);
-    });
+    final sortedByNewest = List<MentionRef>.from(candidates)
+      ..sort((a, b) {
+        final aTs = a.createdAt?.toUtc();
+        final bTs = b.createdAt?.toUtc();
+        if (aTs != null && bTs != null) {
+          final cmp = bTs.compareTo(aTs);
+          if (cmp != 0) return cmp;
+        }
+        return a.startIndex.compareTo(b.startIndex);
+      });
 
     final accepted = <MentionRef>[];
     for (final candidate in sortedByNewest) {

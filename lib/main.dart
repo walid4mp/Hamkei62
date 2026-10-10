@@ -1,7 +1,10 @@
 import 'dart:async';
+
 import 'app.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'core/bootstrap/app_bootstrap.dart';
 import 'core/errors/network_error_utils.dart';
 import 'core/observability/error_category.dart';

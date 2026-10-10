@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/design/tokens/typography.dart';
 
 class ReactionsSummaryPill extends StatelessWidget {
@@ -26,8 +27,8 @@ class ReactionsSummaryPill extends StatelessWidget {
     }
 
     final myEmoji = reactions[currentUserId];
-    final sorted =
-        counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sorted = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     const double overlap = 14.0;
     const double emojiSize = 18.0;
@@ -59,10 +60,9 @@ class ReactionsSummaryPill extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color:
-                    myEmoji != null
-                        ? primary
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: myEmoji != null
+                    ? primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.2,
               ),
             ),
@@ -102,14 +102,13 @@ class ReactionsSummaryPill extends StatelessWidget {
 
     return Transform.translate(
       offset: const Offset(0, -8),
-      child:
-          onTap != null
-              ? GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: onTap,
-                child: pill,
-              )
-              : pill,
+      child: onTap != null
+          ? GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: pill,
+            )
+          : pill,
     );
   }
 }

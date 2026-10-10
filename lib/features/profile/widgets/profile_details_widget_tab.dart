@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/themes/app_colors.dart';
 import '../../auth/data/models/user_data.dart';
 import '../models/social_platform_info.dart';
@@ -19,13 +20,12 @@ class ProfileDetailsWidgetTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final populatedSocialLinks =
-        SocialPlatformInfo.all
-            .where(
-              (platform) =>
-                  (user.socialLinks[platform.key] ?? '').trim().isNotEmpty,
-            )
-            .toList();
+    final populatedSocialLinks = SocialPlatformInfo.all
+        .where(
+          (platform) =>
+              (user.socialLinks[platform.key] ?? '').trim().isNotEmpty,
+        )
+        .toList();
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(
@@ -62,9 +62,8 @@ class ProfileDetailsWidgetTab extends StatelessWidget {
               const Gap(8),
               Text(
                 'Social Media',
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineSmall!.copyWith(fontSize: 16),
+                style: Theme.of(context).textTheme.headlineSmall!
+                    .copyWith(fontSize: 16),
               ),
             ],
           ),

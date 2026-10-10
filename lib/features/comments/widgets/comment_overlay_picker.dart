@@ -1,6 +1,8 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:social_media_app/features/comments/helpers/comment_menu_action.dart';
+
 import 'comment_action_menu.dart';
 import 'comment_reactions_picker_bubble.dart';
 
@@ -32,8 +34,9 @@ class CommentOverlayPicker {
 
     final double screenHeight = overlayBox.size.height;
 
-    final double actionsHeight =
-        actions.isEmpty ? 0.0 : (8.0 + (actions.length * 46.0));
+    final double actionsHeight = actions.isEmpty
+        ? 0.0
+        : (8.0 + (actions.length * 46.0));
     final double estimatedTotalHeight =
         ReactionsPickerBubble.kBubbleHeight + actionsHeight;
 
@@ -49,10 +52,9 @@ class CommentOverlayPicker {
         spaceBelow < (estimatedTotalHeight + verticalGap) &&
         (anchorRect.top - topSafeLimit) > spaceBelow;
 
-    double y =
-        showAbove
-            ? anchorRect.top - estimatedTotalHeight - verticalGap
-            : anchorRect.bottom + verticalGap;
+    double y = showAbove
+        ? anchorRect.top - estimatedTotalHeight - verticalGap
+        : anchorRect.bottom + verticalGap;
 
     final double maxTop = math.max(
       topSafeLimit,
@@ -64,41 +66,39 @@ class CommentOverlayPicker {
     y = y.clamp(topSafeLimit, maxTop);
 
     return OverlayEntry(
-      builder:
-          (_) => Stack(
-            children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: onDismiss,
-                  onPanDown: (_) => onDismiss(),
-                ),
-              ),
-              Positioned(
-                right: horizontalMargin,
-                top: y,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ReactionsPickerBubble(
-                      onReactionSelected: onSelect,
-                      onDismiss: onDismiss,
-                      selectedEmoji: selectedEmoji,
-                      scaleAlignment:
-                          showAbove
-                              ? Alignment.bottomRight
-                              : Alignment.topRight,
-                    ),
-                    if (actions.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      CommentActionMenu(actions: actions),
-                    ],
-                  ],
-                ),
-              ),
-            ],
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: onDismiss,
+              onPanDown: (_) => onDismiss(),
+            ),
           ),
+          Positioned(
+            right: horizontalMargin,
+            top: y,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ReactionsPickerBubble(
+                  onReactionSelected: onSelect,
+                  onDismiss: onDismiss,
+                  selectedEmoji: selectedEmoji,
+                  scaleAlignment: showAbove
+                      ? Alignment.bottomRight
+                      : Alignment.topRight,
+                ),
+                if (actions.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  CommentActionMenu(actions: actions),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
