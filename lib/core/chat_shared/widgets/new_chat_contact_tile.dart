@@ -69,8 +69,9 @@ class NewChatContactTile extends StatelessWidget {
     );
     final afterMatch = text.substring(matchIndex + searchQuery.length);
 
-    final highlightColor = Theme.of(context).primaryColor
-        .withValues(alpha: 0.25);
+    final highlightColor = Theme.of(
+      context,
+    ).primaryColor.withValues(alpha: 0.25);
 
     return Text.rich(
       TextSpan(
@@ -113,20 +114,21 @@ class NewChatContactTile extends StatelessWidget {
         user.name,
         TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textColor),
       ),
-      subtitle: isBlocked
-          ? null
-          : _hasTitle
-          ? Text(
-              user.title!,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            )
-          : PresenceStatusText(
-              userId: user.id,
-              fallbackLastSeen: user.lastSeen,
-              presencePrivacy: user.presencePrivacy,
-            ),
+      subtitle:
+          isBlocked
+              ? null
+              : _hasTitle
+              ? Text(
+                user.title!,
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )
+              : PresenceStatusText(
+                userId: user.id,
+                fallbackLastSeen: user.lastSeen,
+                presencePrivacy: user.presencePrivacy,
+              ),
     );
 
     return isBlocked ? Opacity(opacity: 0.5, child: tile) : tile;

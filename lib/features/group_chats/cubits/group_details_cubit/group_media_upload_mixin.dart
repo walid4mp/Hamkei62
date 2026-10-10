@@ -78,9 +78,10 @@ mixin GroupMediaUploadMixin on Cubit<GroupDetailsState> {
       fileSizeBytes: fileSizeBytes,
       mentions: mentions,
       replyToMessageId: reply?.id,
-      replyToText: (reply?.text != null && reply!.text.isNotEmpty)
-          ? reply.text
-          : reply?.caption,
+      replyToText:
+          (reply?.text != null && reply!.text.isNotEmpty)
+              ? reply.text
+              : reply?.caption,
       replyToSenderId: reply?.senderId,
       replyToSenderName: reply?.senderName,
       replyToMessageType: reply?.messageType,
@@ -183,9 +184,10 @@ mixin GroupMediaUploadMixin on Cubit<GroupDetailsState> {
 
         final originalName =
             fileName ?? documentFile.path.split('/').last.split('\\').last;
-        final nameWithoutExt = originalName.contains('.')
-            ? originalName.substring(0, originalName.lastIndexOf('.'))
-            : originalName;
+        final nameWithoutExt =
+            originalName.contains('.')
+                ? originalName.substring(0, originalName.lastIndexOf('.'))
+                : originalName;
         final safeName = nameWithoutExt.replaceAll(
           RegExp(r'[^a-zA-Z0-9\-_]'),
           '_',
@@ -266,10 +268,11 @@ mixin GroupMediaUploadMixin on Cubit<GroupDetailsState> {
       );
       _emitLoaded();
 
-      final memberIds = group.members
-          .map((m) => m.userId)
-          .where((id) => id != currentUserId)
-          .toList();
+      final memberIds =
+          group.members
+              .map((m) => m.userId)
+              .where((id) => id != currentUserId)
+              .toList();
 
       if (sent.isNewInsert) {
         final notificationFutures = memberIds.map(

@@ -25,13 +25,15 @@ void main() {
     idOf: (m) => m.id,
     clientMessageIdOf: (m) => m.clientMessageId,
     createdAtOf: (m) => m.createdAt,
-    merge: (existing, incoming) => incoming.copyWith(
-      reactions: incoming.reactions.isNotEmpty
-          ? incoming.reactions
-          : existing.reactions,
-      reactionsCreatedAt:
-          incoming.reactionsCreatedAt ?? existing.reactionsCreatedAt,
-    ),
+    merge:
+        (existing, incoming) => incoming.copyWith(
+          reactions:
+              incoming.reactions.isNotEmpty
+                  ? incoming.reactions
+                  : existing.reactions,
+          reactionsCreatedAt:
+              incoming.reactionsCreatedAt ?? existing.reactionsCreatedAt,
+        ),
   );
 
   group('correlationKeyFor', () {

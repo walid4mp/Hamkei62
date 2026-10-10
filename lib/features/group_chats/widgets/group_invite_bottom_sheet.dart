@@ -204,18 +204,19 @@ class _ValidInviteContent extends StatelessWidget {
           child: ClipOval(
             child:
                 (preview.groupAvatarUrl != null &&
-                    preview.groupAvatarUrl!.isNotEmpty)
-                ? CachedNetworkImage(
-                    imageUrl: preview.groupAvatarUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Container(color: palette.surfaceVariant),
-                    errorWidget: (_, __, ___) => Image.asset(
-                      AppImages.defaultGroupImg,
+                        preview.groupAvatarUrl!.isNotEmpty)
+                    ? CachedNetworkImage(
+                      imageUrl: preview.groupAvatarUrl!,
                       fit: BoxFit.cover,
-                    ),
-                  )
-                : Image.asset(AppImages.defaultGroupImg, fit: BoxFit.cover),
+                      placeholder:
+                          (_, __) => Container(color: palette.surfaceVariant),
+                      errorWidget:
+                          (_, __, ___) => Image.asset(
+                            AppImages.defaultGroupImg,
+                            fit: BoxFit.cover,
+                          ),
+                    )
+                    : Image.asset(AppImages.defaultGroupImg, fit: BoxFit.cover),
           ),
         ),
         const SizedBox(height: 16),
@@ -288,12 +289,14 @@ class _InvitePreviewShimmerState extends State<_InvitePreviewShimmer>
     final palette = context.palette;
     final isDark = palette.isDark;
 
-    final baseColor = isDark
-        ? palette.surfaceVariant.withValues(alpha: 0.6)
-        : palette.surfaceVariant;
-    final highlightColor = isDark
-        ? palette.surfaceVariant.withValues(alpha: 0.9)
-        : Colors.white.withValues(alpha: 0.7);
+    final baseColor =
+        isDark
+            ? palette.surfaceVariant.withValues(alpha: 0.6)
+            : palette.surfaceVariant;
+    final highlightColor =
+        isDark
+            ? palette.surfaceVariant.withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.7);
 
     return AnimatedBuilder(
       animation: _controller,

@@ -18,10 +18,12 @@ class ChatPermissionService {
     required String otherUserId,
   }) async {
     // 1) صداقة/متابعة بالفعل؟
-    final connected = await _supabase.rpc(
-      'are_users_connected',
-      params: {'user_a': currentUserId, 'user_b': otherUserId},
-    ) as bool;
+    final connected =
+        await _supabase.rpc(
+              'are_users_connected',
+              params: {'user_a': currentUserId, 'user_b': otherUserId},
+            )
+            as bool;
     if (connected) {
       return const ChatPermissionResult(permission: ChatPermission.allowed);
     }
@@ -78,11 +80,12 @@ class ChatPermissionService {
     required String senderId,
     required String receiverId,
   }) async {
-    final row = await _supabase
-        .from(SupabaseConstants.messageRequests)
-        .insert({'sender_id': senderId, 'receiver_id': receiverId})
-        .select('id')
-        .single();
+    final row =
+        await _supabase
+            .from(SupabaseConstants.messageRequests)
+            .insert({'sender_id': senderId, 'receiver_id': receiverId})
+            .select('id')
+            .single();
     return row['id'] as String;
   }
 

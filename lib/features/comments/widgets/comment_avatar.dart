@@ -40,9 +40,8 @@ class CommentAvatar extends StatelessWidget {
   }
 
   void _openMyAvatar(BuildContext context) {
-    final url = imageUrl?.isNotEmpty == true
-        ? imageUrl!
-        : AppImages.defaultUserImg;
+    final url =
+        imageUrl?.isNotEmpty == true ? imageUrl! : AppImages.defaultUserImg;
 
     Navigator.of(context, rootNavigator: true).pushNamed(
       AppRoutes.fullScreenImageViewRoute,

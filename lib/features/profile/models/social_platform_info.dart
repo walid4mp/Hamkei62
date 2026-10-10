@@ -28,9 +28,8 @@ class SocialPlatformInfo {
     if (icon != null) {
       return FaIcon(icon, size: size, color: color);
     }
-    final fallback = label.length >= 2
-        ? label.substring(0, 2)
-        : label.substring(0, 1);
+    final fallback =
+        label.length >= 2 ? label.substring(0, 2) : label.substring(0, 1);
     return Text(
       (monogram ?? fallback).toUpperCase(),
       style: TextStyle(
@@ -62,10 +61,11 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.whatsapp,
       brandColor: const Color(0xFF25D366),
       hint: 'Phone number, e.g. +201234567890',
-      normalizeToUrl: (raw) => _urlOrBuild(raw, (v) {
-        final digitsOnly = v.replaceAll(RegExp(r'[^0-9]'), '');
-        return 'https://wa.me/$digitsOnly';
-      }),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) {
+            final digitsOnly = v.replaceAll(RegExp(r'[^0-9]'), '');
+            return 'https://wa.me/$digitsOnly';
+          }),
     ),
     SocialPlatformInfo(
       key: 'facebook',
@@ -73,8 +73,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.facebook,
       brandColor: const Color(0xFF1877F2),
       hint: 'Username or profile URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://facebook.com/$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://facebook.com/$v'),
     ),
     SocialPlatformInfo(
       key: 'linkedin',
@@ -82,8 +82,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.linkedin,
       brandColor: const Color(0xFF0A66C2),
       hint: 'Username or profile URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://linkedin.com/in/$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://linkedin.com/in/$v'),
     ),
     SocialPlatformInfo(
       key: 'github',
@@ -107,8 +107,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.instagram,
       brandColor: const Color(0xFFE4405F),
       hint: 'Username or profile URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://instagram.com/$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://instagram.com/$v'),
     ),
     SocialPlatformInfo(
       key: 'youtube',
@@ -116,8 +116,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.youtube,
       brandColor: const Color(0xFFFF0000),
       hint: 'Channel handle or URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://youtube.com/@$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://youtube.com/@$v'),
     ),
     SocialPlatformInfo(
       key: 'tiktok',
@@ -125,8 +125,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.tiktok,
       brandColor: const Color(0xFF000000),
       hint: 'Username or profile URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://tiktok.com/@$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://tiktok.com/@$v'),
     ),
 
     // ── Newly added platforms ──
@@ -144,8 +144,9 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.stackOverflow,
       brandColor: const Color(0xFFF58025),
       hint: 'Full profile URL (stackoverflow.com/users/…)',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://stackoverflow.com/users/$v'),
+      normalizeToUrl:
+          (raw) =>
+              _urlOrBuild(raw, (v) => 'https://stackoverflow.com/users/$v'),
     ),
     SocialPlatformInfo(
       key: 'snapchat',
@@ -154,8 +155,8 @@ class SocialPlatformInfo {
       brandColor: const Color(0xFFFFFC00),
       monochromeGlyphColor: Colors.black,
       hint: 'Username',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://snapchat.com/add/$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://snapchat.com/add/$v'),
     ),
     SocialPlatformInfo(
       key: 'telegram',
@@ -171,8 +172,8 @@ class SocialPlatformInfo {
       icon: FontAwesomeIcons.reddit,
       brandColor: const Color(0xFFFF4500),
       hint: 'Username or profile URL',
-      normalizeToUrl: (raw) =>
-          _urlOrBuild(raw, (v) => 'https://reddit.com/user/$v'),
+      normalizeToUrl:
+          (raw) => _urlOrBuild(raw, (v) => 'https://reddit.com/user/$v'),
     ),
   ];
 

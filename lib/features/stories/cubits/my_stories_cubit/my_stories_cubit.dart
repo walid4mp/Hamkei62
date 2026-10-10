@@ -187,9 +187,8 @@ class MyStoriesCubit extends Cubit<MyStoriesState> {
     final current = state;
     if (current is! MyStoriesLoaded) return;
 
-    final updatedStories = current.stories
-        .where((s) => !ids.contains(s.id))
-        .toList();
+    final updatedStories =
+        current.stories.where((s) => !ids.contains(s.id)).toList();
     final updatedStats = Map<String, StoryStatModel>.from(
       current.statsByStoryId,
     )..removeWhere((id, _) => ids.contains(id));

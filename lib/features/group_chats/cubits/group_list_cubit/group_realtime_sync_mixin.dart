@@ -53,20 +53,20 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
 
             final cachedGroup = cached.firstWhere(
               (g) => g.id == groupId,
-              orElse: () => GroupModel(
-                id: groupId,
-                name: '',
-                createdBy: '',
-                createdAt: DateTime.now(),
-                isMember: true,
-              ),
+              orElse:
+                  () => GroupModel(
+                    id: groupId,
+                    name: '',
+                    createdBy: '',
+                    createdAt: DateTime.now(),
+                    isMember: true,
+                  ),
             );
             if (!cachedGroup.isMember) continue;
 
             final isActiveGroup = activeGroupId == groupId;
-            final computedUnread = isActiveGroup
-                ? 0
-                : (unreadPerGroup[groupId] ?? 0);
+            final computedUnread =
+                isActiveGroup ? 0 : (unreadPerGroup[groupId] ?? 0);
 
             _processMessageRow(groupId, row, computedUnread);
           }
@@ -84,9 +84,10 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
     if (messageId == null) return;
 
     final createdAtStr = row['created_at'] as String?;
-    final createdAt = createdAtStr != null
-        ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-        : DateTime.now();
+    final createdAt =
+        createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now();
 
     final currentState = state as GroupListLoaded;
     final existingIdx = currentState.groups.indexWhere((g) => g.id == groupId);
@@ -115,9 +116,8 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
     final targetName = row['target_name'] as String?;
     final text = row['message_text'] as String? ?? '';
 
-    final String rawMessage = messageType == 'call'
-        ? _parseGroupCallPreview(text)
-        : text;
+    final String rawMessage =
+        messageType == 'call' ? _parseGroupCallPreview(text) : text;
 
     updateGroupInState(
       groupId: groupId,
@@ -260,10 +260,11 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
     presenceSub = services.watchAllGroupsPresence().listen((map) {
       if (state is! GroupListLoaded) return;
       final current = state as GroupListLoaded;
-      final updated = current.groups.map((g) {
-        final snapshot = map[g.id] ?? GroupPresenceSnapshot.empty;
-        return g.copyWith(presence: snapshot);
-      }).toList();
+      final updated =
+          current.groups.map((g) {
+            final snapshot = map[g.id] ?? GroupPresenceSnapshot.empty;
+            return g.copyWith(presence: snapshot);
+          }).toList();
       cached = updated;
       emit(GroupListLoaded(updated));
     });
@@ -288,9 +289,10 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
     final participants = (row['participant_count'] as int?) ?? 0;
     final updatedAtStr =
         row['ended_at'] as String? ?? row['started_at'] as String?;
-    final updatedAt = updatedAtStr != null
-        ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
-        : DateTime.now();
+    final updatedAt =
+        updatedAtStr != null
+            ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+            : DateTime.now();
 
     if (groupId == null || status == null) return;
 
@@ -334,9 +336,8 @@ mixin GroupRealtimeSyncMixin on GroupListBase {
         final callType = data['call_type'] as String? ?? 'audio';
         final status = data['status'] as String? ?? 'ended';
         final icon = callType == 'video' ? '🎥' : '📞';
-        final typeLabel = callType == 'video'
-            ? 'Group video call'
-            : 'Group voice call';
+        final typeLabel =
+            callType == 'video' ? 'Group video call' : 'Group voice call';
         return switch (status) {
           'ringing' || 'accepted' || 'ongoing' => '$icon $typeLabel',
           'missed' => '$icon Missed $typeLabel',

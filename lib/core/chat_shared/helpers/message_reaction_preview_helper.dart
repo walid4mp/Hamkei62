@@ -85,9 +85,10 @@ class MessageReactionPreviewHelper {
     final cleanCaption = (caption ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
 
     if (type == 'file' || type == 'document') {
-      final rawName = cleanFileName.isNotEmpty
-          ? cleanFileName
-          : (cleanBody.isNotEmpty ? cleanBody : 'File');
+      final rawName =
+          cleanFileName.isNotEmpty
+              ? cleanFileName
+              : (cleanBody.isNotEmpty ? cleanBody : 'File');
       return '📄 ${extractCleanFileName(rawName)}';
     }
 
@@ -121,9 +122,10 @@ class MessageReactionPreviewHelper {
     String? fileName,
     String? caption,
   }) {
-    final actor = isMe
-        ? 'You'
-        : (reactorName.trim().isNotEmpty ? reactorName.trim() : 'Someone');
+    final actor =
+        isMe
+            ? 'You'
+            : (reactorName.trim().isNotEmpty ? reactorName.trim() : 'Someone');
     final emoji = resolveEmoji(reactionType);
     final snippet = getMessageFallback(
       type: messageType,
@@ -194,9 +196,8 @@ class MessageReactionPreviewHelper {
     double iconSize = 13,
   }) {
     final reactIdx = rawPreview.indexOf(' react with ');
-    final toIdx = reactIdx != -1
-        ? rawPreview.indexOf(' to ', reactIdx + 12)
-        : -1;
+    final toIdx =
+        reactIdx != -1 ? rawPreview.indexOf(' to ', reactIdx + 12) : -1;
 
     if (reactIdx == -1 || toIdx == -1) {
       final dir = BidiTextHelper.detectDirection(rawPreview);

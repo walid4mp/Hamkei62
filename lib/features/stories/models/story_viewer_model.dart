@@ -37,9 +37,10 @@ class StoryViewerModel {
           DateTime.tryParse(map['viewed_at']?.toString() ?? '') ??
           DateTime.now(),
       isOnline: map['is_online'] as bool? ?? false,
-      lastSeen: map['last_seen'] != null
-          ? DateTime.tryParse(map['last_seen'].toString())
-          : null,
+      lastSeen:
+          map['last_seen'] != null
+              ? DateTime.tryParse(map['last_seen'].toString())
+              : null,
     );
   }
 

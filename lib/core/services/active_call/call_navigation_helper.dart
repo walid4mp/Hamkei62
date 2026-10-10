@@ -22,11 +22,12 @@ class CallNavigationHelper {
       pip.restore();
       navigatorKey.currentState?.push(
         MaterialPageRoute(
-          builder: (_) => LiveKitGroupCallView(
-            call: session.groupCall!,
-            currentUserId: session.currentUserId!,
-            currentUserName: session.currentUserName!,
-          ),
+          builder:
+              (_) => LiveKitGroupCallView(
+                call: session.groupCall!,
+                currentUserId: session.currentUserId!,
+                currentUserName: session.currentUserName!,
+              ),
         ),
       );
       return;

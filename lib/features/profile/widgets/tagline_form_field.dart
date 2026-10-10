@@ -82,9 +82,10 @@ class _TaglineFormFieldState extends State<TaglineFormField> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: isAtLimit ? FontWeight.w600 : FontWeight.w400,
-              color: isAtLimit
-                  ? Theme.of(context).colorScheme.error
-                  : Theme.of(context).colorScheme.onSurfaceVariant,
+              color:
+                  isAtLimit
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -103,15 +104,16 @@ class _TaglineFormFieldState extends State<TaglineFormField> {
               ),
             );
           },
-          child: widget.isHidden
-              ? const Padding(
-                  key: ValueKey('tagline-hidden-notice'),
-                  padding: EdgeInsets.only(top: 10),
-                  child: _HiddenStatusNotice(),
-                )
-              : const SizedBox.shrink(
-                  key: ValueKey('tagline-hidden-notice-empty'),
-                ),
+          child:
+              widget.isHidden
+                  ? const Padding(
+                    key: ValueKey('tagline-hidden-notice'),
+                    padding: EdgeInsets.only(top: 10),
+                    child: _HiddenStatusNotice(),
+                  )
+                  : const SizedBox.shrink(
+                    key: ValueKey('tagline-hidden-notice-empty'),
+                  ),
         ),
       ],
     );
@@ -133,8 +135,9 @@ class _HiddenToggleButton extends StatelessWidget {
       tooltip: isHidden ? 'Show on profile' : 'Hide from profile',
       icon: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
-        transitionBuilder: (child, animation) =>
-            ScaleTransition(scale: animation, child: child),
+        transitionBuilder:
+            (child, animation) =>
+                ScaleTransition(scale: animation, child: child),
         child: Icon(
           isHidden ? Icons.visibility_off_rounded : Icons.visibility_rounded,
           key: ValueKey(isHidden),

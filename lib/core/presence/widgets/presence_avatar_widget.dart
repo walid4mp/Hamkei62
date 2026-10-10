@@ -39,9 +39,10 @@ class PresenceAvatarWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: showBorder
-              ? Border.all(color: Colors.green, width: borderWidth)
-              : null,
+          border:
+              showBorder
+                  ? Border.all(color: Colors.green, width: borderWidth)
+                  : null,
         ),
         child: ClipOval(child: child),
       ),

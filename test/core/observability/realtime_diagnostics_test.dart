@@ -157,9 +157,10 @@ void main() {
         diagnostics.onChannelSubscribed('topic_$i');
       }
 
-      final pressure = reporter.errors
-          .where((e) => e.error is RealtimeChannelPressure)
-          .toList();
+      final pressure =
+          reporter.errors
+              .where((e) => e.error is RealtimeChannelPressure)
+              .toList();
 
       expect(pressure, hasLength(1));
       expect(

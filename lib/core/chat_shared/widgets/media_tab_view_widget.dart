@@ -46,10 +46,8 @@ class _MediaTabViewState extends State<MediaTabView>
       builder: (context, state) {
         final isLoading = state.isLoading(widget.tab);
         final items = state.itemsFor(widget.tab);
-        final currentUserAvatar = context
-            .read<HomeCubit>()
-            .currentUserData
-            ?.imageUrl;
+        final currentUserAvatar =
+            context.read<HomeCubit>().currentUserData?.imageUrl;
 
         if (isLoading && items.isEmpty) {
           return switch (widget.tab) {
@@ -124,18 +122,18 @@ class _AllMediaGrid extends StatelessWidget {
         IconData openIcon = Icons.open_in_full_rounded;
 
         if (item.messageType == 'image') {
-          onOpen = () =>
-              MediaActionHelper.openFullScreenMedia(context, items, item);
+          onOpen =
+              () => MediaActionHelper.openFullScreenMedia(context, items, item);
           openLabel = 'View photo';
           openIcon = Icons.image_outlined;
         } else if (item.messageType == 'video') {
-          onOpen = () =>
-              MediaActionHelper.openFullScreenMedia(context, items, item);
+          onOpen =
+              () => MediaActionHelper.openFullScreenMedia(context, items, item);
           openLabel = 'Play video';
           openIcon = Icons.play_circle_outline_rounded;
         } else if (isVoice) {
-          onOpen = () =>
-              MediaActionHelper.openFullScreenMedia(context, items, item);
+          onOpen =
+              () => MediaActionHelper.openFullScreenMedia(context, items, item);
           openLabel = 'Play voice message';
           openIcon = Icons.mic_none_rounded;
         }
@@ -153,17 +151,19 @@ class _AllMediaGrid extends StatelessWidget {
               context: context,
               globalPosition: details.globalPosition,
               isMe: isMe,
-              onShowInChat: () => MediaActionHelper.handleShowInChat(
-                context,
-                item,
-                onShowInChat,
-              ),
+              onShowInChat:
+                  () => MediaActionHelper.handleShowInChat(
+                    context,
+                    item,
+                    onShowInChat,
+                  ),
 
-              onConfirmedDelete: () => MediaActionHelper.handleDelete(
-                context,
-                item,
-                forEveryone: isMe,
-              ),
+              onConfirmedDelete:
+                  () => MediaActionHelper.handleDelete(
+                    context,
+                    item,
+                    forEveryone: isMe,
+                  ),
               onOpen: onOpen,
               openLabel: openLabel,
               openIcon: openIcon,
@@ -173,14 +173,16 @@ class _AllMediaGrid extends StatelessWidget {
             'image' => CachedNetworkImage(
               imageUrl: item.imageUrl ?? '',
               fit: BoxFit.cover,
-              errorWidget: (context, url, error) => Container(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: Icon(
-                  Icons.broken_image_rounded,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  size: 28,
-                ),
-              ),
+              errorWidget:
+                  (context, url, error) => Container(
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    child: Icon(
+                      Icons.broken_image_rounded,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      size: 28,
+                    ),
+                  ),
             ),
             'video' => Stack(
               fit: StackFit.expand,
@@ -192,16 +194,18 @@ class _AllMediaGrid extends StatelessWidget {
                       '',
                   fit: BoxFit.cover,
                   placeholder: (_, __) => Container(color: Colors.black12),
-                  errorWidget: (context, url, error) => Container(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest,
-                    child: Icon(
-                      Icons.video_file_rounded,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      size: 28,
-                    ),
-                  ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color:
+                            Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.video_file_rounded,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 28,
+                        ),
+                      ),
                 ),
                 const Center(
                   child: Icon(

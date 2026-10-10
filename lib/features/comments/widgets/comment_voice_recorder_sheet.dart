@@ -131,73 +131,78 @@ class _CommentVoiceRecorderSheetState extends State<CommentVoiceRecorderSheet> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: _errorMessage != null
-              ? [
-                  Icon(Icons.mic_off_rounded, color: AppColors.grey6, size: 40),
-                  const Gap(12),
-                  Text(_errorMessage!, style: theme.textTheme.bodyMedium),
-                  const Gap(16),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
-                  ),
-                ]
-              : [
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0.9, end: _isRecording ? 1.1 : 1.0),
-                    duration: const Duration(milliseconds: 700),
-                    curve: Curves.easeInOut,
-                    builder: (context, scale, child) {
-                      return Transform.scale(scale: scale, child: child);
-                    },
-                    child: Container(
-                      width: 84,
-                      height: 84,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.redAccent.withValues(alpha: 0.12),
-                      ),
-                      child: const Icon(
-                        Icons.mic_rounded,
-                        color: Colors.redAccent,
-                        size: 38,
-                      ),
-                    ),
-                  ),
-                  const Gap(16),
-                  Text(
-                    _isInitializing ? 'Preparing...' : _formattedTime,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  const Gap(4),
-                  Text(
-                    'Recording voice message',
-                    style: theme.textTheme.bodySmall?.copyWith(
+          children:
+              _errorMessage != null
+                  ? [
+                    Icon(
+                      Icons.mic_off_rounded,
                       color: AppColors.grey6,
+                      size: 40,
                     ),
-                  ),
-                  const Gap(24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _RoundButton(
-                        icon: Icons.close_rounded,
+                    const Gap(12),
+                    Text(_errorMessage!, style: theme.textTheme.bodyMedium),
+                    const Gap(16),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Close'),
+                    ),
+                  ]
+                  : [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.9, end: _isRecording ? 1.1 : 1.0),
+                      duration: const Duration(milliseconds: 700),
+                      curve: Curves.easeInOut,
+                      builder: (context, scale, child) {
+                        return Transform.scale(scale: scale, child: child);
+                      },
+                      child: Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.redAccent.withValues(alpha: 0.12),
+                        ),
+                        child: const Icon(
+                          Icons.mic_rounded,
+                          color: Colors.redAccent,
+                          size: 38,
+                        ),
+                      ),
+                    ),
+                    const Gap(16),
+                    Text(
+                      _isInitializing ? 'Preparing...' : _formattedTime,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    const Gap(4),
+                    Text(
+                      'Recording voice message',
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: AppColors.grey6,
-                        onTap: _cancel,
                       ),
-                      const Gap(28),
-                      _RoundButton(
-                        icon: Icons.check_rounded,
-                        color: Colors.white,
-                        background: theme.primaryColor,
-                        onTap: _isRecording ? _stopAndSend : null,
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const Gap(24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _RoundButton(
+                          icon: Icons.close_rounded,
+                          color: AppColors.grey6,
+                          onTap: _cancel,
+                        ),
+                        const Gap(28),
+                        _RoundButton(
+                          icon: Icons.check_rounded,
+                          color: Colors.white,
+                          background: theme.primaryColor,
+                          onTap: _isRecording ? _stopAndSend : null,
+                        ),
+                      ],
+                    ),
+                  ],
         ),
       ),
     );

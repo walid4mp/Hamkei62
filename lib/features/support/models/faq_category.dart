@@ -29,9 +29,10 @@ class FaqCategory {
     return FaqCategory(
       title: json['title'] as String? ?? '',
       icon: _iconFromName(json['icon'] as String?),
-      items: (json['items'] as List<dynamic>? ?? const [])
-          .map((e) => FaqItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      items:
+          (json['items'] as List<dynamic>? ?? const [])
+              .map((e) => FaqItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 

@@ -112,9 +112,10 @@ class AiChatSelectionHeaderBar extends StatelessWidget
                   child: IgnorePointer(
                     ignoring: !showStar,
                     child: PremiumSelectionActionIcon(
-                      state: isStarred
-                          ? PremiumActionVisualState.on
-                          : PremiumActionVisualState.off,
+                      state:
+                          isStarred
+                              ? PremiumActionVisualState.on
+                              : PremiumActionVisualState.off,
                       onIcon: Icons.star_rounded,
                       offIcon: Icons.star_border_rounded,
                       onLabel: 'Unstar',

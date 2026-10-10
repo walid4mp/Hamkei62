@@ -26,13 +26,15 @@ Future<PrivacySelection?> pickContentPrivacy(
   if (result == null || !context.mounted) return null;
 
   if (result == ContentPrivacy.private) {
-    final selected = await Navigator.of(context, rootNavigator: true)
-        .push<Set<String>>(
-          MaterialPageRoute(
-            builder: (_) =>
-                AudiencePickerView(initialSelectedIds: currentViewerIds),
-          ),
-        );
+    final selected = await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push<Set<String>>(
+      MaterialPageRoute(
+        builder:
+            (_) => AudiencePickerView(initialSelectedIds: currentViewerIds),
+      ),
+    );
     if (selected == null || selected.isEmpty) return null;
     return PrivacySelection(
       privacy: ContentPrivacy.private,

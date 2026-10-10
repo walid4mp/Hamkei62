@@ -25,8 +25,9 @@ class AboutUsSocialLinks extends StatelessWidget {
       //   color: Colors.blue,
       // ),
       _SocialLink(
-        iconBuilder: (color, size) =>
-            FaIcon(FontAwesomeIcons.briefcase, color: color, size: size),
+        iconBuilder:
+            (color, size) =>
+                FaIcon(FontAwesomeIcons.briefcase, color: color, size: size),
 
         label: 'Portfolio',
         value: 'ahmed-portfolio.web.app',
@@ -34,8 +35,9 @@ class AboutUsSocialLinks extends StatelessWidget {
         color: Colors.blue,
       ),
       _SocialLink(
-        iconBuilder: (color, size) =>
-            FaIcon(FontAwesomeIcons.linkedin, color: color, size: size),
+        iconBuilder:
+            (color, size) =>
+                FaIcon(FontAwesomeIcons.linkedin, color: color, size: size),
 
         label: 'LinkedIn',
         value: 'linkedin.com/in/ahmed-ateif-00b77b28a',
@@ -43,8 +45,9 @@ class AboutUsSocialLinks extends StatelessWidget {
         color: const Color(0xFF0A66C2),
       ),
       _SocialLink(
-        iconBuilder: (color, size) =>
-            FaIcon(FontAwesomeIcons.github, color: color, size: size),
+        iconBuilder:
+            (color, size) =>
+                FaIcon(FontAwesomeIcons.github, color: color, size: size),
 
         label: 'GitHub',
         value: 'github.com/Ahmedatef5O5',
@@ -53,8 +56,9 @@ class AboutUsSocialLinks extends StatelessWidget {
       ),
 
       _SocialLink(
-        iconBuilder: (color, size) =>
-            FaIcon(FontAwesomeIcons.whatsapp, color: color, size: size),
+        iconBuilder:
+            (color, size) =>
+                FaIcon(FontAwesomeIcons.whatsapp, color: color, size: size),
 
         label: 'WhatsApp',
         value: 'Contact with me',
@@ -62,8 +66,12 @@ class AboutUsSocialLinks extends StatelessWidget {
         color: const Color(0xFF25D366),
       ),
       _SocialLink(
-        iconBuilder: (color, size) =>
-            FaIcon(FontAwesomeIcons.solidEnvelope, color: color, size: size),
+        iconBuilder:
+            (color, size) => FaIcon(
+              FontAwesomeIcons.solidEnvelope,
+              color: color,
+              size: size,
+            ),
 
         label: 'Email',
         value: 'ahmedateif0@gmail.com',
@@ -77,110 +85,120 @@ class AboutUsSocialLinks extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : Colors.grey.shade50,
+        color:
+            isDark ? Colors.white.withValues(alpha: 0.04) : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.07)
-              : Colors.grey.shade200,
+          color:
+              isDark
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : Colors.grey.shade200,
           width: 0.8,
         ),
       ),
       child: Column(
-        children: links.asMap().entries.map((entry) {
-          final i = entry.key;
-          final link = entry.value;
-          final isLast = i == links.length - 1;
-          return Column(
-            children: [
-              InkWell(
-                borderRadius: BorderRadius.circular(18),
-                onTap: () async {
-                  HapticFeedback.selectionClick();
+        children:
+            links.asMap().entries.map((entry) {
+              final i = entry.key;
+              final link = entry.value;
+              final isLast = i == links.length - 1;
+              return Column(
+                children: [
+                  InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () async {
+                      HapticFeedback.selectionClick();
 
-                  if (link.label == 'Email') {
-                    final uri = Uri(
-                      scheme: 'mailto',
-                      path: 'ahmedateif0@gmail.com',
-                      queryParameters: {
-                        'subject': 'Contact from Social App',
-                        'body': 'Hello Ahmed,',
-                      },
-                    );
+                      if (link.label == 'Email') {
+                        final uri = Uri(
+                          scheme: 'mailto',
+                          path: 'ahmedateif0@gmail.com',
+                          queryParameters: {
+                            'subject': 'Contact from Social App',
+                            'body': 'Hello Ahmed,',
+                          },
+                        );
 
-                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
 
-                    return;
-                  }
+                        return;
+                      }
 
-                  final uri = Uri.parse(link.url);
-                  if (await canLaunchUrl(uri)) {
-                    launchUrl(uri, mode: LaunchMode.externalApplication);
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: link.color.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Center(child: link.iconBuilder(link.color, 18)),
+                      final uri = Uri.parse(link.url);
+                      if (await canLaunchUrl(uri)) {
+                        launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
-                      const Gap(14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              link.label,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: link.color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(11),
                             ),
-                            Text(
-                              link.value,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark
-                                    ? Colors.white38
-                                    : Colors.grey.shade500,
-                              ),
+                            child: Center(
+                              child: link.iconBuilder(link.color, 18),
                             ),
-                          ],
-                        ),
+                          ),
+                          const Gap(14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  link.label,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                                Text(
+                                  link.value,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color:
+                                        isDark
+                                            ? Colors.white38
+                                            : Colors.grey.shade500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 15,
+                            color:
+                                isDark ? Colors.white24 : Colors.grey.shade300,
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.open_in_new_rounded,
-                        size: 15,
-                        color: isDark ? Colors.white24 : Colors.grey.shade300,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              if (!isLast)
-                Divider(
-                  height: 1,
-                  indent: 68,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.grey.shade200,
-                ),
-            ],
-          );
-        }).toList(),
+                  if (!isLast)
+                    Divider(
+                      height: 1,
+                      indent: 68,
+                      color:
+                          isDark
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : Colors.grey.shade200,
+                    ),
+                ],
+              );
+            }).toList(),
       ),
     );
   }

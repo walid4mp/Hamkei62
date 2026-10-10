@@ -166,10 +166,11 @@ class _RichPreview extends StatelessWidget {
             imageUrl: preview.imageUrl!,
             fit: BoxFit.cover,
             httpHeaders: imageHeaders,
-            errorWidget: (_, __, ___) => _CompactBrandCard(
-              platform: platform,
-              rawValue: preview.title ?? '',
-            ),
+            errorWidget:
+                (_, __, ___) => _CompactBrandCard(
+                  platform: platform,
+                  rawValue: preview.title ?? '',
+                ),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -431,9 +432,10 @@ class _CompactBrandCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle = (fallbackTitle != null && fallbackTitle!.trim().isNotEmpty)
-        ? fallbackTitle!.trim()
-        : rawValue;
+    final subtitle =
+        (fallbackTitle != null && fallbackTitle!.trim().isNotEmpty)
+            ? fallbackTitle!.trim()
+            : rawValue;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 14, 44, 14),

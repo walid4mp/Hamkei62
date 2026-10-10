@@ -77,11 +77,12 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
     idOf: (m) => m.id,
     clientMessageIdOf: (m) => m.clientMessageId,
     createdAtOf: (m) => m.createdAt,
-    merge: (existing, incoming) => incoming.copyWith(
-      reactions: incoming.reactions,
-      reactionsCreatedAt:
-          incoming.reactionsCreatedAt ?? existing.reactionsCreatedAt,
-    ),
+    merge:
+        (existing, incoming) => incoming.copyWith(
+          reactions: incoming.reactions,
+          reactionsCreatedAt:
+              incoming.reactionsCreatedAt ?? existing.reactionsCreatedAt,
+        ),
   );
 
   final ValueNotifier<ChatPermissionResult> chatPermission = ValueNotifier(
@@ -136,8 +137,8 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
   late final ChatSearchController<MessageModel> searchController =
       ChatSearchController<MessageModel>(
         getMessages: () => cachedMessages,
-        getSearchableText: (m) =>
-            (m.caption?.isNotEmpty == true ? m.caption! : m.text),
+        getSearchableText:
+            (m) => (m.caption?.isNotEmpty == true ? m.caption! : m.text),
         getId: (m) => m.id,
       );
 
@@ -348,10 +349,11 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
           }
         }
 
-        final enrichedDiskMessages = diskMessages.map((m) {
-          final reactions = _reactionsCache[m.id] ?? m.reactions;
-          return m.copyWith(reactions: reactions);
-        }).toList();
+        final enrichedDiskMessages =
+            diskMessages.map((m) {
+              final reactions = _reactionsCache[m.id] ?? m.reactions;
+              return m.copyWith(reactions: reactions);
+            }).toList();
 
         final dedupedDiskMessages = _reconciler.dedupe(enrichedDiskMessages);
 
@@ -361,12 +363,15 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
       }
     }
 
-    _protectedKeys = cachedMessages
-        .map(
-          (m) =>
-              correlationKeyFor(id: m.id, clientMessageId: m.clientMessageId),
-        )
-        .toSet();
+    _protectedKeys =
+        cachedMessages
+            .map(
+              (m) => correlationKeyFor(
+                id: m.id,
+                clientMessageId: m.clientMessageId,
+              ),
+            )
+            .toSet();
 
     _listenReactions(conversationId);
 
@@ -377,16 +382,18 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
             if (myEpoch != _messagesStreamEpoch) return;
 
             final clearedAt = ChatClearStore.instance.clearedAtFor(receiverId);
-            final messages = clearedAt == null
-                ? rawMessages
-                : rawMessages
-                      .where((m) => m.createdAt.isAfter(clearedAt))
-                      .toList();
+            final messages =
+                clearedAt == null
+                    ? rawMessages
+                    : rawMessages
+                        .where((m) => m.createdAt.isAfter(clearedAt))
+                        .toList();
 
-            final enriched = messages.map((m) {
-              final reactions = _reactionsCache[m.id] ?? {};
-              return m.copyWith(reactions: reactions);
-            }).toList();
+            final enriched =
+                messages.map((m) {
+                  final reactions = _reactionsCache[m.id] ?? {};
+                  return m.copyWith(reactions: reactions);
+                }).toList();
 
             final reconciliation = _reconciler.applySnapshot(
               cachedMessages,
@@ -407,11 +414,13 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
             final bool hasOwnNewMessage = resolved.any(
               (m) => newIds.contains(m.id) && m.senderId == currentUserId,
             );
-            final int otherNewCount = resolved
-                .where(
-                  (m) => newIds.contains(m.id) && m.senderId != currentUserId,
-                )
-                .length;
+            final int otherNewCount =
+                resolved
+                    .where(
+                      (m) =>
+                          newIds.contains(m.id) && m.senderId != currentUserId,
+                    )
+                    .length;
 
             if (!isAtBottomNotifier.value &&
                 otherNewCount > 0 &&
@@ -454,12 +463,15 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
   // the same widget-remount-on-reconciliation bug this whole fix is about
   // the moment it does get wired up.
   void _registerBubbleKeys(List<MessageModel> messages) {
-    final currentKeys = messages
-        .map(
-          (m) =>
-              correlationKeyFor(id: m.id, clientMessageId: m.clientMessageId),
-        )
-        .toSet();
+    final currentKeys =
+        messages
+            .map(
+              (m) => correlationKeyFor(
+                id: m.id,
+                clientMessageId: m.clientMessageId,
+              ),
+            )
+            .toSet();
     bubbleKeys.removeWhere((key, _) => !currentKeys.contains(key));
     for (final msg in messages) {
       final key = correlationKeyFor(
@@ -563,9 +575,10 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
       fileUrl: documentFile?.path,
       fileSizeBytes: fileSizeBytes,
       replyToMessageId: replyTo?.id,
-      replyToText: (replyTo?.text != null && replyTo!.text.isNotEmpty)
-          ? replyTo.text
-          : replyTo?.caption,
+      replyToText:
+          (replyTo?.text != null && replyTo!.text.isNotEmpty)
+              ? replyTo.text
+              : replyTo?.caption,
       replyToMessageType: replyTo?.messageType,
       replyToSenderId: replyTo?.senderId,
       replyToMediaUrl: MessageModel.replyMediaUrlFrom(replyTo),
@@ -697,9 +710,10 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
 
           final originalName =
               fileName ?? documentFile.path.split('/').last.split('\\').last;
-          final nameWithoutExt = originalName.contains('.')
-              ? originalName.substring(0, originalName.lastIndexOf('.'))
-              : originalName;
+          final nameWithoutExt =
+              originalName.contains('.')
+                  ? originalName.substring(0, originalName.lastIndexOf('.'))
+                  : originalName;
           final safeName = nameWithoutExt.replaceAll(
             RegExp(r'[^a-zA-Z0-9\-_]'),
             '_',
@@ -751,9 +765,10 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
           fileSizeBytes: fileSizeBytes,
           caption: caption,
           replyToMessageId: replyTo?.id,
-          replyToText: (replyTo?.text != null && replyTo!.text.isNotEmpty)
-              ? replyTo.text
-              : replyTo?.caption,
+          replyToText:
+              (replyTo?.text != null && replyTo!.text.isNotEmpty)
+                  ? replyTo.text
+                  : replyTo?.caption,
           replyToMessageType: replyTo?.messageType,
           replyToSenderId: replyTo?.senderId,
           replyToMediaUrl: MessageModel.replyMediaUrlFrom(replyTo),
@@ -815,12 +830,14 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
         await NotificationRepository.instance.notifyChatMessage(
           receiverId: receiverId,
           senderId: currentUserId,
-          senderName: _resolvedCurrentUserName.isNotEmpty
-              ? _resolvedCurrentUserName
-              : currentUserName,
-          senderImageUrl: _resolvedSenderImageUrl.isNotEmpty
-              ? _resolvedSenderImageUrl
-              : (senderImageUrl ?? ''),
+          senderName:
+              _resolvedCurrentUserName.isNotEmpty
+                  ? _resolvedCurrentUserName
+                  : currentUserName,
+          senderImageUrl:
+              _resolvedSenderImageUrl.isNotEmpty
+                  ? _resolvedSenderImageUrl
+                  : (senderImageUrl ?? ''),
           messageBody: caption ?? messageText,
           messageType: messageType,
           chatReferenceId: currentUserId,
@@ -901,13 +918,15 @@ class ChatDetailsCubit extends Cubit<ChatDetailsState>
   String _resolvedCurrentUserName = '';
   String _resolvedSenderImageUrl = '';
 
-  String get effectiveCurrentUserName => _resolvedCurrentUserName.isNotEmpty
-      ? _resolvedCurrentUserName
-      : currentUserName;
+  String get effectiveCurrentUserName =>
+      _resolvedCurrentUserName.isNotEmpty
+          ? _resolvedCurrentUserName
+          : currentUserName;
 
-  String? get effectiveSenderImageUrl => _resolvedSenderImageUrl.isNotEmpty
-      ? _resolvedSenderImageUrl
-      : senderImageUrl;
+  String? get effectiveSenderImageUrl =>
+      _resolvedSenderImageUrl.isNotEmpty
+          ? _resolvedSenderImageUrl
+          : senderImageUrl;
 
   Future<void> loadCurrentUserInfo() async {
     try {

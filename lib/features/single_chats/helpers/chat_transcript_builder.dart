@@ -9,9 +9,10 @@ class ChatTranscriptBuilder {
     required String otherUserName,
     required int maxMessages,
   }) {
-    final recent = messages.length > maxMessages
-        ? messages.sublist(messages.length - maxMessages)
-        : messages;
+    final recent =
+        messages.length > maxMessages
+            ? messages.sublist(messages.length - maxMessages)
+            : messages;
 
     final buffer = StringBuffer();
     for (final message in recent) {

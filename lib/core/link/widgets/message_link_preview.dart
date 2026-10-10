@@ -76,9 +76,8 @@ class _MessageLinkPreviewState extends State<MessageLinkPreview>
 
     final url = urlElements.first.url;
     _url = url;
-    final withoutUrl = widget.text
-        .replaceFirst(urlElements.first.text, '')
-        .trim();
+    final withoutUrl =
+        widget.text.replaceFirst(urlElements.first.text, '').trim();
     _isOnlyUrl = withoutUrl.isEmpty;
 
     final cached = LinkPreviewService.instance.peek(url);

@@ -67,13 +67,14 @@ class CustomUserProfileImagesSection extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           GestureDetector(
-            onTap: isEditMode
-                ? onEditBackground
-                : () {
-                    final String url =
-                        backgroundUrl ?? AppImages.defaultBackgroundImg;
-                    _openFullScreenImage(context, url, 'background-$url');
-                  },
+            onTap:
+                isEditMode
+                    ? onEditBackground
+                    : () {
+                      final String url =
+                          backgroundUrl ?? AppImages.defaultBackgroundImg;
+                      _openFullScreenImage(context, url, 'background-$url');
+                    },
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -81,16 +82,17 @@ class CustomUserProfileImagesSection extends StatelessWidget {
                   height: dynamicBackgroundHeight,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: isEditMode
-                        ? const BorderRadius.vertical(
-                            bottom: Radius.circular(20),
-                            top: Radius.circular(20),
-                          )
-                        : isProfileHeader
-                        ? const BorderRadius.vertical(
-                            bottom: Radius.circular(20),
-                          )
-                        : null,
+                    borderRadius:
+                        isEditMode
+                            ? const BorderRadius.vertical(
+                              bottom: Radius.circular(20),
+                              top: Radius.circular(20),
+                            )
+                            : isProfileHeader
+                            ? const BorderRadius.vertical(
+                              bottom: Radius.circular(20),
+                            )
+                            : null,
                     image: DecorationImage(
                       image: _getBackgroundImage(),
                       fit: BoxFit.cover,
@@ -102,14 +104,16 @@ class CustomUserProfileImagesSection extends StatelessWidget {
                     height: dynamicBackgroundHeight,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor
-                          .withValues(alpha: 0.18),
+                      color: Theme.of(
+                        context,
+                      ).scaffoldBackgroundColor.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
                       Icons.edit,
-                      color: Theme.of(context).primaryColor
-                          .withValues(alpha: 0.9),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.9),
                       size: 28,
                     ),
                   ),
@@ -121,12 +125,14 @@ class CustomUserProfileImagesSection extends StatelessWidget {
           Align(
             alignment: avatarAlignment,
             child: GestureDetector(
-              onTap: isEditMode
-                  ? onEditAvatar
-                  : () {
-                      final String url = avatarUrl ?? AppImages.defaultUserImg;
-                      _openFullScreenImage(context, url, 'avatar-$url');
-                    },
+              onTap:
+                  isEditMode
+                      ? onEditAvatar
+                      : () {
+                        final String url =
+                            avatarUrl ?? AppImages.defaultUserImg;
+                        _openFullScreenImage(context, url, 'avatar-$url');
+                      },
               child: Hero(
                 tag: heroTag ?? 'default-avatar-tag-${avatarUrl ?? "none"}',
                 child: SizedBox(
@@ -156,25 +162,28 @@ class CustomUserProfileImagesSection extends StatelessWidget {
                           child: AppAvatar(
                             imageUrl: avatarUrl,
                             size: dynamicAvatarSize,
-                            borderColor: (!isEditMode && !isOnline)
-                                ? Theme.of(context).primaryColor
-                                : Colors.transparent,
-                            borderWidth: (!isEditMode && !isOnline)
-                                ? (isProfileHeader ? 2.2 : 2.0)
-                                : 0.0,
+                            borderColor:
+                                (!isEditMode && !isOnline)
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.transparent,
+                            borderWidth:
+                                (!isEditMode && !isOnline)
+                                    ? (isProfileHeader ? 2.2 : 2.0)
+                                    : 0.0,
                           ),
                         ),
 
                       if (isEditMode)
                         CircleAvatar(
                           radius: dynamicAvatarSize / 2,
-                          backgroundColor: Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withValues(alpha: 0.25),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).scaffoldBackgroundColor.withValues(alpha: 0.25),
                           child: Icon(
                             Icons.edit,
-                            color: Theme.of(context).primaryColor
-                                .withValues(alpha: 0.9),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.9),
                             size: 26,
                           ),
                         ),

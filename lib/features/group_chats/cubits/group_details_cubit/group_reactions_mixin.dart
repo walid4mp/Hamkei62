@@ -66,9 +66,8 @@ mixin GroupReactionsMixin on Cubit<GroupDetailsState> {
     final isOffline = await ConnectivityBannerController.notifyIfOffline();
     if (isOffline) return;
 
-    final existingMsg = cachedMessages
-        .where((m) => m.id == messageId)
-        .firstOrNull;
+    final existingMsg =
+        cachedMessages.where((m) => m.id == messageId).firstOrNull;
     final currentEmoji =
         _reactionsCache[messageId]?[currentUserId] ??
         existingMsg?.reactions[currentUserId];
@@ -83,8 +82,8 @@ mixin GroupReactionsMixin on Cubit<GroupDetailsState> {
     } else {
       _reactionsCache[messageId]![currentUserId] = emoji;
       _reactionsCreatedAtCache[messageId] ??= {};
-      _reactionsCreatedAtCache[messageId]![currentUserId] = now
-          .toIso8601String();
+      _reactionsCreatedAtCache[messageId]![currentUserId] =
+          now.toIso8601String();
     }
     cachedMessages = GroupDetailsCubit._reconciler.applyFieldUpdate(
       cachedMessages,
@@ -100,9 +99,8 @@ mixin GroupReactionsMixin on Cubit<GroupDetailsState> {
     }
 
     if (!isRemoving) {
-      final reactedMsg = cachedMessages
-          .where((m) => m.id == messageId)
-          .firstOrNull;
+      final reactedMsg =
+          cachedMessages.where((m) => m.id == messageId).firstOrNull;
       final previewText = MessageReactionPreviewHelper.formatReactionPreview(
         isMe: true,
         reactorName: 'You',
@@ -172,8 +170,8 @@ mixin GroupReactionsMixin on Cubit<GroupDetailsState> {
     final latest = cachedMessages.first;
     final rawText =
         (latest.messageType == 'file' || latest.messageType == 'document')
-        ? (latest.fileName ?? latest.text)
-        : latest.text;
+            ? (latest.fileName ?? latest.text)
+            : latest.text;
 
     groupListCubit.updateGroupLastMessage(
       groupId: group.id,

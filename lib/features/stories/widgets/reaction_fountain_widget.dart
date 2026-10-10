@@ -84,27 +84,29 @@ class _ReactionFountainWidgetState extends State<ReactionFountainWidget>
       }
     }
 
-    final capped = expanded.length > widget.maxParticles
-        ? (expanded..shuffle(random)).take(widget.maxParticles).toList()
-        : expanded;
+    final capped =
+        expanded.length > widget.maxParticles
+            ? (expanded..shuffle(random)).take(widget.maxParticles).toList()
+            : expanded;
 
     const totalMs = _riseMs + _maxStartDelayMs;
 
-    final particles = capped.map((emoji) {
-      final startMs = random.nextDouble() * _maxStartDelayMs;
-      return _FountainParticle(
-        emoji: emoji,
-        startFraction: startMs / totalMs,
-        durationFraction: _riseMs / totalMs,
-        spawnXJitter: (random.nextDouble() - 0.5) * 50,
-        wobbleAmplitude: 14 + random.nextDouble() * 18,
-        wobbleFrequency: 1.0 + random.nextDouble() * 1.2,
-        wobbleDirection: random.nextBool() ? 1.0 : -1.0,
-        travelFraction: 0.25 + random.nextDouble() * (1 / 3 - 0.25),
-        sizeScale: 0.8 + random.nextDouble() * 0.5,
-        rotationAmplitude: (random.nextDouble() - 0.5) * 0.35,
-      );
-    }).toList();
+    final particles =
+        capped.map((emoji) {
+          final startMs = random.nextDouble() * _maxStartDelayMs;
+          return _FountainParticle(
+            emoji: emoji,
+            startFraction: startMs / totalMs,
+            durationFraction: _riseMs / totalMs,
+            spawnXJitter: (random.nextDouble() - 0.5) * 50,
+            wobbleAmplitude: 14 + random.nextDouble() * 18,
+            wobbleFrequency: 1.0 + random.nextDouble() * 1.2,
+            wobbleDirection: random.nextBool() ? 1.0 : -1.0,
+            travelFraction: 0.25 + random.nextDouble() * (1 / 3 - 0.25),
+            sizeScale: 0.8 + random.nextDouble() * 0.5,
+            rotationAmplitude: (random.nextDouble() - 0.5) * 0.35,
+          );
+        }).toList();
 
     setState(() => _particles = particles);
 

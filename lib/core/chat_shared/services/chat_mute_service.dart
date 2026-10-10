@@ -47,9 +47,10 @@ class ChatMuteService {
           schema: 'public',
           table: 'chat_mutes',
           callback: (payload) {
-            final row = payload.eventType == PostgresChangeEvent.delete
-                ? payload.oldRecord
-                : payload.newRecord;
+            final row =
+                payload.eventType == PostgresChangeEvent.delete
+                    ? payload.oldRecord
+                    : payload.newRecord;
 
             final ownerId = row['owner_id'] as String?;
             final rowPeerId = row['peer_id'] as String?;

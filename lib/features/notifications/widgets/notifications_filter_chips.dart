@@ -98,20 +98,23 @@ class _NotificationsFilterChipsState extends State<NotificationsFilterChips> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: isActive
-                    ? widget.primary
-                    : (widget.isDark
-                          ? Colors.white.withValues(alpha: 0.07)
-                          : Colors.grey.shade100),
+                color:
+                    isActive
+                        ? widget.primary
+                        : (widget.isDark
+                            ? Colors.white.withValues(alpha: 0.07)
+                            : Colors.grey.shade100),
                 borderRadius: BorderRadius.circular(20),
-                border: isActive
-                    ? null
-                    : Border.all(
-                        color: widget.isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.grey.shade200,
-                        width: 0.8,
-                      ),
+                border:
+                    isActive
+                        ? null
+                        : Border.all(
+                          color:
+                              widget.isDark
+                                  ? Colors.white.withValues(alpha: 0.08)
+                                  : Colors.grey.shade200,
+                          width: 0.8,
+                        ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -119,11 +122,12 @@ class _NotificationsFilterChipsState extends State<NotificationsFilterChips> {
                   Icon(
                     icon,
                     size: 13,
-                    color: isActive
-                        ? Colors.white
-                        : (widget.isDark
-                              ? Colors.white54
-                              : Colors.grey.shade600),
+                    color:
+                        isActive
+                            ? Colors.white
+                            : (widget.isDark
+                                ? Colors.white54
+                                : Colors.grey.shade600),
                   ),
                   const SizedBox(width: 5),
                   Text(
@@ -131,11 +135,12 @@ class _NotificationsFilterChipsState extends State<NotificationsFilterChips> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
-                      color: isActive
-                          ? Colors.white
-                          : (widget.isDark
-                                ? Colors.white60
-                                : Colors.grey.shade700),
+                      color:
+                          isActive
+                              ? Colors.white
+                              : (widget.isDark
+                                  ? Colors.white60
+                                  : Colors.grey.shade700),
                     ),
                   ),
                 ],

@@ -32,8 +32,9 @@ class IncomingShareSliverAppBar extends StatelessWidget {
           if (canPopNormally) {
             Navigator.pop(context);
           } else {
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
           }
         },
       ),

@@ -37,8 +37,9 @@ class IncomingShareTargetView extends StatelessWidget {
       action();
     } catch (e) {
       debugPrint('⚠️ IncomingShareTargetView: $label routing failed: $e');
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
     }
   }
 
@@ -161,8 +162,9 @@ class IncomingShareTargetView extends StatelessWidget {
       canPop: canPopNormally,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.homeRoute, (route) => false);
       },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -190,8 +192,9 @@ class IncomingShareTargetView extends StatelessWidget {
                           height: 26,
                           color: const Color(0xFFFF6B6B),
                         ),
-                        bgColor: const Color(0xFFFF6B6B)
-                            .withValues(alpha: 0.12),
+                        bgColor: const Color(
+                          0xFFFF6B6B,
+                        ).withValues(alpha: 0.12),
                         onTap: () => _onStoryTap(context),
                       ),
                       ModernShareTile(
@@ -201,8 +204,9 @@ class IncomingShareTargetView extends StatelessWidget {
                           color: Color(0xFF4CAF50),
                           size: 26,
                         ),
-                        bgColor: const Color(0xFF4CAF50)
-                            .withValues(alpha: 0.12),
+                        bgColor: const Color(
+                          0xFF4CAF50,
+                        ).withValues(alpha: 0.12),
                         onTap: () => _onPostTap(context),
                       ),
                       ModernShareTile(
@@ -213,12 +217,14 @@ class IncomingShareTargetView extends StatelessWidget {
                           color: Color(0xFF9C27B0),
                           size: 26,
                         ),
-                        bgColor: const Color(0xFF9C27B0)
-                            .withValues(alpha: 0.12),
+                        bgColor: const Color(
+                          0xFF9C27B0,
+                        ).withValues(alpha: 0.12),
                         enabled: _aiSupportsPayload,
-                        subtitle: _aiSupportsPayload
-                            ? null
-                            : "AI doesn't support video yet",
+                        subtitle:
+                            _aiSupportsPayload
+                                ? null
+                                : "AI doesn't support video yet",
                         onTap: () => _onAiTap(context),
                       ),
                     ]),

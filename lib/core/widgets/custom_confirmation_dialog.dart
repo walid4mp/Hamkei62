@@ -56,8 +56,10 @@ class CustomConfirmationDialog extends StatelessWidget {
                 textAlign: textAlign,
                 style:
                     style ??
-                    Theme.of(context).textTheme.titleMedium!
-                        .copyWith(fontWeight: FontWeight.w600, fontSize: 18),
+                    Theme.of(context).textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
               ),
               const Gap(24),
               Row(
@@ -67,8 +69,11 @@ class CustomConfirmationDialog extends StatelessWidget {
                       maximumSize: Size(80, 40),
                       minimumSize: Size(80, 40),
                       txtBtn: cancelBtnText,
-                      onPressed: () =>
-                          Navigator.of(context, rootNavigator: true).pop(false),
+                      onPressed:
+                          () => Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pop(false),
                       elevation: 1.5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),

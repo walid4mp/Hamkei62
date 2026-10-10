@@ -65,9 +65,10 @@ class DownloadProgressBarButton extends StatelessWidget {
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeOut,
-                      width: isDownloading
-                          ? constraints.maxWidth * progress.clamp(0.04, 1.0)
-                          : 0,
+                      width:
+                          isDownloading
+                              ? constraints.maxWidth * progress.clamp(0.04, 1.0)
+                              : 0,
                       height: height,
                       color: theme.primaryColor,
                     ),
@@ -75,31 +76,32 @@ class DownloadProgressBarButton extends StatelessWidget {
                     Center(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
-                        child: isDownloading
-                            ? Text(
-                                '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}%',
-                                key: const ValueKey('pct'),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: textColor,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black26,
-                                      blurRadius: 2,
-                                    ),
-                                  ],
+                        child:
+                            isDownloading
+                                ? Text(
+                                  '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}%',
+                                  key: const ValueKey('pct'),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: textColor,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black26,
+                                        blurRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                : Text(
+                                  'Download',
+                                  key: const ValueKey('idle'),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.primaryColor,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                'Download',
-                                key: const ValueKey('idle'),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.primaryColor,
-                                ),
-                              ),
                       ),
                     ),
                   ],

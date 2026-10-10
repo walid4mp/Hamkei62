@@ -60,9 +60,10 @@ class VoicePlaybackController {
     VideoPlayerController? temp;
     try {
       final isLocal = url.startsWith('/');
-      temp = isLocal
-          ? VideoPlayerController.file(File(url))
-          : VideoPlayerController.networkUrl(Uri.parse(url));
+      temp =
+          isLocal
+              ? VideoPlayerController.file(File(url))
+              : VideoPlayerController.networkUrl(Uri.parse(url));
       await temp.initialize();
       final duration = temp.value.duration;
       await temp.dispose();

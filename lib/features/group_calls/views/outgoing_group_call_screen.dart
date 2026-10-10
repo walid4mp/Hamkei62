@@ -128,11 +128,12 @@ class _OutgoingGroupCallScreenState extends State<OutgoingGroupCallScreen>
     await Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => LiveKitGroupCallView(
-          call: call,
-          currentUserId: SupabaseProvider.id,
-          currentUserName: name,
-        ),
+        builder:
+            (_) => LiveKitGroupCallView(
+              call: call,
+              currentUserId: SupabaseProvider.id,
+              currentUserName: name,
+            ),
       ),
     );
   }
@@ -186,12 +187,12 @@ class _OutgoingGroupCallScreenState extends State<OutgoingGroupCallScreen>
                       SizedBox(height: metrics.topGap),
 
                       CallStatusPill(
-                        icon: isVideo
-                            ? Icons.videocam_rounded
-                            : Icons.phone_rounded,
-                        label: isVideo
-                            ? 'Group Video Call'
-                            : 'Group Voice Call',
+                        icon:
+                            isVideo
+                                ? Icons.videocam_rounded
+                                : Icons.phone_rounded,
+                        label:
+                            isVideo ? 'Group Video Call' : 'Group Voice Call',
                       ),
 
                       SizedBox(height: metrics.midGap),

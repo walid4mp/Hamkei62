@@ -60,12 +60,14 @@ class SocialNotificationDispatcher {
         '';
     final String referenceId = resolveSocialReferenceId(data);
 
-    final String title = (data['title'] as String?)?.isNotEmpty == true
-        ? data['title']!
-        : actorName;
-    final String body = (data['body'] as String?)?.isNotEmpty == true
-        ? data['body']!
-        : 'New notification';
+    final String title =
+        (data['title'] as String?)?.isNotEmpty == true
+            ? data['title']!
+            : actorName;
+    final String body =
+        (data['body'] as String?)?.isNotEmpty == true
+            ? data['body']!
+            : 'New notification';
 
     Uint8List avatarBitmap;
     try {
@@ -94,9 +96,10 @@ class SocialNotificationDispatcher {
       title,
       body,
       NotificationDetails(android: androidDetails),
-      payload: type == 'message_react'
-          ? 'message_react|${data['isGroup']}|${data['groupId']}|${data['groupName']}|${data['actorId']}|${data['actorName']}|${data['actorImageUrl']}'
-          : 'social|$type|$referenceId|$actorId|$actorName|$actorImageUrl|$mentionContext',
+      payload:
+          type == 'message_react'
+              ? 'message_react|${data['isGroup']}|${data['groupId']}|${data['groupName']}|${data['actorId']}|${data['actorName']}|${data['actorImageUrl']}'
+              : 'social|$type|$referenceId|$actorId|$actorName|$actorImageUrl|$mentionContext',
     );
   }
 }

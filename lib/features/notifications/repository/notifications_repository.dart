@@ -134,9 +134,10 @@ class NotificationRepository {
     required String commentPreview,
     bool isReply = false,
   }) async {
-    final preview = commentPreview.length > 50
-        ? '${commentPreview.substring(0, 50)}…'
-        : commentPreview;
+    final preview =
+        commentPreview.length > 50
+            ? '${commentPreview.substring(0, 50)}…'
+            : commentPreview;
     await _insert({
       'receiver_id': receiverId,
       'sender_id': commenterId,
@@ -308,9 +309,8 @@ class NotificationRepository {
   bool _needsMessageBodyHydration(String? rawBody) {
     final b = (rawBody ?? '').trim();
     if (b.isEmpty) return true;
-    final content = b.contains(': ')
-        ? b.substring(b.indexOf(': ') + 2).trim()
-        : b;
+    final content =
+        b.contains(': ') ? b.substring(b.indexOf(': ') + 2).trim() : b;
     return content.isEmpty ||
         content == '📄 Sent an attachment' ||
         content == 'Sent an attachment' ||
@@ -335,9 +335,10 @@ class NotificationRepository {
     final fileUrl = (msg['file_url'] as String?)?.trim();
     if (fileUrl != null && fileUrl.isNotEmpty) {
       final uri = Uri.tryParse(fileUrl);
-      final lastSeg = uri != null && uri.pathSegments.isNotEmpty
-          ? uri.pathSegments.last
-          : fileUrl.split('/').last;
+      final lastSeg =
+          uri != null && uri.pathSegments.isNotEmpty
+              ? uri.pathSegments.last
+              : fileUrl.split('/').last;
       if (lastSeg.isNotEmpty) return Uri.decodeComponent(lastSeg);
     }
     return null;
@@ -352,18 +353,18 @@ class NotificationRepository {
         .order('created_at', ascending: false)
         .limit(limit);
 
-    final rows = (data as List)
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    final rows =
+        (data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
     if (rows.isEmpty) return [];
 
-    final senderIds = rows
-        .map((r) => r['sender_id'] as String?)
-        .whereType<String>()
-        .where((id) => id.isNotEmpty)
-        .toSet()
-        .toList();
+    final senderIds =
+        rows
+            .map((r) => r['sender_id'] as String?)
+            .whereType<String>()
+            .where((id) => id.isNotEmpty)
+            .toSet()
+            .toList();
 
     final Map<String, Map<String, dynamic>> usersById = {};
     if (senderIds.isNotEmpty) {
@@ -384,13 +385,14 @@ class NotificationRepository {
       }
     }
 
-    final groupIds = rows
-        .where((r) => r['type'] == 'group_message')
-        .map((r) => r['reference_id'] as String?)
-        .whereType<String>()
-        .where((id) => id.isNotEmpty)
-        .toSet()
-        .toList();
+    final groupIds =
+        rows
+            .where((r) => r['type'] == 'group_message')
+            .map((r) => r['reference_id'] as String?)
+            .whereType<String>()
+            .where((id) => id.isNotEmpty)
+            .toSet()
+            .toList();
 
     final Map<String, Map<String, dynamic>> groupsById = {};
     if (groupIds.isNotEmpty) {
@@ -411,17 +413,18 @@ class NotificationRepository {
       }
     }
 
-    final chatSendersToHydrate = rows
-        .where(
-          (r) =>
-              r['type'] == 'chat' &&
-              _needsMessageBodyHydration(r['body'] as String?),
-        )
-        .map((r) => r['sender_id'] as String?)
-        .whereType<String>()
-        .where((id) => id.isNotEmpty)
-        .toSet()
-        .toList();
+    final chatSendersToHydrate =
+        rows
+            .where(
+              (r) =>
+                  r['type'] == 'chat' &&
+                  _needsMessageBodyHydration(r['body'] as String?),
+            )
+            .map((r) => r['sender_id'] as String?)
+            .whereType<String>()
+            .where((id) => id.isNotEmpty)
+            .toSet()
+            .toList();
 
     final Map<String, List<Map<String, dynamic>>> chatMessagesBySender = {};
     if (chatSendersToHydrate.isNotEmpty) {
@@ -483,8 +486,8 @@ class NotificationRepository {
           final resolvedFileName = _resolveFileNameFromMessageRow(bestMatch);
           final captionOrText =
               (bestMatch['caption'] as String?)?.trim().isNotEmpty == true
-              ? (bestMatch['caption'] as String)
-              : (bestMatch['message_text'] as String? ?? '');
+                  ? (bestMatch['caption'] as String)
+                  : (bestMatch['message_text'] as String? ?? '');
 
           final hydratedBody = _chatBody(
             captionOrText,

@@ -15,27 +15,26 @@ class MediaPreviewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUserAvatar = context
-        .read<HomeCubit>()
-        .currentUserData
-        ?.imageUrl;
+    final currentUserAvatar =
+        context.read<HomeCubit>().currentUserData?.imageUrl;
     return GestureDetector(
-      onTap: () =>
-          _openFullScreenMedia(context, items, item, currentUserAvatar),
+      onTap:
+          () => _openFullScreenMedia(context, items, item, currentUserAvatar),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: switch (item.messageType) {
           'image' => CachedNetworkImage(
             imageUrl: item.imageUrl ?? '',
             fit: BoxFit.cover,
-            errorWidget: (context, url, error) => Container(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Icon(
-                Icons.broken_image_rounded,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                size: 28,
-              ),
-            ),
+            errorWidget:
+                (context, url, error) => Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    Icons.broken_image_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    size: 28,
+                  ),
+                ),
           ),
           'video' => Stack(
             fit: StackFit.expand,
@@ -46,14 +45,16 @@ class MediaPreviewTile extends StatelessWidget {
                     item.videoUrl ??
                     '',
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.video_file_rounded,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    size: 28,
-                  ),
-                ),
+                errorWidget:
+                    (context, url, error) => Container(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.video_file_rounded,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        size: 28,
+                      ),
+                    ),
               ),
               const Center(
                 child: Icon(
@@ -76,29 +77,29 @@ class MediaPreviewTile extends StatelessWidget {
     SharedMediaItem tappedItem,
     String? currentUserAvatar,
   ) {
-    final playable = tabItems
-        .where(
-          (i) =>
-              i.messageType == 'image' ||
-              i.messageType == 'video' ||
-              (i.voiceUrl ?? '').isNotEmpty,
-        )
-        .toList();
+    final playable =
+        tabItems
+            .where(
+              (i) =>
+                  i.messageType == 'image' ||
+                  i.messageType == 'video' ||
+                  (i.voiceUrl ?? '').isNotEmpty,
+            )
+            .toList();
     final initialIndex = playable.indexWhere((i) => i.id == tappedItem.id);
 
-    final currentUserAvatar = context
-        .read<HomeCubit>()
-        .currentUserData
-        ?.imageUrl;
+    final currentUserAvatar =
+        context.read<HomeCubit>().currentUserData?.imageUrl;
 
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        pageBuilder: (_, __, ___) => FullScreenMediaPager(
-          items: playable,
-          initialIndex: initialIndex < 0 ? 0 : initialIndex,
-          currentUserAvatar: currentUserAvatar,
-        ),
+        pageBuilder:
+            (_, __, ___) => FullScreenMediaPager(
+              items: playable,
+              initialIndex: initialIndex < 0 ? 0 : initialIndex,
+              currentUserAvatar: currentUserAvatar,
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

@@ -78,14 +78,13 @@ class _HighlightedLinkifyTextState extends State<HighlightedLinkifyText> {
     }
     _recognizers.clear();
 
-    final baseStyle =
-        (widget.style ??
-                Theme.of(context).textTheme.bodyMedium ??
-                const TextStyle())
-            .copyWith(
-              fontSize: widget.style?.fontSize ?? 15,
-              fontFamilyFallback: AppTypography.fontFallback,
-            );
+    final baseStyle = (widget.style ??
+            Theme.of(context).textTheme.bodyMedium ??
+            const TextStyle())
+        .copyWith(
+          fontSize: widget.style?.fontSize ?? 15,
+          fontFamilyFallback: AppTypography.fontFallback,
+        );
     final linkStyle =
         widget.linkStyle ??
         const TextStyle(
@@ -112,8 +111,8 @@ class _HighlightedLinkifyTextState extends State<HighlightedLinkifyText> {
 
     for (final element in elements) {
       if (element is LinkableElement) {
-        final recognizer = TapGestureRecognizer()
-          ..onTap = () => _onOpen(element.url);
+        final recognizer =
+            TapGestureRecognizer()..onTap = () => _onOpen(element.url);
         _recognizers.add(recognizer);
         spans.add(
           TextSpan(
@@ -183,9 +182,8 @@ class _HighlightedLinkifyTextState extends State<HighlightedLinkifyText> {
         widget.textDirection ?? ChatHelper.getTextDirection(normalizedText);
     return RichText(
       textDirection: direction,
-      textAlign: direction == TextDirection.rtl
-          ? TextAlign.right
-          : TextAlign.left,
+      textAlign:
+          direction == TextDirection.rtl ? TextAlign.right : TextAlign.left,
       maxLines: widget.maxLines,
       overflow: widget.overflow ?? TextOverflow.ellipsis,
       text: TextSpan(children: _buildSpans(context)),

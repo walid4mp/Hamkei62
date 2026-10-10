@@ -52,9 +52,10 @@ class _StoryDisplayViewState extends State<StoryDisplayView> {
             userStories: widget.allUserGroups[index],
             storiesCubit: widget.storiesCubit,
             onClose: _safeClose,
-            initialStoryIndex: index == widget.initialGroupIndex
-                ? widget.initialStoryIndex
-                : 0,
+            initialStoryIndex:
+                index == widget.initialGroupIndex
+                    ? widget.initialStoryIndex
+                    : 0,
             onAllStoriesComplete: () {
               if (index < widget.allUserGroups.length - 1) {
                 _groupPageController.nextPage(

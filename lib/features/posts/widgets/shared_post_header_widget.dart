@@ -219,9 +219,9 @@ class SharedPostHeaderWidget extends StatelessWidget {
                     children: [
                       Text(
                         FormattedDate.getFormattedDate(
-                          DateTime.parse(sharedPost.createdAt)
-                              .toLocal()
-                              .toIso8601String(),
+                          DateTime.parse(
+                            sharedPost.createdAt,
+                          ).toLocal().toIso8601String(),
                         ),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w500,

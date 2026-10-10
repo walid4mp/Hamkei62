@@ -32,20 +32,17 @@ class CommentsReactionAvatarStack extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     final borderColor = theme.scaffoldBackgroundColor;
-    final remainingBgColor = isDark
-        ? colorScheme.surfaceContainerHighest
-        : Colors.grey[300];
-    final remainingTextColor = isDark
-        ? colorScheme.onSurface
-        : colorScheme.onSurface;
+    final remainingBgColor =
+        isDark ? colorScheme.surfaceContainerHighest : Colors.grey[300];
+    final remainingTextColor =
+        isDark ? colorScheme.onSurface : colorScheme.onSurface;
 
     final topEmojis = reactions.map((r) => r.emoji).toList();
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        int visibleCount = imageUrls.length > maxVisible
-            ? maxVisible
-            : imageUrls.length;
+        int visibleCount =
+            imageUrls.length > maxVisible ? maxVisible : imageUrls.length;
 
         if (constraints.maxWidth.isFinite && constraints.maxWidth > 0) {
           final int maxCirclesByWidth =
@@ -58,9 +55,8 @@ class CommentsReactionAvatarStack extends StatelessWidget {
           }
         }
 
-        final int remainingCount = totalReactions > visibleCount
-            ? totalReactions - visibleCount
-            : 0;
+        final int remainingCount =
+            totalReactions > visibleCount ? totalReactions - visibleCount : 0;
         final bool showRemaining = remainingCount > 0;
         final int totalCircles = visibleCount + (showRemaining ? 1 : 0);
         final double stackWidth =
@@ -145,8 +141,9 @@ class CommentsReactionAvatarStack extends StatelessWidget {
       secureUrl: url,
       fit: BoxFit.cover,
       isAvatar: true,
-      errorWidget: (context, error) =>
-          Image.asset(AppImages.defaultUserImg, fit: BoxFit.cover),
+      errorWidget:
+          (context, error) =>
+              Image.asset(AppImages.defaultUserImg, fit: BoxFit.cover),
     );
   }
 

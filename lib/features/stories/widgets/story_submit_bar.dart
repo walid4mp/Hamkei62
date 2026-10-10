@@ -19,18 +19,20 @@ class StorySubmitBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: loading ? null : onPressed,
-      child: loading
-          ? const CustomLoadingIndicator(radius: 10, color: AppColors.white)
-          : Text(
-              'Done',
-              style: TextStyle(
-                color: hasText
-                    ? AppColors.white
-                    : AppColors.grey2.withValues(alpha: 0.6),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+      child:
+          loading
+              ? const CustomLoadingIndicator(radius: 10, color: AppColors.white)
+              : Text(
+                'Done',
+                style: TextStyle(
+                  color:
+                      hasText
+                          ? AppColors.white
+                          : AppColors.grey2.withValues(alpha: 0.6),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
     );
   }
 }

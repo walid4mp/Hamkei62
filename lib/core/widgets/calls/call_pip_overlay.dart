@@ -64,16 +64,17 @@ class _CallPipOverlayState extends State<CallPipOverlay> {
               child: SizedBox(
                 width: _bubbleWidth,
                 height: _bubbleHeight,
-                child: pip.previewTrack != null
-                    ? VideoTrackRenderer(pip.previewTrack!)
-                    : Container(
-                        color: Colors.black87,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.videocam_off_rounded,
-                          color: Colors.white54,
+                child:
+                    pip.previewTrack != null
+                        ? VideoTrackRenderer(pip.previewTrack!)
+                        : Container(
+                          color: Colors.black87,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.videocam_off_rounded,
+                            color: Colors.white54,
+                          ),
                         ),
-                      ),
               ),
             ),
           ),

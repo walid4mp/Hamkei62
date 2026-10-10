@@ -52,9 +52,10 @@ class ReelsPreferencesStore {
     );
 
     final merged = <String>{...existing, ...newlyViewedIds}.toList();
-    final trimmed = merged.length > maxStoredSeenIds
-        ? merged.sublist(merged.length - maxStoredSeenIds)
-        : merged;
+    final trimmed =
+        merged.length > maxStoredSeenIds
+            ? merged.sublist(merged.length - maxStoredSeenIds)
+            : merged;
 
     await box.put(_recentlyViewedIdsKey, trimmed);
   }

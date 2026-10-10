@@ -76,12 +76,14 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
                     return _buildErrorState(theme, state.message, query);
                   }
 
-                  final users = state is DiscoverPeopleSuccess
-                      ? state.users
-                      : const <DiscoverPersonModel>[];
-                  final hasReachedMax = state is DiscoverPeopleSuccess
-                      ? state.hasReachedMax
-                      : true;
+                  final users =
+                      state is DiscoverPeopleSuccess
+                          ? state.users
+                          : const <DiscoverPersonModel>[];
+                  final hasReachedMax =
+                      state is DiscoverPeopleSuccess
+                          ? state.hasReachedMax
+                          : true;
 
                   if (users.isEmpty) {
                     return _buildEmptyState(theme, query);
@@ -117,11 +119,12 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
                                 key: ValueKey(person.user.id),
                                 personData: person,
                                 highlightQuery: query.isEmpty ? null : query,
-                                onDismiss: query.isEmpty
-                                    ? () => _cubit.dismissSuggestion(
-                                        person.user.id,
-                                      )
-                                    : null,
+                                onDismiss:
+                                    query.isEmpty
+                                        ? () => _cubit.dismissSuggestion(
+                                          person.user.id,
+                                        )
+                                        : null,
                               );
                             },
                           ),
@@ -155,9 +158,10 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
         color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           bottom: BorderSide(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.07)
-                : Colors.black.withValues(alpha: 0.07),
+            color:
+                isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.black.withValues(alpha: 0.07),
             width: 0.5,
           ),
         ),
@@ -176,9 +180,10 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
             child: Container(
               height: 46,
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.07)
-                    : Colors.grey.shade100,
+                color:
+                    isDark
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: TextField(
@@ -195,9 +200,10 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
                 decoration: InputDecoration(
                   hintText: 'Search people...',
                   hintStyle: TextStyle(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.35)
-                        : Colors.grey.shade400,
+                    color:
+                        isDark
+                            ? Colors.white.withValues(alpha: 0.35)
+                            : Colors.grey.shade400,
                     fontSize: 15,
                   ),
                   prefixIcon: Icon(
@@ -205,23 +211,25 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
                     color: primary,
                     size: 22,
                   ),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.close_rounded,
-                            size: 18,
-                            color: isDark
-                                ? Colors.white54
-                                : Colors.grey.shade500,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                            _cubit.searchPeople('');
-                            _focusNode.requestFocus();
-                            setState(() {});
-                          },
-                        )
-                      : null,
+                  suffixIcon:
+                      _searchController.text.isNotEmpty
+                          ? IconButton(
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color:
+                                  isDark
+                                      ? Colors.white54
+                                      : Colors.grey.shade500,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              _cubit.searchPeople('');
+                              _focusNode.requestFocus();
+                              setState(() {});
+                            },
+                          )
+                          : null,
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 13),
                 ),
@@ -290,9 +298,11 @@ class _DiscoverPeopleSearchViewState extends State<DiscoverPeopleSearchView> {
             ),
             const SizedBox(height: 14),
             TextButton(
-              onPressed: () => query.isEmpty
-                  ? _cubit.getDiscoverPeople()
-                  : _cubit.searchPeople(query),
+              onPressed:
+                  () =>
+                      query.isEmpty
+                          ? _cubit.getDiscoverPeople()
+                          : _cubit.searchPeople(query),
               child: const Text('Retry'),
             ),
           ],

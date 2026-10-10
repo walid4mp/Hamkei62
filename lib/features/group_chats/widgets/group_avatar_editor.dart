@@ -73,21 +73,25 @@ class GroupAvatarEditor extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 72,
                       backgroundColor: AppColors.black12,
-                      backgroundImage: currentAvatarUrl != null
-                          ? CachedNetworkImageProvider(currentAvatarUrl!)
-                          : null,
-                      child: currentAvatarUrl == null
-                          ? Container(
-                              padding: EdgeInsets.zero,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage(AppImages.defaultGroupImg),
-                                  fit: BoxFit.cover,
+                      backgroundImage:
+                          currentAvatarUrl != null
+                              ? CachedNetworkImageProvider(currentAvatarUrl!)
+                              : null,
+                      child:
+                          currentAvatarUrl == null
+                              ? Container(
+                                padding: EdgeInsets.zero,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      AppImages.defaultGroupImg,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            )
-                          : null,
+                              )
+                              : null,
                     ),
                   ),
                 ),
@@ -113,30 +117,31 @@ class GroupAvatarEditor extends StatelessWidget {
                         ),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (child, animation) =>
-                              ScaleTransition(
+                          transitionBuilder:
+                              (child, animation) => ScaleTransition(
                                 scale: animation,
                                 child: FadeTransition(
                                   opacity: animation,
                                   child: child,
                                 ),
                               ),
-                          child: isUploadingPhoto
-                              ? const SizedBox(
-                                  key: ValueKey('loading'),
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
+                          child:
+                              isUploadingPhoto
+                                  ? const SizedBox(
+                                    key: ValueKey('loading'),
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Icon(
+                                    Icons.camera_alt_rounded,
+                                    key: ValueKey('camera_icon'),
+                                    size: 18,
                                     color: Colors.white,
-                                    strokeWidth: 2,
                                   ),
-                                )
-                              : const Icon(
-                                  Icons.camera_alt_rounded,
-                                  key: ValueKey('camera_icon'),
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
                         ),
                       ),
                     ),
@@ -165,30 +170,31 @@ class GroupAvatarEditor extends StatelessWidget {
                           ),
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (child, animation) =>
-                                ScaleTransition(
+                            transitionBuilder:
+                                (child, animation) => ScaleTransition(
                                   scale: animation,
                                   child: FadeTransition(
                                     opacity: animation,
                                     child: child,
                                   ),
                                 ),
-                            child: isRemovingPhoto
-                                ? const SizedBox(
-                                    key: ValueKey('loading_remove'),
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
+                            child:
+                                isRemovingPhoto
+                                    ? const SizedBox(
+                                      key: ValueKey('loading_remove'),
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : const Icon(
+                                      Icons.delete_outline_rounded,
+                                      key: ValueKey('delete_icon'),
+                                      size: 18,
                                       color: Colors.white,
-                                      strokeWidth: 2,
                                     ),
-                                  )
-                                : const Icon(
-                                    Icons.delete_outline_rounded,
-                                    key: ValueKey('delete_icon'),
-                                    size: 18,
-                                    color: Colors.white,
-                                  ),
                           ),
                         ),
                       ),
@@ -204,8 +210,10 @@ class GroupAvatarEditor extends StatelessWidget {
         Center(
           child: Text(
             liveGroupName,
-            style: Theme.of(context).textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold, fontSize: 22),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
             textAlign: TextAlign.center,
           ),
         ),

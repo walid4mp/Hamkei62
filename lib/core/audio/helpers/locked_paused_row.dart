@@ -61,9 +61,10 @@ class LockedPausedRow extends StatelessWidget {
           child: WaveformProgressBar(
             seed: waveformSeed,
             position: previewPosition,
-            duration: previewDuration > Duration.zero
-                ? previewDuration
-                : Duration(seconds: seconds),
+            duration:
+                previewDuration > Duration.zero
+                    ? previewDuration
+                    : Duration(seconds: seconds),
             activeColor: primary,
             onSeek: onSeek,
           ),

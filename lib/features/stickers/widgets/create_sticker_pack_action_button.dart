@@ -24,9 +24,10 @@ class CreateStickerPackActionButton extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: Material(
-          color: (canSubmit || isUploading)
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : theme.colorScheme.surfaceContainerHighest,
+          color:
+              (canSubmit || isUploading)
+                  ? theme.primaryColor.withValues(alpha: 0.15)
+                  : theme.colorScheme.surfaceContainerHighest,
           child: InkWell(
             onTap: (!isUploading && canSubmit) ? onSubmit : null,
             child: LayoutBuilder(
@@ -37,44 +38,46 @@ class CreateStickerPackActionButton extends StatelessWidget {
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeOut,
-                      width: isUploading
-                          ? constraints.maxWidth * progress.clamp(0.04, 1.0)
-                          : 0,
+                      width:
+                          isUploading
+                              ? constraints.maxWidth * progress.clamp(0.04, 1.0)
+                              : 0,
                       height: 56,
                       color: theme.primaryColor,
                     ),
                     Center(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
-                        child: isUploading
-                            ? Text(
-                                '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}%',
-                                key: const ValueKey('progress'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.85,
+                        child:
+                            isUploading
+                                ? Text(
+                                  '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}%',
+                                  key: const ValueKey('progress'),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.85),
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black26,
+                                        blurRadius: 2,
+                                      ),
+                                    ],
                                   ),
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black26,
-                                      blurRadius: 2,
-                                    ),
-                                  ],
+                                )
+                                : Text(
+                                  'Create Pack',
+                                  key: const ValueKey('idle'),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        canSubmit
+                                            ? theme.primaryColor
+                                            : theme.disabledColor,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                'Create Pack',
-                                key: const ValueKey('idle'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: canSubmit
-                                      ? theme.primaryColor
-                                      : theme.disabledColor,
-                                ),
-                              ),
                       ),
                     ),
                   ],

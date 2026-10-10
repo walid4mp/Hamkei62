@@ -92,11 +92,12 @@ class GroupCallDispatcher {
     if (callerId.isEmpty) {
       if (callId.isEmpty) return;
       try {
-        final row = await SupabaseProvider.client
-            .from('group_calls')
-            .select('initiator_id, status')
-            .eq('call_id', callId)
-            .maybeSingle();
+        final row =
+            await SupabaseProvider.client
+                .from('group_calls')
+                .select('initiator_id, status')
+                .eq('call_id', callId)
+                .maybeSingle();
         if (row == null) return;
         final initiatorId = row['initiator_id'] as String? ?? '';
         final status = row['status'] as String? ?? '';
@@ -138,9 +139,10 @@ class GroupCallDispatcher {
       initiatorName: callerName,
       status: GroupCallStatus.ringing,
       type: callType == 'video' ? GroupCallType.video : GroupCallType.audio,
-      startedAt: startedAt != null
-          ? (DateTime.tryParse(startedAt) ?? DateTime.now())
-          : DateTime.now(),
+      startedAt:
+          startedAt != null
+              ? (DateTime.tryParse(startedAt) ?? DateTime.now())
+              : DateTime.now(),
     );
 
     if (!IncomingCallNavigationGuard.claim(callId)) return;

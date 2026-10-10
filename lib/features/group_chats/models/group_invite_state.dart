@@ -15,9 +15,10 @@ class GroupInviteState {
   factory GroupInviteState.fromMap(Map<String, dynamic> map) {
     return GroupInviteState(
       inviteHash: map['invite_hash'] as String,
-      expiresAt: map['invite_expires_at'] != null
-          ? DateTime.parse(map['invite_expires_at'] as String).toLocal()
-          : null,
+      expiresAt:
+          map['invite_expires_at'] != null
+              ? DateTime.parse(map['invite_expires_at'] as String).toLocal()
+              : null,
       joinCount: (map['invite_join_count'] as num?)?.toInt() ?? 0,
     );
   }

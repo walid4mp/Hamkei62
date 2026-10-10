@@ -96,20 +96,20 @@ class GroupReplyPreviewBar extends StatelessWidget {
                 const Gap(2),
                 _isPlainText && reply.text.isNotEmpty
                     ? MentionRichText(
-                        text: reply.text,
-                        mentions: reply.mentions,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textStyle,
-                        mentionColor: primary,
-                        onMentionTap: (_, __) {},
-                      )
+                      text: reply.text,
+                      mentions: reply.mentions,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textStyle,
+                      mentionColor: primary,
+                      onMentionTap: (_, __) {},
+                    )
                     : Text(
-                        _fallbackLabel(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textStyle,
-                      ),
+                      _fallbackLabel(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textStyle,
+                    ),
               ],
             ),
           ),

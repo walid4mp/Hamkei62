@@ -47,15 +47,16 @@ class AttachmentPickerSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AttachmentPickerSheet(
-        showVoiceOption: showVoiceOption,
-        showFileOption: showFileOption,
-        showCameraOption: showCameraOption,
-        showVideoOption: showVideoOption,
-        showGifOption: showGifOption,
-        showStickerOption: showStickerOption,
-        onRecordVoice: onRecordVoice,
-      ),
+      builder:
+          (_) => AttachmentPickerSheet(
+            showVoiceOption: showVoiceOption,
+            showFileOption: showFileOption,
+            showCameraOption: showCameraOption,
+            showVideoOption: showVideoOption,
+            showGifOption: showGifOption,
+            showStickerOption: showStickerOption,
+            onRecordVoice: onRecordVoice,
+          ),
     );
   }
 
@@ -174,8 +175,9 @@ class AttachmentPickerSheet extends StatelessWidget {
           const Gap(6),
           Text(
             option.label,
-            style: Theme.of(context).textTheme.labelSmall
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

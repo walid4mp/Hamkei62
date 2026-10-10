@@ -36,9 +36,8 @@ class DiscoverGridActionButton extends StatefulWidget {
 enum _ButtonVisual { idle, loading, success, active }
 
 class _DiscoverGridActionButtonState extends State<DiscoverGridActionButton> {
-  late _ButtonVisual _visual = widget.isActive
-      ? _ButtonVisual.active
-      : _ButtonVisual.idle;
+  late _ButtonVisual _visual =
+      widget.isActive ? _ButtonVisual.active : _ButtonVisual.idle;
   bool _isBusy = false;
 
   static const _successGreen = Color(0xFF34C759);
@@ -105,9 +104,8 @@ class _DiscoverGridActionButtonState extends State<DiscoverGridActionButton> {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final fullWidth = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : 120.0;
+          final fullWidth =
+              constraints.maxWidth.isFinite ? constraints.maxWidth : 120.0;
           final targetWidth = isMorphed ? widget.height : fullWidth;
 
           return Center(
@@ -121,9 +119,10 @@ class _DiscoverGridActionButtonState extends State<DiscoverGridActionButton> {
                 decoration: BoxDecoration(
                   color: bgColor,
                   borderRadius: BorderRadius.circular(10),
-                  border: isOutlined
-                      ? Border.all(color: theme.primaryColor, width: 1.4)
-                      : null,
+                  border:
+                      isOutlined
+                          ? Border.all(color: theme.primaryColor, width: 1.4)
+                          : null,
                 ),
                 alignment: Alignment.center,
                 child: AnimatedSwitcher(

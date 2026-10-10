@@ -70,9 +70,10 @@ class _CommentVoicePlayerState extends State<CommentVoicePlayer> {
     if (!_hasSetSource ||
         _player.state == PlayerState.completed ||
         _player.state == PlayerState.stopped) {
-      final audioSource = widget.isLocalFile
-          ? DeviceFileSource(widget.source)
-          : UrlSource(widget.source);
+      final audioSource =
+          widget.isLocalFile
+              ? DeviceFileSource(widget.source)
+              : UrlSource(widget.source);
 
       await _player.play(audioSource);
       _hasSetSource = true;
@@ -155,8 +156,9 @@ class _CommentVoicePlayerState extends State<CommentVoicePlayer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest
-            .withValues(alpha: 0.35),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(18),
       ),
       child: content,

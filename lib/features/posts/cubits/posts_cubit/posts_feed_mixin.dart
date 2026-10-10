@@ -88,25 +88,28 @@ mixin PostsFeedMixin on Cubit<PostsState> {
   void mergePostsIntoCache(List<PostModel> posts, {bool appendNew = false}) {
     if (posts.isEmpty || isClosed) return;
 
-    final List<PostModel> basePosts = state is PostsLoaded
-        ? (state as PostsLoaded).posts
-        : cachedPosts;
+    final List<PostModel> basePosts =
+        state is PostsLoaded ? (state as PostsLoaded).posts : cachedPosts;
 
     final Map<String, PostModel> incomingById = {
       for (final p in _fixLikersImages(posts)) p.id: p,
     };
 
-    final updatedExisting = basePosts.map((existing) {
-      final incoming = incomingById.remove(existing.id);
-      if (incoming == null) return existing;
-      return incoming.copyWith(isSuggestedForYou: existing.isSuggestedForYou);
-    }).toList();
+    final updatedExisting =
+        basePosts.map((existing) {
+          final incoming = incomingById.remove(existing.id);
+          if (incoming == null) return existing;
+          return incoming.copyWith(
+            isSuggestedForYou: existing.isSuggestedForYou,
+          );
+        }).toList();
 
     final brandNewPosts = incomingById.values.toList();
 
-    cachedPosts = appendNew
-        ? [...updatedExisting, ...brandNewPosts]
-        : [...brandNewPosts, ...updatedExisting];
+    cachedPosts =
+        appendNew
+            ? [...updatedExisting, ...brandNewPosts]
+            : [...brandNewPosts, ...updatedExisting];
 
     emit(PostsLoaded(cachedPosts, DateTime.now()));
   }
@@ -163,9 +166,10 @@ mixin PostsFeedMixin on Cubit<PostsState> {
         final idx = updated.likes!.indexOf(authorId);
         if (idx >= 0 && idx < updated.likersImages!.length) {
           final newLikersImages = List<String>.from(updated.likersImages!);
-          newLikersImages[idx] = (newImageUrl != null && newImageUrl.isNotEmpty)
-              ? newImageUrl
-              : 'asset:default';
+          newLikersImages[idx] =
+              (newImageUrl != null && newImageUrl.isNotEmpty)
+                  ? newImageUrl
+                  : 'asset:default';
           updated = updated.copyWith(likersImages: newLikersImages);
         }
       }

@@ -35,8 +35,8 @@ class CallAvatarBackdrop extends StatelessWidget {
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
-              errorWidget: (_, __) =>
-                  CallGradientBackground(baseColor: baseColor),
+              errorWidget:
+                  (_, __) => CallGradientBackground(baseColor: baseColor),
             ),
           ),
         ),

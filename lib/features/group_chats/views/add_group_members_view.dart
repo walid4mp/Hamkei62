@@ -42,9 +42,10 @@ class _AddGroupMembersViewState extends State<AddGroupMembersView> {
 
   Future<void> _loadUsers() async {
     final data = await ConnectionsService().getMyConnections();
-    final available = data
-        .where((u) => !widget.existingMemberIds.contains(u['id'] as String))
-        .toList();
+    final available =
+        data
+            .where((u) => !widget.existingMemberIds.contains(u['id'] as String))
+            .toList();
 
     if (mounted) {
       setState(() {
@@ -58,11 +59,12 @@ class _AddGroupMembersViewState extends State<AddGroupMembersView> {
   void _filterUsers() {
     final q = _searchController.text.toLowerCase();
     setState(() {
-      _filteredUsers = q.isEmpty
-          ? _allUsers
-          : _allUsers
-                .where((u) => (u['name'] as String).toLowerCase().contains(q))
-                .toList();
+      _filteredUsers =
+          q.isEmpty
+              ? _allUsers
+              : _allUsers
+                  .where((u) => (u['name'] as String).toLowerCase().contains(q))
+                  .toList();
     });
   }
 
@@ -139,176 +141,184 @@ class _AddGroupMembersViewState extends State<AddGroupMembersView> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: _isLoadingUsers
-            ? const Center(child: CustomLoadingIndicator())
-            : _allUsers.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.people_outline_rounded,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const Gap(16),
-                    Text(
-                      'No new connections to add',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w600,
+        body:
+            _isLoadingUsers
+                ? const Center(child: CustomLoadingIndicator())
+                : _allUsers.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.people_outline_rounded,
+                        size: 64,
+                        color: Colors.grey.shade400,
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : CustomScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.manual,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: SelectedMembersSection(
-                        selectedUserIds: _selectedUserIds,
-                        allUsers: _allUsers,
-                        primary: primary,
-                        onRemove: (uid) =>
-                            setState(() => _selectedUserIds.remove(uid)),
-                      ),
-                    ),
-                  ),
-
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickySearchBarDelegate(
-                      child: Container(
-                        color: theme.scaffoldBackgroundColor,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GroupSearchField(
-                              controller: _searchController,
-                              isDark: isDark,
-                            ),
-                            if (_selectedUserIds.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 24,
-                                  right: 24,
-                                  bottom: 8,
-                                ),
-                                child: Text(
-                                  '${_selectedUserIds.length} selected',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    color: primary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                          ],
+                      const Gap(16),
+                      Text(
+                        'No new connections to add',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      height: _selectedUserIds.isNotEmpty ? 115.0 : 75.0,
-                    ),
+                    ],
                   ),
-
-                  if (_filteredUsers.isEmpty)
+                )
+                : CustomScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.manual,
+                  slivers: [
                     SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: Center(
-                          child: Text(
-                            'No people found',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.grey.shade500,
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: SelectedMembersSection(
+                          selectedUserIds: _selectedUserIds,
+                          allUsers: _allUsers,
+                          primary: primary,
+                          onRemove:
+                              (uid) =>
+                                  setState(() => _selectedUserIds.remove(uid)),
+                        ),
+                      ),
+                    ),
+
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickySearchBarDelegate(
+                        child: Container(
+                          color: theme.scaffoldBackgroundColor,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GroupSearchField(
+                                controller: _searchController,
+                                isDark: isDark,
+                              ),
+                              if (_selectedUserIds.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 24,
+                                    right: 24,
+                                    bottom: 8,
+                                  ),
+                                  child: Text(
+                                    '${_selectedUserIds.length} selected',
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      color: primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        height: _selectedUserIds.isNotEmpty ? 115.0 : 75.0,
+                      ),
+                    ),
+
+                    if (_filteredUsers.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: Center(
+                            child: Text(
+                              'No people found',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey.shade500,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final user = _filteredUsers[index];
-                          final uid = user['id'] as String;
-                          final isSelected = _selectedUserIds.contains(uid);
+                      )
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final user = _filteredUsers[index];
+                            final uid = user['id'] as String;
+                            final isSelected = _selectedUserIds.contains(uid);
 
-                          return GroupUserListTile(
-                            user: user,
-                            isSelected: isSelected,
-                            primary: primary,
-                            onTap: () {
-                              setState(() {
-                                isSelected
-                                    ? _selectedUserIds.remove(uid)
-                                    : _selectedUserIds.add(uid);
-                              });
-                            },
-                          );
-                        }, childCount: _filteredUsers.length),
+                            return GroupUserListTile(
+                              user: user,
+                              isSelected: isSelected,
+                              primary: primary,
+                              onTap: () {
+                                setState(() {
+                                  isSelected
+                                      ? _selectedUserIds.remove(uid)
+                                      : _selectedUserIds.add(uid);
+                                });
+                              },
+                            );
+                          }, childCount: _filteredUsers.length),
+                        ),
                       ),
-                    ),
 
-                  const SliverToBoxAdapter(child: Gap(120)),
-                ],
-              ),
+                    const SliverToBoxAdapter(child: Gap(120)),
+                  ],
+                ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton:
             isKeyboardOpen || _isLoadingUsers || _allUsers.isEmpty
-            ? null
-            : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  width: double.infinity,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      if (canAdd)
-                        BoxShadow(
-                          color: primary.withValues(alpha: 0.35),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: canAdd && !_isSubmitting ? _confirmAdd : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: isDark
-                          ? Colors.grey.shade800
-                          : Colors.grey.shade300,
-                      disabledForegroundColor: isDark
-                          ? Colors.white54
-                          : Colors.black38,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                    ),
-                    child: _isSubmitting
-                        ? const CustomLoadingIndicator(color: Colors.white)
-                        : Text(
-                            _selectedUserIds.isEmpty
-                                ? 'Add Members'
-                                : 'Add ${_selectedUserIds.length} Members',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
+                ? null
+                : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        if (canAdd)
+                          BoxShadow(
+                            color: primary.withValues(alpha: 0.35),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
                           ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: canAdd && !_isSubmitting ? _confirmAdd : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                            isDark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade300,
+                        disabledForegroundColor:
+                            isDark ? Colors.white54 : Colors.black38,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      child:
+                          _isSubmitting
+                              ? const CustomLoadingIndicator(
+                                color: Colors.white,
+                              )
+                              : Text(
+                                _selectedUserIds.isEmpty
+                                    ? 'Add Members'
+                                    : 'Add ${_selectedUserIds.length} Members',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                    ),
                   ),
                 ),
-              ),
       ),
     );
   }

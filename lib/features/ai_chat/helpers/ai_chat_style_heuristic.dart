@@ -26,9 +26,10 @@ class AiChatStyleHeuristic {
     final sample = recentUserTexts
         .where((t) => t.trim().isNotEmpty)
         .toList(growable: false);
-    final sampled = sample.length > _maxSampledMessages
-        ? sample.sublist(sample.length - _maxSampledMessages)
-        : sample;
+    final sampled =
+        sample.length > _maxSampledMessages
+            ? sample.sublist(sample.length - _maxSampledMessages)
+            : sample;
 
     if (sampled.isEmpty) {
       return const AiChatStyleHint(

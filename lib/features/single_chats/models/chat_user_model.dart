@@ -46,17 +46,19 @@ class ChatUserModel {
       imageUrl: map['image_url'] as String?,
       lastMessage: map['last_message'] as String?, // from SQL
       lastMessageType: map['last_message_type'] ?? 'text',
-      lastMessageTime: map['last_message_time'] != null
-          ? DateTime.parse(map['last_message_time'].toString()) // from SQL
-          : null,
+      lastMessageTime:
+          map['last_message_time'] != null
+              ? DateTime.parse(map['last_message_time'].toString()) // from SQL
+              : null,
       lastMessageIsMe: map['last_message_sender_id'] == currentUserId,
       lastMessageIsRead: map['last_message_is_read'] ?? false,
       isTyping: map[UserColumns.isTypingTo] == currentUserId,
       isRecording: false,
       unreadCount: (map['unread_count'] as num?)?.toInt() ?? 0,
-      lastSeen: map['last_seen'] != null
-          ? DateTime.parse(map['last_seen'].toString())
-          : null,
+      lastSeen:
+          map['last_seen'] != null
+              ? DateTime.parse(map['last_seen'].toString())
+              : null,
       isOnline: false,
       presencePrivacy: PresencePrivacy.fromValue(
         map['presence_privacy'] as String?,
@@ -132,15 +134,17 @@ class ChatUserModel {
       imageUrl: map['image_url'] as String?,
       lastMessage: map['last_message'] as String?,
       lastMessageType: map['last_message_type'] as String?,
-      lastMessageTime: map['last_message_time'] != null
-          ? DateTime.parse(map['last_message_time'] as String)
-          : null,
+      lastMessageTime:
+          map['last_message_time'] != null
+              ? DateTime.parse(map['last_message_time'] as String)
+              : null,
       lastMessageIsMe: map['last_message_is_me'] as bool? ?? false,
       lastMessageIsRead: map['last_message_is_read'] as bool? ?? false,
       unreadCount: (map['unread_count'] as num?)?.toInt() ?? 0,
-      lastSeen: map['last_seen'] != null
-          ? DateTime.parse(map['last_seen'] as String)
-          : null,
+      lastSeen:
+          map['last_seen'] != null
+              ? DateTime.parse(map['last_seen'] as String)
+              : null,
       isTyping: false,
       isRecording: false,
       isOnline: false,

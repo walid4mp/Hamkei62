@@ -21,10 +21,11 @@ class GroupMessagingService {
         .eq(GroupMemberColumns.groupId, groupId)
         .order('created_at', ascending: false)
         .map(
-          (data) => data
-              .map((map) => GroupMessageModel.fromMap(map))
-              .where((m) => !m.deletedFor.contains(currentUserId))
-              .toList(),
+          (data) =>
+              data
+                  .map((map) => GroupMessageModel.fromMap(map))
+                  .where((m) => !m.deletedFor.contains(currentUserId))
+                  .toList(),
         );
   }
 
@@ -55,11 +56,12 @@ class GroupMessagingService {
   }) async {
     final currentUser = SupabaseProvider.user!;
 
-    final userProfile = await _supabase
-        .from('users')
-        .select('name, image_url')
-        .eq('id', currentUser.id)
-        .maybeSingle();
+    final userProfile =
+        await _supabase
+            .from('users')
+            .select('name, image_url')
+            .eq('id', currentUser.id)
+            .maybeSingle();
 
     final senderName = (userProfile?['name'] as String?) ?? 'Unknown';
     final senderAvatar = (userProfile?['image_url'] as String?) ?? '';
@@ -87,9 +89,8 @@ class GroupMessagingService {
       if (filePublicId != null) 'file_public_id': filePublicId,
       if (replyTo != null) ...{
         'reply_to_message_id': replyTo.id,
-        'reply_to_text': replyTo.text.isNotEmpty
-            ? replyTo.text
-            : (replyTo.caption ?? ''),
+        'reply_to_text':
+            replyTo.text.isNotEmpty ? replyTo.text : (replyTo.caption ?? ''),
         'reply_to_sender_id': replyTo.senderId,
         'reply_to_sender_name': replyTo.senderName,
         'reply_to_message_type': replyTo.messageType,
@@ -110,14 +111,15 @@ class GroupMessagingService {
     // `INSERT ... ON CONFLICT (sender_id, client_message_id) DO NOTHING`,
     // so a retry that reuses the same clientMessageId never creates a
     // second row and never overwrites the original row's content.
-    final upserted = await _supabase
-        .from(SupabaseConstants.groupMessages)
-        .upsert(
-          insertData,
-          onConflict: 'sender_id,${GroupMessageColumns.clientMessageId}',
-          ignoreDuplicates: true,
-        )
-        .select();
+    final upserted =
+        await _supabase
+            .from(SupabaseConstants.groupMessages)
+            .upsert(
+              insertData,
+              onConflict: 'sender_id,${GroupMessageColumns.clientMessageId}',
+              ignoreDuplicates: true,
+            )
+            .select();
 
     final Map<String, dynamic> result;
     final bool isNewInsert;
@@ -129,12 +131,13 @@ class GroupMessagingService {
       // exists — recover it instead of treating this as a new send. Do
       // NOT re-insert mentions or re-fire the notification below: both
       // already happened on the original successful attempt.
-      result = await _supabase
-          .from(SupabaseConstants.groupMessages)
-          .select()
-          .eq('sender_id', currentUser.id)
-          .eq(GroupMessageColumns.clientMessageId, clientMessageId)
-          .single();
+      result =
+          await _supabase
+              .from(SupabaseConstants.groupMessages)
+              .select()
+              .eq('sender_id', currentUser.id)
+              .eq(GroupMessageColumns.clientMessageId, clientMessageId)
+              .single();
       isNewInsert = false;
     }
 
@@ -179,9 +182,10 @@ class GroupMessagingService {
           fileName: fileName,
           fileSizeBytes: fileSizeBytes,
           replyToMessageId: replyTo?.id,
-          replyToText: replyTo?.text.isNotEmpty == true
-              ? replyTo?.text
-              : replyTo?.caption,
+          replyToText:
+              replyTo?.text.isNotEmpty == true
+                  ? replyTo?.text
+                  : replyTo?.caption,
           replyToMessageType: replyTo?.messageType,
           replyToSenderId: replyTo?.senderId,
           replyToMediaUrl: GroupMessageModel.replyMediaUrlFrom(replyTo),
@@ -257,11 +261,12 @@ class GroupMessagingService {
     required String messageId,
     required String currentUserId,
   }) async {
-    final row = await _supabase
-        .from(SupabaseConstants.groupMessages)
-        .select(GroupMessageColumns.deletedFor)
-        .eq('id', messageId)
-        .maybeSingle();
+    final row =
+        await _supabase
+            .from(SupabaseConstants.groupMessages)
+            .select(GroupMessageColumns.deletedFor)
+            .eq('id', messageId)
+            .maybeSingle();
 
     final current =
         (row?[GroupMessageColumns.deletedFor] as List?)?.cast<String>() ?? [];
@@ -354,10 +359,11 @@ class GroupMessagingService {
         .stream(primaryKey: ['id'])
         .eq(GroupMemberColumns.groupId, groupId)
         .map(
-          (data) => data
-              .where((m) => m['sender_id'] == currentUserId)
-              .map((m) => {'id': m['id'], 'read_by': m['read_by'] ?? []})
-              .toList(),
+          (data) =>
+              data
+                  .where((m) => m['sender_id'] == currentUserId)
+                  .map((m) => {'id': m['id'], 'read_by': m['read_by'] ?? []})
+                  .toList(),
         );
   }
 

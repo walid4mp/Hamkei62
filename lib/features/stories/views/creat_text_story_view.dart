@@ -93,10 +93,12 @@ class _CreateTextStoryViewState extends State<CreateTextStoryView> {
 
     if (_selectedPrivacy == ContentPrivacy.private &&
         _selectedViewerIds.isEmpty) {
-      final selected = await Navigator.of(context, rootNavigator: true)
-          .push<Set<String>>(
-            MaterialPageRoute(builder: (_) => const AudiencePickerView()),
-          );
+      final selected = await Navigator.of(
+        context,
+        rootNavigator: true,
+      ).push<Set<String>>(
+        MaterialPageRoute(builder: (_) => const AudiencePickerView()),
+      );
       if (selected == null || selected.isEmpty) return;
       if (!context.mounted) return;
       setState(() => _selectedViewerIds = selected);
@@ -157,72 +159,77 @@ class _CreateTextStoryViewState extends State<CreateTextStoryView> {
                           spacing: 24,
                           runSpacing: 24,
                           alignment: WrapAlignment.center,
-                          children: _colors.map((color) {
-                            final isSelected = color == _selectedColor;
-                            return GestureDetector(
-                              onTap: () {
-                                setDialogState(() {});
-                                setState(() => _selectedColor = color);
-                                Future.delayed(
-                                  const Duration(milliseconds: 200),
-                                  () {
-                                    if (dialogContext.mounted) {
-                                      Navigator.of(dialogContext).pop();
-                                    }
+                          children:
+                              _colors.map((color) {
+                                final isSelected = color == _selectedColor;
+                                return GestureDetector(
+                                  onTap: () {
+                                    setDialogState(() {});
+                                    setState(() => _selectedColor = color);
+                                    Future.delayed(
+                                      const Duration(milliseconds: 200),
+                                      () {
+                                        if (dialogContext.mounted) {
+                                          Navigator.of(dialogContext).pop();
+                                        }
+                                      },
+                                    );
                                   },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOutBack,
+                                    width: isSelected ? 60 : 48,
+                                    height: isSelected ? 60 : 48,
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      shape: BoxShape.circle,
+                                      border:
+                                          isSelected
+                                              ? Border.all(
+                                                color: Colors.white,
+                                                width: 3.5,
+                                              )
+                                              : Border.all(
+                                                color: Colors.white24,
+                                                width: 1.5,
+                                              ),
+                                      boxShadow:
+                                          isSelected
+                                              ? [
+                                                BoxShadow(
+                                                  color: color.withValues(
+                                                    alpha: 0.8,
+                                                  ),
+                                                  blurRadius: 16,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ]
+                                              : [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.4),
+                                                  blurRadius: 6,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                    ),
+                                    child:
+                                        isSelected
+                                            ? const Icon(
+                                              Icons.check_rounded,
+                                              color: Colors.white,
+                                              size: 30,
+                                              shadows: [
+                                                Shadow(
+                                                  color: Colors.black54,
+                                                  blurRadius: 6,
+                                                ),
+                                              ],
+                                            )
+                                            : null,
+                                  ),
                                 );
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOutBack,
-                                width: isSelected ? 60 : 48,
-                                height: isSelected ? 60 : 48,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  shape: BoxShape.circle,
-                                  border: isSelected
-                                      ? Border.all(
-                                          color: Colors.white,
-                                          width: 3.5,
-                                        )
-                                      : Border.all(
-                                          color: Colors.white24,
-                                          width: 1.5,
-                                        ),
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                            color: color.withValues(alpha: 0.8),
-                                            blurRadius: 16,
-                                            spreadRadius: 2,
-                                          ),
-                                        ]
-                                      : [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.4,
-                                            ),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                ),
-                                child: isSelected
-                                    ? const Icon(
-                                        Icons.check_rounded,
-                                        color: Colors.white,
-                                        size: 30,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black54,
-                                            blurRadius: 6,
-                                          ),
-                                        ],
-                                      )
-                                    : null,
-                              ),
-                            );
-                          }).toList(),
+                              }).toList(),
                         ),
                       ),
                     ),
@@ -290,9 +297,10 @@ class _CreateTextStoryViewState extends State<CreateTextStoryView> {
                     padding: EdgeInsets.only(
                       left: 20,
                       right: 20,
-                      bottom: MediaQuery.of(context).viewInsets.bottom > 0
-                          ? 16
-                          : 24,
+                      bottom:
+                          MediaQuery.of(context).viewInsets.bottom > 0
+                              ? 16
+                              : 24,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -328,9 +336,10 @@ class _CreateTextStoryViewState extends State<CreateTextStoryView> {
 
                         // Share Button
                         ElevatedButton(
-                          onPressed: _hasText && state is! AddStoryLoading
-                              ? () => _share(context)
-                              : null,
+                          onPressed:
+                              _hasText && state is! AddStoryLoading
+                                  ? () => _share(context)
+                                  : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColor,
                             foregroundColor: Colors.white,
@@ -344,22 +353,23 @@ class _CreateTextStoryViewState extends State<CreateTextStoryView> {
                               borderRadius: BorderRadius.circular(28),
                             ),
                           ),
-                          child: state is AddStoryLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
+                          child:
+                              state is AddStoryLoading
+                                  ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Share',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                )
-                              : const Text(
-                                  'Share',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                         ),
                       ],
                     ),

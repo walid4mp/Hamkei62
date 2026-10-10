@@ -69,12 +69,13 @@ class GroupCallInitiator {
       outgoingFlagRaised = false;
       await navigator.push(
         MaterialPageRoute(
-          builder: (_) => OutgoingGroupCallScreen(
-            groupId: group.id,
-            groupName: group.name,
-            groupAvatarUrl: group.avatarUrl,
-            callType: type,
-          ),
+          builder:
+              (_) => OutgoingGroupCallScreen(
+                groupId: group.id,
+                groupName: group.name,
+                groupAvatarUrl: group.avatarUrl,
+                callType: type,
+              ),
         ),
       );
     } catch (e) {

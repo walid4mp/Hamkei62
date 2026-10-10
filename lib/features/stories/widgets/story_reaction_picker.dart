@@ -36,29 +36,30 @@ class StoryReactionOverlay {
     final top = anchorRect.top - bubbleHeight - gap;
 
     return OverlayEntry(
-      builder: (_) => Stack(
-        children: [
-          Positioned.fill(
-            child: Listener(
-              onPointerDown: (_) => onDismiss(),
-              behavior: HitTestBehavior.opaque,
-              child: const SizedBox.expand(),
-            ),
+      builder:
+          (_) => Stack(
+            children: [
+              Positioned.fill(
+                child: Listener(
+                  onPointerDown: (_) => onDismiss(),
+                  behavior: HitTestBehavior.opaque,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              Positioned(
+                left: left.clamp(12.0, screenWidth - bubbleWidth - 12.0),
+                top: top.clamp(
+                  MediaQuery.paddingOf(context).top + 8,
+                  screenHeight - bubbleHeight - 8,
+                ),
+                child: _StoryReactionBubble(
+                  key: bubbleKey,
+                  onSelect: onSelect,
+                  selectedEmoji: selectedEmoji,
+                ),
+              ),
+            ],
           ),
-          Positioned(
-            left: left.clamp(12.0, screenWidth - bubbleWidth - 12.0),
-            top: top.clamp(
-              MediaQuery.paddingOf(context).top + 8,
-              screenHeight - bubbleHeight - 8,
-            ),
-            child: _StoryReactionBubble(
-              key: bubbleKey,
-              onSelect: onSelect,
-              selectedEmoji: selectedEmoji,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -173,17 +174,19 @@ class StoryReactionBubbleState extends State<_StoryReactionBubble>
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected
-                            ? scheme.primary.withValues(alpha: 0.22)
-                            : Colors.transparent,
+                        color:
+                            isSelected
+                                ? scheme.primary.withValues(alpha: 0.22)
+                                : Colors.transparent,
                       ),
-                      transform: isSelected
-                          ? (Matrix4.identity()..scale(1.3))
-                          : isHov
-                          ? (Matrix4.identity()
-                              ..translate(-6.0, 0.0)
-                              ..scale(1.15))
-                          : Matrix4.identity(),
+                      transform:
+                          isSelected
+                              ? (Matrix4.identity()..scale(1.3))
+                              : isHov
+                              ? (Matrix4.identity()
+                                ..translate(-6.0, 0.0)
+                                ..scale(1.15))
+                              : Matrix4.identity(),
                       transformAlignment: Alignment.center,
                       child: Text(
                         emoji,

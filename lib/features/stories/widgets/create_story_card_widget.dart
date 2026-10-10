@@ -52,24 +52,26 @@ class CreateStoryCardWidget extends StatelessWidget {
                 SizedBox(
                   width: cardWidth,
                   height: topHeight,
-                  child: avatarUrl == null || avatarUrl!.isEmpty
-                      ? CircleDefaultUserImage(
-                          theme: theme,
-                          cardWidth: cardWidth,
-                        )
-                      : CachedCloudinaryImage(
-                          secureUrl: avatarUrl!,
-                          fit: BoxFit.cover,
-                          width: cardWidth,
-                          height: topHeight,
-                          isAvatar: true,
-                          placeholder: (_) =>
-                              Container(color: theme.dividerColor),
-                          errorWidget: (_, __) => CircleDefaultUserImage(
+                  child:
+                      avatarUrl == null || avatarUrl!.isEmpty
+                          ? CircleDefaultUserImage(
                             theme: theme,
                             cardWidth: cardWidth,
+                          )
+                          : CachedCloudinaryImage(
+                            secureUrl: avatarUrl!,
+                            fit: BoxFit.cover,
+                            width: cardWidth,
+                            height: topHeight,
+                            isAvatar: true,
+                            placeholder:
+                                (_) => Container(color: theme.dividerColor),
+                            errorWidget:
+                                (_, __) => CircleDefaultUserImage(
+                                  theme: theme,
+                                  cardWidth: cardWidth,
+                                ),
                           ),
-                        ),
                 ),
 
                 Positioned(
@@ -110,16 +112,17 @@ class CreateStoryCardWidget extends StatelessWidget {
                         width: borderWidth,
                       ),
                     ),
-                    child: isUploading
-                        ? const CustomLoadingIndicator(
-                            radius: 6,
-                            color: AppColors.white,
-                          )
-                        : const Icon(
-                            Icons.add,
-                            color: AppColors.white,
-                            size: 18,
-                          ),
+                    child:
+                        isUploading
+                            ? const CustomLoadingIndicator(
+                              radius: 6,
+                              color: AppColors.white,
+                            )
+                            : const Icon(
+                              Icons.add,
+                              color: AppColors.white,
+                              size: 18,
+                            ),
                   ),
                 ),
               ],

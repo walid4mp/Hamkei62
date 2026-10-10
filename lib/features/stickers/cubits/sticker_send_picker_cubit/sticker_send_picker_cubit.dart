@@ -25,9 +25,8 @@ class StickerSendPickerCubit extends Cubit<StickerSendPickerState>
       }
 
       final allPacks = await _repository.fetchPacks();
-      final downloadedPacks = allPacks
-          .where((p) => downloadedIds.contains(p.id))
-          .toList();
+      final downloadedPacks =
+          allPacks.where((p) => downloadedIds.contains(p.id)).toList();
 
       if (downloadedPacks.isEmpty) {
         emit(StickerSendPickerEmpty());

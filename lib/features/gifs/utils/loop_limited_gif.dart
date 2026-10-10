@@ -188,9 +188,8 @@ class _LoopLimitedGifState extends State<LoopLimitedGif> {
       );
     }
 
-    final displayedFrame = _isPlaying
-        ? (_playingFrame ?? _thumbnailFrame!)
-        : _thumbnailFrame!;
+    final displayedFrame =
+        _isPlaying ? (_playingFrame ?? _thumbnailFrame!) : _thumbnailFrame!;
 
     return GestureDetector(
       onTap: _isPlaying ? _stop : _play,
@@ -286,12 +285,13 @@ class _GlassCutoutPainter extends CustomPainter {
     );
 
     final center = Offset(size.width / 2, size.height / 2);
-    final paint = Paint()
-      ..blendMode = BlendMode.clear
-      ..style = PaintingStyle.stroke
-      ..strokeWidth =
-          2.1 // سُمك المستطيل
-      ..strokeCap = StrokeCap.round;
+    final paint =
+        Paint()
+          ..blendMode = BlendMode.clear
+          ..style = PaintingStyle.stroke
+          ..strokeWidth =
+              2.1 // سُمك المستطيل
+          ..strokeCap = StrokeCap.round;
 
     final radius = (size.width / 2) - 6.5;
 

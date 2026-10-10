@@ -28,8 +28,10 @@ class CommentReactionsSummary extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             '$total',
-            style: Theme.of(context).textTheme.bodySmall!
-                .copyWith(color: AppColors.grey6, fontSize: 11),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: AppColors.grey6,
+              fontSize: 11,
+            ),
           ),
           const SizedBox(width: 3),
           ...reactions

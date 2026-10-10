@@ -26,8 +26,7 @@ class PostsServices {
   PostsServices({NetworkStatusService? networkStatus})
     : _networkStatus = networkStatus ?? NetworkStatusService.instance;
 
-  static const String _postFields =
-      ''' 
+  static const String _postFields = ''' 
   *,
   saved_count,
   is_post_saved,
@@ -66,9 +65,10 @@ class PostsServices {
   PostModel _hydratePost(Map<String, dynamic> data) {
     final post = PostModel.fromMap(data);
 
-    final flatComments = (data['comments'] as List? ?? [])
-        .map((e) => CommentModel.fromMap(e))
-        .toList();
+    final flatComments =
+        (data['comments'] as List? ?? [])
+            .map((e) => CommentModel.fromMap(e))
+            .toList();
     final tree = CommentTreeBuilder.build(flatComments);
 
     PostModel? hydratedOriginal;
@@ -88,10 +88,11 @@ class PostsServices {
   ) async {
     if (rawPostsData.isEmpty) return [];
 
-    final Set<String> sharedPostIds = rawPostsData
-        .map((p) => p['shared_post_id'] as String?)
-        .whereType<String>()
-        .toSet();
+    final Set<String> sharedPostIds =
+        rawPostsData
+            .map((p) => p['shared_post_id'] as String?)
+            .whereType<String>()
+            .toSet();
 
     final Map<String, Map<String, dynamic>> originalsDataMap = {};
 
@@ -134,9 +135,10 @@ class PostsServices {
       for (final row in presenceRows as List)
         if (PresenceService.isConsideredOnline(
           isOnline: row[PresenceColumns.isOnline] as bool? ?? false,
-          updatedAt: row[PresenceColumns.updatedAt] != null
-              ? DateTime.parse(row[PresenceColumns.updatedAt].toString())
-              : null,
+          updatedAt:
+              row[PresenceColumns.updatedAt] != null
+                  ? DateTime.parse(row[PresenceColumns.updatedAt].toString())
+                  : null,
         ))
           row[GroupMemberColumns.userId] as String,
     };
@@ -228,11 +230,12 @@ class PostsServices {
       if (hydratedList.isEmpty) return null;
 
       final postWithComments = hydratedList.first;
-      final authorIds = <String>{
-        postWithComments.authorId,
-        if (postWithComments.originalPost != null)
-          postWithComments.originalPost!.authorId,
-      }.toList();
+      final authorIds =
+          <String>{
+            postWithComments.authorId,
+            if (postWithComments.originalPost != null)
+              postWithComments.originalPost!.authorId,
+          }.toList();
 
       final onlineMap = await _fetchOnlineMap(authorIds);
       return _applyOnline(postWithComments, onlineMap);
@@ -266,12 +269,13 @@ class PostsServices {
       final posts = await _resolveSharedPostsAndHydrate(rawPosts);
       if (posts.isEmpty) return posts;
 
-      final authorIds = <String>{
-        for (final p in posts) ...[
-          p.authorId,
-          if (p.originalPost != null) p.originalPost!.authorId,
-        ],
-      }.toList();
+      final authorIds =
+          <String>{
+            for (final p in posts) ...[
+              p.authorId,
+              if (p.originalPost != null) p.originalPost!.authorId,
+            ],
+          }.toList();
       final onlineMap = await _fetchOnlineMap(authorIds);
       final hydrated = posts.map((p) => _applyOnline(p, onlineMap)).toList();
 
@@ -323,11 +327,13 @@ class PostsServices {
 
       final hydrated = await fetchPostsByIds(orderedIds);
 
-      final flagged = hydrated
-          .map(
-            (p) => p.copyWith(isSuggestedForYou: suggestedById[p.id] ?? false),
-          )
-          .toList();
+      final flagged =
+          hydrated
+              .map(
+                (p) =>
+                    p.copyWith(isSuggestedForYou: suggestedById[p.id] ?? false),
+              )
+              .toList();
 
       return _spreadOutByAuthor(flagged);
     } catch (e) {
@@ -357,9 +363,8 @@ class PostsServices {
         continue;
       }
 
-      final searchLimit = remaining.length < lookahead
-          ? remaining.length
-          : lookahead;
+      final searchLimit =
+          remaining.length < lookahead ? remaining.length : lookahead;
       var swapIndex = -1;
       for (var i = 1; i < searchLimit; i++) {
         if (authorAllowed(remaining[i].authorId)) {
@@ -434,9 +439,10 @@ class PostsServices {
           schema: 'public',
           table: SupabaseConstants.likes,
           callback: (payload) {
-            final record = payload.newRecord.isNotEmpty
-                ? payload.newRecord
-                : payload.oldRecord;
+            final record =
+                payload.newRecord.isNotEmpty
+                    ? payload.newRecord
+                    : payload.oldRecord;
             final postId = record[LikeColumns.postId] as String?;
             if (postId != null && !controller.isClosed) {
               controller.add(LikeChangedEvent(postId, payload.eventType));
@@ -448,9 +454,10 @@ class PostsServices {
           schema: 'public',
           table: SupabaseConstants.comments,
           callback: (payload) {
-            final record = payload.newRecord.isNotEmpty
-                ? payload.newRecord
-                : payload.oldRecord;
+            final record =
+                payload.newRecord.isNotEmpty
+                    ? payload.newRecord
+                    : payload.oldRecord;
             final postId = record[CommentColumns.postId] as String?;
 
             if (postId != null && !controller.isClosed) {
@@ -463,9 +470,10 @@ class PostsServices {
           schema: 'public',
           table: SupabaseConstants.postShares,
           callback: (payload) {
-            final record = payload.newRecord.isNotEmpty
-                ? payload.newRecord
-                : payload.oldRecord;
+            final record =
+                payload.newRecord.isNotEmpty
+                    ? payload.newRecord
+                    : payload.oldRecord;
             final postId = record[PostShareColumns.postId] as String?;
             if (postId != null && !controller.isClosed) {
               controller.add(ShareChangedEvent(postId, payload.eventType));
@@ -483,9 +491,8 @@ class PostsServices {
               final isOnline =
                   record[PresenceColumns.isOnline] as bool? ?? false;
               final updatedAtRaw = record[PresenceColumns.updatedAt] as String?;
-              final updatedAt = updatedAtRaw != null
-                  ? DateTime.tryParse(updatedAtRaw)
-                  : null;
+              final updatedAt =
+                  updatedAtRaw != null ? DateTime.tryParse(updatedAtRaw) : null;
               controller.add(PresenceChangedEvent(userId, isOnline, updatedAt));
             }
           },

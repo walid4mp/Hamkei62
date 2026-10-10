@@ -20,10 +20,11 @@ class ForYouReelsGridSection extends StatelessWidget {
   void _openReel(BuildContext context, int localIndex) {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (_) => ReelsFullScreenView(
-          reels: reelsPool,
-          initialIndex: startIndex + localIndex,
-        ),
+        builder:
+            (_) => ReelsFullScreenView(
+              reels: reelsPool,
+              initialIndex: startIndex + localIndex,
+            ),
       ),
     );
   }

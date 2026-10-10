@@ -134,12 +134,14 @@ class _IncomingCallViewState extends State<IncomingCallView>
                     SizedBox(height: metrics.topGap),
 
                     CallStatusPill(
-                      icon: isVideo
-                          ? Icons.videocam_rounded
-                          : Icons.phone_callback_rounded,
-                      label: isVideo
-                          ? 'Incoming Video Call'
-                          : 'Incoming Voice Call',
+                      icon:
+                          isVideo
+                              ? Icons.videocam_rounded
+                              : Icons.phone_callback_rounded,
+                      label:
+                          isVideo
+                              ? 'Incoming Video Call'
+                              : 'Incoming Voice Call',
                       shake: _shakeAnim,
                     ),
 
@@ -206,9 +208,10 @@ class _IncomingCallViewState extends State<IncomingCallView>
                             },
                           ),
                           GlassCallActionButton(
-                            icon: isVideo
-                                ? Icons.videocam_rounded
-                                : Icons.call_rounded,
+                            icon:
+                                isVideo
+                                    ? Icons.videocam_rounded
+                                    : Icons.call_rounded,
                             label: 'Accept',
                             color: Colors.green.shade600,
                             size: metrics.buttonSize,

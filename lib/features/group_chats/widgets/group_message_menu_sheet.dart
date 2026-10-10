@@ -33,39 +33,43 @@ class GroupMessageMenuSheet {
               if (!isCall) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: ['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) {
-                    final myReaction = message.reactions[currentUserId];
-                    final isSelected = myReaction == emoji;
+                  children:
+                      ['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) {
+                        final myReaction = message.reactions[currentUserId];
+                        final isSelected = myReaction == emoji;
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        cubit.toggleReaction(
-                          messageId: message.id,
-                          emoji: emoji,
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? primary.withValues(alpha: 0.2)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          border: isSelected
-                              ? Border.all(color: primary, width: 1.5)
-                              : null,
-                        ),
-                        child: Text(
-                          emoji,
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontFamilyFallback: AppTypography.emojiFontFallback,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            cubit.toggleReaction(
+                              messageId: message.id,
+                              emoji: emoji,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color:
+                                  isSelected
+                                      ? primary.withValues(alpha: 0.2)
+                                      : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border:
+                                  isSelected
+                                      ? Border.all(color: primary, width: 1.5)
+                                      : null,
+                            ),
+                            child: Text(
+                              emoji,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontFamilyFallback:
+                                    AppTypography.emojiFontFallback,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 ),
                 const Divider(),
                 ListTile(

@@ -45,13 +45,12 @@ class _UserStoryGroupContainerState extends State<UserStoryGroupContainer>
   }
 
   void _initController({bool autoStart = false}) {
-    _progressController =
-        AnimationController(
-          vsync: this,
-          duration: _durationForStory(widget.userStories[_currentStoryIndex]),
-        )..addStatusListener((status) {
-          if (status == AnimationStatus.completed) _nextStory();
-        });
+    _progressController = AnimationController(
+      vsync: this,
+      duration: _durationForStory(widget.userStories[_currentStoryIndex]),
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) _nextStory();
+    });
 
     if (autoStart) _progressController.forward();
   }
@@ -177,26 +176,29 @@ class _UserStoryGroupContainerState extends State<UserStoryGroupContainer>
           right: 10,
           child: AnimatedBuilder(
             animation: _progressController,
-            builder: (context, _) => Row(
-              children: widget.userStories.asMap().entries.map((entry) {
-                int idx = entry.key;
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: LinearProgressIndicator(
-                      value: idx < _currentStoryIndex
-                          ? 1.0
-                          : (idx == _currentStoryIndex
-                                ? _progressController.value
-                                : 0.0),
-                      backgroundColor: Colors.white24,
-                      valueColor: AlwaysStoppedAnimation(Colors.white),
-                      minHeight: 2,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+            builder:
+                (context, _) => Row(
+                  children:
+                      widget.userStories.asMap().entries.map((entry) {
+                        int idx = entry.key;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: LinearProgressIndicator(
+                              value:
+                                  idx < _currentStoryIndex
+                                      ? 1.0
+                                      : (idx == _currentStoryIndex
+                                          ? _progressController.value
+                                          : 0.0),
+                              backgroundColor: Colors.white24,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                              minHeight: 2,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                ),
           ),
         ),
       ],

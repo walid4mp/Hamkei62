@@ -40,9 +40,10 @@ class AiUsageSnapshot {
     final rawBonus = quota.bonusGranted ?? bonusGranted;
 
     return AiUsageSnapshot(
-      activeProvider: provider != null
-          ? AiActiveProviderX.fromWireValue(provider)
-          : activeProvider,
+      activeProvider:
+          provider != null
+              ? AiActiveProviderX.fromWireValue(provider)
+              : activeProvider,
       activeModelId: modelId ?? activeModelId,
       usedToday: trueUsedToday,
       dailyLimit: _stabilize(previous: dailyLimit, incoming: serverLimit),

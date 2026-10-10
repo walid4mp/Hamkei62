@@ -42,8 +42,9 @@ class StarredMessageTile extends StatelessWidget {
                       child: Text(
                         entry.isMe ? 'You' : entry.senderName,
                         maxLines: 1,
-                        style: Theme.of(context).textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

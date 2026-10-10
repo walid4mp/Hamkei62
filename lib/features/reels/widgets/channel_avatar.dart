@@ -12,14 +12,15 @@ class ChannelAvatar extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: avatarUrl != null
-            ? CachedNetworkImage(
-                imageUrl: avatarUrl!,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => const _ChannelAvatarFallback(),
-                errorWidget: (_, __, ___) => const _ChannelAvatarFallback(),
-              )
-            : const _ChannelAvatarFallback(),
+        child:
+            avatarUrl != null
+                ? CachedNetworkImage(
+                  imageUrl: avatarUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => const _ChannelAvatarFallback(),
+                  errorWidget: (_, __, ___) => const _ChannelAvatarFallback(),
+                )
+                : const _ChannelAvatarFallback(),
       ),
     );
   }

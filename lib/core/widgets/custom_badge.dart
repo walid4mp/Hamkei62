@@ -42,12 +42,13 @@ class CustomBadge extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
               shape: BoxShape.circle,
-              border: border != null
-                  ? Border.all(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      width: 1.5,
-                    )
-                  : null,
+              border:
+                  border != null
+                      ? Border.all(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        width: 1.5,
+                      )
+                      : null,
             ),
             constraints: BoxConstraints(minWidth: size!, minHeight: size!),
             child: Center(

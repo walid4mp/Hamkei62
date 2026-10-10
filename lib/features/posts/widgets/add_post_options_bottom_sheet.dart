@@ -130,8 +130,9 @@ class AddPostOptionsBottomSheet extends StatelessWidget {
                       Icons.color_lens_rounded,
                       'Background Color',
                       const Color(0xFFE91E63),
-                      onTap: () =>
-                          AppToast.info('Background Color is coming soon'),
+                      onTap:
+                          () =>
+                              AppToast.info('Background Color is coming soon'),
                     ),
                     BuildOptionItem(
                       Icons.gif_box_rounded,

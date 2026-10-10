@@ -102,9 +102,8 @@ class MentionTextEditingController extends TextEditingController {
     if (_mentions.isEmpty || oldText == newText) return;
 
     int prefixLen = 0;
-    final int minLen = oldText.length < newText.length
-        ? oldText.length
-        : newText.length;
+    final int minLen =
+        oldText.length < newText.length ? oldText.length : newText.length;
     while (prefixLen < minLen &&
         oldText.codeUnitAt(prefixLen) == newText.codeUnitAt(prefixLen)) {
       prefixLen++;

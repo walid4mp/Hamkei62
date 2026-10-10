@@ -353,9 +353,10 @@ class AiChatAttachmentController extends ChangeNotifier {
     );
 
     try {
-      final extension = fileName.contains('.')
-          ? fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()
-          : '';
+      final extension =
+          fileName.contains('.')
+              ? fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()
+              : '';
 
       String? textContent;
       String? documentBase64;
@@ -369,9 +370,10 @@ class AiChatAttachmentController extends ChangeNotifier {
           // compute() keeps large-file text extraction off the UI thread.
           final raw = await compute(_extractPlainText, bytes);
           if (raw != null && raw.isNotEmpty) {
-            textContent = raw.length > 25000
-                ? '${raw.substring(0, 25000)}\n\n[...The remaining text has been truncated due to its large size...]'
-                : raw;
+            textContent =
+                raw.length > 25000
+                    ? '${raw.substring(0, 25000)}\n\n[...The remaining text has been truncated due to its large size...]'
+                    : raw;
           } else {
             targetMediaType = 'document';
           }
@@ -383,9 +385,10 @@ class AiChatAttachmentController extends ChangeNotifier {
           final bytes = await file.readAsBytes();
           final extracted = await compute(_extractDocxText, bytes);
           if (extracted != null && extracted.isNotEmpty) {
-            textContent = extracted.length > 25000
-                ? '${extracted.substring(0, 25000)}\n\n[...The remaining text has been truncated...]'
-                : extracted;
+            textContent =
+                extracted.length > 25000
+                    ? '${extracted.substring(0, 25000)}\n\n[...The remaining text has been truncated...]'
+                    : extracted;
           } else {
             targetMediaType = 'document';
           }
@@ -397,9 +400,10 @@ class AiChatAttachmentController extends ChangeNotifier {
           final bytes = await file.readAsBytes();
           final extracted = await compute(_extractXlsxText, bytes);
           if (extracted != null && extracted.isNotEmpty) {
-            textContent = extracted.length > 25000
-                ? '${extracted.substring(0, 25000)}\n\n[...The remaining data has been truncated...]'
-                : extracted;
+            textContent =
+                extracted.length > 25000
+                    ? '${extracted.substring(0, 25000)}\n\n[...The remaining data has been truncated...]'
+                    : extracted;
           } else {
             targetMediaType = 'document';
           }
@@ -596,13 +600,14 @@ String _downscaleAndEncodeImage(Uint8List bytes) {
   if (decoded == null) return base64Encode(bytes);
 
   final needsResize = decoded.width > 1024 || decoded.height > 1024;
-  final resized = needsResize
-      ? img.copyResize(
-          decoded,
-          width: decoded.width >= decoded.height ? 1024 : null,
-          height: decoded.height > decoded.width ? 1024 : null,
-        )
-      : decoded;
+  final resized =
+      needsResize
+          ? img.copyResize(
+            decoded,
+            width: decoded.width >= decoded.height ? 1024 : null,
+            height: decoded.height > decoded.width ? 1024 : null,
+          )
+          : decoded;
 
   return base64Encode(img.encodeJpg(resized, quality: 85));
 }

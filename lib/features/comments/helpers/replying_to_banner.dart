@@ -34,8 +34,10 @@ class ReplyingToBanner extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 text: 'Replying to ',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: AppColors.grey7, fontSize: 12),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.grey7,
+                  fontSize: 12,
+                ),
                 children: [
                   TextSpan(
                     text: '@$authorName',

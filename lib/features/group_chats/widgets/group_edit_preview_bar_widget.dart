@@ -17,9 +17,8 @@ class GroupEditPreviewBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).primaryColor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text = message.text.isNotEmpty
-        ? message.text
-        : (message.caption ?? '');
+    final text =
+        message.text.isNotEmpty ? message.text : (message.caption ?? '');
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

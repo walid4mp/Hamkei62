@@ -72,8 +72,9 @@ void main() {
 
       expect(removedCount, 2);
       verify(() => dataSource.removeCachedMedia('expired-story')).called(1);
-      verify(() => dataSource.removeCachedMedia('expired-unknown-folder'))
-          .called(1);
+      verify(
+        () => dataSource.removeCachedMedia('expired-unknown-folder'),
+      ).called(1);
       verifyNever(() => dataSource.removeCachedMedia('fresh-post'));
     });
 
@@ -119,8 +120,9 @@ void main() {
             cachedAt: DateTime.now().subtract(const Duration(days: 10)),
           ),
         ]);
-        when(() => dataSource.removeCachedMedia(any()))
-            .thenAnswer((_) => removeCompleter.future);
+        when(
+          () => dataSource.removeCachedMedia(any()),
+        ).thenAnswer((_) => removeCompleter.future);
 
         final first = service.runSweep();
         final secondResult = await service.runSweep();
@@ -148,15 +150,17 @@ void main() {
 
     test('parses a previously-stored ISO timestamp', () {
       final stored = DateTime(2026, 1, 15, 10, 30);
-      when(() => metaBox.get('last_eviction_run_at'))
-          .thenReturn(stored.toIso8601String());
+      when(
+        () => metaBox.get('last_eviction_run_at'),
+      ).thenReturn(stored.toIso8601String());
 
       expect(service.lastRunAt, stored);
     });
 
     test('a corrupted timestamp string returns null instead of throwing', () {
-      when(() => metaBox.get('last_eviction_run_at'))
-          .thenReturn('not-a-valid-date');
+      when(
+        () => metaBox.get('last_eviction_run_at'),
+      ).thenReturn('not-a-valid-date');
 
       expect(service.lastRunAt, isNull);
     });

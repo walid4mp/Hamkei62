@@ -12,17 +12,18 @@ Future<void> showCreatePackFriendPicker(BuildContext context) async {
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder: (_) => BlocBuilder<CreateStickerPackCubit, CreateStickerPackState>(
-      bloc: cubit,
-      builder: (context, latest) {
-        final form = latest as CreateStickerPackForm;
-        return FriendPickerSheet(
-          friends: form.allFriends,
-          selectedIds: form.selectedFriendIds,
-          onToggle: cubit.toggleFriend,
-        );
-      },
-    ),
+    builder:
+        (_) => BlocBuilder<CreateStickerPackCubit, CreateStickerPackState>(
+          bloc: cubit,
+          builder: (context, latest) {
+            final form = latest as CreateStickerPackForm;
+            return FriendPickerSheet(
+              friends: form.allFriends,
+              selectedIds: form.selectedFriendIds,
+              onToggle: cubit.toggleFriend,
+            );
+          },
+        ),
   );
 }
 

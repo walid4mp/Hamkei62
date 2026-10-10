@@ -225,9 +225,10 @@ class VoiceChunkRecorderService {
     if (fmtChunk == null || dataOffset == -1) return null;
 
     final actualRemaining = bytes.length - dataOffset;
-    final effectiveDataSize = (dataSize <= 0 || dataSize > actualRemaining)
-        ? actualRemaining
-        : dataSize;
+    final effectiveDataSize =
+        (dataSize <= 0 || dataSize > actualRemaining)
+            ? actualRemaining
+            : dataSize;
 
     return _WavHeaderInfo(
       fmtChunkBytes: fmtChunk,

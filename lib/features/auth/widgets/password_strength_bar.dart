@@ -36,9 +36,8 @@ class PasswordStrengthBar extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: index == 0 ? 0 : 2),
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? color
-                        : Colors.grey.withValues(alpha: 0.2),
+                    color:
+                        isActive ? color : Colors.grey.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

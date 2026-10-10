@@ -44,27 +44,31 @@ class StoryReplyPreviewBubble extends StatelessWidget {
     final storyText = replyToStoryText?.trim();
     final bool useWhiteText = isMe && onColoredBubble;
 
-    final Color surfaceColor = useWhiteText
-        ? Colors.white.withValues(alpha: 0.14)
-        : (isDarkMode ? Colors.white.withValues(alpha: 0.08) : AppColors.grey1);
-    final Color accentColor = useWhiteText
-        ? Colors.white
-        : Theme.of(context).primaryColor;
+    final Color surfaceColor =
+        useWhiteText
+            ? Colors.white.withValues(alpha: 0.14)
+            : (isDarkMode
+                ? Colors.white.withValues(alpha: 0.08)
+                : AppColors.grey1);
+    final Color accentColor =
+        useWhiteText ? Colors.white : Theme.of(context).primaryColor;
 
-    final Color subTextColor = useWhiteText
-        ? Colors.white70
-        : (isDarkMode ? Colors.white70 : AppColors.greyColor);
+    final Color subTextColor =
+        useWhiteText
+            ? Colors.white70
+            : (isDarkMode ? Colors.white70 : AppColors.greyColor);
 
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => StoryReplyNavigator.openOriginalStory(
-          context,
-          storyId: replyToStoryId,
-          authorId: replyToStoryAuthorId,
-        ),
+        onTap:
+            () => StoryReplyNavigator.openOriginalStory(
+              context,
+              storyId: replyToStoryId,
+              authorId: replyToStoryAuthorId,
+            ),
         child: Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: 6),
@@ -188,9 +192,8 @@ class StoryReplyPreviewBubble extends StatelessWidget {
       );
     }
 
-    final displayUrl = type == 'video'
-        ? mediaUrl.cloudinaryVideoThumbnailUrl
-        : mediaUrl;
+    final displayUrl =
+        type == 'video' ? mediaUrl.cloudinaryVideoThumbnailUrl : mediaUrl;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
@@ -206,8 +209,8 @@ class StoryReplyPreviewBubble extends StatelessWidget {
                 width: _thumbnailSize,
                 height: _thumbnailSize,
                 fit: BoxFit.cover,
-                errorWidget: (context, error) =>
-                    Container(color: Colors.grey.shade700),
+                errorWidget:
+                    (context, error) => Container(color: Colors.grey.shade700),
               )
             else
               Container(color: Colors.grey.shade700),

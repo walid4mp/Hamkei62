@@ -85,8 +85,9 @@ void main() {
       ),
     ).thenAnswer((_) => messagesB.stream);
 
-    when(() => chatServices.getMessageReactionsStream(any()))
-        .thenAnswer((_) => reactions.stream);
+    when(
+      () => chatServices.getMessageReactionsStream(any()),
+    ).thenAnswer((_) => reactions.stream);
   });
 
   tearDown(() async {
@@ -245,9 +246,11 @@ void main() {
       ]);
       await settle();
 
-      expect(cubit.cachedMessages.map((m) => m.id), [
-        'b1',
-      ], reason: "peer A's messages must not leak into peer B's chat");
+      expect(
+        cubit.cachedMessages.map((m) => m.id),
+        ['b1'],
+        reason: "peer A's messages must not leak into peer B's chat",
+      );
     });
 
     test('re-subscribing resets the confirmed-initial-load flag so the UI '

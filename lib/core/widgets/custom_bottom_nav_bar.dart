@@ -137,13 +137,15 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   Future<bool?> _showExitConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      builder: (context) => CustomConfirmationDialog(
-        title: 'Are you sure you want to quit ?',
-        textAlign: TextAlign.center,
-        img: AppImages.exitAnimationLot,
+      builder:
+          (context) => CustomConfirmationDialog(
+            title: 'Are you sure you want to quit ?',
+            textAlign: TextAlign.center,
+            img: AppImages.exitAnimationLot,
 
-        onConfirm: () => Navigator.of(context, rootNavigator: true).pop(true),
-      ),
+            onConfirm:
+                () => Navigator.of(context, rootNavigator: true).pop(true),
+          ),
     );
   }
 
@@ -182,35 +184,37 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           child: MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) => ProfileCubit(
-                  context.read<UserService>(),
-                  friendshipServices: context.read<FriendshipServices>(),
-                  followServices: context.read<FollowServices>(),
-                  homeCubit: context.read<HomeCubit>(),
-                  connectivityCubit: context.read<ConnectivityCubit>(),
-                )..getProfileData(userId),
+                create:
+                    (context) => ProfileCubit(
+                      context.read<UserService>(),
+                      friendshipServices: context.read<FriendshipServices>(),
+                      followServices: context.read<FollowServices>(),
+                      homeCubit: context.read<HomeCubit>(),
+                      connectivityCubit: context.read<ConnectivityCubit>(),
+                    )..getProfileData(userId),
               ),
 
               BlocProvider(
-                create: (context) => ProfilePostsCubit(
-                  userId: userId,
-                  postsServices: context.read<PostsServices>(),
-                  postsCubit: context.read<PostsCubit>(),
-                )..loadInitial(),
+                create:
+                    (context) => ProfilePostsCubit(
+                      userId: userId,
+                      postsServices: context.read<PostsServices>(),
+                      postsCubit: context.read<PostsCubit>(),
+                    )..loadInitial(),
               ),
             ],
             child: AnnotatedRegion<SystemUiOverlayStyle>(
-              value:
-                  (currentTheme.isDark
-                          ? SystemUiOverlayStyle.light
-                          : SystemUiOverlayStyle.dark)
-                      .copyWith(
-                        statusBarColor: Colors.transparent,
-                        systemNavigationBarColor: currentTheme.bgBase,
-                        systemNavigationBarIconBrightness: currentTheme.isDark
+              value: (currentTheme.isDark
+                      ? SystemUiOverlayStyle.light
+                      : SystemUiOverlayStyle.dark)
+                  .copyWith(
+                    statusBarColor: Colors.transparent,
+                    systemNavigationBarColor: currentTheme.bgBase,
+                    systemNavigationBarIconBrightness:
+                        currentTheme.isDark
                             ? Brightness.light
                             : Brightness.dark,
-                      ),
+                  ),
               child: Scaffold(
                 backgroundColor: currentTheme.bgBase,
                 key: _scaffoldKey,

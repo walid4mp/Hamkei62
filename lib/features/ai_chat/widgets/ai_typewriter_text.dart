@@ -203,9 +203,8 @@ class _AiTypewriterTextState extends State<AiTypewriterText> {
   Widget build(BuildContext context) {
     final safeLength = _revealedLength.clamp(0, widget.text.length);
 
-    final revealedText = safeLength == 0
-        ? ''
-        : widget.text.substring(0, safeLength);
+    final revealedText =
+        safeLength == 0 ? '' : widget.text.substring(0, safeLength);
 
     return Directionality(
       textDirection:

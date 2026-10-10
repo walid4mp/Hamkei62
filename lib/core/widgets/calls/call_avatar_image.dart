@@ -45,14 +45,15 @@ class CallAvatarImage extends StatelessWidget {
             ],
       ),
       child: ClipOval(
-        child: (imageUrl != null && imageUrl!.isNotEmpty)
-            ? CachedCloudinaryImage(
-                secureUrl: imageUrl!,
-                fit: BoxFit.cover,
-                isAvatar: true,
-                errorWidget: (_, __) => _fallback(),
-              )
-            : _fallback(),
+        child:
+            (imageUrl != null && imageUrl!.isNotEmpty)
+                ? CachedCloudinaryImage(
+                  secureUrl: imageUrl!,
+                  fit: BoxFit.cover,
+                  isAvatar: true,
+                  errorWidget: (_, __) => _fallback(),
+                )
+                : _fallback(),
       ),
     );
   }

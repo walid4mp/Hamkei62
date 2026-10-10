@@ -67,9 +67,10 @@ class _LoginViewWidgetState extends State<LoginViewWidget> {
               ),
               const Gap(42),
               BlocConsumer<AuthCubit, AuthState>(
-                listenWhen: (previous, current) =>
-                    (previous is! AuthSuccess && current is AuthSuccess) ||
-                    current is AuthFailure,
+                listenWhen:
+                    (previous, current) =>
+                        (previous is! AuthSuccess && current is AuthSuccess) ||
+                        current is AuthFailure,
                 listener: (context, state) async {
                   if (state is AuthSuccess) {
                     AppToast.success('Login Successfully');
@@ -87,12 +88,13 @@ class _LoginViewWidgetState extends State<LoginViewWidget> {
                     AppToast.error(state.errMsg);
                   }
                 },
-                buildWhen: (previous, current) =>
-                    current is AuthLoading ||
-                    current is AuthSuccess ||
-                    current is AuthFailure ||
-                    current is AuthInitial ||
-                    current is AuthSignedOut,
+                buildWhen:
+                    (previous, current) =>
+                        current is AuthLoading ||
+                        current is AuthSuccess ||
+                        current is AuthFailure ||
+                        current is AuthInitial ||
+                        current is AuthSignedOut,
                 builder: (context, state) {
                   return CustomElevatedButton(
                     txtBtn: 'Login',

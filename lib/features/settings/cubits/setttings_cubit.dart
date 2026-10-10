@@ -121,8 +121,8 @@ class SettingsCubit extends Cubit<SettingsState>
 
   Future<void> toggleBiometricLock(bool value) async {
     if (value) {
-      final availability = await AppLockService.instance
-          .checkBiometricAvailability();
+      final availability =
+          await AppLockService.instance.checkBiometricAvailability();
       if (availability != BiometricAvailability.available) {
         emit(
           state.copyWith(errorMessage: _biometricErrorMessage(availability)),
@@ -136,9 +136,10 @@ class SettingsCubit extends Cubit<SettingsState>
         final reason = AppLockService.instance.lastUnlockFailureReason;
         emit(
           state.copyWith(
-            errorMessage: reason != null
-                ? _biometricErrorMessage(reason)
-                : 'Your identity has not been verified; please try again.',
+            errorMessage:
+                reason != null
+                    ? _biometricErrorMessage(reason)
+                    : 'Your identity has not been verified; please try again.',
           ),
         );
         emit(state.copyWith(errorMessage: null));

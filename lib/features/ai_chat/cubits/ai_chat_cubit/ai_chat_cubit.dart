@@ -76,9 +76,8 @@ class AiChatCubit extends Cubit<AiChatMessagesState>
     String? replyToMediaUrl,
   }) {
     final current = state;
-    final existingDomain = current is AiChatMessagesLoaded
-        ? current.messages
-        : <AiChatMessage>[];
+    final existingDomain =
+        current is AiChatMessagesLoaded ? current.messages : <AiChatMessage>[];
 
     final tempId = 'pending-${DateTime.now().microsecondsSinceEpoch}';
 
@@ -122,9 +121,10 @@ class AiChatCubit extends Cubit<AiChatMessagesState>
 
     final updated = current.messages
         .map(
-          (m) => m.id == messageId
-              ? m.copyWith(uploadProgress: progress, id: messageId)
-              : m,
+          (m) =>
+              m.id == messageId
+                  ? m.copyWith(uploadProgress: progress, id: messageId)
+                  : m,
         )
         .toList(growable: false);
     emit(AiChatMessagesLoaded(messages: updated, isSending: current.isSending));
@@ -161,15 +161,15 @@ class AiChatCubit extends Cubit<AiChatMessagesState>
     String? replyToMediaUrl,
   }) async {
     final current = state;
-    final existingDomain = current is AiChatMessagesLoaded
-        ? current.messages
-        : <AiChatMessage>[];
+    final existingDomain =
+        current is AiChatMessagesLoaded ? current.messages : <AiChatMessage>[];
 
-    final baseDomain = replacingMessageId == null
-        ? existingDomain
-        : existingDomain
-              .where((m) => m.id != replacingMessageId)
-              .toList(growable: false);
+    final baseDomain =
+        replacingMessageId == null
+            ? existingDomain
+            : existingDomain
+                .where((m) => m.id != replacingMessageId)
+                .toList(growable: false);
     final replyOrigin = _findMessage(existingDomain, replyToMessageId);
 
     final resolvedReplyText = _firstNonEmpty([
@@ -279,9 +279,8 @@ class AiChatCubit extends Cubit<AiChatMessagesState>
         if (mediaType == 'image' && mediaUrl != null) 'image_url': mediaUrl,
         if (resolvedImageBase64 != null) 'image_base64': resolvedImageBase64,
         if (resolvedImageBase64 != null)
-          'image_mime_type': isRepliedImageAttached
-              ? 'image/jpeg'
-              : imageMimeType,
+          'image_mime_type':
+              isRepliedImageAttached ? 'image/jpeg' : imageMimeType,
         if (isRepliedImageAttached) 'reply_image_attached': true,
         if (textContent != null) 'text_content': textContent,
         if (documentBase64 != null) 'document_base64': documentBase64,

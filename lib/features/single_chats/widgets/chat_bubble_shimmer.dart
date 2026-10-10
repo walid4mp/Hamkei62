@@ -41,9 +41,8 @@ class ChatBubbleShimmer extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: showAvatar || isMe ? 12 : 2),
       child: Row(
-        mainAxisAlignment: isMe
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[

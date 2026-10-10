@@ -15,12 +15,10 @@ class CallGradientBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hsl = HSLColor.fromColor(baseColor);
-    final mid = hsl
-        .withLightness((hsl.lightness - 0.10).clamp(0.0, 1.0))
-        .toColor();
-    final darker = hsl
-        .withLightness((hsl.lightness - 0.22).clamp(0.0, 1.0))
-        .toColor();
+    final mid =
+        hsl.withLightness((hsl.lightness - 0.10).clamp(0.0, 1.0)).toColor();
+    final darker =
+        hsl.withLightness((hsl.lightness - 0.22).clamp(0.0, 1.0)).toColor();
 
     return DecoratedBox(
       decoration: BoxDecoration(

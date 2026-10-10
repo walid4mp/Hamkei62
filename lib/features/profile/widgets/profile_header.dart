@@ -72,8 +72,9 @@ class ProfileHeader extends StatelessWidget {
                 screenWidth: screenWidth,
                 backgroundHeight: bgHeight,
                 avatarSize: avatarSize,
-                onEditRequested: () =>
-                    _navigateToEditProfile(context, autofocusTagline: true),
+                onEditRequested:
+                    () =>
+                        _navigateToEditProfile(context, autofocusTagline: true),
               ),
             ),
 
@@ -89,9 +90,10 @@ class ProfileHeader extends StatelessWidget {
                 children: [
                   _buildCircularIconButton(
                     theme: theme,
-                    icon: isMe
-                        ? Icons.bookmark_outline_outlined
-                        : Icons.people_alt_outlined,
+                    icon:
+                        isMe
+                            ? Icons.bookmark_outline_outlined
+                            : Icons.people_alt_outlined,
                     tooltip: isMe ? 'Saved Posts' : 'Friends List',
                     onPressed: () {
                       if (isMe) {
@@ -140,9 +142,10 @@ class ProfileHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: ProfileUiTokens.screenPadding,
           ),
-          child: isMe
-              ? _buildMyProfileActions(context)
-              : _buildOtherProfileActions(context),
+          child:
+              isMe
+                  ? _buildMyProfileActions(context)
+                  : _buildOtherProfileActions(context),
         ),
       ],
     );
@@ -255,9 +258,11 @@ class ProfileHeader extends StatelessWidget {
           activeIcon: Icons.hourglass_top_rounded,
           idleStyle: ProfileActionStyle.primary,
           activeStyle: ProfileActionStyle.outlineMuted,
-          onPressed: () => isRequested
-              ? cubit.cancelFriendRequest()
-              : cubit.sendFriendRequest(),
+          onPressed:
+              () =>
+                  isRequested
+                      ? cubit.cancelFriendRequest()
+                      : cubit.sendFriendRequest(),
         );
       case FriendshipStatus.pendingReceived:
         return ProfileActionButton(

@@ -30,9 +30,10 @@ class AiUsageQuotaCard extends StatelessWidget {
       buildWhen: (previous, current) => previous.usage != current.usage,
       builder: (context, state) {
         final usage = state.usage;
-        final fraction = usage.dailyLimit == 0
-            ? 0.0
-            : (usage.usedToday / usage.dailyLimit).clamp(0.0, 1.0);
+        final fraction =
+            usage.dailyLimit == 0
+                ? 0.0
+                : (usage.usedToday / usage.dailyLimit).clamp(0.0, 1.0);
         final percentage = (fraction * 100).round();
 
         return Container(
@@ -92,9 +93,10 @@ class AiUsageQuotaCard extends StatelessWidget {
                       color: theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isDark
-                            ? Colors.white12
-                            : Colors.black.withValues(alpha: 0.06),
+                        color:
+                            isDark
+                                ? Colors.white12
+                                : Colors.black.withValues(alpha: 0.06),
                       ),
                     ),
                     child: Row(
@@ -107,8 +109,8 @@ class AiUsageQuotaCard extends StatelessWidget {
                           usage.activeProvider == AiActiveProvider.unknown
                               ? AiModelBrand.gemini
                               : AiModelIconography.brandFromWire(
-                                  usage.activeProvider.wireValue,
-                                ),
+                                usage.activeProvider.wireValue,
+                              ),
                           size: 13,
                           useOriginalColors: true,
                         ),
@@ -139,9 +141,10 @@ class AiUsageQuotaCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w500,
-                              color: isDark
-                                  ? Colors.white38
-                                  : Colors.grey.shade500,
+                              color:
+                                  isDark
+                                      ? Colors.white38
+                                      : Colors.grey.shade500,
                             ),
                           ),
                         ],
@@ -183,9 +186,10 @@ class AiUsageQuotaCard extends StatelessWidget {
                   children: [
                     Container(
                       height: 8,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.black.withValues(alpha: 0.05),
+                      color:
+                          isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.05),
                     ),
                     TweenAnimationBuilder<double>(
                       tween: Tween(begin: 0.0, end: fraction),
@@ -272,8 +276,9 @@ class _BonusChip extends StatelessWidget {
     final color = Colors.teal.shade600;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
-      transitionBuilder: (child, animation) =>
-          FadeTransition(opacity: animation, child: child),
+      transitionBuilder:
+          (child, animation) =>
+              FadeTransition(opacity: animation, child: child),
       child: Container(
         key: ValueKey(bonus),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

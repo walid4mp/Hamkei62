@@ -19,9 +19,10 @@ class CreateStickerPackFormSection extends StatelessWidget {
     final cubit = context.read<CreateStickerPackCubit>();
     final sizeMb = (state.totalSizeBytes / (1024 * 1024)).toStringAsFixed(1);
 
-    final selectedFriends = state.allFriends
-        .where((f) => state.selectedFriendIds.contains(f.user.id))
-        .toList();
+    final selectedFriends =
+        state.allFriends
+            .where((f) => state.selectedFriendIds.contains(f.user.id))
+            .toList();
     final avatars = selectedFriends.map((f) => f.user.imageUrl ?? '').toList();
 
     return Column(

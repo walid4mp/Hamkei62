@@ -96,8 +96,8 @@ class CreatePostImagePreview extends StatelessWidget {
                     child: Image.file(
                       File(imagePath),
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Center(
+                      errorBuilder:
+                          (context, error, stackTrace) => const Center(
                             child: Icon(
                               Icons.broken_image,
                               size: 50,

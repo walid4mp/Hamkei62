@@ -50,10 +50,10 @@ class RegularMessageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final displayDraft =
         (message.messageType == 'text' ||
-            message.messageType == 'block_event' ||
-            message.messageType == 'unblock_event')
-        ? (message.caption ?? message.text)
-        : (message.caption ?? '');
+                message.messageType == 'block_event' ||
+                message.messageType == 'unblock_event')
+            ? (message.caption ?? message.text)
+            : (message.caption ?? '');
 
     return IntrinsicWidth(
       child: Column(
@@ -65,22 +65,27 @@ class RegularMessageContent extends StatelessWidget {
               onTap: () => _navigateToOriginalMessage(context),
               child: Container(
                 width: double.infinity,
-                margin: (isGif || isSticker)
-                    ? const EdgeInsets.only(bottom: 6)
-                    : null,
-                padding: (isGif || isSticker)
-                    ? const EdgeInsets.all(4)
-                    : EdgeInsets.zero,
-                decoration: (isGif || isSticker)
-                    ? BoxDecoration(
-                        color: isMe
-                            ? Theme.of(context).primaryColor
-                            : Theme.of(context).brightness == Brightness.light
-                            ? Colors.grey.shade200
-                            : Colors.grey.shade800,
-                        borderRadius: BorderRadius.circular(10),
-                      )
-                    : null,
+                margin:
+                    (isGif || isSticker)
+                        ? const EdgeInsets.only(bottom: 6)
+                        : null,
+                padding:
+                    (isGif || isSticker)
+                        ? const EdgeInsets.all(4)
+                        : EdgeInsets.zero,
+                decoration:
+                    (isGif || isSticker)
+                        ? BoxDecoration(
+                          color:
+                              isMe
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.grey.shade200
+                                  : Colors.grey.shade800,
+                          borderRadius: BorderRadius.circular(10),
+                        )
+                        : null,
                 child: ReplyBubblePreview(
                   replyText: message.replyToText,
                   replyType: message.replyToMessageType,
@@ -108,28 +113,30 @@ class RegularMessageContent extends StatelessWidget {
             SizedBox(
               width: 305,
               height: 320,
-              child: message.imageUrl != null
-                  ? ImageMessageWidget(
-                      imageUrl: message.imageUrl!,
-                      caption: message.caption,
-                      isMe: isMe,
-                      fileSizeBytes: message.fileSizeBytes,
-                    )
-                  : const SizedBox.shrink(),
+              child:
+                  message.imageUrl != null
+                      ? ImageMessageWidget(
+                        imageUrl: message.imageUrl!,
+                        caption: message.caption,
+                        isMe: isMe,
+                        fileSizeBytes: message.fileSizeBytes,
+                      )
+                      : const SizedBox.shrink(),
             ),
           if (isVideo)
             SizedBox(
               height: 200,
               width: 280,
-              child: message.videoUrl != null
-                  ? VideoMessageWidget(
-                      videoUrl: message.videoUrl!,
-                      caption: message.caption,
-                      isMe: isMe,
-                      fileSizeBytes: message.fileSizeBytes,
-                      durationSeconds: message.durationSeconds,
-                    )
-                  : const SizedBox.shrink(),
+              child:
+                  message.videoUrl != null
+                      ? VideoMessageWidget(
+                        videoUrl: message.videoUrl!,
+                        caption: message.caption,
+                        isMe: isMe,
+                        fileSizeBytes: message.fileSizeBytes,
+                        durationSeconds: message.durationSeconds,
+                      )
+                      : const SizedBox.shrink(),
             ),
 
           if (message.messageType == 'voice' && message.voiceUrl != null)
@@ -149,33 +156,35 @@ class RegularMessageContent extends StatelessWidget {
               (message.fileUrl != null || isUploading))
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: isUploading
-                  ? ValueListenableBuilder<double>(
-                      valueListenable: context
-                          .read<ChatDetailsCubit>()
-                          .progressNotifierFor(message.id),
-                      builder: (context, progress, child) {
-                        return FileMessageBubble(
-                          fileUrl: message.fileUrl ?? '',
-                          fileName: message.fileName,
-                          fileSizeBytes: message.fileSizeBytes,
-                          isMe: isMe,
-                          isUploading: true,
-                          uploadProgress: progress,
-                          onCancelTap: () => context
-                              .read<ChatDetailsCubit>()
-                              .cancelUpload(message.id),
-                        );
-                      },
-                    )
-                  : FileMessageBubble(
-                      fileUrl: message.fileUrl ?? '',
-                      fileName: message.fileName,
-                      fileSizeBytes: message.fileSizeBytes,
-                      isMe: isMe,
-                      isUploading: false,
-                      uploadProgress: null,
-                    ),
+              child:
+                  isUploading
+                      ? ValueListenableBuilder<double>(
+                        valueListenable: context
+                            .read<ChatDetailsCubit>()
+                            .progressNotifierFor(message.id),
+                        builder: (context, progress, child) {
+                          return FileMessageBubble(
+                            fileUrl: message.fileUrl ?? '',
+                            fileName: message.fileName,
+                            fileSizeBytes: message.fileSizeBytes,
+                            isMe: isMe,
+                            isUploading: true,
+                            uploadProgress: progress,
+                            onCancelTap:
+                                () => context
+                                    .read<ChatDetailsCubit>()
+                                    .cancelUpload(message.id),
+                          );
+                        },
+                      )
+                      : FileMessageBubble(
+                        fileUrl: message.fileUrl ?? '',
+                        fileName: message.fileName,
+                        fileSizeBytes: message.fileSizeBytes,
+                        isMe: isMe,
+                        isUploading: false,
+                        uploadProgress: null,
+                      ),
             ),
 
           if ((isImage || isVideo || message.messageType == 'file') &&
@@ -230,16 +239,19 @@ class RegularMessageContent extends StatelessWidget {
                   child: SizedBox(
                     width: 200,
                     height: 200,
-                    child: message.imageUrl != null
-                        ? GifMessageBubble(url: message.imageUrl!, isMe: isMe)
-                        : const SizedBox.shrink(),
+                    child:
+                        message.imageUrl != null
+                            ? GifMessageBubble(
+                              url: message.imageUrl!,
+                              isMe: isMe,
+                            )
+                            : const SizedBox.shrink(),
                   ),
                 ),
                 const Gap(2.8),
                 Align(
-                  alignment: isMe
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                  alignment:
+                      isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: _buildMediaTimeOverlay(context),
                 ),
               ],
@@ -254,16 +266,16 @@ class RegularMessageContent extends StatelessWidget {
                   child: SizedBox(
                     width: 150,
                     height: 150,
-                    child: message.imageUrl != null
-                        ? StickerMessageBubble(url: message.imageUrl!)
-                        : const SizedBox.shrink(),
+                    child:
+                        message.imageUrl != null
+                            ? StickerMessageBubble(url: message.imageUrl!)
+                            : const SizedBox.shrink(),
                   ),
                 ),
                 const Gap(2.8),
                 Align(
-                  alignment: isMe
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                  alignment:
+                      isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: _buildMediaTimeOverlay(context),
                 ),
               ],
@@ -290,9 +302,10 @@ class RegularMessageContent extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     final textStyle = Theme.of(context).textTheme.titleMedium!.copyWith(
-      color: onColoredBubble
-          ? Theme.of(context).colorScheme.onPrimary
-          : (isDarkMode ? Colors.white : Colors.black87),
+      color:
+          onColoredBubble
+              ? Theme.of(context).colorScheme.onPrimary
+              : (isDarkMode ? Colors.white : Colors.black87),
       fontSize: 15,
       height: 1.3,
       fontWeight: FontWeight.w400,
@@ -326,10 +339,12 @@ class RegularMessageContent extends StatelessWidget {
           collapsedMaxLines: maxLines,
           toggleTextStyle: textStyle.copyWith(
             fontWeight: FontWeight.w700,
-            color: isMe
-                ? Theme.of(context).colorScheme.onPrimary
-                      .withValues(alpha: 0.75)
-                : Theme.of(context).colorScheme.outline,
+            color:
+                isMe
+                    ? Theme.of(
+                      context,
+                    ).colorScheme.onPrimary.withValues(alpha: 0.75)
+                    : Theme.of(context).colorScheme.outline,
           ),
           contentBuilder: (context, effectiveMaxLines, overflow) {
             return HighlightedLinkifyText(
@@ -363,8 +378,9 @@ class RegularMessageContent extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(
           brightness: Brightness.dark,
-          colorScheme: Theme.of(context).colorScheme
-              .copyWith(onSurface: Colors.white),
+          colorScheme: Theme.of(
+            context,
+          ).colorScheme.copyWith(onSurface: Colors.white),
         ),
         child: MessageTimeAndStatus(
           message: message,

@@ -253,25 +253,26 @@ class _SessionsShimmer extends StatelessWidget {
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         itemCount: 8,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: const [
-              SkeletonCircle(size: 34),
-              Gap(12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SkeletonBox(height: 12, width: 140, radius: 4),
-                    Gap(6),
-                    SkeletonBox(height: 10, width: 90, radius: 4),
-                  ],
-                ),
+        itemBuilder:
+            (context, index) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: const [
+                  SkeletonCircle(size: 34),
+                  Gap(12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonBox(height: 12, width: 140, radius: 4),
+                        Gap(6),
+                        SkeletonBox(height: 10, width: 90, radius: 4),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -454,9 +455,10 @@ class _DrawerRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Material(
-        color: isActive
-            ? Colors.white.withValues(alpha: 0.12)
-            : Colors.transparent,
+        color:
+            isActive
+                ? Colors.white.withValues(alpha: 0.12)
+                : Colors.transparent,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -494,9 +496,8 @@ class _DrawerRow extends StatelessWidget {
                           color: Colors.white.withValues(
                             alpha: isActive ? 1 : 0.92,
                           ),
-                          fontWeight: isActive
-                              ? FontWeight.w700
-                              : FontWeight.w600,
+                          fontWeight:
+                              isActive ? FontWeight.w700 : FontWeight.w600,
                           fontSize: 13.5,
                         ),
                       ),
@@ -580,12 +581,13 @@ class _SessionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveProvider = (isActive && selectedModel != null)
-        ? selectedModel!.provider.name
-        : ((session.activeProvider != null &&
-                  session.activeProvider!.isNotEmpty)
-              ? session.activeProvider!
-              : (selectedModel?.provider.name ?? 'gemini'));
+    final effectiveProvider =
+        (isActive && selectedModel != null)
+            ? selectedModel!.provider.name
+            : ((session.activeProvider != null &&
+                    session.activeProvider!.isNotEmpty)
+                ? session.activeProvider!
+                : (selectedModel?.provider.name ?? 'gemini'));
     final brand = AiModelIconography.brandFromWire(effectiveProvider);
     final accentColor = AiModelIconography.colorFor(brand);
     final preview = session.lastMessagePreview?.trim();
@@ -713,11 +715,12 @@ Future<void> showAiSessionActionMenu({
   ];
 
   entry = OverlayEntry(
-    builder: (context) => _AiSessionActionMenuOverlay(
-      anchor: globalPosition,
-      actions: actions,
-      onDismiss: close,
-    ),
+    builder:
+        (context) => _AiSessionActionMenuOverlay(
+          anchor: globalPosition,
+          actions: actions,
+          onDismiss: close,
+        ),
   );
 
   overlay.insert(entry);
@@ -824,8 +827,8 @@ class _AiSessionActionMenuOverlayState
                   child: Builder(
                     builder: (context) {
                       final primary = Theme.of(context).primaryColor;
-                      final topBgColor = SyncraBackdrop.gradientColors(primary)
-                          .first;
+                      final topBgColor =
+                          SyncraBackdrop.gradientColors(primary).first;
 
                       return Container(
                         width: menuWidth,

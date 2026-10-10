@@ -62,9 +62,10 @@ class StickerGridItem extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: onImageTap != null
-                        ? () => onImageTap!(index, image.path)
-                        : null,
+                    onTap:
+                        onImageTap != null
+                            ? () => onImageTap!(index, image.path)
+                            : null,
                     child: Image.file(File(image.path), fit: BoxFit.cover),
                   ),
                 ),

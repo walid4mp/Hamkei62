@@ -234,9 +234,8 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = widget.isMe
-        ? AppColors.white
-        : Theme.of(context).primaryColor;
+    final activeColor =
+        widget.isMe ? AppColors.white : Theme.of(context).primaryColor;
     final showLoadingIcon =
         widget.isUploading ||
         _isLoading ||
@@ -249,33 +248,37 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
         IconButton(
           padding: EdgeInsets.zero,
           onPressed: showLoadingIcon ? null : _initAndPlay,
-          icon: showLoadingIcon
-              ? SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CustomLoadingIndicator(
-                    color: widget.isMe
-                        ? AppColors.white
-                        : Theme.of(context).primaryColor,
+          icon:
+              showLoadingIcon
+                  ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CustomLoadingIndicator(
+                      color:
+                          widget.isMe
+                              ? AppColors.white
+                              : Theme.of(context).primaryColor,
+                    ),
+                  )
+                  : _isLoading
+                  ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CustomLoadingIndicator(
+                      color:
+                          widget.isMe
+                              ? AppColors.white
+                              : Theme.of(context).primaryColor,
+                    ),
+                  )
+                  : Icon(
+                    _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                    color:
+                        widget.isMe
+                            ? AppColors.white
+                            : Theme.of(context).primaryColor,
+                    size: 32,
                   ),
-                )
-              : _isLoading
-              ? SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CustomLoadingIndicator(
-                    color: widget.isMe
-                        ? AppColors.white
-                        : Theme.of(context).primaryColor,
-                  ),
-                )
-              : Icon(
-                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                  color: widget.isMe
-                      ? AppColors.white
-                      : Theme.of(context).primaryColor,
-                  size: 32,
-                ),
         ),
         Flexible(
           child: Column(
@@ -291,9 +294,10 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
                       duration: _effectiveDuration ?? Duration.zero,
                       activeColor: activeColor,
                       inactiveColor: activeColor.withValues(alpha: 0.25),
-                      onSeek: _isInitialized && _controller != null
-                          ? (target) => _controller!.seekTo(target)
-                          : null,
+                      onSeek:
+                          _isInitialized && _controller != null
+                              ? (target) => _controller!.seekTo(target)
+                              : null,
                     ),
                   ),
                   const Gap(8),
@@ -330,9 +334,10 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
                   Text(
                     _durationText,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: widget.isMe
-                          ? AppColors.white70
-                          : Theme.of(context).colorScheme.onSurface,
+                      color:
+                          widget.isMe
+                              ? AppColors.white70
+                              : Theme.of(context).colorScheme.onSurface,
                       fontSize: 9,
                     ),
                   ),
@@ -342,13 +347,15 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
                     children: [
                       Text(
                         FormattedDate.getMessageTime(widget.timestamp),
-                        style: Theme.of(context).textTheme.titleMedium!
-                            .copyWith(
-                              color: widget.isMe
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium!.copyWith(
+                          color:
+                              widget.isMe
                                   ? AppColors.white70
                                   : Theme.of(context).colorScheme.onSurface,
-                              fontSize: 9,
-                            ),
+                          fontSize: 9,
+                        ),
                       ),
                       if (widget.isMe) ...[
                         const Gap(2),
@@ -357,9 +364,10 @@ class _VoiceMessageBubbleWidgetState extends State<VoiceMessageBubbleWidget> {
                               ? Icons.done_all
                               : Icons.done,
                           size: 12,
-                          color: (widget.isRead ?? false)
-                              ? Colors.blue[200]
-                              : AppColors.white70,
+                          color:
+                              (widget.isRead ?? false)
+                                  ? Colors.blue[200]
+                                  : AppColors.white70,
                         ),
                       ],
                     ],

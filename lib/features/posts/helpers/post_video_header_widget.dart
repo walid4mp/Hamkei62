@@ -40,9 +40,10 @@ class PostVideoHeaderWidget extends StatelessWidget {
               builder: (context, _) {
                 final isMuted = _controller.value.volume == 0.0;
                 return CircleIconButton(
-                  icon: isMuted
-                      ? Icons.volume_off_rounded
-                      : Icons.volume_up_rounded,
+                  icon:
+                      isMuted
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_up_rounded,
                   onTap: () => _controller.setVolume(isMuted ? 1.0 : 0.0),
                 );
               },

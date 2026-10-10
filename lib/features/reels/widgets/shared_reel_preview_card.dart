@@ -63,18 +63,20 @@ class SharedReelPreviewCard extends StatelessWidget {
                         CircleAvatar(
                           radius: 10,
                           backgroundColor: Colors.white24,
-                          backgroundImage: reel.channel.channelAvatarUrl != null
-                              ? CachedNetworkImageProvider(
-                                  reel.channel.channelAvatarUrl!,
-                                )
-                              : null,
-                          child: reel.channel.channelAvatarUrl == null
-                              ? const Icon(
-                                  Icons.person,
-                                  size: 11,
-                                  color: Colors.white,
-                                )
-                              : null,
+                          backgroundImage:
+                              reel.channel.channelAvatarUrl != null
+                                  ? CachedNetworkImageProvider(
+                                    reel.channel.channelAvatarUrl!,
+                                  )
+                                  : null,
+                          child:
+                              reel.channel.channelAvatarUrl == null
+                                  ? const Icon(
+                                    Icons.person,
+                                    size: 11,
+                                    color: Colors.white,
+                                  )
+                                  : null,
                         ),
                         const SizedBox(width: 6),
                         Expanded(

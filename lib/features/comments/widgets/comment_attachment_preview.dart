@@ -37,8 +37,9 @@ class CommentAttachmentPreview extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest
-            .withValues(alpha: 0.35),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -131,14 +132,19 @@ class _PreviewThumbnail extends StatelessWidget {
               Navigator.of(context, rootNavigator: true).push(
                 PageRouteBuilder(
                   opaque: false,
-                  pageBuilder: (_, __, ___) => FullScreenMediaView(
-                    videoUrl: videoPath,
-                    isLocal: attachment.localFile != null,
-                  ),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
+                  pageBuilder:
+                      (_, __, ___) => FullScreenMediaView(
+                        videoUrl: videoPath,
+                        isLocal: attachment.localFile != null,
+                      ),
+                  transitionsBuilder: (
+                    context,
+                    animation,
+                    secondaryAnimation,
+                    child,
+                  ) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
                 ),
               );
             }
@@ -314,16 +320,17 @@ class _PreviewInfo extends StatelessWidget {
         }
         return attachment.localFile != null
             ? CommentVoicePlayer(
-                source: attachment.localFile!.path,
-                isLocalFile: true,
-                durationSeconds: attachment.durationSeconds,
-              )
+              source: attachment.localFile!.path,
+              isLocalFile: true,
+              durationSeconds: attachment.durationSeconds,
+            )
             : const SizedBox.shrink();
 
       case CommentType.file:
-        final fileName = attachment.fileName?.trim().isNotEmpty == true
-            ? attachment.fileName!
-            : 'File';
+        final fileName =
+            attachment.fileName?.trim().isNotEmpty == true
+                ? attachment.fileName!
+                : 'File';
         final ext = _getFileExtension();
         final sizeStr = _formatSize(attachment.fileSizeBytes);
 

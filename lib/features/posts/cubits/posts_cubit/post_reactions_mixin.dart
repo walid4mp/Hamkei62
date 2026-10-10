@@ -29,9 +29,9 @@ mixin PostReactionsMixin on Cubit<PostsState> {
 
         final String imagePlaceholder =
             (currentUserData?.imageUrl != null &&
-                currentUserData!.imageUrl!.startsWith('http'))
-            ? currentUserData!.imageUrl!
-            : 'asset:default';
+                    currentUserData!.imageUrl!.startsWith('http'))
+                ? currentUserData!.imageUrl!
+                : 'asset:default';
 
         if (currentEmoji == null) {
           updatedLikes.insert(0, userId);
@@ -52,21 +52,21 @@ mixin PostReactionsMixin on Cubit<PostsState> {
             old.count <= 1
                 ? updatedReactions.removeAt(oldIdx)
                 : updatedReactions[oldIdx] = old.copyWith(
-                    count: old.count - 1,
-                    reactedByMe: false,
-                  );
+                  count: old.count - 1,
+                  reactedByMe: false,
+                );
           }
         }
         if (!isRemoving) {
           final newIdx = updatedReactions.indexWhere((r) => r.emoji == emoji);
           newIdx >= 0
               ? updatedReactions[newIdx] = updatedReactions[newIdx].copyWith(
-                  count: updatedReactions[newIdx].count + 1,
-                  reactedByMe: true,
-                )
+                count: updatedReactions[newIdx].count + 1,
+                reactedByMe: true,
+              )
               : updatedReactions.add(
-                  PostReactionModel(emoji: emoji, count: 1, reactedByMe: true),
-                );
+                PostReactionModel(emoji: emoji, count: 1, reactedByMe: true),
+              );
         }
 
         return p.copyWith(

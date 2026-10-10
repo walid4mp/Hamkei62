@@ -57,9 +57,10 @@ class CustomLinkifyText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final linkColor = bubbleColor == null
-        ? Colors.blue
-        : LinkColorHelper.forBubble(bubbleColor!);
+    final linkColor =
+        bubbleColor == null
+            ? Colors.blue
+            : LinkColorHelper.forBubble(bubbleColor!);
 
     final normalizedText = EmojiHelper.normalize(text);
 
@@ -69,13 +70,14 @@ class CustomLinkifyText extends StatelessWidget {
       onOpen: _onOpen,
       maxLines: maxLines,
       overflow: overflow ?? TextOverflow.ellipsis,
-      style:
-          (style ?? Theme.of(context).textTheme.bodyMedium ?? const TextStyle())
-              .copyWith(
-                fontSize: style?.fontSize ?? 15,
-                fontFamily: null,
-                fontFamilyFallback: AppTypography.fontFallback,
-              ),
+      style: (style ??
+              Theme.of(context).textTheme.bodyMedium ??
+              const TextStyle())
+          .copyWith(
+            fontSize: style?.fontSize ?? 15,
+            fontFamily: null,
+            fontFamilyFallback: AppTypography.fontFallback,
+          ),
       linkStyle:
           linkStyle ??
           TextStyle(

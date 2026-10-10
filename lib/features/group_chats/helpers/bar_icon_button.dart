@@ -13,8 +13,6 @@ class BarIconButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Icon(icon, color: color, size: 27),
-  );
+  Widget build(BuildContext context) =>
+      GestureDetector(onTap: onTap, child: Icon(icon, color: color, size: 27));
 }

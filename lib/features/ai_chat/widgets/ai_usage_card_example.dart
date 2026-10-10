@@ -11,12 +11,12 @@ class AiUsageCard extends StatelessWidget {
     return BlocBuilder<AiUsageCubit, AiUsageState>(
       builder: (context, usage) {
         final fraction = usage.usedFraction;
-        final percentLabel = fraction != null
-            ? '${(fraction * 100).round()}%'
-            : '—';
-        final usedLabel = usage.used != null && usage.effectiveUserLimit != null
-            ? '${usage.used} / ${usage.effectiveUserLimit}'
-            : '—';
+        final percentLabel =
+            fraction != null ? '${(fraction * 100).round()}%' : '—';
+        final usedLabel =
+            usage.used != null && usage.effectiveUserLimit != null
+                ? '${usage.used} / ${usage.effectiveUserLimit}'
+                : '—';
 
         return Card(
           child: Padding(

@@ -16,9 +16,10 @@ class CreateStickerPackView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CreateStickerPackCubit(
-        mediaCacheRepository: context.read<MediaCacheRepository>(),
-      ),
+      create:
+          (_) => CreateStickerPackCubit(
+            mediaCacheRepository: context.read<MediaCacheRepository>(),
+          ),
       child: const _CreateStickerPackBody(),
     );
   }

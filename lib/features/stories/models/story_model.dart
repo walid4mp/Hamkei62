@@ -73,9 +73,8 @@ class StoryModel {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       authorId: authorId ?? this.authorId,
       authorName: authorName ?? this.authorName,
-      authorImageUrl: clearAuthorImageUrl
-          ? null
-          : (authorImageUrl ?? this.authorImageUrl),
+      authorImageUrl:
+          clearAuthorImageUrl ? null : (authorImageUrl ?? this.authorImageUrl),
       createdAt: createdAt ?? this.createdAt,
       caption: caption ?? this.caption,
       lastSeen: lastSeen ?? this.lastSeen,
@@ -114,9 +113,8 @@ class StoryModel {
       StoryColumns.contentText: contentText,
       StoryColumns.backgroundColor: backgroundColor,
       StoryColumns.authorId: authorId,
-      StoryColumns.createdAt: DateTime.parse(createdAt)
-          .toUtc()
-          .toIso8601String(),
+      StoryColumns.createdAt:
+          DateTime.parse(createdAt).toUtc().toIso8601String(),
       StoryColumns.storyCaption: caption,
 
       StoryColumns.imagePublicId: imagePublicId,
@@ -130,16 +128,18 @@ class StoryModel {
     final userData = map[SupabaseConstants.users] as Map<String, dynamic>?;
     String formattedLocalTime = '';
     if (map[StoryColumns.createdAt] != null) {
-      formattedLocalTime = DateTime.parse(
-        map[StoryColumns.createdAt].toString(),
-      ).toLocal().toString();
+      formattedLocalTime =
+          DateTime.parse(
+            map[StoryColumns.createdAt].toString(),
+          ).toLocal().toString();
     }
 
-    final List<MentionRef> mentions = map['story_mentions'] != null
-        ? (map['story_mentions'] as List<dynamic>)
-              .map((m) => MentionRef.fromMap(m as Map<String, dynamic>))
-              .toList()
-        : [];
+    final List<MentionRef> mentions =
+        map['story_mentions'] != null
+            ? (map['story_mentions'] as List<dynamic>)
+                .map((m) => MentionRef.fromMap(m as Map<String, dynamic>))
+                .toList()
+            : [];
 
     return StoryModel(
       id: map[StoryColumns.id] as String,
@@ -152,11 +152,12 @@ class StoryModel {
       authorImageUrl: userData?[UserColumns.imageUrl] as String?,
       createdAt: formattedLocalTime,
       caption: map[StoryColumns.storyCaption] as String?,
-      lastSeen: userData != null && userData[UserColumns.lastSeen] != null
-          ? DateTime.parse(userData[UserColumns.lastSeen].toString())
-          : null,
-      videoDurationSeconds: (map[StoryColumns.videoDurationSeconds] as num?)
-          ?.toInt(),
+      lastSeen:
+          userData != null && userData[UserColumns.lastSeen] != null
+              ? DateTime.parse(userData[UserColumns.lastSeen].toString())
+              : null,
+      videoDurationSeconds:
+          (map[StoryColumns.videoDurationSeconds] as num?)?.toInt(),
       mentions: mentions,
       privacyType: contentPrivacyFromString(
         map[StoryColumns.privacyType] as String?,
@@ -204,15 +205,17 @@ class StoryModel {
       authorImageUrl: map['author_image_url'] as String?,
       createdAt: map['created_at'] as String? ?? '',
       caption: map['caption'] as String?,
-      lastSeen: map['last_seen'] != null
-          ? DateTime.parse(map['last_seen'] as String)
-          : null,
+      lastSeen:
+          map['last_seen'] != null
+              ? DateTime.parse(map['last_seen'] as String)
+              : null,
       imagePublicId: map['image_public_id'] as String?,
       videoPublicId: map['video_public_id'] as String?,
       videoDurationSeconds: (map['video_duration_seconds'] as num?)?.toInt(),
-      mentions: (map['mentions'] as List<dynamic>? ?? [])
-          .map((m) => MentionRef.fromCacheJson(m as Map<String, dynamic>))
-          .toList(),
+      mentions:
+          (map['mentions'] as List<dynamic>? ?? [])
+              .map((m) => MentionRef.fromCacheJson(m as Map<String, dynamic>))
+              .toList(),
       privacyType: contentPrivacyFromString(
         map[StoryColumns.privacyType] as String?,
       ),

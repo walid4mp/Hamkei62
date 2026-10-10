@@ -48,10 +48,12 @@ void main() {
     authServices = MockSupabaseAuthServices();
     networkStatus = MockNetworkStatusService();
     authStateController = StreamController<supabase_pkg.AuthState>.broadcast();
-    when(() => authServices.authStateStream)
-        .thenAnswer((_) => authStateController.stream);
-    when(() => authServices.ensureUserExistsInDb(any()))
-        .thenAnswer((_) async {});
+    when(
+      () => authServices.authStateStream,
+    ).thenAnswer((_) => authStateController.stream);
+    when(
+      () => authServices.ensureUserExistsInDb(any()),
+    ).thenAnswer((_) async {});
   });
 
   tearDown(() async {
@@ -133,45 +135,50 @@ void main() {
       'emits AuthLoading immediately; the actual AuthSuccess only comes '
       'from the auth-state stream, not from signInWithEmail itself',
       build: buildCubit,
-      setUp: () =>
-          when(() => authServices.signInWithEmail(any(), any()))
-              .thenAnswer((_) async {}),
+      setUp:
+          () => when(
+            () => authServices.signInWithEmail(any(), any()),
+          ).thenAnswer((_) async {}),
       act: (cubit) => cubit.signInWithEmail('a@b.com', 'password123'),
       expect: () => [isA<AuthLoading>()],
       verify: (_) {
-        verify(() => authServices.signInWithEmail('a@b.com', 'password123'))
-            .called(1);
+        verify(
+          () => authServices.signInWithEmail('a@b.com', 'password123'),
+        ).called(1);
       },
     );
 
     blocTest<AuthCubit, AuthState>(
       'a wrong-password AuthException maps to a user-facing AuthFailure',
       build: buildCubit,
-      setUp: () => when(() => authServices.signInWithEmail(any(), any()))
-          .thenThrow(
-            const supabase_pkg.AuthException(
-              'Invalid login credentials',
-              code: 'invalid_credentials',
-            ),
-          ),
+      setUp:
+          () =>
+              when(() => authServices.signInWithEmail(any(), any())).thenThrow(
+                const supabase_pkg.AuthException(
+                  'Invalid login credentials',
+                  code: 'invalid_credentials',
+                ),
+              ),
       act: (cubit) => cubit.signInWithEmail('a@b.com', 'wrong'),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>().having(
-          (s) => s.errMsg,
-          'errMsg',
-          'Incorrect email or password. Please try again.',
-        ),
-      ],
+      expect:
+          () => [
+            isA<AuthLoading>(),
+            isA<AuthFailure>().having(
+              (s) => s.errMsg,
+              'errMsg',
+              'Incorrect email or password. Please try again.',
+            ),
+          ],
     );
 
     blocTest<AuthCubit, AuthState>(
       'a "cancelled"-worded error resets to AuthInitial instead of '
       'showing a scary error for what was really just the user backing out',
       build: buildCubit,
-      setUp: () =>
-          when(() => authServices.signInWithEmail(any(), any()))
-              .thenThrow(Exception('user_cancelled')),
+      setUp:
+          () => when(
+            () => authServices.signInWithEmail(any(), any()),
+          ).thenThrow(Exception('user_cancelled')),
       act: (cubit) => cubit.signInWithEmail('a@b.com', 'x'),
       expect: () => [isA<AuthLoading>(), isA<AuthInitial>()],
     );
@@ -182,9 +189,10 @@ void main() {
       'an "aborted" error (user closed the picker) resets to AuthInitial, '
       'checked before generic error handling',
       build: buildCubit,
-      setUp: () =>
-          when(() => authServices.signInWithGoogle())
-              .thenThrow(Exception('sign_in_aborted')),
+      setUp:
+          () => when(
+            () => authServices.signInWithGoogle(),
+          ).thenThrow(Exception('sign_in_aborted')),
       act: (cubit) => cubit.signInWithGoogle(),
       expect: () => [isA<AuthLoading>(), isA<AuthInitial>()],
     );
@@ -192,9 +200,10 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'any other error still goes through normal mapping → AuthFailure',
       build: buildCubit,
-      setUp: () =>
-          when(() => authServices.signInWithGoogle())
-              .thenThrow(Exception('some unexpected google error')),
+      setUp:
+          () => when(
+            () => authServices.signInWithGoogle(),
+          ).thenThrow(Exception('some unexpected google error')),
       act: (cubit) => cubit.signInWithGoogle(),
       expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
@@ -271,8 +280,10 @@ void main() {
       'a still-valid cached session → AuthSuccess immediately, no network '
       'call needed',
       build: buildCubit,
-      setUp: () => when(() => authServices.currentSession)
-          .thenReturn(testSession(user: testUser(), expiresInSeconds: 3600)),
+      setUp:
+          () => when(
+            () => authServices.currentSession,
+          ).thenReturn(testSession(user: testUser(), expiresInSeconds: 3600)),
       act: (cubit) => cubit.checkAuthStatus(),
       expect: () => [isA<AuthSuccess>()],
       verify: (_) {
@@ -285,8 +296,9 @@ void main() {
       'than forcing a sign-out the user did not ask for',
       build: buildCubit,
       setUp: () {
-        when(() => authServices.currentSession)
-            .thenReturn(testSession(user: testUser(), expiresInSeconds: -3600));
+        when(
+          () => authServices.currentSession,
+        ).thenReturn(testSession(user: testUser(), expiresInSeconds: -3600));
         when(() => networkStatus.isConnected()).thenAnswer((_) async => false);
       },
       act: (cubit) => cubit.checkAuthStatus(),
@@ -300,8 +312,9 @@ void main() {
       'an expired session while online refreshes silently → AuthSuccess',
       build: buildCubit,
       setUp: () {
-        when(() => authServices.currentSession)
-            .thenReturn(testSession(user: testUser(), expiresInSeconds: -3600));
+        when(
+          () => authServices.currentSession,
+        ).thenReturn(testSession(user: testUser(), expiresInSeconds: -3600));
         when(() => networkStatus.isConnected()).thenAnswer((_) async => true);
         when(() => authServices.refreshSession()).thenAnswer(
           (_) async => supabase_pkg.AuthResponse(

@@ -43,11 +43,12 @@ class GroupCallJoinHelper {
     if (!context.mounted) return;
     await navigator.push(
       MaterialPageRoute(
-        builder: (_) => LiveKitGroupCallView(
-          call: callToJoin,
-          currentUserId: user.id,
-          currentUserName: userName,
-        ),
+        builder:
+            (_) => LiveKitGroupCallView(
+              call: callToJoin,
+              currentUserId: user.id,
+              currentUserName: userName,
+            ),
       ),
     );
   }

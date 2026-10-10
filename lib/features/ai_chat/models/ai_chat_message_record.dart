@@ -184,9 +184,10 @@ extension AiChatMessageRecordMapping on AiChatMessageRecord {
       fileName: fileName,
       fileSizeBytes: fileSizeBytes,
       durationSeconds: durationSeconds,
-      model: (provider != null && provider!.isNotEmpty && model != null)
-          ? AiModelDisplay.fromRaw(provider!, model!)
-          : null,
+      model:
+          (provider != null && provider!.isNotEmpty && model != null)
+              ? AiModelDisplay.fromRaw(provider!, model!)
+              : null,
       replyToMessageId: replyToMessageId,
       replyToText: replyToText,
       replyToSenderRole: replyToSenderRole,

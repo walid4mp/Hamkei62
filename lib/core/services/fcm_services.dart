@@ -515,11 +515,12 @@ class FcmService {
 
   Future<String?> _fetchFcmToken(String userId) async {
     try {
-      final data = await SupabaseProvider.client
-          .from('users')
-          .select('fcm_token')
-          .eq('id', userId)
-          .maybeSingle();
+      final data =
+          await SupabaseProvider.client
+              .from('users')
+              .select('fcm_token')
+              .eq('id', userId)
+              .maybeSingle();
       final token = data?['fcm_token'] as String?;
       return (token != null && token.isNotEmpty) ? token : null;
     } catch (e) {

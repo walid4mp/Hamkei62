@@ -22,24 +22,34 @@ class VideoThumbnailGrid extends StatelessWidget {
         final isMe = item.senderId == SupabaseProvider.id;
 
         return GestureDetector(
-          onTap: () =>
-              MediaActionHelper.openFullScreenMedia(context, items, item),
-          onLongPressStart: (details) => showSharedMediaActionMenu(
-            context: context,
-            globalPosition: details.globalPosition,
-            isMe: isMe,
-            onShowInChat: () =>
-                MediaActionHelper.handleShowInChat(context, item, onShowInChat),
-            onConfirmedDelete: () => MediaActionHelper.handleDelete(
-              context,
-              item,
-              forEveryone: isMe,
-            ),
-            onOpen: () =>
-                MediaActionHelper.openFullScreenMedia(context, items, item),
-            openLabel: 'Play video',
-            openIcon: Icons.play_circle_outline_rounded,
-          ),
+          onTap:
+              () => MediaActionHelper.openFullScreenMedia(context, items, item),
+          onLongPressStart:
+              (details) => showSharedMediaActionMenu(
+                context: context,
+                globalPosition: details.globalPosition,
+                isMe: isMe,
+                onShowInChat:
+                    () => MediaActionHelper.handleShowInChat(
+                      context,
+                      item,
+                      onShowInChat,
+                    ),
+                onConfirmedDelete:
+                    () => MediaActionHelper.handleDelete(
+                      context,
+                      item,
+                      forEveryone: isMe,
+                    ),
+                onOpen:
+                    () => MediaActionHelper.openFullScreenMedia(
+                      context,
+                      items,
+                      item,
+                    ),
+                openLabel: 'Play video',
+                openIcon: Icons.play_circle_outline_rounded,
+              ),
           child: Stack(
             fit: StackFit.expand,
             children: [

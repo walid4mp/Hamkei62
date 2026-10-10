@@ -36,9 +36,10 @@ class _FullScreenVideoCaptionState extends State<FullScreenVideoCaption> {
                 Text(
                   widget.text,
                   maxLines: _isExpanded ? null : 2,
-                  overflow: _isExpanded
-                      ? TextOverflow.visible
-                      : TextOverflow.ellipsis,
+                  overflow:
+                      _isExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13.5,

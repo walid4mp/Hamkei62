@@ -168,8 +168,8 @@ class CreateStickerPackPrivacySection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  onPressed: () async =>
-                      await showCreatePackFriendPicker(context),
+                  onPressed:
+                      () async => await showCreatePackFriendPicker(context),
                   child: Text(
                     'Edit',
                     style: TextStyle(

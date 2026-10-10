@@ -63,19 +63,20 @@ class ChatsCubit extends Cubit<ChatsState>
     _reactionsChannel?.unsubscribe();
 
     final channelName = 'public:message_reactions_overview_$_currentUserId';
-    _reactionsChannel = SupabaseProvider.client.channel(channelName)
-      ..onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: SupabaseConstants.messageReactions,
-        callback: (payload) {
-          _refreshDebounce?.cancel();
-          _refreshDebounce = Timer(const Duration(milliseconds: 100), () {
-            getChats(isRefresh: true, silent: true);
-          });
-        },
-      )
-      ..subscribe();
+    _reactionsChannel =
+        SupabaseProvider.client.channel(channelName)
+          ..onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: SupabaseConstants.messageReactions,
+            callback: (payload) {
+              _refreshDebounce?.cancel();
+              _refreshDebounce = Timer(const Duration(milliseconds: 100), () {
+                getChats(isRefresh: true, silent: true);
+              });
+            },
+          )
+          ..subscribe();
   }
 
   void _listenToChatsStream() {
@@ -103,16 +104,17 @@ class ChatsCubit extends Cubit<ChatsState>
   void _emitWithPresence() {
     if (isClosed || _cachedChats.isEmpty) return;
 
-    final updatedChats = _cachedChats.map((chat) {
-      final action = actionFor(chat.id);
-      final isTyping = action == ChatActionType.typing;
-      final isRecording = action == ChatActionType.recording;
+    final updatedChats =
+        _cachedChats.map((chat) {
+          final action = actionFor(chat.id);
+          final isTyping = action == ChatActionType.typing;
+          final isRecording = action == ChatActionType.recording;
 
-      if (chat.isTyping == isTyping && chat.isRecording == isRecording) {
-        return chat;
-      }
-      return chat.copyWith(isTyping: isTyping, isRecording: isRecording);
-    }).toList();
+          if (chat.isTyping == isTyping && chat.isRecording == isRecording) {
+            return chat;
+          }
+          return chat.copyWith(isTyping: isTyping, isRecording: isRecording);
+        }).toList();
 
     emit(ChatsSuccessloaded(chats: updatedChats));
   }
@@ -144,9 +146,8 @@ class ChatsCubit extends Cubit<ChatsState>
 
     if (isClosed) return;
 
-    final newList = _cachedChats
-        .where((c) => !otherUserIds.contains(c.id))
-        .toList();
+    final newList =
+        _cachedChats.where((c) => !otherUserIds.contains(c.id)).toList();
     _cachedChats = newList;
     emit(ChatsSuccessloaded(chats: newList));
     _persistChatsSnapshot(newList);
@@ -199,9 +200,8 @@ class ChatsCubit extends Cubit<ChatsState>
 
       if (isClosed) return;
 
-      final chats = fetchedChats
-          .where((c) => !_isHiddenByLocalClear(c))
-          .toList();
+      final chats =
+          fetchedChats.where((c) => !_isHiddenByLocalClear(c)).toList();
       _cachedChats = chats;
       _showSkeleton = false;
 

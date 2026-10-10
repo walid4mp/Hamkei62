@@ -69,11 +69,13 @@ class AiSettingsView extends StatelessWidget {
                           SettingsItemData(
                             icon: Icons.auto_fix_high_rounded,
                             label: 'AI Auto Complete',
-                            subtitle: 'Tap the AI icon to generate captions & replies',
+                            subtitle:
+                                'Tap the AI icon to generate captions & replies',
                             toggle: aiState.autoCompleteEnabled,
-                            onToggle: (v) => context
-                                .read<AiPreferencesCubit>()
-                                .toggleAutoComplete(v),
+                            onToggle:
+                                (v) => context
+                                    .read<AiPreferencesCubit>()
+                                    .toggleAutoComplete(v),
                           ),
                           SettingsItemData(
                             icon: Icons.spellcheck_rounded,
@@ -81,44 +83,52 @@ class AiSettingsView extends StatelessWidget {
                             subtitle:
                                 'Automatic spelling suggestions while you type',
                             toggle: aiState.autoDetectEnabled,
-                            onToggle: (v) => context
-                                .read<AiPreferencesCubit>()
-                                .toggleAutoDetect(v),
-                            footer: aiState.autoDetectEnabled
-                                ? const _AutoDetectQuotaWarning()
-                                : null,
+                            onToggle:
+                                (v) => context
+                                    .read<AiPreferencesCubit>()
+                                    .toggleAutoDetect(v),
+                            footer:
+                                aiState.autoDetectEnabled
+                                    ? const _AutoDetectQuotaWarning()
+                                    : null,
                           ),
                           SettingsItemData(
                             icon: Icons.mode_comment_outlined,
                             label: 'AI Comment Suggestions',
                             subtitle: 'Quick AI-suggested replies under posts',
                             toggle: aiState.commentSuggestionsEnabled,
-                            onToggle: (v) => context
-                                .read<AiPreferencesCubit>()
-                                .toggleCommentSuggestions(v),
+                            onToggle:
+                                (v) => context
+                                    .read<AiPreferencesCubit>()
+                                    .toggleCommentSuggestions(v),
                           ),
                           SettingsItemData(
                             icon: Icons.translate_rounded,
                             label: 'Auto Complete Language',
                             subtitle: aiState.language.displayLabel,
-                            onTap: () =>
-                                _pickAiLanguage(context, aiState.language),
+                            onTap:
+                                () =>
+                                    _pickAiLanguage(context, aiState.language),
                           ),
                           // [NEW]
                           SettingsItemData(
                             icon: Icons.record_voice_over_rounded,
                             label: 'Reply Tone',
                             subtitle: aiState.replyTone.displayLabel,
-                            onTap: () =>
-                                _pickReplyTone(context, aiState.replyTone),
+                            onTap:
+                                () =>
+                                    _pickReplyTone(context, aiState.replyTone),
                           ),
                           // [NEW]
                           SettingsItemData(
                             icon: Icons.straighten_rounded,
                             label: 'Reply Length',
                             subtitle: aiState.replyLength.displayLabel,
-                            onTap: () =>
-                                _pickReplyLength(context, aiState.replyLength),
+                            onTap:
+                                () => _pickReplyLength(
+                                  context,
+                                  aiState.replyLength,
+                                ),
                           ),
                         ],
                       ),

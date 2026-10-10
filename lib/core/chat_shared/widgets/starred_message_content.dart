@@ -32,26 +32,29 @@ class StarredMessageContent extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final maxBubbleWidth = MediaQuery.sizeOf(context).width * 0.72;
 
-    final bubbleColor = entry.isMe
-        ? Theme.of(context).primaryColor
-        : (isDarkMode
-              ? Theme.of(context).colorScheme.surfaceContainerHigh
-              : Colors.grey.shade200);
+    final bubbleColor =
+        entry.isMe
+            ? Theme.of(context).primaryColor
+            : (isDarkMode
+                ? Theme.of(context).colorScheme.surfaceContainerHigh
+                : Colors.grey.shade200);
 
-    final EdgeInsetsGeometry bubblePadding = _isStickerOrGif
-        ? EdgeInsets.zero
-        : (_isImage || _isVideo)
-        ? const EdgeInsets.all(3)
-        : const EdgeInsets.symmetric(horizontal: 10, vertical: 8);
+    final EdgeInsetsGeometry bubblePadding =
+        _isStickerOrGif
+            ? EdgeInsets.zero
+            : (_isImage || _isVideo)
+            ? const EdgeInsets.all(3)
+            : const EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: maxBubbleWidth,
-        minWidth: _isVoice
-            ? (_kStarredVoiceBubbleWidth > maxBubbleWidth
-                  ? maxBubbleWidth
-                  : _kStarredVoiceBubbleWidth)
-            : (_isImage || _isVideo ? 200 : 48),
+        minWidth:
+            _isVoice
+                ? (_kStarredVoiceBubbleWidth > maxBubbleWidth
+                    ? maxBubbleWidth
+                    : _kStarredVoiceBubbleWidth)
+                : (_isImage || _isVideo ? 200 : 48),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,17 +83,18 @@ class StarredMessageContent extends StatelessWidget {
                 bottomRight: Radius.circular(entry.isMe ? 4 : 20),
               ),
             ),
-            child: _isStickerOrGif
-                ? _buildBody(context, isDarkMode)
-                : ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(18),
-                      topRight: const Radius.circular(18),
-                      bottomLeft: Radius.circular(entry.isMe ? 18 : 4),
-                      bottomRight: Radius.circular(entry.isMe ? 4 : 18),
+            child:
+                _isStickerOrGif
+                    ? _buildBody(context, isDarkMode)
+                    : ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(18),
+                        topRight: const Radius.circular(18),
+                        bottomLeft: Radius.circular(entry.isMe ? 18 : 4),
+                        bottomRight: Radius.circular(entry.isMe ? 4 : 18),
+                      ),
+                      child: _buildBody(context, isDarkMode),
                     ),
-                    child: _buildBody(context, isDarkMode),
-                  ),
           ),
         ],
       ),
@@ -98,9 +102,10 @@ class StarredMessageContent extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, bool isDarkMode) {
-    final textColor = entry.isMe
-        ? Colors.white
-        : (isDarkMode ? Colors.white : Colors.black87);
+    final textColor =
+        entry.isMe
+            ? Colors.white
+            : (isDarkMode ? Colors.white : Colors.black87);
     final hasCaption =
         entry.caption != null && entry.caption!.trim().isNotEmpty;
 
@@ -113,14 +118,15 @@ class StarredMessageContent extends StatelessWidget {
             SizedBox(
               width: 260,
               height: 240,
-              child: entry.imageUrl != null
-                  ? ImageMessageWidget(
-                      imageUrl: entry.imageUrl!,
-                      caption: entry.caption,
-                      isMe: entry.isMe,
-                      fileSizeBytes: entry.fileSizeBytes,
-                    )
-                  : const SizedBox.shrink(),
+              child:
+                  entry.imageUrl != null
+                      ? ImageMessageWidget(
+                        imageUrl: entry.imageUrl!,
+                        caption: entry.caption,
+                        isMe: entry.isMe,
+                        fileSizeBytes: entry.fileSizeBytes,
+                      )
+                      : const SizedBox.shrink(),
             ),
             if (hasCaption)
               Padding(
@@ -151,15 +157,16 @@ class StarredMessageContent extends StatelessWidget {
             SizedBox(
               width: 260,
               height: 190,
-              child: entry.videoUrl != null
-                  ? VideoMessageWidget(
-                      videoUrl: entry.videoUrl!,
-                      caption: entry.caption,
-                      isMe: entry.isMe,
-                      fileSizeBytes: entry.fileSizeBytes,
-                      durationSeconds: entry.durationSeconds,
-                    )
-                  : const SizedBox.shrink(),
+              child:
+                  entry.videoUrl != null
+                      ? VideoMessageWidget(
+                        videoUrl: entry.videoUrl!,
+                        caption: entry.caption,
+                        isMe: entry.isMe,
+                        fileSizeBytes: entry.fileSizeBytes,
+                        durationSeconds: entry.durationSeconds,
+                      )
+                      : const SizedBox.shrink(),
             ),
             if (hasCaption)
               Padding(
@@ -201,9 +208,10 @@ class StarredMessageContent extends StatelessWidget {
         child: SizedBox(
           width: 190,
           height: 190,
-          child: entry.imageUrl != null
-              ? GifMessageBubble(url: entry.imageUrl!, isMe: entry.isMe)
-              : const SizedBox.shrink(),
+          child:
+              entry.imageUrl != null
+                  ? GifMessageBubble(url: entry.imageUrl!, isMe: entry.isMe)
+                  : const SizedBox.shrink(),
         ),
       );
     }
@@ -214,9 +222,10 @@ class StarredMessageContent extends StatelessWidget {
         child: SizedBox(
           width: 145,
           height: 145,
-          child: entry.imageUrl != null
-              ? StickerMessageBubble(url: entry.imageUrl!)
-              : const SizedBox.shrink(),
+          child:
+              entry.imageUrl != null
+                  ? StickerMessageBubble(url: entry.imageUrl!)
+                  : const SizedBox.shrink(),
         ),
       );
     }
@@ -232,9 +241,10 @@ class StarredMessageContent extends StatelessWidget {
     }
 
     if (_isText) {
-      final displayText = (entry.caption != null && entry.caption!.isNotEmpty)
-          ? entry.caption!
-          : entry.text;
+      final displayText =
+          (entry.caption != null && entry.caption!.isNotEmpty)
+              ? entry.caption!
+              : entry.text;
       return MessageLinkPreview(
         text: displayText,
         isMe: entry.isMe,

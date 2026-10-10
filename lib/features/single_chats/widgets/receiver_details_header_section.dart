@@ -91,22 +91,24 @@ class ReceiverDetailsHeaderSection extends StatelessWidget {
                       Flexible(
                         child: Text(
                           receiverUser.name,
-                          style: Theme.of(context).textTheme.titleSmall!
-                              .copyWith(
-                                color: Theme.of(context).primaryColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleSmall!.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       ValueListenableBuilder<bool>(
-                        valueListenable: context
-                            .read<ChatDetailsCubit>()
-                            .muteStatus,
-                        builder: (context, isMuted, _) => isMuted
-                            ? const MutedBadgeIcon(size: 10)
-                            : const SizedBox.shrink(),
+                        valueListenable:
+                            context.read<ChatDetailsCubit>().muteStatus,
+                        builder:
+                            (context, isMuted, _) =>
+                                isMuted
+                                    ? const MutedBadgeIcon(size: 10)
+                                    : const SizedBox.shrink(),
                       ),
                     ],
                   ),
@@ -115,19 +117,20 @@ class ReceiverDetailsHeaderSection extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: AlignmentDirectional.centerStart,
                     child: ValueListenableBuilder<ChatActionType>(
-                      valueListenable: context
-                          .read<ChatDetailsCubit>()
-                          .receiverAction,
+                      valueListenable:
+                          context.read<ChatDetailsCubit>().receiverAction,
                       builder: (context, action, _) {
                         if (action != ChatActionType.none) {
                           return AnimatedActivityText(
-                            text: action == ChatActionType.recording
-                                ? 'recording audio...'
-                                : 'typing...',
+                            text:
+                                action == ChatActionType.recording
+                                    ? 'recording audio...'
+                                    : 'typing...',
                             style: TextStyle(
-                              color: action == ChatActionType.recording
-                                  ? Colors.red.shade700
-                                  : Colors.green,
+                              color:
+                                  action == ChatActionType.recording
+                                      ? Colors.red.shade700
+                                      : Colors.green,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               fontStyle: FontStyle.italic,
@@ -203,18 +206,19 @@ class ReceiverDetailsHeaderSection extends StatelessWidget {
                         .activate();
                   }
                 },
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
-                    value: 'search',
-                    child: Row(
-                      children: [
-                        Icon(Icons.search_rounded, size: 20),
-                        Gap(10),
-                        Text('Search'),
-                      ],
-                    ),
-                  ),
-                ],
+                itemBuilder:
+                    (_) => const [
+                      PopupMenuItem(
+                        value: 'search',
+                        child: Row(
+                          children: [
+                            Icon(Icons.search_rounded, size: 20),
+                            Gap(10),
+                            Text('Search'),
+                          ],
+                        ),
+                      ),
+                    ],
               ),
             ],
           ),

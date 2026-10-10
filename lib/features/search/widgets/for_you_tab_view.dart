@@ -125,27 +125,35 @@ class _ForYouTabViewState extends State<ForYouTabView>
               return false;
             },
             child: BlocBuilder<SearchPostsCubit, SearchPostsState>(
-              builder: (context, searchState) =>
-                  _buildSearchResults(context, theme, searchState, query),
+              builder:
+                  (context, searchState) =>
+                      _buildSearchResults(context, theme, searchState, query),
             ),
           );
         }
         return BlocBuilder<PostsCubit, PostsState>(
-          buildWhen: (p, c) =>
-              c is PostsLoading || c is PostsLoaded || c is PostsError,
+          buildWhen:
+              (p, c) =>
+                  c is PostsLoading || c is PostsLoaded || c is PostsError,
           builder: (context, postsState) {
             return BlocBuilder<SearchReelsCubit, SearchReelsState>(
-              builder: (context, reelsState) =>
-                  NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (scrollInfo.metrics.pixels >=
-                          scrollInfo.metrics.maxScrollExtent - 200) {
-                        _maybeTopUpReels();
-                      }
-                      return false;
-                    },
-                    child: _buildBody(context, theme, postsState, reelsState),
-                  ),
+              builder:
+                  (context, reelsState) =>
+                      NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification scrollInfo) {
+                          if (scrollInfo.metrics.pixels >=
+                              scrollInfo.metrics.maxScrollExtent - 200) {
+                            _maybeTopUpReels();
+                          }
+                          return false;
+                        },
+                        child: _buildBody(
+                          context,
+                          theme,
+                          postsState,
+                          reelsState,
+                        ),
+                      ),
             );
           },
         );
@@ -183,30 +191,32 @@ class _ForYouTabViewState extends State<ForYouTabView>
         ),
         SliverList.separated(
           itemCount: posts.length,
-          itemBuilder: (context, i) => Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SearchViewMetrics.horizontalPadding,
-            ),
-            child: PostItemWidget(
-              key: ValueKey(posts[i].id),
-              currPost: posts[i],
-              postsCubit: postsCubit,
-            ),
-          ),
-          separatorBuilder: (context, i) =>
-              const Gap(SearchViewMetrics.itemGap),
+          itemBuilder:
+              (context, i) => Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: SearchViewMetrics.horizontalPadding,
+                ),
+                child: PostItemWidget(
+                  key: ValueKey(posts[i].id),
+                  currPost: posts[i],
+                  postsCubit: postsCubit,
+                ),
+              ),
+          separatorBuilder:
+              (context, i) => const Gap(SearchViewMetrics.itemGap),
         ),
         SliverToBoxAdapter(
           child: SizedBox(
             height: SearchViewMetrics.bottomGap,
-            child: !state.hasReachedMax
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : null,
+            child:
+                !state.hasReachedMax
+                    ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                    : null,
           ),
         ),
       ],
@@ -249,9 +259,10 @@ class _ForYouTabViewState extends State<ForYouTabView>
       _rankedPosts = _rankedPosts!.map((p) => byId[p.id] ?? p).toList();
     }
 
-    final reelsPool = reelsState is SearchReelsLoaded
-        ? reelsState.reels
-        : const <ReelModel>[];
+    final reelsPool =
+        reelsState is SearchReelsLoaded
+            ? reelsState.reels
+            : const <ReelModel>[];
 
     final items = _mergeForYouFeed(
       rankedPosts: _rankedPosts!,
@@ -269,10 +280,10 @@ class _ForYouTabViewState extends State<ForYouTabView>
           ),
           SliverList.separated(
             itemCount: items.length,
-            itemBuilder: (context, i) =>
-                _buildItem(context, items[i], postsCubit),
-            separatorBuilder: (context, i) =>
-                const Gap(SearchViewMetrics.itemGap),
+            itemBuilder:
+                (context, i) => _buildItem(context, items[i], postsCubit),
+            separatorBuilder:
+                (context, i) => const Gap(SearchViewMetrics.itemGap),
           ),
           const SliverToBoxAdapter(
             child: SizedBox(height: SearchViewMetrics.bottomGap),

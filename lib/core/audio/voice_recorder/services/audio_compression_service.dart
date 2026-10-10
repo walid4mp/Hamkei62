@@ -63,9 +63,8 @@ class AudioCompressionService {
 
   String _buildM4aPath(String wavPath) {
     final dotIndex = wavPath.lastIndexOf('.');
-    final withoutExt = dotIndex == -1
-        ? wavPath
-        : wavPath.substring(0, dotIndex);
+    final withoutExt =
+        dotIndex == -1 ? wavPath : wavPath.substring(0, dotIndex);
     return '$withoutExt.m4a';
   }
 

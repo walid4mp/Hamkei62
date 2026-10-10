@@ -174,11 +174,12 @@ mixin PostsRealtimeMixin on Cubit<PostsState> {
     final affectsCurrentFeed = cachedPosts.any((p) => p.authorId == userId);
     if (!affectsCurrentFeed || isClosed) return;
 
-    cachedPosts = cachedPosts.map((p) {
-      return p.authorId == userId
-          ? p.copyWith(isOnline: isConsideredOnline)
-          : p;
-    }).toList();
+    cachedPosts =
+        cachedPosts.map((p) {
+          return p.authorId == userId
+              ? p.copyWith(isOnline: isConsideredOnline)
+              : p;
+        }).toList();
 
     emit(PostsLoaded(cachedPosts, DateTime.now()));
   }

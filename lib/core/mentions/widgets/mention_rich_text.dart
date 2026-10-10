@@ -126,26 +126,29 @@ class _MentionRichTextState extends State<MentionRichText> {
     final double vPad = isCompact ? 0.5 : 1.2;
     final double borderRadius = isCompact ? 4.0 : 6.0;
 
-    final Color pillBgColor = isOnPrimaryBubble
-        ? Colors.white.withValues(alpha: 0.22)
-        : isWhiteOverlayText
-        ? Color.alphaBlend(
-            primaryColor.withValues(alpha: 0.18),
-            Colors.white.withValues(alpha: 0.92),
-          )
-        : resolvedMentionColor.withValues(alpha: isDark ? 0.20 : 0.12);
+    final Color pillBgColor =
+        isOnPrimaryBubble
+            ? Colors.white.withValues(alpha: 0.22)
+            : isWhiteOverlayText
+            ? Color.alphaBlend(
+              primaryColor.withValues(alpha: 0.18),
+              Colors.white.withValues(alpha: 0.92),
+            )
+            : resolvedMentionColor.withValues(alpha: isDark ? 0.20 : 0.12);
 
-    final Color pillBorderColor = isOnPrimaryBubble
-        ? Colors.white.withValues(alpha: 0.48)
-        : isWhiteOverlayText
-        ? primaryColor.withValues(alpha: 0.55)
-        : resolvedMentionColor.withValues(alpha: isDark ? 0.45 : 0.28);
+    final Color pillBorderColor =
+        isOnPrimaryBubble
+            ? Colors.white.withValues(alpha: 0.48)
+            : isWhiteOverlayText
+            ? primaryColor.withValues(alpha: 0.55)
+            : resolvedMentionColor.withValues(alpha: isDark ? 0.45 : 0.28);
 
-    final Color pillTextColor = isOnPrimaryBubble
-        ? Colors.white
-        : isWhiteOverlayText
-        ? primaryColor
-        : resolvedMentionColor;
+    final Color pillTextColor =
+        isOnPrimaryBubble
+            ? Colors.white
+            : isWhiteOverlayText
+            ? primaryColor
+            : resolvedMentionColor;
 
     final TextStyle pillTextStyle = mentionStyle.copyWith(
       color: pillTextColor,
@@ -169,15 +172,16 @@ class _MentionRichTextState extends State<MentionRichText> {
                 decoration: TextDecoration.underline,
                 decorationColor: widget.linkColor ?? Colors.blue,
               ),
-              recognizer: forMeasurement
-                  ? null
-                  : _recognizerFor(() async {
-                      if (widget.onLinkTap != null) {
-                        await widget.onLinkTap!(element.url);
-                      } else {
-                        await _openLink(element.url);
-                      }
-                    }),
+              recognizer:
+                  forMeasurement
+                      ? null
+                      : _recognizerFor(() async {
+                        if (widget.onLinkTap != null) {
+                          await widget.onLinkTap!(element.url);
+                        } else {
+                          await _openLink(element.url);
+                        }
+                      }),
             ),
           );
         } else {
@@ -196,9 +200,10 @@ class _MentionRichTextState extends State<MentionRichText> {
       addLinkifiedSegment(text.substring(cursor, mention.startIndex));
 
       final mentionSlice = text.substring(mention.startIndex, mention.endIndex);
-      final cleanName = mentionSlice.startsWith('@')
-          ? mentionSlice.substring(1).trim()
-          : mentionSlice.trim();
+      final cleanName =
+          mentionSlice.startsWith('@')
+              ? mentionSlice.substring(1).trim()
+              : mentionSlice.trim();
       final displayMentionText = '@${EmojiHelper.normalize(cleanName)}';
 
       if (forMeasurement) {
@@ -212,8 +217,8 @@ class _MentionRichTextState extends State<MentionRichText> {
             alignment: PlaceholderAlignment.middle,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () =>
-                  widget.onMentionTap(mention.mentionedUserId, cleanName),
+              onTap:
+                  () => widget.onMentionTap(mention.mentionedUserId, cleanName),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 1.5),
                 padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
@@ -289,14 +294,13 @@ class _MentionRichTextState extends State<MentionRichText> {
   Widget build(BuildContext context) {
     _disposeRecognizers();
 
-    final defaultStyle =
-        (widget.style ??
-                Theme.of(context).textTheme.bodyMedium ??
-                const TextStyle())
-            .copyWith(
-              fontSize: widget.style?.fontSize ?? 14,
-              height: widget.style?.height ?? 1.4,
-            );
+    final defaultStyle = (widget.style ??
+            Theme.of(context).textTheme.bodyMedium ??
+            const TextStyle())
+        .copyWith(
+          fontSize: widget.style?.fontSize ?? 14,
+          height: widget.style?.height ?? 1.4,
+        );
 
     final resolvedMentionColor =
         widget.mentionColor ?? Theme.of(context).primaryColor;

@@ -200,9 +200,10 @@ class GroupMessageModel {
     }
 
     final deletedForRaw = map['deleted_for'];
-    final List<String> deletedForList = deletedForRaw is List
-        ? deletedForRaw.map((e) => e.toString()).toList()
-        : const [];
+    final List<String> deletedForList =
+        deletedForRaw is List
+            ? deletedForRaw.map((e) => e.toString()).toList()
+            : const [];
 
     return GroupMessageModel(
       id: map['id'] as String,
@@ -217,46 +218,51 @@ class GroupMessageModel {
       imageUrl: _nullIfEmpty(map['image_url']),
       videoUrl: _nullIfEmpty(map['video_url']),
       voiceUrl: _nullIfEmpty(map['voice_url']),
-      durationSeconds: (map[GroupMessageColumns.durationSeconds] as num?)
-          ?.toInt(),
+      durationSeconds:
+          (map[GroupMessageColumns.durationSeconds] as num?)?.toInt(),
       fileUrl: _nullIfEmpty(map['file_url']),
 
       fileName: map['file_name'] == '' ? null : map['file_name'] as String?,
       fileSizeBytes: (map['file_size_bytes'] as num?)?.toInt(),
       caption: map['caption'] == '' ? null : map['caption'] as String?,
-      replyToMessageId: map['reply_to_message_id'] == ''
-          ? null
-          : map['reply_to_message_id'] as String?,
-      replyToText: map['reply_to_text'] == ''
-          ? null
-          : map['reply_to_text'] as String?,
-      replyToSenderId: map['reply_to_sender_id'] == ''
-          ? null
-          : map['reply_to_sender_id'] as String?,
-      replyToSenderName: map['reply_to_sender_name'] == ''
-          ? null
-          : map['reply_to_sender_name'] as String?,
-      replyToMessageType: map['reply_to_message_type'] == ''
-          ? null
-          : map['reply_to_message_type'] as String?,
+      replyToMessageId:
+          map['reply_to_message_id'] == ''
+              ? null
+              : map['reply_to_message_id'] as String?,
+      replyToText:
+          map['reply_to_text'] == '' ? null : map['reply_to_text'] as String?,
+      replyToSenderId:
+          map['reply_to_sender_id'] == ''
+              ? null
+              : map['reply_to_sender_id'] as String?,
+      replyToSenderName:
+          map['reply_to_sender_name'] == ''
+              ? null
+              : map['reply_to_sender_name'] as String?,
+      replyToMessageType:
+          map['reply_to_message_type'] == ''
+              ? null
+              : map['reply_to_message_type'] as String?,
       replyToMediaUrl: _nullIfEmpty(map['reply_to_media_url']),
       mentions: mentions,
       reactions: reactionsMap,
-      reactionsCreatedAt: reactionsCreatedAtMap.isEmpty
-          ? null
-          : reactionsCreatedAtMap,
+      reactionsCreatedAt:
+          reactionsCreatedAtMap.isEmpty ? null : reactionsCreatedAtMap,
       readBy: readBySet,
       isEdited: (map[GroupMessageColumns.isEdited] as bool?) ?? false,
       deletedFor: deletedForList,
-      forwardedFromUserId: map['forwarded_from_user_id'] == ''
-          ? null
-          : map['forwarded_from_user_id'] as String?,
-      forwardedFromUserName: map['forwarded_from_user_name'] == ''
-          ? null
-          : map['forwarded_from_user_name'] as String?,
-      forwardedFromUserAvatar: map['forwarded_from_user_avatar'] == ''
-          ? null
-          : map['forwarded_from_user_avatar'] as String?,
+      forwardedFromUserId:
+          map['forwarded_from_user_id'] == ''
+              ? null
+              : map['forwarded_from_user_id'] as String?,
+      forwardedFromUserName:
+          map['forwarded_from_user_name'] == ''
+              ? null
+              : map['forwarded_from_user_name'] as String?,
+      forwardedFromUserAvatar:
+          map['forwarded_from_user_avatar'] == ''
+              ? null
+              : map['forwarded_from_user_avatar'] as String?,
       systemEventData: map['system_event_data'] as Map<String, dynamic>?,
       targetId: map['target_id'] as String?,
       targetName: map['target_name'] as String?,
@@ -294,35 +300,37 @@ class GroupMessageModel {
 
   factory GroupMessageModel.fromJson(Map<String, dynamic> json) {
     final mentionsRaw = json['mentions'];
-    final List<MentionRef> mentionsList = mentionsRaw is List
-        ? mentionsRaw
-              .map((m) => MentionRef.fromCacheJson(m as Map<String, dynamic>))
-              .toList()
-        : const [];
+    final List<MentionRef> mentionsList =
+        mentionsRaw is List
+            ? mentionsRaw
+                .map((m) => MentionRef.fromCacheJson(m as Map<String, dynamic>))
+                .toList()
+            : const [];
 
     final reactionsRaw = json['reactions'];
-    final Map<String, String> reactionsMap = reactionsRaw is Map
-        ? reactionsRaw.map(
-            (key, value) => MapEntry(key.toString(), value.toString()),
-          )
-        : {};
+    final Map<String, String> reactionsMap =
+        reactionsRaw is Map
+            ? reactionsRaw.map(
+              (key, value) => MapEntry(key.toString(), value.toString()),
+            )
+            : {};
     final reactionsCreatedAtRaw = json['reactionsCreatedAt'];
     final Map<String, String>? reactionsCreatedAtMap =
         reactionsCreatedAtRaw is Map
-        ? reactionsCreatedAtRaw.map(
-            (key, value) => MapEntry(key.toString(), value.toString()),
-          )
-        : null;
+            ? reactionsCreatedAtRaw.map(
+              (key, value) => MapEntry(key.toString(), value.toString()),
+            )
+            : null;
 
     final readByRaw = json['read_by'];
-    final Set<String> readBySet = readByRaw is List
-        ? readByRaw.map((e) => e.toString()).toSet()
-        : {};
+    final Set<String> readBySet =
+        readByRaw is List ? readByRaw.map((e) => e.toString()).toSet() : {};
 
     final deletedForRaw = json['deleted_for'];
-    final List<String> deletedForList = deletedForRaw is List
-        ? deletedForRaw.map((e) => e.toString()).toList()
-        : const [];
+    final List<String> deletedForList =
+        deletedForRaw is List
+            ? deletedForRaw.map((e) => e.toString()).toList()
+            : const [];
 
     return GroupMessageModel(
       id: json['id'] as String,
@@ -337,27 +345,30 @@ class GroupMessageModel {
       imageUrl: json['image_url'] as String?,
       videoUrl: json['video_url'] as String?,
       voiceUrl: json['voice_url'] as String?,
-      durationSeconds: (json[GroupMessageColumns.durationSeconds] as num?)
-          ?.toInt(),
+      durationSeconds:
+          (json[GroupMessageColumns.durationSeconds] as num?)?.toInt(),
       fileUrl: json['file_url'] as String?,
       fileName: json['file_name'] == '' ? null : json['file_name'] as String?,
       fileSizeBytes: (json['file_size_bytes'] as num?)?.toInt(),
       caption: json['caption'] == '' ? null : json['caption'] as String?,
-      replyToMessageId: json['reply_to_message_id'] == ''
-          ? null
-          : json['reply_to_message_id'] as String?,
-      replyToText: json['reply_to_text'] == ''
-          ? null
-          : json['reply_to_text'] as String?,
-      replyToSenderId: json['reply_to_sender_id'] == ''
-          ? null
-          : json['reply_to_sender_id'] as String?,
-      replyToSenderName: json['reply_to_sender_name'] == ''
-          ? null
-          : json['reply_to_sender_name'] as String?,
-      replyToMessageType: json['reply_to_message_type'] == ''
-          ? null
-          : json['reply_to_message_type'] as String?,
+      replyToMessageId:
+          json['reply_to_message_id'] == ''
+              ? null
+              : json['reply_to_message_id'] as String?,
+      replyToText:
+          json['reply_to_text'] == '' ? null : json['reply_to_text'] as String?,
+      replyToSenderId:
+          json['reply_to_sender_id'] == ''
+              ? null
+              : json['reply_to_sender_id'] as String?,
+      replyToSenderName:
+          json['reply_to_sender_name'] == ''
+              ? null
+              : json['reply_to_sender_name'] as String?,
+      replyToMessageType:
+          json['reply_to_message_type'] == ''
+              ? null
+              : json['reply_to_message_type'] as String?,
       replyToMediaUrl: _nullIfEmpty(json['reply_to_media_url']),
       mentions: mentionsList,
       reactions: reactionsMap,
@@ -366,15 +377,18 @@ class GroupMessageModel {
       readBy: readBySet,
       isEdited: (json['is_edited'] as bool?) ?? false,
       deletedFor: deletedForList,
-      forwardedFromUserId: json['forwarded_from_user_id'] == ''
-          ? null
-          : json['forwarded_from_user_id'] as String?,
-      forwardedFromUserName: json['forwarded_from_user_name'] == ''
-          ? null
-          : json['forwarded_from_user_name'] as String?,
-      forwardedFromUserAvatar: json['forwarded_from_user_avatar'] == ''
-          ? null
-          : json['forwarded_from_user_avatar'] as String?,
+      forwardedFromUserId:
+          json['forwarded_from_user_id'] == ''
+              ? null
+              : json['forwarded_from_user_id'] as String?,
+      forwardedFromUserName:
+          json['forwarded_from_user_name'] == ''
+              ? null
+              : json['forwarded_from_user_name'] as String?,
+      forwardedFromUserAvatar:
+          json['forwarded_from_user_avatar'] == ''
+              ? null
+              : json['forwarded_from_user_avatar'] as String?,
       systemEventData: json['system_event_data'] as Map<String, dynamic>?,
       targetId: json['target_id'] as String?,
       targetName: json['target_name'] as String?,

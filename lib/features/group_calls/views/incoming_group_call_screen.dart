@@ -137,11 +137,12 @@ class _IncomingGroupCallScreenState extends State<IncomingGroupCallScreen>
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => LiveKitGroupCallView(
-            call: updatedCall,
-            currentUserId: SupabaseProvider.id,
-            currentUserName: userName,
-          ),
+          builder:
+              (_) => LiveKitGroupCallView(
+                call: updatedCall,
+                currentUserId: SupabaseProvider.id,
+                currentUserName: userName,
+              ),
         ),
       );
     } finally {
@@ -185,12 +186,14 @@ class _IncomingGroupCallScreenState extends State<IncomingGroupCallScreen>
                     SizedBox(height: metrics.topGap),
 
                     CallStatusPill(
-                      icon: isVideo
-                          ? Icons.videocam_rounded
-                          : Icons.phone_callback_rounded,
-                      label: isVideo
-                          ? 'Incoming Group Video'
-                          : 'Incoming Group Voice',
+                      icon:
+                          isVideo
+                              ? Icons.videocam_rounded
+                              : Icons.phone_callback_rounded,
+                      label:
+                          isVideo
+                              ? 'Incoming Group Video'
+                              : 'Incoming Group Voice',
                       shake: _shakeAnim,
                     ),
 
@@ -260,9 +263,10 @@ class _IncomingGroupCallScreenState extends State<IncomingGroupCallScreen>
                             },
                           ),
                           GlassCallActionButton(
-                            icon: isVideo
-                                ? Icons.videocam_rounded
-                                : Icons.call_rounded,
+                            icon:
+                                isVideo
+                                    ? Icons.videocam_rounded
+                                    : Icons.call_rounded,
                             label: 'Accept',
                             color: Colors.green.shade600,
                             size: metrics.buttonSize,

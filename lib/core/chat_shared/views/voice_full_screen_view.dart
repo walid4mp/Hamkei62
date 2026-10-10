@@ -135,9 +135,10 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
         .read<MediaCacheRepository>()
         .resolveLocalPath(_voiceUrl);
 
-    final controller = localPath != null
-        ? VideoPlayerController.file(File(localPath))
-        : VideoPlayerController.networkUrl(Uri.parse(_voiceUrl));
+    final controller =
+        localPath != null
+            ? VideoPlayerController.file(File(localPath))
+            : VideoPlayerController.networkUrl(Uri.parse(_voiceUrl));
 
     try {
       await controller.initialize();
@@ -211,9 +212,10 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
     final position = _controller?.value.position ?? Duration.zero;
     final duration = _effectiveDuration ?? Duration.zero;
 
-    final avatarUrl = isMe
-        ? (widget.currentUserAvatar ?? item.senderAvatar)
-        : item.senderAvatar;
+    final avatarUrl =
+        isMe
+            ? (widget.currentUserAvatar ?? item.senderAvatar)
+            : item.senderAvatar;
     final hasAvatar = (avatarUrl ?? '').isNotEmpty;
 
     return Scaffold(
@@ -235,15 +237,16 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
         children: [
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: hasAvatar
-                ? CachedCloudinaryImage(
-                    secureUrl: avatarUrl!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                    errorWidget: (_, __) => const _AvatarFallbackBackground(),
-                  )
-                : const _AvatarFallbackBackground(),
+            child:
+                hasAvatar
+                    ? CachedCloudinaryImage(
+                      secureUrl: avatarUrl!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorWidget: (_, __) => const _AvatarFallbackBackground(),
+                    )
+                    : const _AvatarFallbackBackground(),
           ),
           Container(
             decoration: BoxDecoration(
@@ -273,12 +276,13 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white24, width: 2),
                       ),
-                      child: hasAvatar
-                          ? CachedCloudinaryImage(
-                              secureUrl: avatarUrl!,
-                              fit: BoxFit.cover,
-                            )
-                          : _AvatarFallbackCircle(name: item.senderName),
+                      child:
+                          hasAvatar
+                              ? CachedCloudinaryImage(
+                                secureUrl: avatarUrl!,
+                                fit: BoxFit.cover,
+                              )
+                              : _AvatarFallbackCircle(name: item.senderName),
                     ),
                     Positioned(
                       bottom: 3,
@@ -312,20 +316,21 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
                         children: [
                           _isLoading
                               ? const SizedBox(
-                                  width: 42,
-                                  height: 42,
-                                  child: CustomLoadingIndicator(
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : GlassIconButton(
-                                  icon: _isPlaying
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  size: 42,
-                                  iconSize: 24,
-                                  onTap: _togglePlayback,
+                                width: 42,
+                                height: 42,
+                                child: CustomLoadingIndicator(
+                                  color: Colors.white,
                                 ),
+                              )
+                              : GlassIconButton(
+                                icon:
+                                    _isPlaying
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                size: 42,
+                                iconSize: 24,
+                                onTap: _togglePlayback,
+                              ),
                           const Gap(12),
                           Expanded(
                             child: SizedBox(
@@ -341,9 +346,11 @@ class _VoiceFullScreenViewState extends State<VoiceFullScreenView> {
                                 height: 40,
                                 barWidth: 3.6,
                                 gap: 2.6,
-                                onSeek: _isInitialized && _controller != null
-                                    ? (target) => _controller!.seekTo(target)
-                                    : null,
+                                onSeek:
+                                    _isInitialized && _controller != null
+                                        ? (target) =>
+                                            _controller!.seekTo(target)
+                                        : null,
                               ),
                             ),
                           ),

@@ -21,14 +21,18 @@ class DrawerItemWidget extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: color == Colors.red.withValues(alpha: 0.92)
-            ? Colors.red.withValues(alpha: 0.92)
-            : Theme.of(context).primaryColor,
+        color:
+            color == Colors.red.withValues(alpha: 0.92)
+                ? Colors.red.withValues(alpha: 0.92)
+                : Theme.of(context).primaryColor,
       ),
       title: Text(
         title,
-        style: Theme.of(context).textTheme.labelLarge!
-            .copyWith(color: color, fontWeight: FontWeight.w500, fontSize: 16),
+        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+          color: color,
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
       ),
       trailing: const Icon(
         Icons.arrow_forward_ios,

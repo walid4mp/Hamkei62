@@ -162,9 +162,8 @@ class _ProfileViewState extends State<ProfileView> {
                     state is ProfileInitial ||
                     state is ProfileLoading ||
                     state is ProfileRefreshFeedback;
-                String? errorMessage = state is ProfileError
-                    ? state.message
-                    : null;
+                String? errorMessage =
+                    state is ProfileError ? state.message : null;
 
                 return CustomTabWrapper(
                   isLoading: isLoading,
@@ -179,54 +178,59 @@ class _ProfileViewState extends State<ProfileView> {
                       context.read<ProfileCubit>().getProfileData(retryId);
                     }
                   },
-                  child: state is ProfileLoaded
-                      ? NotificationListener<ScrollNotification>(
-                          onNotification: (notification) {
-                            if (_isScrollingToTop) return false;
+                  child:
+                      state is ProfileLoaded
+                          ? NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              if (_isScrollingToTop) return false;
 
-                            if (notification is ScrollUpdateNotification) {
-                              final metrics = notification.metrics;
-                              double currentOffset = metrics.pixels;
+                              if (notification is ScrollUpdateNotification) {
+                                final metrics = notification.metrics;
+                                double currentOffset = metrics.pixels;
 
-                              bool isScrollingUp = currentOffset < _lastOffset;
+                                bool isScrollingUp =
+                                    currentOffset < _lastOffset;
 
-                              if (currentOffset > 450 && isScrollingUp) {
-                                if (!_showBackToTop) {
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    if (mounted && !_showBackToTop) {
-                                      setState(() => _showBackToTop = true);
-                                    }
-                                  });
+                                if (currentOffset > 450 && isScrollingUp) {
+                                  if (!_showBackToTop) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                          if (mounted && !_showBackToTop) {
+                                            setState(
+                                              () => _showBackToTop = true,
+                                            );
+                                          }
+                                        });
+                                  }
+                                } else if (!isScrollingUp ||
+                                    currentOffset < 10) {
+                                  if (_showBackToTop) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                          if (mounted && _showBackToTop) {
+                                            setState(
+                                              () => _showBackToTop = false,
+                                            );
+                                          }
+                                        });
+                                  }
                                 }
-                              } else if (!isScrollingUp || currentOffset < 10) {
-                                if (_showBackToTop) {
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    if (mounted && _showBackToTop) {
-                                      setState(() => _showBackToTop = false);
-                                    }
-                                  });
-                                }
+
+                                _lastOffset = currentOffset;
                               }
-
-                              _lastOffset = currentOffset;
-                            }
-                            return false;
-                          },
-                          child: ProfileBodyContent(
-                            state: state,
-                            scrollController: _scrollController,
-                            size: size,
-                            refreshProgress: _refreshProgress,
-                            isRefreshing: _isRefreshing,
-                            postsCubit: postsCubit,
-                            isCurrentUser: isCurrentUser,
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                              return false;
+                            },
+                            child: ProfileBodyContent(
+                              state: state,
+                              scrollController: _scrollController,
+                              size: size,
+                              refreshProgress: _refreshProgress,
+                              isRefreshing: _isRefreshing,
+                              postsCubit: postsCubit,
+                              isCurrentUser: isCurrentUser,
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 );
               },
             ),
@@ -243,11 +247,12 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (context, progress, staticChild) {
         final brightness = Theme.of(context).brightness;
         final bool pastCover = progress >= 0.5;
-        final overlayStyle = pastCover
-            ? (brightness == Brightness.dark
-                  ? SystemUiOverlayStyle.light
-                  : SystemUiOverlayStyle.dark)
-            : SystemUiOverlayStyle.light;
+        final overlayStyle =
+            pastCover
+                ? (brightness == Brightness.dark
+                    ? SystemUiOverlayStyle.light
+                    : SystemUiOverlayStyle.dark)
+                : SystemUiOverlayStyle.light;
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlayStyle,

@@ -115,10 +115,10 @@ class StoryGridTile extends StatelessWidget {
         final thumbUrl = story.videoUrl?.cloudinaryVideoThumbnailUrl;
         return thumbUrl != null
             ? CachedCloudinaryImage(
-                secureUrl: thumbUrl,
-                fit: BoxFit.cover,
-                errorWidget: (_, __) => Container(color: Colors.grey.shade800),
-              )
+              secureUrl: thumbUrl,
+              fit: BoxFit.cover,
+              errorWidget: (_, __) => Container(color: Colors.grey.shade800),
+            )
             : Container(color: Colors.grey.shade800);
 
       case StoryType.text:

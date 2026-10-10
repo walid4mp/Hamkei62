@@ -86,9 +86,8 @@ class AppPermissionsService {
     if (await hasCallPermissions(isVideo: isVideo)) return true;
 
     final micStatus = await Permission.microphone.request();
-    final camStatus = isVideo
-        ? await Permission.camera.request()
-        : PermissionStatus.granted;
+    final camStatus =
+        isVideo ? await Permission.camera.request() : PermissionStatus.granted;
 
     if (micStatus.isGranted && camStatus.isGranted) return true;
 
@@ -125,29 +124,31 @@ class AppPermissionsService {
       return;
     }
 
-    final what = missingMic && missingCamera
-        ? 'Microphone and Camera'
-        : (missingMic ? 'Microphone' : 'Camera');
+    final what =
+        missingMic && missingCamera
+            ? 'Microphone and Camera'
+            : (missingMic ? 'Microphone' : 'Camera');
 
     final openSettings = await showDialog<bool>(
       context: host,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Permission required'),
-        content: Text(
-          '$what access is turned off for this app. '
-          'Enable it in Settings to make or join calls.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Not now'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('Permission required'),
+            content: Text(
+              '$what access is turned off for this app. '
+              'Enable it in Settings to make or join calls.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Not now'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Open Settings'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Open Settings'),
-          ),
-        ],
-      ),
     );
 
     if (openSettings == true) {

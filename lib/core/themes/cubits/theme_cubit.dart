@@ -56,11 +56,12 @@ class ThemeCubit extends Cubit<ThemeState> {
 
     if (userId != null && userId.isNotEmpty) {
       try {
-        final row = await SupabaseProvider.client
-            .from(SupabaseConstants.users)
-            .select(UserColumns.theme)
-            .eq(UserColumns.id, userId)
-            .maybeSingle();
+        final row =
+            await SupabaseProvider.client
+                .from(SupabaseConstants.users)
+                .select(UserColumns.theme)
+                .eq(UserColumns.id, userId)
+                .maybeSingle();
 
         final serverTheme = row?[UserColumns.theme] as String?;
         if (serverTheme != null) {

@@ -74,16 +74,14 @@ class ReelPlayerControllerPool {
       return slot;
     }
 
-    final stealCandidates = _slots.where((s) => !s.isMounted).toList()
-      ..sort((a, b) {
-        final distanceA = a.assignedIndex == null
-            ? -1
-            : (a.assignedIndex! - index).abs();
-        final distanceB = b.assignedIndex == null
-            ? -1
-            : (b.assignedIndex! - index).abs();
-        return distanceB.compareTo(distanceA); // farthest first
-      });
+    final stealCandidates =
+        _slots.where((s) => !s.isMounted).toList()..sort((a, b) {
+          final distanceA =
+              a.assignedIndex == null ? -1 : (a.assignedIndex! - index).abs();
+          final distanceB =
+              b.assignedIndex == null ? -1 : (b.assignedIndex! - index).abs();
+          return distanceB.compareTo(distanceA); // farthest first
+        });
 
     if (stealCandidates.isNotEmpty) {
       return stealCandidates.first;

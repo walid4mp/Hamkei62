@@ -337,7 +337,8 @@ void _initForegroundTask() {
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'ongoing_call_channel',
       channelName: 'Ongoing Call',
-      channelDescription: 'Shown while a voice or video call is active and the app is in the background.',
+      channelDescription:
+          'Shown while a voice or video call is active and the app is in the background.',
       channelImportance: NotificationChannelImportance.LOW,
       priority: NotificationPriority.LOW,
       onlyAlertOnce: true,

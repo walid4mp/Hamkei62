@@ -69,10 +69,7 @@ class ProfileBodyContent extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     indicatorPadding: const EdgeInsets.only(top: 45),
 
-                    tabs: [
-                      Tab(text: 'Posts'),
-                      Tab(text: 'Details'),
-                    ],
+                    tabs: [Tab(text: 'Posts'), Tab(text: 'Details')],
                   ),
                 ),
               ),

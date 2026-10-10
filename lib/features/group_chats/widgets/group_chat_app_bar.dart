@@ -38,18 +38,20 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
       builder: (context, detailsState) {
-        final isMemberLive = detailsState is GroupDetailsLoaded
-            ? detailsState.isMember
-            : group.isMember;
+        final isMemberLive =
+            detailsState is GroupDetailsLoaded
+                ? detailsState.isMember
+                : group.isMember;
 
         return BlocBuilder<GroupListCubit, GroupListState>(
           builder: (context, state) {
-            final updatedGroup = (state is GroupListLoaded)
-                ? state.groups.firstWhere(
-                    (g) => g.id == group.id,
-                    orElse: () => group,
-                  )
-                : group;
+            final updatedGroup =
+                (state is GroupListLoaded)
+                    ? state.groups.firstWhere(
+                      (g) => g.id == group.id,
+                      orElse: () => group,
+                    )
+                    : group;
             final avatarUrl = updatedGroup.avatarUrl;
 
             return StreamBuilder<GroupCallModel?>(
@@ -74,36 +76,39 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   titleSpacing: 0,
                   title: GestureDetector(
-                    onTap: () => Navigator.of(context).pushNamed(
-                      AppRoutes.groupInfoViewRoute,
-                      arguments: {
-                        'group': group,
-                        'cubit': context.read<GroupDetailsCubit>(),
-                        'itemScrollController': itemScrollController,
-                      },
-                    ),
+                    onTap:
+                        () => Navigator.of(context).pushNamed(
+                          AppRoutes.groupInfoViewRoute,
+                          arguments: {
+                            'group': group,
+                            'cubit': context.read<GroupDetailsCubit>(),
+                            'itemScrollController': itemScrollController,
+                          },
+                        ),
                     child: Row(
                       children: [
                         CircleAvatar(
                           radius: 20,
                           backgroundColor: primary.withValues(alpha: 0.12),
-                          backgroundImage: hasAvatar
-                              ? CachedNetworkImageProvider(avatarUrl!)
-                              : null,
-                          child: !hasAvatar
-                              ? Container(
-                                  padding: EdgeInsets.zero,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                        AppImages.defaultGroupImg,
+                          backgroundImage:
+                              hasAvatar
+                                  ? CachedNetworkImageProvider(avatarUrl!)
+                                  : null,
+                          child:
+                              !hasAvatar
+                                  ? Container(
+                                    padding: EdgeInsets.zero,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                          AppImages.defaultGroupImg,
+                                        ),
+                                        fit: BoxFit.cover,
                                       ),
-                                      fit: BoxFit.cover,
                                     ),
-                                  ),
-                                )
-                              : null,
+                                  )
+                                  : null,
                         ),
                         const Gap(10),
                         Expanded(
@@ -132,11 +137,12 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 presence: updatedGroup.presence,
                                 fallback: GroupMembersOnlineLabel(
                                   groupId: updatedGroup.id,
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .copyWith(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w300,
-                                      ),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleSmall!.copyWith(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w300,
+                                  ),
                                 ),
                               ),
                             ],
@@ -163,16 +169,18 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => LiveKitGroupCallView(
-                                    call: activeCall,
-                                    currentUserId: Supabase
-                                        .instance
-                                        .client
-                                        .auth
-                                        .currentUser!
-                                        .id,
-                                    currentUserName: 'Me',
-                                  ),
+                                  builder:
+                                      (_) => LiveKitGroupCallView(
+                                        call: activeCall,
+                                        currentUserId:
+                                            Supabase
+                                                .instance
+                                                .client
+                                                .auth
+                                                .currentUser!
+                                                .id,
+                                        currentUserName: 'Me',
+                                      ),
                                 ),
                               );
                             },
@@ -191,35 +199,35 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                   tooltip: 'Voice call',
                                   icon: Icon(
                                     Icons.phone_outlined,
-                                    color: isLocalUserBusy
-                                        ? Colors.grey
-                                        : primary,
+                                    color:
+                                        isLocalUserBusy ? Colors.grey : primary,
                                     size: 22,
                                   ),
-                                  onPressed: isLocalUserBusy
-                                      ? null
-                                      : () => GroupCallInitiator.initiate(
-                                          context,
-                                          updatedGroup,
-                                          GroupCallType.audio,
-                                        ),
+                                  onPressed:
+                                      isLocalUserBusy
+                                          ? null
+                                          : () => GroupCallInitiator.initiate(
+                                            context,
+                                            updatedGroup,
+                                            GroupCallType.audio,
+                                          ),
                                 ),
                                 IconButton(
                                   tooltip: 'Video call',
                                   icon: Icon(
                                     Icons.videocam_outlined,
-                                    color: isLocalUserBusy
-                                        ? Colors.grey
-                                        : primary,
+                                    color:
+                                        isLocalUserBusy ? Colors.grey : primary,
                                     size: 22,
                                   ),
-                                  onPressed: isLocalUserBusy
-                                      ? null
-                                      : () => GroupCallInitiator.initiate(
-                                          context,
-                                          updatedGroup,
-                                          GroupCallType.video,
-                                        ),
+                                  onPressed:
+                                      isLocalUserBusy
+                                          ? null
+                                          : () => GroupCallInitiator.initiate(
+                                            context,
+                                            updatedGroup,
+                                            GroupCallType.video,
+                                          ),
                                 ),
                               ],
                             );
@@ -252,42 +260,43 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                               .activate();
                         }
                       },
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(
-                          value: 'search',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search_rounded,
-                                size: 18,
-                                color: Colors.black45,
+                      itemBuilder:
+                          (_) => [
+                            const PopupMenuItem(
+                              value: 'search',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.search_rounded,
+                                    size: 18,
+                                    color: Colors.black45,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Search',
+                                    style: TextStyle(color: Colors.black45),
+                                  ),
+                                ],
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Search',
-                                style: TextStyle(color: Colors.black45),
+                            ),
+                            const PopupMenuItem(
+                              value: 'info',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    size: 18,
+                                    color: Colors.black45,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'group info',
+                                    style: TextStyle(color: Colors.black45),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'info',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                size: 18,
-                                color: Colors.black45,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'group info',
-                                style: TextStyle(color: Colors.black45),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                            ),
+                          ],
                     ),
                   ],
                 );

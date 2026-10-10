@@ -300,9 +300,10 @@ class _VoiceRecorderInputSectionState extends State<VoiceRecorderInputSection> {
     if (_isPreviewPlaying) await _previewPlayer.stop();
 
     final file = await _recorderService.finishAndBuild();
-    final preciseDuration = file != null
-        ? await _extractPreciseDuration(file, Duration(seconds: _seconds))
-        : Duration(seconds: _seconds);
+    final preciseDuration =
+        file != null
+            ? await _extractPreciseDuration(file, Duration(seconds: _seconds))
+            : Duration(seconds: _seconds);
 
     if (mounted) {
       setState(() {
@@ -364,19 +365,21 @@ class _VoiceRecorderInputSectionState extends State<VoiceRecorderInputSection> {
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 2),
-          child: isLocked
-              ? ElevatedIconButton(
-                  icon: Icons.delete_outline_rounded,
-                  color: Colors.red,
-                  onPressed: _cancelRecording,
-                )
-              : ElevatedIconButton(
-                  icon: Icons.add,
-                  color: primary,
-                  onPressed: _uiState == _RecordUiState.idle
-                      ? widget.onShowAttachments
-                      : null,
-                ),
+          child:
+              isLocked
+                  ? ElevatedIconButton(
+                    icon: Icons.delete_outline_rounded,
+                    color: Colors.red,
+                    onPressed: _cancelRecording,
+                  )
+                  : ElevatedIconButton(
+                    icon: Icons.add,
+                    color: primary,
+                    onPressed:
+                        _uiState == _RecordUiState.idle
+                            ? widget.onShowAttachments
+                            : null,
+                  ),
         ),
 
         Expanded(
@@ -387,9 +390,10 @@ class _VoiceRecorderInputSectionState extends State<VoiceRecorderInputSection> {
               vertical: _uiState == _RecordUiState.idle ? 0 : 8,
             ),
             decoration: BoxDecoration(
-              color: _uiState == _RecordUiState.idle
-                  ? primary.withValues(alpha: 0.25)
-                  : Colors.red.withValues(alpha: 0.12),
+              color:
+                  _uiState == _RecordUiState.idle
+                      ? primary.withValues(alpha: 0.25)
+                      : Colors.red.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(25),
             ),
             child: switch (_uiState) {
@@ -402,20 +406,20 @@ class _VoiceRecorderInputSectionState extends State<VoiceRecorderInputSection> {
               _RecordUiState.locked =>
                 _isPaused
                     ? LockedPausedRow(
-                        seconds: _seconds,
-                        isPreviewPlaying: _isPreviewPlaying,
-                        previewPosition: _previewPosition,
-                        previewDuration: _previewDuration,
-                        waveformSeed: _recordingSessionId ?? 'recording',
-                        onTogglePlay: _togglePreviewPlayback,
-                        onSeek: (d) => _previewPlayer.seek(d),
-                        onResume: _resumeRecording,
-                      )
+                      seconds: _seconds,
+                      isPreviewPlaying: _isPreviewPlaying,
+                      previewPosition: _previewPosition,
+                      previewDuration: _previewDuration,
+                      waveformSeed: _recordingSessionId ?? 'recording',
+                      onTogglePlay: _togglePreviewPlayback,
+                      onSeek: (d) => _previewPlayer.seek(d),
+                      onResume: _resumeRecording,
+                    )
                     : LockedRecordingRow(
-                        seconds: _seconds,
-                        amplitudes: _liveAmplitudes,
-                        onPause: _pauseRecording,
-                      ),
+                      seconds: _seconds,
+                      amplitudes: _liveAmplitudes,
+                      onPause: _pauseRecording,
+                    ),
             },
           ),
         ),
@@ -434,41 +438,42 @@ class _VoiceRecorderInputSectionState extends State<VoiceRecorderInputSection> {
 
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
-              child: isLocked
-                  ? InkWell(
-                      onTap: _finishAndSend,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: primary,
-                          shape: BoxShape.circle,
+              child:
+                  isLocked
+                      ? InkWell(
+                        onTap: _finishAndSend,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.send_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.send_rounded,
-                          color: Colors.white,
-                          size: 20,
+                      )
+                      : widget.hasText
+                      ? widget.sendButton
+                      : GestureDetector(
+                        onTap: widget.onMicTap,
+                        onLongPressStart: (_) => _startRecording(),
+                        onLongPressMoveUpdate: _onDragUpdate,
+                        onLongPressEnd: _onLongPressEnd,
+                        onLongPressCancel: _onLongPressCancel,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: Icon(
+                            isActivelyListening ? Icons.mic : Icons.mic_none,
+                            key: ValueKey(isActivelyListening),
+                            color: isActivelyListening ? Colors.red : primary,
+                            size: 28,
+                          ),
                         ),
                       ),
-                    )
-                  : widget.hasText
-                  ? widget.sendButton
-                  : GestureDetector(
-                      onTap: widget.onMicTap,
-                      onLongPressStart: (_) => _startRecording(),
-                      onLongPressMoveUpdate: _onDragUpdate,
-                      onLongPressEnd: _onLongPressEnd,
-                      onLongPressCancel: _onLongPressCancel,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          isActivelyListening ? Icons.mic : Icons.mic_none,
-                          key: ValueKey(isActivelyListening),
-                          color: isActivelyListening ? Colors.red : primary,
-                          size: 28,
-                        ),
-                      ),
-                    ),
             ),
           ],
         ),

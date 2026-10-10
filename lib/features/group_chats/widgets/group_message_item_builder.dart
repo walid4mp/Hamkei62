@@ -93,9 +93,10 @@ class GroupMessageItemBuilder extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 4),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isMissed
-                  ? Colors.red.withValues(alpha: 0.1)
-                  : Colors.green.withValues(alpha: 0.1),
+              color:
+                  isMissed
+                      ? Colors.red.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

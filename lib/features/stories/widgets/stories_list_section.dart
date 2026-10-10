@@ -26,10 +26,11 @@ class StoriesListSection extends StatelessWidget {
 
       child: BlocConsumer<StoriesCubit, StoriesState>(
         bloc: storiesCubit,
-        listenWhen: (_, current) =>
-            current is StoriesError ||
-            current is StoryVideoTooLong ||
-            current is StoryVideoPickError,
+        listenWhen:
+            (_, current) =>
+                current is StoriesError ||
+                current is StoryVideoTooLong ||
+                current is StoryVideoPickError,
         listener: (context, state) {
           if (state is StoriesError) {
             AppToast.error('Error: ${state.message}');
@@ -44,15 +45,17 @@ class StoriesListSection extends StatelessWidget {
             AppToast.error('Error: ${state.message}');
           }
         },
-        buildWhen: (previous, current) =>
-            current is StoriesLoaded ||
-            current is AddStoryLoading ||
-            current is AddStorySuccess ||
-            (current is StoriesLoading && previous is! StoriesLoaded),
+        buildWhen:
+            (previous, current) =>
+                current is StoriesLoaded ||
+                current is AddStoryLoading ||
+                current is AddStorySuccess ||
+                (current is StoriesLoading && previous is! StoriesLoaded),
         builder: (context, state) {
-          final stories = state is StoriesLoaded
-              ? state.stories
-              : storiesCubit.cachedStories;
+          final stories =
+              state is StoriesLoaded
+                  ? state.stories
+                  : storiesCubit.cachedStories;
           if (stories.isEmpty) {
             if (state is StoriesLoading) return const StoriesListSkeleton();
             return const SizedBox.shrink();

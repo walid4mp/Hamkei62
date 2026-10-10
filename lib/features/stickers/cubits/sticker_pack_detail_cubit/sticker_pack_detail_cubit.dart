@@ -66,16 +66,18 @@ class StickerPackDetailCubit extends Cubit<StickerPackDetailState>
     _cancelToken = CancelToken();
 
     void report() {
-      final overall = totalWeight > 0
-          ? current.stickers.fold<double>(
-              0,
-              (sum, s) =>
-                  sum +
-                  (s.sizeBytes / totalWeight) * (fileProgress[s.imageUrl] ?? 0),
-            )
-          : (fileProgress.values.isEmpty
-                ? 0.0
-                : fileProgress.values.fold<double>(0, (a, b) => a + b) /
+      final overall =
+          totalWeight > 0
+              ? current.stickers.fold<double>(
+                0,
+                (sum, s) =>
+                    sum +
+                    (s.sizeBytes / totalWeight) *
+                        (fileProgress[s.imageUrl] ?? 0),
+              )
+              : (fileProgress.values.isEmpty
+                  ? 0.0
+                  : fileProgress.values.fold<double>(0, (a, b) => a + b) /
                       current.stickers.length);
       final latest = state;
       if (latest is StickerPackDetailLoaded) {

@@ -119,19 +119,20 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updated = current.members.map((m) {
-      return m.userId == member.userId
-          ? GroupMemberModel(
-              id: m.id,
-              groupId: m.groupId,
-              userId: m.userId,
-              userName: m.userName,
-              userAvatar: m.userAvatar,
-              role: GroupMemberRole.admin,
-              joinedAt: m.joinedAt,
-            )
-          : m;
-    }).toList();
+    final updated =
+        current.members.map((m) {
+          return m.userId == member.userId
+              ? GroupMemberModel(
+                id: m.id,
+                groupId: m.groupId,
+                userId: m.userId,
+                userName: m.userName,
+                userAvatar: m.userAvatar,
+                role: GroupMemberRole.admin,
+                joinedAt: m.joinedAt,
+              )
+              : m;
+        }).toList();
     emit(current.copyWith(members: updated));
 
     try {
@@ -152,19 +153,20 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updated = current.members.map((m) {
-      return m.userId == member.userId
-          ? GroupMemberModel(
-              id: m.id,
-              groupId: m.groupId,
-              userId: m.userId,
-              userName: m.userName,
-              userAvatar: m.userAvatar,
-              role: GroupMemberRole.member,
-              joinedAt: m.joinedAt,
-            )
-          : m;
-    }).toList();
+    final updated =
+        current.members.map((m) {
+          return m.userId == member.userId
+              ? GroupMemberModel(
+                id: m.id,
+                groupId: m.groupId,
+                userId: m.userId,
+                userName: m.userName,
+                userAvatar: m.userAvatar,
+                role: GroupMemberRole.member,
+                joinedAt: m.joinedAt,
+              )
+              : m;
+        }).toList();
     emit(current.copyWith(members: updated));
 
     try {
@@ -209,9 +211,8 @@ class GroupMembersCubit extends Cubit<GroupMembersState> {
     final current = state;
     if (current is! GroupMembersLoaded) return;
 
-    final updatedMembers = current.members
-        .where((m) => m.userId != member.userId)
-        .toList();
+    final updatedMembers =
+        current.members.where((m) => m.userId != member.userId).toList();
     emit(
       current.copyWith(
         members: updatedMembers,

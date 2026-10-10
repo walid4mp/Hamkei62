@@ -82,8 +82,8 @@ mixin ChatReactionsMixin on Cubit<ChatDetailsState> {
     } else {
       _reactionsCache[messageId]![currentUserId] = emoji;
       _reactionsCreatedAtCache[messageId] ??= {};
-      _reactionsCreatedAtCache[messageId]![currentUserId] = now
-          .toIso8601String();
+      _reactionsCreatedAtCache[messageId]![currentUserId] =
+          now.toIso8601String();
     }
     _applyReactionsCacheToMessages();
 
@@ -137,8 +137,8 @@ mixin ChatReactionsMixin on Cubit<ChatDetailsState> {
       if (isRemoving && currentEmoji != null) {
         _reactionsCache[messageId]![currentUserId] = currentEmoji;
         _reactionsCreatedAtCache[messageId] ??= {};
-        _reactionsCreatedAtCache[messageId]![currentUserId] = DateTime.now()
-            .toIso8601String();
+        _reactionsCreatedAtCache[messageId]![currentUserId] =
+            DateTime.now().toIso8601String();
       } else {
         _reactionsCache[messageId]!.remove(currentUserId);
         _reactionsCreatedAtCache[messageId]?.remove(currentUserId);
@@ -156,8 +156,8 @@ mixin ChatReactionsMixin on Cubit<ChatDetailsState> {
     final latest = cachedMessages.first;
     final rawText =
         (latest.messageType == 'file' || latest.messageType == 'document')
-        ? (latest.fileName ?? latest.text)
-        : latest.text;
+            ? (latest.fileName ?? latest.text)
+            : latest.text;
 
     chatsCubit?.updateChatLastMessagePreview(
       otherUserId: receiverId,

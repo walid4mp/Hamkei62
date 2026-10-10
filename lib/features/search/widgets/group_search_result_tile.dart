@@ -23,13 +23,14 @@ class GroupSearchResultTile extends StatelessWidget {
           width: 48,
           height: 48,
           color: primary.withValues(alpha: 0.12),
-          child: hasAvatar
-              ? CachedCloudinaryImage(
-                  secureUrl: group.avatarUrl!,
-                  fit: BoxFit.cover,
-                  isAvatar: true,
-                )
-              : Image.asset(AppImages.defaultGroupImg, fit: BoxFit.cover),
+          child:
+              hasAvatar
+                  ? CachedCloudinaryImage(
+                    secureUrl: group.avatarUrl!,
+                    fit: BoxFit.cover,
+                    isAvatar: true,
+                  )
+                  : Image.asset(AppImages.defaultGroupImg, fit: BoxFit.cover),
         ),
       ),
       title: Text(
@@ -48,13 +49,14 @@ class GroupSearchResultTile extends StatelessWidget {
           color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
-      onTap: () => openGroupChat(
-        group.id,
-        () => Navigator.of(
-          context,
-          rootNavigator: true,
-        ).pushNamed(AppRoutes.groupChatRoute, arguments: group),
-      ),
+      onTap:
+          () => openGroupChat(
+            group.id,
+            () => Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed(AppRoutes.groupChatRoute, arguments: group),
+          ),
     );
   }
 }

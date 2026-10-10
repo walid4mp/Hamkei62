@@ -54,36 +54,43 @@ class CallMessageContent extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    final IconData icon = isMissed
-        ? (isAudio ? Icons.call_missed : Icons.missed_video_call)
-        : (isAudio ? Icons.call : Icons.videocam);
+    final IconData icon =
+        isMissed
+            ? (isAudio ? Icons.call_missed : Icons.missed_video_call)
+            : (isAudio ? Icons.call : Icons.videocam);
 
-    final Color bubbleBg = isMe
-        ? Theme.of(context).primaryColor.withValues(alpha: 0.95)
-        : (isDarkMode
-              ? colorScheme.surfaceContainerHigh
-              : Colors.grey.shade200);
+    final Color bubbleBg =
+        isMe
+            ? Theme.of(context).primaryColor.withValues(alpha: 0.95)
+            : (isDarkMode
+                ? colorScheme.surfaceContainerHigh
+                : Colors.grey.shade200);
 
-    final Color textColor = isMe
-        ? colorScheme.onPrimary
-        : colorScheme.onSurface.withValues(alpha: 0.7);
-    final Color timeColor = isMe
-        ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8)
-        : Theme.of(context).scaffoldBackgroundColor;
+    final Color textColor =
+        isMe
+            ? colorScheme.onPrimary
+            : colorScheme.onSurface.withValues(alpha: 0.7);
+    final Color timeColor =
+        isMe
+            ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8)
+            : Theme.of(context).scaffoldBackgroundColor;
 
-    final Color iconColor = isMe
-        ? colorScheme.onPrimary
-        : (isMissed ? Colors.redAccent : Colors.green);
+    final Color iconColor =
+        isMe
+            ? colorScheme.onPrimary
+            : (isMissed ? Colors.redAccent : Colors.green);
 
-    final Color iconBgColor = isMe
-        ? Colors.white.withValues(alpha: 0.5)
-        : iconColor.withValues(alpha: 0.15);
+    final Color iconBgColor =
+        isMe
+            ? Colors.white.withValues(alpha: 0.5)
+            : iconColor.withValues(alpha: 0.15);
 
-    final String title = isRinging
-        ? (isAudio ? 'Calling…' : 'Video calling…')
-        : isMissed
-        ? (isAudio ? 'Missed voice call' : 'Missed video call')
-        : (isAudio ? 'Voice call' : 'Video call');
+    final String title =
+        isRinging
+            ? (isAudio ? 'Calling…' : 'Video calling…')
+            : isMissed
+            ? (isAudio ? 'Missed voice call' : 'Missed video call')
+            : (isAudio ? 'Voice call' : 'Video call');
 
     return Stack(
       clipBehavior: Clip.none,
@@ -130,12 +137,13 @@ class CallMessageContent extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.titleMedium!
-                              .copyWith(
-                                color: textColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium!.copyWith(
+                            color: textColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         if (duration.isNotEmpty && !isMissed && !isRinging) ...[
                           Row(
@@ -150,12 +158,13 @@ class CallMessageContent extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 duration,
-                                style: Theme.of(context).textTheme.titleMedium!
-                                    .copyWith(
-                                      color: isMe ? timeColor : null,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium!.copyWith(
+                                  color: isMe ? timeColor : null,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ],
                           ),
@@ -170,10 +179,11 @@ class CallMessageContent extends StatelessWidget {
                 const Gap(10),
                 ReturnToOngoingSingleCallButton(
                   isVideo: !isAudio,
-                  onTap: () => CallNavigationHelper.expandActiveCall(
-                    context.read<CallPipCubit>(),
-                    activeSession,
-                  ),
+                  onTap:
+                      () => CallNavigationHelper.expandActiveCall(
+                        context.read<CallPipCubit>(),
+                        activeSession,
+                      ),
                   isMe: isMe,
                 ),
               ],

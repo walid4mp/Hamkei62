@@ -145,9 +145,8 @@ class RealtimeDiagnostics {
   /// it will keep delivering the previous user's rows into the new user's
   /// UI. This is the mechanism behind V6 finding C-02.
   List<ChannelRecord> detectZombies(String currentUserId) {
-    final zombies = active
-        .where((c) => c.ownerUserId != currentUserId)
-        .toList();
+    final zombies =
+        active.where((c) => c.ownerUserId != currentUserId).toList();
 
     if (zombies.isNotEmpty) {
       obs.recordError(

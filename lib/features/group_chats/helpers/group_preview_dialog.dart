@@ -53,30 +53,32 @@ class GroupPreviewDialog extends StatelessWidget {
                   children: [
                     hasAvatar
                         ? CachedCloudinaryImage(
-                            secureUrl: group.avatarUrl!,
-                            fit: BoxFit.cover,
-                            height: imageHeight,
-                            width: double.infinity,
-                            isAvatar: true,
-                            placeholder: (context) => SizedBox(
-                              height: imageHeight,
-                              child: const Center(
-                                child: CustomLoadingIndicator(),
+                          secureUrl: group.avatarUrl!,
+                          fit: BoxFit.cover,
+                          height: imageHeight,
+                          width: double.infinity,
+                          isAvatar: true,
+                          placeholder:
+                              (context) => SizedBox(
+                                height: imageHeight,
+                                child: const Center(
+                                  child: CustomLoadingIndicator(),
+                                ),
                               ),
-                            ),
-                            errorWidget: (context, error) => Image.asset(
-                              defaultGroupImage,
-                              fit: BoxFit.cover,
-                              height: imageHeight,
-                              width: double.infinity,
-                            ),
-                          )
+                          errorWidget:
+                              (context, error) => Image.asset(
+                                defaultGroupImage,
+                                fit: BoxFit.cover,
+                                height: imageHeight,
+                                width: double.infinity,
+                              ),
+                        )
                         : Image.asset(
-                            defaultGroupImage,
-                            fit: BoxFit.cover,
-                            height: imageHeight,
-                            width: double.infinity,
-                          ),
+                          defaultGroupImage,
+                          fit: BoxFit.cover,
+                          height: imageHeight,
+                          width: double.infinity,
+                        ),
                     Positioned(
                       top: 0,
                       left: 0,

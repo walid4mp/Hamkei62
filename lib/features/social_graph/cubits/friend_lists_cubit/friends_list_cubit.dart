@@ -110,9 +110,8 @@ class FriendsListCubit extends Cubit<FriendsListState>
       if (isClosed || generation != _generation) return;
 
       final knownIds = _friends.map((f) => f.friendshipId).toSet();
-      final freshItems = page.items
-          .where((f) => knownIds.add(f.friendshipId))
-          .toList();
+      final freshItems =
+          page.items.where((f) => knownIds.add(f.friendshipId)).toList();
 
       _friends.addAll(freshItems);
       _totalCount = page.totalCount ?? _totalCount;

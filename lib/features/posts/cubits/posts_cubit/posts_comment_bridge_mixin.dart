@@ -107,9 +107,12 @@ mixin PostsCommentBridgeMixin on Cubit<PostsState> {
     return comments
         .where((c) => c.id != commentId)
         .map(
-          (c) => c.replies.isEmpty
-              ? c
-              : c.copyWith(replies: _removeCommentById(c.replies, commentId)),
+          (c) =>
+              c.replies.isEmpty
+                  ? c
+                  : c.copyWith(
+                    replies: _removeCommentById(c.replies, commentId),
+                  ),
         )
         .toList();
   }

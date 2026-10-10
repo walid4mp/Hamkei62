@@ -50,9 +50,8 @@ final class ProfileLoaded extends ProfileState {
       friendsCount: friendsCount ?? this.friendsCount,
       mutualFriendsCount: mutualFriendsCount ?? this.mutualFriendsCount,
       friendshipStatus: friendshipStatus ?? this.friendshipStatus,
-      friendshipId: clearFriendshipId
-          ? null
-          : (friendshipId ?? this.friendshipId),
+      friendshipId:
+          clearFriendshipId ? null : (friendshipId ?? this.friendshipId),
       isFollowing: isFollowing ?? this.isFollowing,
       followsMe: followsMe ?? this.followsMe,
       mutuals: mutuals ?? this.mutuals,

@@ -40,9 +40,10 @@ class StoryStatModel {
       storyId: map['story_id'] as String? ?? '',
       viewCount: (map['view_count'] as num?)?.toInt() ?? 0,
       reactionCount: (map['reaction_count'] as num?)?.toInt() ?? 0,
-      reactions: reactionsRaw
-          .map((e) => StoryReactorModel.fromMap(e as Map<String, dynamic>))
-          .toList(),
+      reactions:
+          reactionsRaw
+              .map((e) => StoryReactorModel.fromMap(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }

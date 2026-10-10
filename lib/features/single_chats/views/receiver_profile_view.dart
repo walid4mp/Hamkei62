@@ -103,24 +103,26 @@ class _ReceiverProfileViewState extends State<ReceiverProfileView> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => StarredMessagesView(
-          entriesLoader: loadEntries,
-          onUnstar: (messageId) => StarredMessagesStore.instance.toggleStar(
-            currentUserId: cubit.currentUserId,
-            messageId: messageId,
-          ),
-          onTapEntry: (messageId) {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            final controller = widget.itemScrollController;
-            if (controller != null) {
-              cubit.scrollToMessage(
-                messageId: messageId,
-                itemScrollController: controller,
-              );
-            }
-          },
-        ),
+        builder:
+            (_) => StarredMessagesView(
+              entriesLoader: loadEntries,
+              onUnstar:
+                  (messageId) => StarredMessagesStore.instance.toggleStar(
+                    currentUserId: cubit.currentUserId,
+                    messageId: messageId,
+                  ),
+              onTapEntry: (messageId) {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                final controller = widget.itemScrollController;
+                if (controller != null) {
+                  cubit.scrollToMessage(
+                    messageId: messageId,
+                    itemScrollController: controller,
+                  );
+                }
+              },
+            ),
       ),
     );
   }
@@ -174,34 +176,38 @@ class _ReceiverProfileViewState extends State<ReceiverProfileView> {
                 Flexible(
                   child: Text(
                     widget.receiverUser.name,
-                    style: Theme.of(context).textTheme.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 ValueListenableBuilder<bool>(
                   valueListenable: context.read<ChatDetailsCubit>().muteStatus,
-                  builder: (context, isMuted, _) => isMuted
-                      ? const MutedBadgeIcon(size: 10)
-                      : const SizedBox.shrink(),
+                  builder:
+                      (context, isMuted, _) =>
+                          isMuted
+                              ? const MutedBadgeIcon(size: 10)
+                              : const SizedBox.shrink(),
                 ),
               ],
             ),
             BlocBuilder<ChatDetailsCubit, ChatDetailsState>(
               builder: (context, state) {
                 return ValueListenableBuilder<ChatActionType>(
-                  valueListenable: context
-                      .read<ChatDetailsCubit>()
-                      .receiverAction,
+                  valueListenable:
+                      context.read<ChatDetailsCubit>().receiverAction,
                   builder: (context, action, _) {
                     if (action != ChatActionType.none) {
                       return AnimatedActivityText(
-                        text: action == ChatActionType.recording
-                            ? 'recording audio...'
-                            : 'typing...',
+                        text:
+                            action == ChatActionType.recording
+                                ? 'recording audio...'
+                                : 'typing...',
                         style: TextStyle(
-                          color: action == ChatActionType.recording
-                              ? Colors.red.shade700
-                              : Colors.green,
+                          color:
+                              action == ChatActionType.recording
+                                  ? Colors.red.shade700
+                                  : Colors.green,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.italic,
@@ -249,9 +255,8 @@ class _ReceiverProfileViewState extends State<ReceiverProfileView> {
                       isBlocked: blockStatus.isBlocked,
                     ),
                     ValueListenableBuilder<bool>(
-                      valueListenable: context
-                          .read<ChatDetailsCubit>()
-                          .muteStatus,
+                      valueListenable:
+                          context.read<ChatDetailsCubit>().muteStatus,
                       builder: (context, isMuted, _) {
                         return _buildOptionItem(
                           context,
@@ -336,10 +341,11 @@ class _ReceiverProfileViewState extends State<ReceiverProfileView> {
                 final isBlockedByMe = status.blockedByMe;
                 final color = isBlockedByMe ? null : Colors.red;
                 return InkWell(
-                  onTap: () => context.read<ChatDetailsCubit>().toggleBlock(
-                    receiverId: widget.receiverUser.id,
-                    otherUserName: widget.receiverUser.name,
-                  ),
+                  onTap:
+                      () => context.read<ChatDetailsCubit>().toggleBlock(
+                        receiverId: widget.receiverUser.id,
+                        otherUserName: widget.receiverUser.name,
+                      ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,

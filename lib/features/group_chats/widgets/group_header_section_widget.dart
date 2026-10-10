@@ -36,20 +36,22 @@ class GroupHeaderSection extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
-                    image: groupImage != null
-                        ? DecorationImage(
-                            image: FileImage(groupImage!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    image:
+                        groupImage != null
+                            ? DecorationImage(
+                              image: FileImage(groupImage!),
+                              fit: BoxFit.cover,
+                            )
+                            : null,
                     border: Border.all(
                       color: primary.withValues(alpha: 0.2),
                       width: 2,
                     ),
                   ),
-                  child: groupImage == null
-                      ? Icon(Icons.groups_rounded, size: 36, color: primary)
-                      : null,
+                  child:
+                      groupImage == null
+                          ? Icon(Icons.groups_rounded, size: 36, color: primary)
+                          : null,
                 ),
                 Positioned(
                   bottom: 0,

@@ -45,9 +45,10 @@ class ChatFcmPushDispatcher {
     try {
       final muted =
           await _supabase.rpc(
-            'is_chat_muted',
-            params: {'p_owner': receiverId, 'p_peer': senderId},
-          ) as bool? ??
+                'is_chat_muted',
+                params: {'p_owner': receiverId, 'p_peer': senderId},
+              )
+              as bool? ??
           false;
       if (muted) return;
 

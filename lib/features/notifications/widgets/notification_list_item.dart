@@ -75,9 +75,10 @@ class NotificationListItem extends StatelessWidget {
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.green.shade900.withValues(alpha: 0.5)
-              : Colors.green.shade50,
+          color:
+              isDark
+                  ? Colors.green.shade900.withValues(alpha: 0.5)
+                  : Colors.green.shade50,
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 24),
@@ -103,9 +104,10 @@ class NotificationListItem extends StatelessWidget {
       secondaryBackground: Container(
         margin: const EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.red.shade900.withValues(alpha: 0.4)
-              : Colors.red.shade50,
+          color:
+              isDark
+                  ? Colors.red.shade900.withValues(alpha: 0.4)
+                  : Colors.red.shade50,
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
@@ -139,13 +141,14 @@ class NotificationListItem extends StatelessWidget {
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 250 + (index * 40).clamp(0, 300)),
       curve: Curves.easeOut,
-      builder: (context, value, child) => Opacity(
-        opacity: value,
-        child: Transform.translate(
-          offset: Offset(0, 16 * (1 - value)),
-          child: child,
-        ),
-      ),
+      builder:
+          (context, value, child) => Opacity(
+            opacity: value,
+            child: Transform.translate(
+              offset: Offset(0, 16 * (1 - value)),
+              child: child,
+            ),
+          ),
       child: InkWell(
         onTap: () {
           if (!notif.isRead) onMarkAsRead(notif.id);
@@ -155,15 +158,17 @@ class NotificationListItem extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: notif.isRead
-                ? Colors.transparent
-                : (isDark
-                      ? primary.withValues(alpha: 0.06)
-                      : primary.withValues(alpha: 0.04)),
+            color:
+                notif.isRead
+                    ? Colors.transparent
+                    : (isDark
+                        ? primary.withValues(alpha: 0.06)
+                        : primary.withValues(alpha: 0.04)),
             border: Border(
-              left: notif.isRead
-                  ? BorderSide.none
-                  : BorderSide(color: primary, width: 3),
+              left:
+                  notif.isRead
+                      ? BorderSide.none
+                      : BorderSide(color: primary, width: 3),
             ),
           ),
           child: Row(
@@ -182,9 +187,10 @@ class NotificationListItem extends StatelessWidget {
                             notif.title,
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: notif.isRead
-                                  ? FontWeight.w500
-                                  : FontWeight.w700,
+                              fontWeight:
+                                  notif.isRead
+                                      ? FontWeight.w500
+                                      : FontWeight.w700,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
                             maxLines: 1,
@@ -195,9 +201,8 @@ class NotificationListItem extends StatelessWidget {
                           _formatTime(notif.createdAt),
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark
-                                ? Colors.white30
-                                : Colors.grey.shade400,
+                            color:
+                                isDark ? Colors.white30 : Colors.grey.shade400,
                           ),
                         ),
                       ],
@@ -209,11 +214,14 @@ class NotificationListItem extends StatelessWidget {
                         String text = notif.displaySubtitle;
                         final textStyle = TextStyle(
                           fontSize: 13,
-                          color: isDark
-                              ? (notif.isRead ? Colors.white38 : Colors.white60)
-                              : (notif.isRead
-                                    ? Colors.grey.shade500
-                                    : Colors.grey.shade700),
+                          color:
+                              isDark
+                                  ? (notif.isRead
+                                      ? Colors.white38
+                                      : Colors.white60)
+                                  : (notif.isRead
+                                      ? Colors.grey.shade500
+                                      : Colors.grey.shade700),
                           height: 1.35,
                         );
 
@@ -238,9 +246,10 @@ class NotificationListItem extends StatelessWidget {
                                       style: textStyle.copyWith(
                                         fontFamily: null,
                                       ),
-                                      defaultIconColor: isDark
-                                          ? Colors.white60
-                                          : Colors.grey.shade600,
+                                      defaultIconColor:
+                                          isDark
+                                              ? Colors.white60
+                                              : Colors.grey.shade600,
                                       iconSize: 13,
                                       keepCaption: true,
                                     ),
@@ -269,9 +278,10 @@ class NotificationListItem extends StatelessWidget {
                                   vertical: 8,
                                 ),
                                 side: BorderSide(
-                                  color: isDark
-                                      ? Colors.white24
-                                      : Colors.grey.shade300,
+                                  color:
+                                      isDark
+                                          ? Colors.white24
+                                          : Colors.grey.shade300,
                                 ),
                               ),
                               onPressed: () => onRejectFriendRequest(notif),
@@ -310,23 +320,26 @@ class NotificationListItem extends StatelessWidget {
                           height: 30,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isFollowingBack
-                                  ? Colors.grey.shade300
-                                  : primary,
+                              backgroundColor:
+                                  isFollowingBack
+                                      ? Colors.grey.shade300
+                                      : primary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                               ),
                             ),
-                            onPressed: isFollowingBack
-                                ? null
-                                : () => onFollowBack(notif),
+                            onPressed:
+                                isFollowingBack
+                                    ? null
+                                    : () => onFollowBack(notif),
                             child: Text(
                               isFollowingBack ? 'Following' : 'Follow Back',
                               style: TextStyle(
                                 fontSize: 12.5,
-                                color: isFollowingBack
-                                    ? Colors.black54
-                                    : Colors.white,
+                                color:
+                                    isFollowingBack
+                                        ? Colors.black54
+                                        : Colors.white,
                               ),
                             ),
                           ),
@@ -364,9 +377,10 @@ class NotificationListItem extends StatelessWidget {
         CircleAvatar(
           radius: 24,
           backgroundColor: primary.withValues(alpha: 0.1),
-          backgroundImage: hasImage
-              ? CachedNetworkImageProvider(imageUrl)
-              : const AssetImage(AppImages.defaultUserImg) as ImageProvider,
+          backgroundImage:
+              hasImage
+                  ? CachedNetworkImageProvider(imageUrl)
+                  : const AssetImage(AppImages.defaultUserImg) as ImageProvider,
         ),
         Positioned(
           bottom: 0,

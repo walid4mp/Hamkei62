@@ -147,12 +147,14 @@ class _ReelsFullScreenViewState extends State<ReelsFullScreenView> {
           if (previous is! ReelsFeedLoaded || current is! ReelsFeedLoaded) {
             return true;
           }
-          final prevLen = widget.sectionIndex! < previous.sections.length
-              ? previous.sections[widget.sectionIndex!].length
-              : 0;
-          final currLen = widget.sectionIndex! < current.sections.length
-              ? current.sections[widget.sectionIndex!].length
-              : 0;
+          final prevLen =
+              widget.sectionIndex! < previous.sections.length
+                  ? previous.sections[widget.sectionIndex!].length
+                  : 0;
+          final currLen =
+              widget.sectionIndex! < current.sections.length
+                  ? current.sections[widget.sectionIndex!].length
+                  : 0;
           return prevLen != currLen;
         },
         builder: (context, state) {

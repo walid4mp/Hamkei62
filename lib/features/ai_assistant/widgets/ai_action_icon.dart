@@ -176,9 +176,10 @@ class _AiActionIconState extends State<AiActionIcon> {
     return BlocProvider.value(
       value: _cubit,
       child: BlocListener<AiPreferencesCubit, AiPreferencesState>(
-        listenWhen: (previous, current) =>
-            previous.autoCompleteEnabled != current.autoCompleteEnabled ||
-            previous.autoDetectEnabled != current.autoDetectEnabled,
+        listenWhen:
+            (previous, current) =>
+                previous.autoCompleteEnabled != current.autoCompleteEnabled ||
+                previous.autoDetectEnabled != current.autoDetectEnabled,
         listener: (context, prefs) {
           _cubit.updatePreferences(
             autoCompleteEnabled: prefs.autoCompleteEnabled,
@@ -228,11 +229,8 @@ class _AiActionIconState extends State<AiActionIcon> {
             final needsVisionNow =
                 state is AiFieldIdle &&
                 widget.targetMediaType == AiTargetMediaType.image;
-            final activeProvider = context
-                .watch<AiPreferencesCubit>()
-                .state
-                .usage
-                .activeProvider;
+            final activeProvider =
+                context.watch<AiPreferencesCubit>().state.usage.activeProvider;
             final isVisionUnavailable =
                 needsVisionNow && !activeProvider.supportsVision;
 
@@ -246,21 +244,23 @@ class _AiActionIconState extends State<AiActionIcon> {
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 visualDensity: VisualDensity.compact,
-                tooltip: isSpellingError
-                    ? 'Spelling Correction'
-                    : (isVisionUnavailable
-                          ? 'Smart reply to images is currently unavailable'
-                          : 'AI Suggestion'),
+                tooltip:
+                    isSpellingError
+                        ? 'Spelling Correction'
+                        : (isVisionUnavailable
+                            ? 'Smart reply to images is currently unavailable'
+                            : 'AI Suggestion'),
                 icon: Icon(
                   isSpellingError
                       ? Icons.spellcheck_rounded
                       : Icons.auto_awesome_rounded,
                   size: 22,
-                  color: isDisabledLook
-                      ? theme.disabledColor
-                      : (isSpellingError
-                            ? Colors.orangeAccent
-                            : theme.primaryColor),
+                  color:
+                      isDisabledLook
+                          ? theme.disabledColor
+                          : (isSpellingError
+                              ? Colors.orangeAccent
+                              : theme.primaryColor),
                 ),
                 onPressed: () async {
                   if (isQuotaExceeded) {

@@ -177,8 +177,10 @@ class _ReelsTabViewState extends State<ReelsTabView>
     String query,
   ) => ErrorSearchState(
     message: message,
-    onRetry: () => query.isEmpty
-        ? context.read<SearchReelsCubit>().getReels()
-        : context.read<SearchReelsCubit>().searchReels(query),
+    onRetry:
+        () =>
+            query.isEmpty
+                ? context.read<SearchReelsCubit>().getReels()
+                : context.read<SearchReelsCubit>().searchReels(query),
   );
 }

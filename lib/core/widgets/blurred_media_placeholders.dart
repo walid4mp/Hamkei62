@@ -87,18 +87,19 @@ class BlurredVideoPlaceholder extends StatelessWidget {
         Container(color: Colors.black.withValues(alpha: 0.25)),
         if (hasThumbnail)
           Center(
-            child: localThumbnailBytes != null
-                ? Image.memory(
-                    localThumbnailBytes!,
-                    fit: BoxFit.contain,
-                    gaplessPlayback: true,
-                  )
-                : CachedCloudinaryImage(
-                    secureUrl: networkThumbnailUrl!,
-                    fit: BoxFit.contain,
-                    placeholder: (_) => const SizedBox.shrink(),
-                    errorWidget: (_, __) => const SizedBox.shrink(),
-                  ),
+            child:
+                localThumbnailBytes != null
+                    ? Image.memory(
+                      localThumbnailBytes!,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: true,
+                    )
+                    : CachedCloudinaryImage(
+                      secureUrl: networkThumbnailUrl!,
+                      fit: BoxFit.contain,
+                      placeholder: (_) => const SizedBox.shrink(),
+                      errorWidget: (_, __) => const SizedBox.shrink(),
+                    ),
           ),
         const Center(
           child: CustomLoadingIndicator(radius: 14, color: Colors.white),

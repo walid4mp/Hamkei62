@@ -75,24 +75,25 @@ class _Avatar extends StatelessWidget {
         ),
       ),
       child: ClipOval(
-        child: hasImage
-            ? CachedCloudinaryImage(
-                secureUrl: avatarUrl!,
-                isAvatar: true,
-                fit: BoxFit.cover,
-              )
-            : Container(
-                color: Colors.white.withValues(alpha: 0.12),
-                alignment: Alignment.center,
-                child: Text(
-                  userName.isNotEmpty ? userName[0].toUpperCase() : '?',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
+        child:
+            hasImage
+                ? CachedCloudinaryImage(
+                  secureUrl: avatarUrl!,
+                  isAvatar: true,
+                  fit: BoxFit.cover,
+                )
+                : Container(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  alignment: Alignment.center,
+                  child: Text(
+                    userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                    ),
                   ),
                 ),
-              ),
       ),
     );
   }

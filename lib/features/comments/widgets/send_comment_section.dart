@@ -251,12 +251,13 @@ class _SendCommentSectionState extends State<SendCommentSection> {
                     final isMediaCaptionable =
                         pendingMedia?.type == CommentType.image ||
                         pendingMedia?.type == CommentType.video;
-                    final repliedComment = widget.replyingToCommentId == null
-                        ? null
-                        : _findRepliedComment(
-                            cubit.comments,
-                            widget.replyingToCommentId!,
-                          );
+                    final repliedComment =
+                        widget.replyingToCommentId == null
+                            ? null
+                            : _findRepliedComment(
+                              cubit.comments,
+                              widget.replyingToCommentId!,
+                            );
 
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -269,8 +270,9 @@ class _SendCommentSectionState extends State<SendCommentSection> {
                               width: 35,
                               height: 35,
                               fit: BoxFit.cover,
-                              color: Theme.of(context).primaryColor
-                                  .withValues(alpha: 2),
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 2),
                             ),
                           ),
                           const Gap(5),
@@ -279,77 +281,83 @@ class _SendCommentSectionState extends State<SendCommentSection> {
                               controller: _commentController,
                               focusNode: _focusNode,
                               enabled: !isLoading && !isStickerOnly,
-                              hintText: isStickerOnly
-                                  ? 'Sticker ready to send'
-                                  : isReplying
-                                  ? 'Reply to @${widget.replyingToAuthorName}...'
-                                  : 'Write a comment...',
+                              hintText:
+                                  isStickerOnly
+                                      ? 'Sticker ready to send'
+                                      : isReplying
+                                      ? 'Reply to @${widget.replyingToAuthorName}...'
+                                      : 'Write a comment...',
                               onSubmitted: (_) => _submitComment(),
                               trailingIcon: AiActionIcon(
                                 controller: _commentController,
                                 surface: AiSurfaceType.comment,
                                 generationAction: AiActionType.replySuggestion,
-                                actionContext: isMediaCaptionable
-                                    ? AiActionContext.mediaCaption
-                                    : AiActionContext.commentReply,
+                                actionContext:
+                                    isMediaCaptionable
+                                        ? AiActionContext.mediaCaption
+                                        : AiActionContext.commentReply,
                                 hasMediaAttached: isMediaCaptionable,
                                 hasReplyContext: isReplying,
                                 imageBytesProvider:
                                     pendingMedia?.type == CommentType.image &&
-                                        pendingMedia?.localFile != null
-                                    ? () =>
-                                          pendingMedia!.localFile!.readAsBytes()
-                                    : null,
+                                            pendingMedia?.localFile != null
+                                        ? () =>
+                                            pendingMedia!.localFile!
+                                                .readAsBytes()
+                                        : null,
                                 targetUserName: widget.replyingToAuthorName,
-                                targetText: (repliedComment == null)
-                                    ? widget.post.text
-                                    : (repliedComment.commentType ==
-                                              CommentType.text
-                                          ? repliedComment.text
-                                          : null),
+                                targetText:
+                                    (repliedComment == null)
+                                        ? widget.post.text
+                                        : (repliedComment.commentType ==
+                                                CommentType.text
+                                            ? repliedComment.text
+                                            : null),
                                 targetImageBytesProvider:
                                     (repliedComment != null &&
-                                        repliedComment.commentType ==
-                                            CommentType.image &&
-                                        repliedComment.imageUrl != null)
-                                    ? () => RemoteMediaFetcher.fetchBytes(
-                                        repliedComment.imageUrl!,
-                                      )
-                                    : null,
+                                            repliedComment.commentType ==
+                                                CommentType.image &&
+                                            repliedComment.imageUrl != null)
+                                        ? () => RemoteMediaFetcher.fetchBytes(
+                                          repliedComment.imageUrl!,
+                                        )
+                                        : null,
                                 mediaCaption:
                                     (repliedComment != null &&
-                                        repliedComment.commentType !=
-                                            CommentType.text)
-                                    ? repliedComment.text
-                                    : null,
-                                targetMediaType: isMediaCaptionable
-                                    ? _mapCommentType(pendingMedia!.type)
-                                    : (repliedComment != null
-                                          ? _mapCommentType(
+                                            repliedComment.commentType !=
+                                                CommentType.text)
+                                        ? repliedComment.text
+                                        : null,
+                                targetMediaType:
+                                    isMediaCaptionable
+                                        ? _mapCommentType(pendingMedia!.type)
+                                        : (repliedComment != null
+                                            ? _mapCommentType(
                                               repliedComment.commentType,
                                             )
-                                          : AiTargetMediaType.text),
+                                            : AiTargetMediaType.text),
                               ),
                             ),
                           ),
                           const Gap(8),
                           isLoading
                               ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CustomLoadingIndicator(),
-                                )
+                                height: 24,
+                                width: 24,
+                                child: CustomLoadingIndicator(),
+                              )
                               : InkWell(
-                                  onTap: canSend ? _submitComment : null,
-                                  child: Image.asset(
-                                    AppImages.sendIcon,
-                                    width: 24,
-                                    height: 24,
-                                    color: canSend
-                                        ? Theme.of(context).primaryColor
-                                        : AppColors.grey5,
-                                  ),
+                                onTap: canSend ? _submitComment : null,
+                                child: Image.asset(
+                                  AppImages.sendIcon,
+                                  width: 24,
+                                  height: 24,
+                                  color:
+                                      canSend
+                                          ? Theme.of(context).primaryColor
+                                          : AppColors.grey5,
                                 ),
+                              ),
                           const Gap(2),
                         ],
                       ),

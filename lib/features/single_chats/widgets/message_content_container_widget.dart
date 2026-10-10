@@ -48,23 +48,25 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
 
   void _openReactionsSheet(BuildContext context) {
     final cubit = context.read<ChatDetailsCubit>();
-    final partnerId = widget.message.senderId == cubit.currentUserId
-        ? widget.message.receiverId
-        : widget.message.senderId;
+    final partnerId =
+        widget.message.senderId == cubit.currentUserId
+            ? widget.message.receiverId
+            : widget.message.senderId;
 
     MessageReactionsBottomSheet.show(
       context: context,
       messageId: widget.message.id,
       initialReactions: _mergeLiveReactions(widget.message),
       currentUserId: cubit.currentUserId,
-      reactionsBuilder: (contentBuilder) =>
-          BlocBuilder<ChatDetailsCubit, ChatDetailsState>(
+      reactionsBuilder:
+          (contentBuilder) => BlocBuilder<ChatDetailsCubit, ChatDetailsState>(
             bloc: cubit,
             buildWhen: (previous, current) => current is MessagesSuccessLoaded,
             builder: (context, state) {
-              final messages = state is MessagesSuccessLoaded
-                  ? state.messages
-                  : cubit.cachedMessages;
+              final messages =
+                  state is MessagesSuccessLoaded
+                      ? state.messages
+                      : cubit.cachedMessages;
               final current = messages.firstWhere(
                 (m) => m.id == widget.message.id,
                 orElse: () => widget.message,
@@ -78,15 +80,17 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
         currentUserImageUrl: cubit.senderImageUrl,
         receiver: widget.receiverUser,
       ),
-      onRemoveReaction: (emoji) => cubit.toggleReaction(
-        messageId: widget.message.id,
-        receiverId: partnerId,
-        emoji: emoji,
-      ),
-      onOpenProfile: (userId) => Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamed(AppRoutes.profileViewRoute, arguments: userId),
+      onRemoveReaction:
+          (emoji) => cubit.toggleReaction(
+            messageId: widget.message.id,
+            receiverId: partnerId,
+            emoji: emoji,
+          ),
+      onOpenProfile:
+          (userId) => Navigator.of(
+            context,
+            rootNavigator: true,
+          ).pushNamed(AppRoutes.profileViewRoute, arguments: userId),
     );
   }
 
@@ -95,9 +99,8 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double screenCap = MediaQuery.of(context).size.width * 0.70;
-        final double maxBubbleWidth = constraints.maxWidth < screenCap
-            ? constraints.maxWidth
-            : screenCap;
+        final double maxBubbleWidth =
+            constraints.maxWidth < screenCap ? constraints.maxWidth : screenCap;
 
         return _buildContent(context, maxBubbleWidth);
       },
@@ -151,27 +154,35 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
             right: 0,
             bottom: hasReaction ? 28 : 2,
           ),
-          padding: isStickerOrGif
-              ? EdgeInsets.zero
-              : (isImage || isVideo)
-              ? const EdgeInsets.all(3)
-              : const EdgeInsets.only(left: 10, right: 10, bottom: 8, top: 6),
+          padding:
+              isStickerOrGif
+                  ? EdgeInsets.zero
+                  : (isImage || isVideo)
+                  ? const EdgeInsets.all(3)
+                  : const EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    bottom: 8,
+                    top: 6,
+                  ),
           constraints: BoxConstraints(
             maxWidth: maxBubbleWidth,
-            minWidth: isVoice
-                ? (280 > maxBubbleWidth ? maxBubbleWidth : 280)
-                : (isImage || isVideo ? 200 : 40),
+            minWidth:
+                isVoice
+                    ? (280 > maxBubbleWidth ? maxBubbleWidth : 280)
+                    : (isImage || isVideo ? 200 : 40),
           ),
           decoration: BoxDecoration(
-            color: isStickerOrGif
-                ? Colors.transparent
-                : (isImage || isVideo) &&
-                      (widget.message.imageUrl == null &&
-                          widget.message.videoUrl == null)
-                ? AppColors.transparent
-                : (widget.isMe
-                      ? Theme.of(context).primaryColor
-                      : (isDarkMode
+            color:
+                isStickerOrGif
+                    ? Colors.transparent
+                    : (isImage || isVideo) &&
+                        (widget.message.imageUrl == null &&
+                            widget.message.videoUrl == null)
+                    ? AppColors.transparent
+                    : (widget.isMe
+                        ? Theme.of(context).primaryColor
+                        : (isDarkMode
                             ? Theme.of(context).colorScheme.surfaceContainerHigh
                             : Colors.grey.shade200)),
             borderRadius: BorderRadius.only(
@@ -180,31 +191,36 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
               bottomLeft: Radius.circular(widget.isMe ? 20 : 0),
               bottomRight: Radius.circular(widget.isMe ? 0 : 20),
             ),
-            boxShadow: (isUploading && !isFile) || isStickerOrGif
-                ? []
-                : [BoxShadow(color: AppColors.grey1.withValues(alpha: 0.8))],
+            boxShadow:
+                (isUploading && !isFile) || isStickerOrGif
+                    ? []
+                    : [
+                      BoxShadow(color: AppColors.grey1.withValues(alpha: 0.8)),
+                    ],
           ),
           child: Opacity(
             opacity: 1,
-            child: widget.message.isForwarded
-                ? IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ForwardedHeader(
-                          name:
-                              widget.message.forwardedFromUserName ?? 'Unknown',
-                          avatarUrl: widget.message.forwardedFromUserAvatar,
-                          originalSenderId:
-                              widget.message.forwardedFromUserId ?? '',
-                          onColoredBubble: widget.isMe && !isStickerOrGif,
-                        ),
-                        regularContent,
-                      ],
-                    ),
-                  )
-                : regularContent,
+            child:
+                widget.message.isForwarded
+                    ? IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ForwardedHeader(
+                            name:
+                                widget.message.forwardedFromUserName ??
+                                'Unknown',
+                            avatarUrl: widget.message.forwardedFromUserAvatar,
+                            originalSenderId:
+                                widget.message.forwardedFromUserId ?? '',
+                            onColoredBubble: widget.isMe && !isStickerOrGif,
+                          ),
+                          regularContent,
+                        ],
+                      ),
+                    )
+                    : regularContent,
           ),
         ),
 
@@ -221,19 +237,23 @@ class _MessageContentContainerState extends State<MessageContentContainer> {
                 valueListenable: context
                     .read<ChatDetailsCubit>()
                     .progressNotifierFor(widget.message.id),
-                builder:
-                    (BuildContext context, double progress, Widget? child) {
-                      return MediaStateOverlay(
-                        state: MediaTransferState.uploading(progress),
-                        isVideo: widget.message.messageType == 'video',
-                        durationSeconds: widget.message.durationSeconds,
-                        fileSizeBytes: widget.message.fileSizeBytes,
-                        onCancelTap: () => context
-                            .read<ChatDetailsCubit>()
-                            .cancelUpload(widget.message.id),
-                        child: const SizedBox.shrink(),
-                      );
-                    },
+                builder: (
+                  BuildContext context,
+                  double progress,
+                  Widget? child,
+                ) {
+                  return MediaStateOverlay(
+                    state: MediaTransferState.uploading(progress),
+                    isVideo: widget.message.messageType == 'video',
+                    durationSeconds: widget.message.durationSeconds,
+                    fileSizeBytes: widget.message.fileSizeBytes,
+                    onCancelTap:
+                        () => context.read<ChatDetailsCubit>().cancelUpload(
+                          widget.message.id,
+                        ),
+                    child: const SizedBox.shrink(),
+                  );
+                },
               ),
             ),
           ),

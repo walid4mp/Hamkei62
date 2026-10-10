@@ -37,22 +37,25 @@ class ConversationItem {
   );
 
   ConversationRef get ref => ConversationRef(
-    type: kind == ConversationKind.single
-        ? ConversationType.single
-        : ConversationType.group,
+    type:
+        kind == ConversationKind.single
+            ? ConversationType.single
+            : ConversationType.group,
     id: kind == ConversationKind.single ? chat!.id : group!.id,
   );
 
   int get unreadCount =>
       kind == ConversationKind.single ? chat!.unreadCount : group!.unreadCount;
 
-  DateTime? get lastActivityAt => kind == ConversationKind.single
-      ? chat!.lastMessageTime
-      : (group!.lastMessageAt ?? group!.createdAt);
+  DateTime? get lastActivityAt =>
+      kind == ConversationKind.single
+          ? chat!.lastMessageTime
+          : (group!.lastMessageAt ?? group!.createdAt);
 
-  bool get isMuted => kind == ConversationKind.group
-      ? group!.isMuted
-      : (flags.muteOverride ?? flags.isArchived);
+  bool get isMuted =>
+      kind == ConversationKind.group
+          ? group!.isMuted
+          : (flags.muteOverride ?? flags.isArchived);
 
   bool get isPinned => flags.isPinned;
   bool get isFavorite => flags.isFavorite;

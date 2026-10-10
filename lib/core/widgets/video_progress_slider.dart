@@ -38,12 +38,13 @@ class VideoProgressSlider extends StatelessWidget {
         final duration = value.duration;
         final position = value.position;
         final hasDuration = duration > Duration.zero;
-        final progress = hasDuration
-            ? (position.inMilliseconds / duration.inMilliseconds).clamp(
-                0.0,
-                1.0,
-              )
-            : 0.0;
+        final progress =
+            hasDuration
+                ? (position.inMilliseconds / duration.inMilliseconds).clamp(
+                  0.0,
+                  1.0,
+                )
+                : 0.0;
 
         final progressBar = LayoutBuilder(
           builder: (context, constraints) {

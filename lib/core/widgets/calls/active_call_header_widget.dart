@@ -27,8 +27,9 @@ class _ActiveCallHeaderWidgetState extends State<ActiveCallHeaderWidget> {
       builder: (context, session) {
         if (session == null) return const SizedBox.shrink();
         return BlocConsumer<CallPipCubit, CallPipState>(
-          listenWhen: (previous, current) =>
-              !previous.isMinimized && current.isMinimized,
+          listenWhen:
+              (previous, current) =>
+                  !previous.isMinimized && current.isMinimized,
           listener: (context, pip) {
             if (_isDismissedByUser) {
               setState(() => _isDismissedByUser = false);
@@ -51,25 +52,29 @@ Widget _buildSwitcher(
 ) {
   return AnimatedSwitcher(
     duration: const Duration(milliseconds: 250),
-    transitionBuilder: (child, animation) => FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero)
-            .animate(
+    transitionBuilder:
+        (child, animation) => FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -0.2),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
             ),
-        child: child,
-      ),
-    ),
-    child: !shouldShow
-        ? const SizedBox.shrink(key: ValueKey('hidden'))
-        : Material(
-            key: const ValueKey('header'),
-            type: MaterialType.transparency,
-            child: ActiveCallHeaderContent(
-              session: session,
-              onDismiss: onDismiss,
-            ),
+            child: child,
           ),
+        ),
+    child:
+        !shouldShow
+            ? const SizedBox.shrink(key: ValueKey('hidden'))
+            : Material(
+              key: const ValueKey('header'),
+              type: MaterialType.transparency,
+              child: ActiveCallHeaderContent(
+                session: session,
+                onDismiss: onDismiss,
+              ),
+            ),
   );
 }

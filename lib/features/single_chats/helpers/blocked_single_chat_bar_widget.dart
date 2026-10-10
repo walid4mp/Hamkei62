@@ -92,10 +92,11 @@ class BlockedSingleChatBarWidget extends StatelessWidget {
                 ),
                 visualDensity: VisualDensity.compact,
               ),
-              onPressed: () => _chatCubit.toggleBlock(
-                receiverId: _receiverId,
-                otherUserName: widget.receiverUser.name,
-              ),
+              onPressed:
+                  () => _chatCubit.toggleBlock(
+                    receiverId: _receiverId,
+                    otherUserName: widget.receiverUser.name,
+                  ),
               child: const Text('Unblock'),
             ),
           ],

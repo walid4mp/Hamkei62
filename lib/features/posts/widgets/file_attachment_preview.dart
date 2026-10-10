@@ -268,9 +268,10 @@ class _FileAttachmentPreviewState extends State<FileAttachmentPreview>
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: isDark
-            ? fileColor.withValues(alpha: 0.12)
-            : fileColor.withValues(alpha: 0.06),
+        color:
+            isDark
+                ? fileColor.withValues(alpha: 0.12)
+                : fileColor.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: fileColor.withValues(alpha: isDark ? 0.28 : 0.18),

@@ -135,11 +135,12 @@ class _AiChatSummarySheetState extends State<AiChatSummarySheet> {
           _failureReason == AiFailureReason.userQuotaExceeded ||
           _failureReason == AiFailureReason.globalQuotaExceeded;
 
-      final message = _failureReason == 'empty_chat'
-          ? 'There aren\'t enough messages in the chat to summarize.'
-          : isQuota
-          ? 'You have used up your daily AI quota. Please try again tomorrow.'
-          : 'An error occurred. Please try again later.';
+      final message =
+          _failureReason == 'empty_chat'
+              ? 'There aren\'t enough messages in the chat to summarize.'
+              : isQuota
+              ? 'You have used up your daily AI quota. Please try again tomorrow.'
+              : 'An error occurred. Please try again later.';
 
       return Text(message, style: Theme.of(context).textTheme.bodyMedium);
     }

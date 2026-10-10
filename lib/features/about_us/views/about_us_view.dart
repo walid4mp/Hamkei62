@@ -53,10 +53,12 @@ class _AboutUsViewState extends State<AboutUsView>
     _contentFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _contentController, curve: Curves.easeOut),
     );
-    _contentSlide =
-        Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
-          CurvedAnimation(parent: _contentController, curve: Curves.easeOut),
-        );
+    _contentSlide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _contentController, curve: Curves.easeOut),
+    );
 
     _heroController.forward().then((_) => _contentController.forward());
 

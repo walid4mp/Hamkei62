@@ -29,9 +29,10 @@ class VideoPostAuthorAndCaption extends StatelessWidget {
       bloc: postsCubit,
       buildWhen: (prev, curr) => prev is PostsLoaded && curr is PostsLoaded,
       builder: (context, state) {
-        final currentPost = (state is PostsLoaded)
-            ? state.posts.findById(post.id) ?? post
-            : post;
+        final currentPost =
+            (state is PostsLoaded)
+                ? state.posts.findById(post.id) ?? post
+                : post;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

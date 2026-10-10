@@ -31,8 +31,9 @@ class CustomBackToTopBtn extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor
-                        .withValues(alpha: 0.65),
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.65),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(

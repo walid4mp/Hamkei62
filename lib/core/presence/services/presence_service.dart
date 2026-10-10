@@ -139,15 +139,14 @@ class PresenceService with WidgetsBindingObserver {
 
     try {
       final now = DateTime.now().toUtc().toIso8601String();
-      await SupabaseProvider.client.from(SupabaseConstants.userPresence).upsert(
-        {
-          PresenceColumns.userId: uid,
-          PresenceColumns.isOnline: effectiveOnline,
-          PresenceColumns.lastSeen: now,
-          PresenceColumns.updatedAt: now,
-        },
-        onConflict: PresenceColumns.userId,
-      );
+      await SupabaseProvider.client
+          .from(SupabaseConstants.userPresence)
+          .upsert({
+            PresenceColumns.userId: uid,
+            PresenceColumns.isOnline: effectiveOnline,
+            PresenceColumns.lastSeen: now,
+            PresenceColumns.updatedAt: now,
+          }, onConflict: PresenceColumns.userId);
     } catch (e) {
       debugPrint('[PresenceService] _setOnline($isOnline) error: $e');
     }

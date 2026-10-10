@@ -19,9 +19,8 @@ class GroupPresenceTextFormatter {
   }
 
   static String _phraseFor(ChatActionType action, List entries) {
-    final verb = action == ChatActionType.typing
-        ? 'is typing...'
-        : 'recording audio...';
+    final verb =
+        action == ChatActionType.typing ? 'is typing...' : 'recording audio...';
 
     if (entries.length == 1) {
       return '${entries.first.userName} $verb';

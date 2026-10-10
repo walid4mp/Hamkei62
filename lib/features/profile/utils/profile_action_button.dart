@@ -96,9 +96,10 @@ class _ProfileActionButtonState extends State<ProfileActionButton> {
     final colors = profileActionColors(widget.style, tokens);
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(ProfileUiTokens.buttonRadius),
-      side: colors.border == Colors.transparent
-          ? BorderSide.none
-          : BorderSide(color: colors.border, width: 1),
+      side:
+          colors.border == Colors.transparent
+              ? BorderSide.none
+              : BorderSide(color: colors.border, width: 1),
     );
 
     final content = Padding(
@@ -140,12 +141,13 @@ class _ProfileActionButtonState extends State<ProfileActionButton> {
           onTapDown: (_) => setState(() => _pressed = true),
           onTapUp: (_) => setState(() => _pressed = false),
           onTapCancel: () => setState(() => _pressed = false),
-          onTap: widget.onPressed == null
-              ? null
-              : () {
-                  HapticFeedback.lightImpact();
-                  widget.onPressed!();
-                },
+          onTap:
+              widget.onPressed == null
+                  ? null
+                  : () {
+                    HapticFeedback.lightImpact();
+                    widget.onPressed!();
+                  },
           child: SizedBox(
             height: ProfileUiTokens.buttonHeight,
             width: widget.expand ? double.infinity : null,

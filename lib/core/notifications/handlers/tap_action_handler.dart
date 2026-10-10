@@ -345,9 +345,10 @@ class TapActionHandler {
     try {
       await storiesCubit.fetchStories(isRefresh: true);
       final myUserId = SupabaseProvider.idOrNull;
-      final myStories = storiesCubit.cachedStories
-          .where((s) => s.authorId == myUserId)
-          .toList();
+      final myStories =
+          storiesCubit.cachedStories
+              .where((s) => s.authorId == myUserId)
+              .toList();
       final storyIndex = myStories.indexWhere((s) => s.id == storyId);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -390,11 +391,12 @@ class TapActionHandler {
       await storiesCubit.fetchStories(isRefresh: true);
       final match = storiesCubit.cachedStories.where((s) => s.id == storyId);
       final authorId = match.isNotEmpty ? match.first.authorId : null;
-      final authorGroup = authorId == null
-          ? <StoryModel>[]
-          : storiesCubit.cachedStories
-                .where((s) => s.authorId == authorId)
-                .toList();
+      final authorGroup =
+          authorId == null
+              ? <StoryModel>[]
+              : storiesCubit.cachedStories
+                  .where((s) => s.authorId == authorId)
+                  .toList();
       final storyIndex = authorGroup.indexWhere((s) => s.id == storyId);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

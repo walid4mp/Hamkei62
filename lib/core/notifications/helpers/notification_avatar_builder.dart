@@ -9,9 +9,8 @@ class NotificationAvatarBuilder {
   static const _defaultCacheKey = '__default__';
 
   Future<Uint8List> getAvatarBitmap(String? avatarUrl) async {
-    final cacheKey = (avatarUrl == null || avatarUrl.isEmpty)
-        ? _defaultCacheKey
-        : avatarUrl;
+    final cacheKey =
+        (avatarUrl == null || avatarUrl.isEmpty) ? _defaultCacheKey : avatarUrl;
     if (_avatarCache.containsKey(cacheKey)) {
       return _avatarCache[cacheKey]!;
     }

@@ -43,8 +43,9 @@ class SharedGroupsSection extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: Theme.of(context).primaryColor
-                          .withValues(alpha: 0.85),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -56,8 +57,8 @@ class SharedGroupsSection extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: groups.length,
                 separatorBuilder: (_, _) => const Gap(4),
-                itemBuilder: (context, index) =>
-                    SharedGroupTile(item: groups[index]),
+                itemBuilder:
+                    (context, index) => SharedGroupTile(item: groups[index]),
               ),
             ],
           ),

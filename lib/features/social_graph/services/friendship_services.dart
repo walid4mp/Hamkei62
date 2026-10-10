@@ -76,14 +76,15 @@ class FriendshipServices {
   }
 
   Future<String> sendFriendRequest(String addresseeId) async {
-    final row = await _supabase
-        .from(SupabaseConstants.friendships)
-        .insert({
-          FriendshipColumns.requesterId: SupabaseProvider.id,
-          FriendshipColumns.addresseeId: addresseeId,
-        })
-        .select(FriendshipColumns.id)
-        .single();
+    final row =
+        await _supabase
+            .from(SupabaseConstants.friendships)
+            .insert({
+              FriendshipColumns.requesterId: SupabaseProvider.id,
+              FriendshipColumns.addresseeId: addresseeId,
+            })
+            .select(FriendshipColumns.id)
+            .single();
     return row[FriendshipColumns.id] as String;
   }
 
@@ -99,9 +100,8 @@ class FriendshipServices {
         .from(SupabaseConstants.friendships)
         .update({
           FriendshipColumns.status: 'accepted',
-          FriendshipColumns.respondedAt: DateTime.now()
-              .toUtc()
-              .toIso8601String(),
+          FriendshipColumns.respondedAt:
+              DateTime.now().toUtc().toIso8601String(),
         })
         .eq(FriendshipColumns.id, friendshipId)
         .eq(FriendshipColumns.status, 'pending')

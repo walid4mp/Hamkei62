@@ -90,22 +90,20 @@ extension CloudinaryUrlX on String {
     if (idx == -1) return null;
 
     final head = substring(0, idx + marker.length);
-    final tailSegments = substring(idx + marker.length)
-        .split('/')
-        .where((s) => s.isNotEmpty)
-        .toList();
+    final tailSegments =
+        substring(
+          idx + marker.length,
+        ).split('/').where((s) => s.isNotEmpty).toList();
     if (tailSegments.isEmpty) return null;
 
-    final cleanSegments = tailSegments
-        .where((s) => !_isTransformationSegment(s))
-        .toList();
+    final cleanSegments =
+        tailSegments.where((s) => !_isTransformationSegment(s)).toList();
     if (cleanSegments.isEmpty) return null;
 
     final fileName = cleanSegments.removeLast();
     final dotIndex = fileName.lastIndexOf('.');
-    final fileNameWithoutExt = dotIndex == -1
-        ? fileName
-        : fileName.substring(0, dotIndex);
+    final fileNameWithoutExt =
+        dotIndex == -1 ? fileName : fileName.substring(0, dotIndex);
 
     final rebuiltPath = [...cleanSegments, '$fileNameWithoutExt.jpg'].join('/');
 

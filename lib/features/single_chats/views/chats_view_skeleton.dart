@@ -66,10 +66,11 @@ class ChatsViewSkeleton extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 8,
-                separatorBuilder: (_, __) => const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(color: Colors.white, height: 1),
-                ),
+                separatorBuilder:
+                    (_, __) => const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.white, height: 1),
+                    ),
                 itemBuilder: (_, __) => _ChatTileSkeleton(),
               ),
             ),

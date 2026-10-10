@@ -36,9 +36,10 @@ class StoryColorPicker extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
-                border: selected == color
-                    ? Border.all(color: AppColors.white, width: 3)
-                    : null,
+                border:
+                    selected == color
+                        ? Border.all(color: AppColors.white, width: 3)
+                        : null,
               ),
             ),
           );

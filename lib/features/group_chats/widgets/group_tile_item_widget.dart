@@ -46,12 +46,11 @@ class GroupTileItem extends StatelessWidget {
         final isSelected = selection.isSelected(ref);
 
         return Material(
-          color: isSelected
-              ? primary.withValues(alpha: 0.08)
-              : Colors.transparent,
+          color:
+              isSelected ? primary.withValues(alpha: 0.08) : Colors.transparent,
           child: InkWell(
-            onLongPress: () =>
-                context.read<ConversationSelectionCubit>().toggle(ref),
+            onLongPress:
+                () => context.read<ConversationSelectionCubit>().toggle(ref),
             onTap: () {
               if (isSelecting) {
                 context.read<ConversationSelectionCubit>().toggle(ref);
@@ -131,9 +130,10 @@ class GroupTileItem extends StatelessWidget {
     return Text(
       FormattedDate.getMessageTime(group.lastMessageAt!),
       style: TextStyle(
-        color: group.unreadCount > 0
-            ? primary
-            : (isDark ? Colors.white38 : Colors.black38),
+        color:
+            group.unreadCount > 0
+                ? primary
+                : (isDark ? Colors.white38 : Colors.black38),
         fontSize: 11,
       ),
     );
@@ -204,125 +204,131 @@ class GroupTileItem extends StatelessWidget {
         color: Colors.green.shade600,
         fontStyle: FontStyle.italic,
       ),
-      fallback: group.lastMessage != null
-          ? Builder(
-              builder: (context) {
-                final textStyle = TextStyle(
-                  color: highlightUnreadMessage
-                      ? Theme.of(context).colorScheme.onSurface
-                      : Colors.grey.shade600,
-                  fontSize: 13,
-                  fontWeight: highlightUnreadMessage
-                      ? FontWeight.w500
-                      : FontWeight.w400,
-                  fontFamily: null,
-                  fontFamilyFallback: AppTypography.fontFallback,
-                );
+      fallback:
+          group.lastMessage != null
+              ? Builder(
+                builder: (context) {
+                  final textStyle = TextStyle(
+                    color:
+                        highlightUnreadMessage
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Colors.grey.shade600,
+                    fontSize: 13,
+                    fontWeight:
+                        highlightUnreadMessage
+                            ? FontWeight.w500
+                            : FontWeight.w400,
+                    fontFamily: null,
+                    fontFamilyFallback: AppTypography.fontFallback,
+                  );
 
-                if (group.lastMessageType == 'file' ||
-                    group.lastMessageType == 'document') {
-                  final senderId = group.lastMessageSenderId;
-                  final senderNameFromData = group.lastMessageSenderName;
-                  final isMe = senderId != null && senderId == currentUserId;
+                  if (group.lastMessageType == 'file' ||
+                      group.lastMessageType == 'document') {
+                    final senderId = group.lastMessageSenderId;
+                    final senderNameFromData = group.lastMessageSenderName;
+                    final isMe = senderId != null && senderId == currentUserId;
 
-                  final senderName = isMe
-                      ? 'You'
-                      : (senderNameFromData?.trim().isNotEmpty == true
-                            ? senderNameFromData!
-                            : 'Someone');
+                    final senderName =
+                        isMe
+                            ? 'You'
+                            : (senderNameFromData?.trim().isNotEmpty == true
+                                ? senderNameFromData!
+                                : 'Someone');
+
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '$senderName: ',
+                          style: textStyle,
+                          textDirection: TextDirection.ltr,
+                        ),
+                        Flexible(
+                          child:
+                              MessageReactionPreviewHelper.buildDirectionalFilePreview(
+                                fileName: group.lastMessage ?? 'File',
+                                style: textStyle,
+                                defaultIconColor: Colors.grey.shade600,
+                                iconSize: 12,
+                              ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  final fullText = buildGroupLastMessagePreview(
+                    group: group,
+                    currentUserId: currentUserId,
+                  );
+
+                  if (group.lastMessageType == 'message_react') {
+                    return MessageReactionPreviewHelper.buildReactionPreviewWidget(
+                      rawPreview: EmojiHelper.normalize(fullText),
+                      style: textStyle,
+                      defaultIconColor: Colors.grey.shade600,
+                      iconSize: 12,
+                    );
+                  }
+
+                  String prefix = '';
+                  String content = fullText;
+
+                  final isEventOrReact =
+                      group.lastMessageType == 'system_event';
+
+                  final colonIndex =
+                      isEventOrReact ? -1 : fullText.indexOf(': ');
+                  if (colonIndex != -1 && colonIndex < 25) {
+                    prefix = fullText.substring(0, colonIndex + 2);
+                    content = fullText.substring(colonIndex + 2);
+                  }
+
+                  final normalText = EmojiHelper.normalize(content);
+
+                  final direction = BidiTextHelper.detectDirection(
+                    content.trimLeft(),
+                  );
+
+                  if (prefix.isEmpty) {
+                    return Text(
+                      normalText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textDirection: direction,
+                      textAlign: TextAlign.left,
+                      style: textStyle,
+                    );
+                  }
 
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '$senderName: ',
+                        prefix,
                         style: textStyle,
                         textDirection: TextDirection.ltr,
                       ),
-                      Flexible(
-                        child:
-                            MessageReactionPreviewHelper.buildDirectionalFilePreview(
-                              fileName: group.lastMessage ?? 'File',
-                              style: textStyle,
-                              defaultIconColor: Colors.grey.shade600,
-                              iconSize: 12,
-                            ),
+                      Expanded(
+                        child: Text(
+                          content,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textDirection: direction,
+                          textAlign: TextAlign.left,
+                          style: textStyle,
+                        ),
                       ),
                     ],
                   );
-                }
-
-                final fullText = buildGroupLastMessagePreview(
-                  group: group,
-                  currentUserId: currentUserId,
-                );
-
-                if (group.lastMessageType == 'message_react') {
-                  return MessageReactionPreviewHelper.buildReactionPreviewWidget(
-                    rawPreview: EmojiHelper.normalize(fullText),
-                    style: textStyle,
-                    defaultIconColor: Colors.grey.shade600,
-                    iconSize: 12,
-                  );
-                }
-
-                String prefix = '';
-                String content = fullText;
-
-                final isEventOrReact = group.lastMessageType == 'system_event';
-
-                final colonIndex = isEventOrReact ? -1 : fullText.indexOf(': ');
-                if (colonIndex != -1 && colonIndex < 25) {
-                  prefix = fullText.substring(0, colonIndex + 2);
-                  content = fullText.substring(colonIndex + 2);
-                }
-
-                final normalText = EmojiHelper.normalize(content);
-
-                final direction = BidiTextHelper.detectDirection(
-                  content.trimLeft(),
-                );
-
-                if (prefix.isEmpty) {
-                  return Text(
-                    normalText,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textDirection: direction,
-                    textAlign: TextAlign.left,
-                    style: textStyle,
-                  );
-                }
-
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      prefix,
-                      style: textStyle,
-                      textDirection: TextDirection.ltr,
-                    ),
-                    Expanded(
-                      child: Text(
-                        content,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textDirection: direction,
-                        textAlign: TextAlign.left,
-                        style: textStyle,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            )
-          : Text(
-              'Tap to open group chat',
-              style: TextStyle(
-                color: isDark ? Colors.white38 : Colors.black38,
-                fontSize: 13,
+                },
+              )
+              : Text(
+                'Tap to open group chat',
+                style: TextStyle(
+                  color: isDark ? Colors.white38 : Colors.black38,
+                  fontSize: 13,
+                ),
               ),
-            ),
     );
   }
 
@@ -337,29 +343,35 @@ class GroupTileItem extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         GestureDetector(
-          onTap: (!isSelecting)
-              ? () => showDialog(
-                  context: context,
-                  barrierColor: Colors.black54,
-                  builder: (_) => GroupPreviewDialog(group: group),
-                )
-              : null,
+          onTap:
+              (!isSelecting)
+                  ? () => showDialog(
+                    context: context,
+                    barrierColor: Colors.black54,
+                    builder: (_) => GroupPreviewDialog(group: group),
+                  )
+                  : null,
           child: ClipOval(
             child: Container(
               width: 52,
               height: 52,
               color: primary.withValues(alpha: 0.12),
-              child: hasAvatar
-                  ? CachedCloudinaryImage(
-                      secureUrl: group.avatarUrl!,
-                      fit: BoxFit.cover,
-                      isAvatar: true,
-                      errorWidget: (context, error) => Image.asset(
+              child:
+                  hasAvatar
+                      ? CachedCloudinaryImage(
+                        secureUrl: group.avatarUrl!,
+                        fit: BoxFit.cover,
+                        isAvatar: true,
+                        errorWidget:
+                            (context, error) => Image.asset(
+                              AppImages.defaultGroupImg,
+                              fit: BoxFit.cover,
+                            ),
+                      )
+                      : Image.asset(
                         AppImages.defaultGroupImg,
                         fit: BoxFit.cover,
                       ),
-                    )
-                  : Image.asset(AppImages.defaultGroupImg, fit: BoxFit.cover),
             ),
           ),
         ),
@@ -399,9 +411,10 @@ class _SelectionBadge extends StatelessWidget {
             width: 1.5,
           ),
         ),
-        child: isSelected
-            ? const Icon(Icons.check_rounded, color: Colors.white, size: 13)
-            : null,
+        child:
+            isSelected
+                ? const Icon(Icons.check_rounded, color: Colors.white, size: 13)
+                : null,
       ),
     );
   }

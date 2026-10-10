@@ -25,8 +25,9 @@ class CustomFloatingNavBar extends StatelessWidget {
         child: Container(
           height: 60,
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor
-                .withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).scaffoldBackgroundColor.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.12),

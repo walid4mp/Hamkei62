@@ -29,13 +29,13 @@ class NewChatCubit extends Cubit<NewChatState>
         _connectionsService.getMyBlockedPersonIds(), // 🆕
       ]);
 
-      final people = (results[0] as List<Map<String, dynamic>>)
-          .map((row) => NewChatListItem.person(UserData.fromMap(row)))
-          .toList();
+      final people =
+          (results[0] as List<Map<String, dynamic>>)
+              .map((row) => NewChatListItem.person(UserData.fromMap(row)))
+              .toList();
 
-      final groups = (results[1] as List<GroupModel>)
-          .map(NewChatListItem.group)
-          .toList();
+      final groups =
+          (results[1] as List<GroupModel>).map(NewChatListItem.group).toList();
 
       _blockedPersonIds = results[2] as Set<String>;
       _allItems = [...people, ...groups];
@@ -51,23 +51,25 @@ class NewChatCubit extends Cubit<NewChatState>
     emit(NewChatLoaded(rows: _buildRows(_allItems, query), query: query));
   }
 
-  bool _isItemBlocked(NewChatListItem item) => item.isGroup
-      ? item.group!.isBlocked
-      : _blockedPersonIds.contains(item.id);
+  bool _isItemBlocked(NewChatListItem item) =>
+      item.isGroup
+          ? item.group!.isBlocked
+          : _blockedPersonIds.contains(item.id);
 
   List<NewChatRow> _buildRows(List<NewChatListItem> items, String query) {
     final trimmed = query.trim().toLowerCase();
 
-    final matched = trimmed.isEmpty
-        ? items
-        : items.where((item) {
-            if (item.isGroup) {
-              return item.group!.name.toLowerCase().contains(trimmed);
-            }
-            final p = item.person!;
-            return p.name.toLowerCase().contains(trimmed) ||
-                (p.userName?.toLowerCase().contains(trimmed) ?? false);
-          }).toList();
+    final matched =
+        trimmed.isEmpty
+            ? items
+            : items.where((item) {
+              if (item.isGroup) {
+                return item.group!.name.toLowerCase().contains(trimmed);
+              }
+              final p = item.person!;
+              return p.name.toLowerCase().contains(trimmed) ||
+                  (p.userName?.toLowerCase().contains(trimmed) ?? false);
+            }).toList();
 
     // ── تقسيم النتائج: نشِط / محظور أشخاص / محظور جروبات ──
     final active = <NewChatListItem>[];

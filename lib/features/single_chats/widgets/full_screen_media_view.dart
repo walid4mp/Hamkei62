@@ -139,9 +139,8 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
     if (roundedPercent != _lastAppliedVolumePercent) {
       _lastAppliedVolumePercent = roundedPercent;
       controller.setVolume(roundedPercent / 100);
-      _lastNonZeroVolume = roundedPercent > 0
-          ? roundedPercent / 100
-          : _lastNonZeroVolume;
+      _lastNonZeroVolume =
+          roundedPercent > 0 ? roundedPercent / 100 : _lastNonZeroVolume;
     }
 
     _flashVolumeIndicator();
@@ -215,9 +214,10 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
       final localPath = await context
           .read<MediaCacheRepository>()
           .resolveLocalPath(videoUrl);
-      _videoController = localPath != null
-          ? VideoPlayerController.file(File(localPath))
-          : VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      _videoController =
+          localPath != null
+              ? VideoPlayerController.file(File(localPath))
+              : VideoPlayerController.networkUrl(Uri.parse(videoUrl));
     }
     await _videoController!.initialize();
     if (!mounted) return;
@@ -324,24 +324,26 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
             child: AnimatedOpacity(
               opacity: (_hasReadyVideo && !_showControls) ? 0.0 : 1.0,
               duration: const Duration(milliseconds: 300),
-              child: (_hasReadyVideo && widget.showActions)
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const BackButton(color: Colors.white),
-                        GlassIconButton(
-                          size: 28,
-                          iconSize: 15,
-                          icon: _videoController!.value.volume <= 0
-                              ? Icons.volume_off_rounded
-                              : _videoController!.value.volume < 0.5
-                              ? Icons.volume_down_rounded
-                              : Icons.volume_up_rounded,
-                          onTap: _toggleMute,
-                        ),
-                      ],
-                    )
-                  : const BackButton(color: Colors.white),
+              child:
+                  (_hasReadyVideo && widget.showActions)
+                      ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const BackButton(color: Colors.white),
+                          GlassIconButton(
+                            size: 28,
+                            iconSize: 15,
+                            icon:
+                                _videoController!.value.volume <= 0
+                                    ? Icons.volume_off_rounded
+                                    : _videoController!.value.volume < 0.5
+                                    ? Icons.volume_down_rounded
+                                    : Icons.volume_up_rounded,
+                            onTap: _toggleMute,
+                          ),
+                        ],
+                      )
+                      : const BackButton(color: Colors.white),
             ),
           ),
           actions: [
@@ -369,40 +371,41 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
             if (widget.showActions && widget.imageUrl != null)
               _isSaving
                   ? const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CustomLoadingIndicator(color: Colors.white),
-                      ),
-                    )
-                  : PopupMenuButton<String>(
-                      color: Colors.white,
-                      icon: const Icon(Icons.more_vert, color: Colors.white),
-                      offset: const Offset(-24, kToolbarHeight - 12),
-                      onSelected: (value) {
-                        if (value == 'save') _saveMediaToGallery();
-                      },
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(
-                          value: 'save',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.download,
-                                size: 18,
-                                color: Colors.black45,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Save to gallery',
-                                style: TextStyle(color: Colors.black45),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    padding: EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CustomLoadingIndicator(color: Colors.white),
                     ),
+                  )
+                  : PopupMenuButton<String>(
+                    color: Colors.white,
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    offset: const Offset(-24, kToolbarHeight - 12),
+                    onSelected: (value) {
+                      if (value == 'save') _saveMediaToGallery();
+                    },
+                    itemBuilder:
+                        (_) => [
+                          const PopupMenuItem(
+                            value: 'save',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.download,
+                                  size: 18,
+                                  color: Colors.black45,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Save to gallery',
+                                  style: TextStyle(color: Colors.black45),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                  ),
             if (widget.showActions && _hasReadyVideo && _showControls)
               Padding(
                 padding: const EdgeInsets.only(right: 10),
@@ -424,9 +427,10 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
           alignment: Alignment.center,
           children: [
             AnimatedContainer(
-              duration: _isDragging
-                  ? Duration.zero
-                  : const Duration(milliseconds: 300),
+              duration:
+                  _isDragging
+                      ? Duration.zero
+                      : const Duration(milliseconds: 300),
               curve: Curves.easeOut,
               transform: Matrix4.translationValues(0, _dragOffset, 0),
               child: Stack(
@@ -457,21 +461,25 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
             transformationController: _transformationController,
             minScale: 0.5,
             maxScale: 4.0,
-            child: widget.isLocal
-                ? Image.file(File(widget.imageUrl!), fit: BoxFit.contain)
-                : CachedCloudinaryImage(
-                    secureUrl: widget.imageUrl!,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: double.infinity,
-                    placeholder: (context) =>
-                        BlurredImagePlaceholder(secureUrl: widget.imageUrl!),
-                    errorWidget: (context, error) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 50,
+            child:
+                widget.isLocal
+                    ? Image.file(File(widget.imageUrl!), fit: BoxFit.contain)
+                    : CachedCloudinaryImage(
+                      secureUrl: widget.imageUrl!,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                      placeholder:
+                          (context) => BlurredImagePlaceholder(
+                            secureUrl: widget.imageUrl!,
+                          ),
+                      errorWidget:
+                          (context, error) => const Icon(
+                            Icons.broken_image,
+                            color: Colors.white,
+                            size: 50,
+                          ),
                     ),
-                  ),
           ),
         ),
       );
@@ -536,74 +544,76 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onDoubleTap: () => _handleDoubleTapSeek(false),
-                child: _showLeftSeek
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.55),
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.fast_rewind_rounded,
-                              color: Colors.white,
-                              size: 40,
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '-5 sec',
-                              style: TextStyle(
+                child:
+                    _showLeftSeek
+                        ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.55),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.fast_rewind_rounded,
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                size: 40,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.expand(),
+                              SizedBox(height: 8),
+                              Text(
+                                '-5 sec',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        : const SizedBox.expand(),
               ),
             ),
             Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onDoubleTap: () => _handleDoubleTapSeek(true),
-                child: _showRightSeek
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.55),
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.fast_forward_rounded,
-                              color: Colors.white,
-                              size: 40,
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '+5 sec',
-                              style: TextStyle(
+                child:
+                    _showRightSeek
+                        ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.55),
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.fast_forward_rounded,
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                size: 40,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.expand(),
+                              SizedBox(height: 8),
+                              Text(
+                                '+5 sec',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        : const SizedBox.expand(),
               ),
             ),
           ],
@@ -619,9 +629,10 @@ class _FullScreenMediaViewState extends State<FullScreenMediaView>
                 Container(color: Colors.black38),
                 Center(
                   child: GlassIconButton(
-                    icon: _videoController!.value.isPlaying
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
+                    icon:
+                        _videoController!.value.isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
                     size: 58,
                     iconSize: 30,
                     onTap: () {

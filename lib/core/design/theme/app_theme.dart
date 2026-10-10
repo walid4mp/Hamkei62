@@ -59,9 +59,8 @@ abstract final class AppTheme {
         foregroundColor: palette.onSurface,
         centerTitle: false,
         titleSpacing: AppSpacing.space4,
-        systemOverlayStyle: isDark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
+        systemOverlayStyle:
+            isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         iconTheme: IconThemeData(
           color: palette.onSurface,
           size: AppDimensions.iconLarge,
@@ -222,9 +221,8 @@ abstract final class AppTheme {
       bottomSheetTheme: BottomSheetThemeData(
         elevation: 0,
         backgroundColor: isDark ? palette.surfaceElevated : palette.surface,
-        modalBackgroundColor: isDark
-            ? palette.surfaceElevated
-            : palette.surface,
+        modalBackgroundColor:
+            isDark ? palette.surfaceElevated : palette.surface,
         shape: const RoundedRectangleBorder(borderRadius: AppRadii.bottomSheet),
         dragHandleColor: palette.onSurfaceVariant.withValues(alpha: 0.3),
         dragHandleSize: const Size(

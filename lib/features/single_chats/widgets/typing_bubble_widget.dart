@@ -46,9 +46,9 @@ class TypingBubbleWidget extends StatelessWidget {
             child: TypingIndicatorWidget(
               color:
                   ThemeData.estimateBrightnessForColor(bubbleColor) ==
-                      Brightness.dark
-                  ? Colors.white70
-                  : Colors.black54,
+                          Brightness.dark
+                      ? Colors.white70
+                      : Colors.black54,
               dotSize: 5,
             ),
           ),

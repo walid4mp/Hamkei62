@@ -13,10 +13,11 @@ class PostsSection extends StatelessWidget {
     final postsCubit = context.read<PostsCubit>();
     return BlocBuilder<PostsCubit, PostsState>(
       bloc: postsCubit,
-      buildWhen: (previous, current) =>
-          current is PostsLoading ||
-          current is PostsLoaded ||
-          current is PostsError,
+      buildWhen:
+          (previous, current) =>
+              current is PostsLoading ||
+              current is PostsLoaded ||
+              current is PostsError,
       builder: (context, state) {
         if (state is PostsLoading) {
           return SliverToBoxAdapter(

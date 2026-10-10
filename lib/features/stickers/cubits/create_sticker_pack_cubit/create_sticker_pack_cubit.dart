@@ -84,9 +84,10 @@ class CreateStickerPackCubit extends Cubit<CreateStickerPackState>
     emit(
       current.copyWith(
         privacy: privacy,
-        selectedFriendIds: privacy == StickerPackPrivacy.friends
-            ? current.selectedFriendIds
-            : {},
+        selectedFriendIds:
+            privacy == StickerPackPrivacy.friends
+                ? current.selectedFriendIds
+                : {},
       ),
     );
     if (privacy == StickerPackPrivacy.friends) _loadFriendsIfNeeded();

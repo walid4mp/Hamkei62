@@ -73,22 +73,22 @@ class ProfileDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context, rootNavigator: true).push(
                       PageRouteBuilder(
-                        pageBuilder: (_, animation, __) =>
-                            const DiscoverPeopleSearchView(),
+                        pageBuilder:
+                            (_, animation, __) =>
+                                const DiscoverPeopleSearchView(),
                         transitionsBuilder: (_, anim, __, child) {
                           return FadeTransition(
                             opacity: anim,
                             child: SlideTransition(
-                              position:
-                                  Tween<Offset>(
-                                    begin: const Offset(0, 0.05),
-                                    end: Offset.zero,
-                                  ).animate(
-                                    CurvedAnimation(
-                                      parent: anim,
-                                      curve: Curves.easeOut,
-                                    ),
-                                  ),
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.05),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: anim,
+                                  curve: Curves.easeOut,
+                                ),
+                              ),
                               child: child,
                             ),
                           );
@@ -125,11 +125,12 @@ class ProfileDrawer extends StatelessWidget {
                 DrawerItemWidget(
                   icon: Icons.settings_outlined,
                   title: "Settings",
-                  onTap: () =>
-                      Navigator.of(context, rootNavigator: true).pushNamed(
-                        AppRoutes.settingsViewRoute,
-                        arguments: context.read<ProfileCubit>(),
-                      ),
+                  onTap:
+                      () =>
+                          Navigator.of(context, rootNavigator: true).pushNamed(
+                            AppRoutes.settingsViewRoute,
+                            arguments: context.read<ProfileCubit>(),
+                          ),
                 ),
                 DrawerItemWidget(
                   icon: Icons.info_outline,
@@ -150,18 +151,20 @@ class ProfileDrawer extends StatelessWidget {
                       AppToast.error(state.errMsg);
                     }
                   },
-                  buildWhen: (previous, current) =>
-                      current is AuthSignedOut ||
-                      current is AuthFailure ||
-                      current is AuthLoading,
+                  buildWhen:
+                      (previous, current) =>
+                          current is AuthSignedOut ||
+                          current is AuthFailure ||
+                          current is AuthLoading,
                   builder: (context, state) {
                     return DrawerItemWidget(
                       icon: Icons.logout,
                       color: Colors.red.withValues(alpha: 0.92),
                       title: "Log Out",
-                      onTap: state is AuthLoading
-                          ? () {}
-                          : () => context.read<AuthCubit>().signOut(),
+                      onTap:
+                          state is AuthLoading
+                              ? () {}
+                              : () => context.read<AuthCubit>().signOut(),
                     );
                   },
                 ),

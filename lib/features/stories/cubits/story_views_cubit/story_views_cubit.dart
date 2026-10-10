@@ -62,9 +62,10 @@ class StoryViewsCubit extends Cubit<StoryViewsState> {
     _liveViewsSub = _storiesServices.getStoryViewsStream(storyId).listen((
       rows,
     ) {
-      final currentCount = state is StoryViewsLoaded
-          ? (state as StoryViewsLoaded).viewers.length
-          : 0;
+      final currentCount =
+          state is StoryViewsLoaded
+              ? (state as StoryViewsLoaded).viewers.length
+              : 0;
       if (rows.length > currentCount) {
         _loadViewers();
       }

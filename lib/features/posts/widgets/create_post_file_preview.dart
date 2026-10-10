@@ -33,17 +33,19 @@ class CreatePostFilePreview extends StatelessWidget {
     final ext = _getFileExtension();
     final (fileIcon, iconAccent) = FileIconHelper.getIconAndColor(ext, primary);
 
-    final sizeStr = fileSizeBytes != null && fileSizeBytes! > 0
-        ? formatMediaFileSize(fileSizeBytes)
-        : '';
+    final sizeStr =
+        fileSizeBytes != null && fileSizeBytes! > 0
+            ? formatMediaFileSize(fileSizeBytes)
+            : '';
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark
-            ? iconAccent.withValues(alpha: 0.12)
-            : iconAccent.withValues(alpha: 0.06),
+        color:
+            isDark
+                ? iconAccent.withValues(alpha: 0.12)
+                : iconAccent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: iconAccent.withValues(alpha: isDark ? 0.3 : 0.18),

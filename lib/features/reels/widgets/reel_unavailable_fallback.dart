@@ -28,10 +28,11 @@ class ReelUnavailableFallback extends StatelessWidget {
               ),
               const Gap(14),
               TextButton.icon(
-                onPressed: () => launchUrl(
-                  Uri.parse(reel.youtubeWatchUrl),
-                  mode: LaunchMode.externalApplication,
-                ),
+                onPressed:
+                    () => launchUrl(
+                      Uri.parse(reel.youtubeWatchUrl),
+                      mode: LaunchMode.externalApplication,
+                    ),
                 icon: const Icon(Icons.open_in_new, color: Colors.white),
                 label: const Text(
                   'Open on YouTube',

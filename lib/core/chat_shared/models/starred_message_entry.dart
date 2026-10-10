@@ -121,9 +121,10 @@ extension GroupMessageModelStarredX on GroupMessageModel {
     required String currentUserId,
     String? fallbackAvatar,
   }) {
-    final resolvedAvatar = (senderAvatar != null && senderAvatar!.isNotEmpty)
-        ? senderAvatar
-        : fallbackAvatar;
+    final resolvedAvatar =
+        (senderAvatar != null && senderAvatar!.isNotEmpty)
+            ? senderAvatar
+            : fallbackAvatar;
     return StarredMessageEntry(
       id: id,
       isMe: senderId == currentUserId,

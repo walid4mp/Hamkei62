@@ -85,8 +85,8 @@ class MyApp extends StatelessWidget {
                                           callState.call.callerAvatar,
                                       'callType':
                                           callState.call.type == CallType.video
-                                          ? 'video'
-                                          : 'audio',
+                                              ? 'video'
+                                              : 'audio',
                                     },
                                   )
                                   .then(
@@ -109,12 +109,14 @@ class MyApp extends StatelessWidget {
                                   .read<ActiveCallSessionCubit>()
                                   .startSingleCallSession(
                                     callId: callState.call.callId,
-                                    title: isCaller
-                                        ? callState.call.receiverName
-                                        : callState.call.callerName,
-                                    avatarUrl: isCaller
-                                        ? callState.call.receiverAvatar
-                                        : callState.call.callerAvatar,
+                                    title:
+                                        isCaller
+                                            ? callState.call.receiverName
+                                            : callState.call.callerName,
+                                    avatarUrl:
+                                        isCaller
+                                            ? callState.call.receiverAvatar
+                                            : callState.call.callerAvatar,
                                     isVideo:
                                         callState.call.type == CallType.video,
                                     startedAt: DateTime.now(),
@@ -181,11 +183,12 @@ class MyApp extends StatelessWidget {
               title: 'Social Mate',
               theme: state.theme.themeData,
               initialRoute: AppRoutes.splashViewRoute,
-              onGenerateInitialRoutes: (initialRoute) => [
-                AppRouter.generateRoute(
-                  const RouteSettings(name: AppRoutes.splashViewRoute),
-                ),
-              ],
+              onGenerateInitialRoutes:
+                  (initialRoute) => [
+                    AppRouter.generateRoute(
+                      const RouteSettings(name: AppRoutes.splashViewRoute),
+                    ),
+                  ],
               onGenerateRoute: AppRouter.generateRoute,
               onUnknownRoute: AppRouter.generateRoute,
               navigatorKey: navigatorKey,

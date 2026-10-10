@@ -49,17 +49,22 @@ class AvatarStack extends StatelessWidget {
               child: _AvatarCircle(
                 size: avatarSize,
                 borderColor: borderColor,
-                child: isNetworkImage
-                    ? CachedCloudinaryImage(
-                        secureUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        isAvatar: true,
-                        errorWidget: (context, error) => Image.asset(
+                child:
+                    isNetworkImage
+                        ? CachedCloudinaryImage(
+                          secureUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          isAvatar: true,
+                          errorWidget:
+                              (context, error) => Image.asset(
+                                AppImages.defaultUserImg,
+                                fit: BoxFit.cover,
+                              ),
+                        )
+                        : Image.asset(
                           AppImages.defaultUserImg,
                           fit: BoxFit.cover,
                         ),
-                      )
-                    : Image.asset(AppImages.defaultUserImg, fit: BoxFit.cover),
               ),
             );
           }),

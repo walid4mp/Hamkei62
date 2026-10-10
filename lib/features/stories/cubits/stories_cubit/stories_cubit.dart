@@ -53,17 +53,18 @@ class StoriesCubit extends Cubit<StoriesState>
   bool _isPickingMedia = false;
 
   void _monitorRealtimeStories() {
-    _storiesChannel = SupabaseProvider.client
-        .channel('public_stories_changes')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: SupabaseConstants.stories,
-          callback: ((payload) {
-            _silentReconcile();
-          }),
-        )
-        .subscribe();
+    _storiesChannel =
+        SupabaseProvider.client
+            .channel('public_stories_changes')
+            .onPostgresChanges(
+              event: PostgresChangeEvent.all,
+              schema: 'public',
+              table: SupabaseConstants.stories,
+              callback: ((payload) {
+                _silentReconcile();
+              }),
+            )
+            .subscribe();
   }
 
   Future<void> _silentReconcile() async {
@@ -273,10 +274,10 @@ class StoriesCubit extends Cubit<StoriesState>
     try {
       final File uploadFile =
           (_stableVideoFile != null && await _stableVideoFile!.exists())
-          ? _stableVideoFile!
-          : (await file.exists()
-                ? file
-                : throw PathNotFoundException(
+              ? _stableVideoFile!
+              : (await file.exists()
+                  ? file
+                  : throw PathNotFoundException(
                     file.path,
                     const OSError('File not found', 2),
                   ));
@@ -378,9 +379,10 @@ class StoriesCubit extends Cubit<StoriesState>
     _isPickingMedia = true;
 
     try {
-      final XFile? pickedFile = source == ImageSource.camera
-          ? await filePickerServices.takePhotoByCamera()
-          : await filePickerServices.pickImageFromGallery();
+      final XFile? pickedFile =
+          source == ImageSource.camera
+              ? await filePickerServices.takePhotoByCamera()
+              : await filePickerServices.pickImageFromGallery();
 
       if (pickedFile == null) return;
 
@@ -401,9 +403,10 @@ class StoriesCubit extends Cubit<StoriesState>
     _isPickingMedia = true;
 
     try {
-      final XFile? pickedFile = source == ImageSource.camera
-          ? await filePickerServices.takeVideoByCamera()
-          : await filePickerServices.pickVideoFromGallery();
+      final XFile? pickedFile =
+          source == ImageSource.camera
+              ? await filePickerServices.takeVideoByCamera()
+              : await filePickerServices.pickVideoFromGallery();
 
       if (pickedFile == null) return;
 
@@ -459,9 +462,10 @@ class StoriesCubit extends Cubit<StoriesState>
       await _storiesServices.deleteStory(storyId);
       cachedStories = cachedStories.where((s) => s.id != storyId).toList();
       if (state is StoriesLoaded) {
-        final updateStories = (state as StoriesLoaded).stories
-            .where((s) => s.id != storyId)
-            .toList();
+        final updateStories =
+            (state as StoriesLoaded).stories
+                .where((s) => s.id != storyId)
+                .toList();
         emit(StoriesLoaded(updateStories, DateTime.now()));
       } else {
         emit(StoriesLoaded(cachedStories, DateTime.now()));
@@ -565,15 +569,16 @@ class StoriesCubit extends Cubit<StoriesState>
     required String? newImageUrl,
   }) {
     bool changed = false;
-    cachedStories = cachedStories.map((story) {
-      if (story.authorId != authorId) return story;
-      changed = true;
-      return story.copyWith(
-        authorName: newName,
-        authorImageUrl: newImageUrl,
-        clearAuthorImageUrl: newImageUrl == null || newImageUrl.isEmpty,
-      );
-    }).toList();
+    cachedStories =
+        cachedStories.map((story) {
+          if (story.authorId != authorId) return story;
+          changed = true;
+          return story.copyWith(
+            authorName: newName,
+            authorImageUrl: newImageUrl,
+            clearAuthorImageUrl: newImageUrl == null || newImageUrl.isEmpty,
+          );
+        }).toList();
 
     if (changed) {
       _persistStoriesSnapshot(cachedStories);

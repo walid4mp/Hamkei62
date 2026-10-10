@@ -33,8 +33,10 @@ class ReelsHorizontalSection extends StatelessWidget {
             children: [
               Text(
                 'Reels',
-                style: Theme.of(context).textTheme.titleSmall!
-                    .copyWith(fontWeight: FontWeight.w500, fontSize: 13),
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
               ),
               Image.asset(
                 AppImages.reelsIcon,
@@ -59,20 +61,19 @@ class ReelsHorizontalSection extends StatelessWidget {
                 reel: reel,
                 onTap: () async {
                   final reelsCubit = context.read<ReelsFeedCubit>();
-                  final hasSeen = await ReelsPreferencesStore.instance
-                      .hasSeenOnboarding();
+                  final hasSeen =
+                      await ReelsPreferencesStore.instance.hasSeenOnboarding();
                   if (!context.mounted) return;
 
                   if (!hasSeen) {
-                    final categories =
-                        await Navigator.of(
-                          context,
-                          rootNavigator: true,
-                        ).push<List<String>>(
-                          MaterialPageRoute(
-                            builder: (_) => const ReelsOnboardingView(),
-                          ),
-                        );
+                    final categories = await Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).push<List<String>>(
+                      MaterialPageRoute(
+                        builder: (_) => const ReelsOnboardingView(),
+                      ),
+                    );
                     if (categories != null && context.mounted) {
                       reelsCubit.updatePreferredCategories(categories);
                     }
@@ -82,13 +83,14 @@ class ReelsHorizontalSection extends StatelessWidget {
 
                   Navigator.of(context, rootNavigator: true).push(
                     MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: reelsCubit,
-                        child: ReelsFullScreenView(
-                          sectionIndex: sectionIndex,
-                          initialIndex: index,
-                        ),
-                      ),
+                      builder:
+                          (_) => BlocProvider.value(
+                            value: reelsCubit,
+                            child: ReelsFullScreenView(
+                              sectionIndex: sectionIndex,
+                              initialIndex: index,
+                            ),
+                          ),
                     ),
                   );
                 },

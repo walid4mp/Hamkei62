@@ -55,17 +55,15 @@ class AppPalette {
       primary: primary,
       onPrimary: onPrimary,
       primaryContainer: primaryContainer,
-      onPrimaryContainer: isDark
-          ? const Color(0xFFDBEAFE)
-          : const Color(0xFF1E3A5F),
+      onPrimaryContainer:
+          isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A5F),
       secondary: secondary,
       onSecondary: isDark ? const Color(0xFF111827) : const Color(0xFFFFFFFF),
       error: error,
       onError: isDark ? const Color(0xFF111827) : const Color(0xFFFFFFFF),
       errorContainer: errorContainer,
-      onErrorContainer: isDark
-          ? const Color(0xFFFEE2E2)
-          : const Color(0xFF7F1D1D),
+      onErrorContainer:
+          isDark ? const Color(0xFFFEE2E2) : const Color(0xFF7F1D1D),
       surface: surface,
       onSurface: onSurface,
       surfaceContainerHighest: surfaceVariant,

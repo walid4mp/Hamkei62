@@ -37,9 +37,8 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final isSmall = size == AppButtonSize.small;
-    final height = isSmall
-        ? AppDimensions.buttonHeightSmall
-        : AppDimensions.buttonHeight;
+    final height =
+        isSmall ? AppDimensions.buttonHeightSmall : AppDimensions.buttonHeight;
     final radius = isSmall ? AppRadii.radiusSm : AppRadii.radiusMd;
 
     // Determine colors based on variant
@@ -71,15 +70,16 @@ class AppButton extends StatelessWidget {
     }
 
     final effectiveOnPressed = isLoading ? null : onPressed;
-    final textStyle = isSmall
-        ? context.typography.titleSmall?.copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          )
-        : context.typography.titleMedium?.copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          );
+    final textStyle =
+        isSmall
+            ? context.typography.titleSmall?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            )
+            : context.typography.titleMedium?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            );
 
     Widget content = Row(
       mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,

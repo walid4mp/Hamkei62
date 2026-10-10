@@ -19,8 +19,9 @@ class ReelGridTile extends StatelessWidget {
           CachedNetworkImage(
             imageUrl: reel.thumbnailUrl,
             fit: BoxFit.cover,
-            placeholder: (_, __) =>
-                Container(color: Colors.black.withValues(alpha: 0.06)),
+            placeholder:
+                (_, __) =>
+                    Container(color: Colors.black.withValues(alpha: 0.06)),
             errorWidget: (_, __, ___) => Container(color: Colors.black26),
           ),
           const Positioned(

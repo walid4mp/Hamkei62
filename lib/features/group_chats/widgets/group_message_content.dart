@@ -65,14 +65,15 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
       messageId: widget.message.id,
       initialReactions: _mergeLiveReactions(widget.message),
       currentUserId: cubit.currentUserId,
-      reactionsBuilder: (contentBuilder) =>
-          BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
+      reactionsBuilder:
+          (contentBuilder) => BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
             bloc: cubit,
             buildWhen: (previous, current) => current is GroupDetailsLoaded,
             builder: (context, state) {
-              final messages = state is GroupDetailsLoaded
-                  ? state.messages
-                  : cubit.cachedMessages;
+              final messages =
+                  state is GroupDetailsLoaded
+                      ? state.messages
+                      : cubit.cachedMessages;
               final current = messages.firstWhere(
                 (m) => m.id == widget.message.id,
                 orElse: () => widget.message,
@@ -81,12 +82,14 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
             },
           ),
       profileResolver: cubit.reactionProfileResolver,
-      onRemoveReaction: (emoji) =>
-          cubit.toggleReaction(messageId: widget.message.id, emoji: emoji),
-      onOpenProfile: (userId) => Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamed(AppRoutes.profileViewRoute, arguments: userId),
+      onRemoveReaction:
+          (emoji) =>
+              cubit.toggleReaction(messageId: widget.message.id, emoji: emoji),
+      onOpenProfile:
+          (userId) => Navigator.of(
+            context,
+            rootNavigator: true,
+          ).pushNamed(AppRoutes.profileViewRoute, arguments: userId),
     );
   }
 
@@ -104,9 +107,9 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
           onReply: widget.onReply,
           onEdit:
               (widget.isMe && widget.message.messageType == 'text' ||
-                  widget.message.caption != null)
-              ? widget.onEdit
-              : null,
+                      widget.message.caption != null)
+                  ? widget.onEdit
+                  : null,
           primary: primary,
           isMe: widget.isMe,
         );
@@ -139,14 +142,16 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
     final bool isStickerOrGif =
         widget.message.messageType == 'gif' ||
         widget.message.messageType == 'sticker';
-    final bgColor = widget.isMe
-        ? primary
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.10)
-              : AppColors.grey3.withValues(alpha: 0.35));
-    final textColor = widget.isMe
-        ? Colors.white
-        : (isDark ? Colors.white : AppColors.black87);
+    final bgColor =
+        widget.isMe
+            ? primary
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : AppColors.grey3.withValues(alpha: 0.35));
+    final textColor =
+        widget.isMe
+            ? Colors.white
+            : (isDark ? Colors.white : AppColors.black87);
 
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
       buildWhen: (prev, cur) {
@@ -162,8 +167,8 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
       builder: (context, state) {
         final double? uploadProgress =
             (state is GroupDetailsLoaded && widget.isMe)
-            ? state.uploadProgress[widget.message.id]
-            : null;
+                ? state.uploadProgress[widget.message.id]
+                : null;
         final bool isUploading = uploadProgress != null;
 
         return ValueListenableBuilder<Set<String>>(
@@ -177,57 +182,65 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
               valueListenable: cubit.highlightedMessageId,
               builder: (context, highlightId, _) {
                 final isHighlighted = highlightId == widget.message.id;
-                final highlightColor = Theme.of(context).primaryColor
-                    .withValues(alpha: widget.isMe ? 0.12 : 0.2);
-                final selectionColor = Theme.of(context).primaryColor
-                    .withValues(alpha: 0.16);
+                final highlightColor = Theme.of(
+                  context,
+                ).primaryColor.withValues(alpha: widget.isMe ? 0.12 : 0.2);
+                final selectionColor = Theme.of(
+                  context,
+                ).primaryColor.withValues(alpha: 0.16);
 
                 return GestureDetector(
-                  onTap: (isSelectionMode && widget.isMember && !isCall)
-                      ? () => _handleTap(cubit)
-                      : null,
-                  onLongPress: (isCall || !widget.isMember)
-                      ? null
-                      : () => _handleLongPress(context, cubit),
+                  onTap:
+                      (isSelectionMode && widget.isMember && !isCall)
+                          ? () => _handleTap(cubit)
+                          : null,
+                  onLongPress:
+                      (isCall || !widget.isMember)
+                          ? null
+                          : () => _handleLongPress(context, cubit),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? selectionColor
-                          : (isHighlighted
-                                ? highlightColor
-                                : Colors.transparent),
+                      color:
+                          isSelected
+                              ? selectionColor
+                              : (isHighlighted
+                                  ? highlightColor
+                                  : Colors.transparent),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
-                      mainAxisAlignment: widget.isMe
-                          ? MainAxisAlignment.end
-                          : MainAxisAlignment.start,
+                      mainAxisAlignment:
+                          widget.isMe
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         AnimatedSize(
                           duration: const Duration(milliseconds: 180),
                           curve: Curves.easeOut,
-                          child: (isSelectionMode && !isCall)
-                              ? Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Icon(
-                                    isSelected
-                                        ? Icons.check_circle_rounded
-                                        : Icons.circle_outlined,
-                                    size: 22,
-                                    color: isSelected
-                                        ? primary
-                                        : AppColors.grey6,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
+                          child:
+                              (isSelectionMode && !isCall)
+                                  ? Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      isSelected
+                                          ? Icons.check_circle_rounded
+                                          : Icons.circle_outlined,
+                                      size: 22,
+                                      color:
+                                          isSelected
+                                              ? primary
+                                              : AppColors.grey6,
+                                    ),
+                                  )
+                                  : const SizedBox.shrink(),
                         ),
                         if (!widget.isMe) ...[
                           widget.showAvatar
                               ? GroupMessageAvatar(
-                                  message: widget.message,
-                                  primary: primary,
-                                )
+                                message: widget.message,
+                                primary: primary,
+                              )
                               : const SizedBox(width: _kAvatarSlotWidth),
                           const Gap(8),
                         ],
@@ -263,8 +276,11 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
                                         reactions: widget.message.reactions,
                                         currentUserId: currentUserId,
                                         primary: primary,
-                                        onTap: () =>
-                                            _openReactionsSheet(context, cubit),
+                                        onTap:
+                                            () => _openReactionsSheet(
+                                              context,
+                                              cubit,
+                                            ),
                                       ),
                                     ),
                                 ],
@@ -301,52 +317,55 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
   }) {
     final hasReaction = widget.message.reactions.isNotEmpty;
 
-    final Widget content = isCall
-        ? GroupCallMessageContent(
-            message: widget.message,
-            isMe: widget.isMe,
-            primary: primary,
-          )
-        : GroupRegularMessageContent(
-            message: widget.message,
-            isMe: widget.isMe,
-            isUploading: isUploading,
-            textColor: textColor,
-            primary: primary,
-            itemScrollController: widget.itemScrollController,
-          );
+    final Widget content =
+        isCall
+            ? GroupCallMessageContent(
+              message: widget.message,
+              isMe: widget.isMe,
+              primary: primary,
+            )
+            : GroupRegularMessageContent(
+              message: widget.message,
+              isMe: widget.isMe,
+              isUploading: isUploading,
+              textColor: textColor,
+              primary: primary,
+              itemScrollController: widget.itemScrollController,
+            );
 
     final Widget innerContent = Padding(
-      padding: isStickerOrGif
-          ? EdgeInsets.zero
-          : (isImage || isVideo)
-          ? const EdgeInsets.all(3)
-          : const EdgeInsets.only(left: 10, right: 10, bottom: 8, top: 6),
-      child: widget.message.isForwarded
-          ? IntrinsicWidth(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ForwardedHeader(
-                    name: widget.message.forwardedFromUserName ?? 'Unknown',
-                    originalSenderId: widget.message.forwardedFromUserId ?? '',
-                    avatarUrl: widget.message.forwardedFromUserAvatar,
-                    onColoredBubble: widget.isMe && !isStickerOrGif,
-                  ),
-                  content,
-                ],
-              ),
-            )
-          : content,
+      padding:
+          isStickerOrGif
+              ? EdgeInsets.zero
+              : (isImage || isVideo)
+              ? const EdgeInsets.all(3)
+              : const EdgeInsets.only(left: 10, right: 10, bottom: 8, top: 6),
+      child:
+          widget.message.isForwarded
+              ? IntrinsicWidth(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ForwardedHeader(
+                      name: widget.message.forwardedFromUserName ?? 'Unknown',
+                      originalSenderId:
+                          widget.message.forwardedFromUserId ?? '',
+                      avatarUrl: widget.message.forwardedFromUserAvatar,
+                      onColoredBubble: widget.isMe && !isStickerOrGif,
+                    ),
+                    content,
+                  ],
+                ),
+              )
+              : content,
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final double screenCap = MediaQuery.of(context).size.width * 0.70;
-        final double maxBubbleWidth = constraints.maxWidth < screenCap
-            ? constraints.maxWidth
-            : screenCap;
+        final double maxBubbleWidth =
+            constraints.maxWidth < screenCap ? constraints.maxWidth : screenCap;
 
         return Stack(
           clipBehavior: Clip.none,
@@ -357,19 +376,21 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
                 margin: EdgeInsets.only(top: 2, bottom: hasReaction ? 28 : 2),
                 constraints: BoxConstraints(
                   maxWidth: maxBubbleWidth,
-                  minWidth: isVoice
-                      ? (240 > maxBubbleWidth ? maxBubbleWidth : 240)
-                      : (isImage || isVideo ? 200 : 50),
+                  minWidth:
+                      isVoice
+                          ? (240 > maxBubbleWidth ? maxBubbleWidth : 240)
+                          : (isImage || isVideo ? 200 : 50),
                 ),
                 decoration: BoxDecoration(
-                  color: isStickerOrGif
-                      ? Colors.transparent
-                      : (isImage || isVideo) &&
-                            !isUploading &&
-                            (widget.message.imageUrl == null &&
-                                widget.message.videoUrl == null)
-                      ? Colors.transparent
-                      : bgColor,
+                  color:
+                      isStickerOrGif
+                          ? Colors.transparent
+                          : (isImage || isVideo) &&
+                              !isUploading &&
+                              (widget.message.imageUrl == null &&
+                                  widget.message.videoUrl == null)
+                          ? Colors.transparent
+                          : bgColor,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(20),
                     topRight: const Radius.circular(20),
@@ -377,17 +398,18 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
                     bottomRight: Radius.circular(widget.isMe ? 0 : 20),
                   ),
                 ),
-                child: isStickerOrGif
-                    ? innerContent
-                    : ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(20),
-                          topRight: const Radius.circular(20),
-                          bottomLeft: Radius.circular(widget.isMe ? 20 : 0),
-                          bottomRight: Radius.circular(widget.isMe ? 0 : 20),
+                child:
+                    isStickerOrGif
+                        ? innerContent
+                        : ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(20),
+                            topRight: const Radius.circular(20),
+                            bottomLeft: Radius.circular(widget.isMe ? 20 : 0),
+                            bottomRight: Radius.circular(widget.isMe ? 0 : 20),
+                          ),
+                          child: innerContent,
                         ),
-                        child: innerContent,
-                      ),
               ),
             ),
 
@@ -409,9 +431,10 @@ class _GroupMessageContentState extends State<GroupMessageContent> {
                         bottomLeft: Radius.circular(widget.isMe ? 18 : 4),
                         bottomRight: Radius.circular(widget.isMe ? 4 : 18),
                       ),
-                      onCancelTap: () => context
-                          .read<GroupDetailsCubit>()
-                          .cancelUpload(widget.message.id),
+                      onCancelTap:
+                          () => context.read<GroupDetailsCubit>().cancelUpload(
+                            widget.message.id,
+                          ),
                       child: const SizedBox.shrink(),
                     );
                   },

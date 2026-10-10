@@ -20,18 +20,20 @@ class NavBarIcon extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isActive
-            ? Theme.of(context).primaryColor.withValues(alpha: .175)
-            : AppColors.transparent,
+        color:
+            isActive
+                ? Theme.of(context).primaryColor.withValues(alpha: .175)
+                : AppColors.transparent,
         shape: BoxShape.circle,
       ),
       child:
           child ??
           Icon(
             icon,
-            color: isActive
-                ? Theme.of(context).primaryColor
-                : AppColors.grey6.withValues(alpha: 0.8),
+            color:
+                isActive
+                    ? Theme.of(context).primaryColor
+                    : AppColors.grey6.withValues(alpha: 0.8),
           ),
     );
     if (badgeCount <= 0) return iconBody;

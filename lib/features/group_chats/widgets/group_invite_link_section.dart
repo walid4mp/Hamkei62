@@ -102,37 +102,42 @@ class _GroupInviteLinkSectionState extends State<GroupInviteLinkSection> {
   Future<_InviteExpiryChoice?> _pickInviteExpiryDuration() {
     return showDialog<_InviteExpiryChoice>(
       context: context,
-      builder: (_) => SimpleDialog(
-        title: const Text('Link Expiration'),
-        children: [
-          SimpleDialogOption(
-            onPressed: () =>
-                Navigator.pop(context, const _InviteExpiryChoice(null)),
-            child: const Text('Never expires'),
+      builder:
+          (_) => SimpleDialog(
+            title: const Text('Link Expiration'),
+            children: [
+              SimpleDialogOption(
+                onPressed:
+                    () =>
+                        Navigator.pop(context, const _InviteExpiryChoice(null)),
+                child: const Text('Never expires'),
+              ),
+              SimpleDialogOption(
+                onPressed:
+                    () => Navigator.pop(
+                      context,
+                      const _InviteExpiryChoice(Duration(hours: 24)),
+                    ),
+                child: const Text('24 hours'),
+              ),
+              SimpleDialogOption(
+                onPressed:
+                    () => Navigator.pop(
+                      context,
+                      const _InviteExpiryChoice(Duration(days: 2)),
+                    ),
+                child: const Text('2 days'),
+              ),
+              SimpleDialogOption(
+                onPressed:
+                    () => Navigator.pop(
+                      context,
+                      const _InviteExpiryChoice(Duration(days: 7)),
+                    ),
+                child: const Text('1 week'),
+              ),
+            ],
           ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(
-              context,
-              const _InviteExpiryChoice(Duration(hours: 24)),
-            ),
-            child: const Text('24 hours'),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(
-              context,
-              const _InviteExpiryChoice(Duration(days: 2)),
-            ),
-            child: const Text('2 days'),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(
-              context,
-              const _InviteExpiryChoice(Duration(days: 7)),
-            ),
-            child: const Text('1 week'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -165,7 +170,8 @@ class _GroupInviteLinkSectionState extends State<GroupInviteLinkSection> {
     final confirm = await GroupConfirmDialog.show(
       context,
       title: 'Revoke Invite Link',
-      body: 'Anyone with the current link will no longer be able to join using it. Continue?',
+      body:
+          'Anyone with the current link will no longer be able to join using it. Continue?',
       confirmLabel: 'Revoke',
       confirmColor: Colors.red,
     );
@@ -205,9 +211,8 @@ class _GroupInviteLinkSectionState extends State<GroupInviteLinkSection> {
       ShareParams(
         text:
             'Join "${widget.groupName}" on Social Media App: ${_inviteUrlFor(hash)}',
-        sharePositionOrigin: box != null
-            ? (box.localToGlobal(Offset.zero) & box.size)
-            : null,
+        sharePositionOrigin:
+            box != null ? (box.localToGlobal(Offset.zero) & box.size) : null,
       ),
     );
   }
@@ -239,14 +244,14 @@ class _GroupInviteLinkSectionState extends State<GroupInviteLinkSection> {
         const SizedBox(width: 12),
         _isUpdatingInvite
             ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
             : TextButton(
-                onPressed: _generateInviteLink,
-                child: const Text('Generate'),
-              ),
+              onPressed: _generateInviteLink,
+              child: const Text('Generate'),
+            ),
       ],
     );
   }
@@ -367,11 +372,12 @@ class _GroupInviteLinkSectionState extends State<GroupInviteLinkSection> {
               ),
             ],
           ),
-          child: _isLoadingInvite
-              ? const InviteLinkSectionSkeleton()
-              : _inviteState == null
-              ? _buildGenerateInviteRow()
-              : _buildActiveInviteRow(_inviteState!),
+          child:
+              _isLoadingInvite
+                  ? const InviteLinkSectionSkeleton()
+                  : _inviteState == null
+                  ? _buildGenerateInviteRow()
+                  : _buildActiveInviteRow(_inviteState!),
         ),
       ],
     );

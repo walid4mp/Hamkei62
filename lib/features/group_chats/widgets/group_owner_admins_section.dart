@@ -72,12 +72,14 @@ class GroupOwnerAdminsSection extends StatelessWidget {
                 leading: CircleAvatar(
                   radius: 22,
                   backgroundColor: Colors.grey.shade200,
-                  backgroundImage: owner.userAvatar != null
-                      ? CachedNetworkImageProvider(owner.userAvatar!)
-                      : null,
-                  child: owner.userAvatar == null
-                      ? Icon(Icons.person, color: Colors.grey.shade400)
-                      : null,
+                  backgroundImage:
+                      owner.userAvatar != null
+                          ? CachedNetworkImageProvider(owner.userAvatar!)
+                          : null,
+                  child:
+                      owner.userAvatar == null
+                          ? Icon(Icons.person, color: Colors.grey.shade400)
+                          : null,
                 ),
                 title: Text(
                   isMe ? 'You' : owner.userName,
@@ -133,9 +135,10 @@ class GroupOwnerAdminsSection extends StatelessWidget {
         List<GroupMemberModel> admins = [];
 
         if (memberState is GroupMembersLoaded) {
-          admins = memberState.members
-              .where((m) => m.role == GroupMemberRole.admin)
-              .toList();
+          admins =
+              memberState.members
+                  .where((m) => m.role == GroupMemberRole.admin)
+                  .toList();
         }
 
         if (admins.isEmpty) return const SizedBox.shrink();
@@ -177,12 +180,14 @@ class GroupOwnerAdminsSection extends StatelessWidget {
                     leading: CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.grey.shade200,
-                      backgroundImage: admin.userAvatar != null
-                          ? CachedNetworkImageProvider(admin.userAvatar!)
-                          : null,
-                      child: admin.userAvatar == null
-                          ? Icon(Icons.person, color: Colors.grey.shade400)
-                          : null,
+                      backgroundImage:
+                          admin.userAvatar != null
+                              ? CachedNetworkImageProvider(admin.userAvatar!)
+                              : null,
+                      child:
+                          admin.userAvatar == null
+                              ? Icon(Icons.person, color: Colors.grey.shade400)
+                              : null,
                     ),
                     title: Text(
                       isMe ? 'You' : admin.userName,
@@ -222,19 +227,20 @@ class GroupOwnerAdminsSection extends StatelessWidget {
                               size: 20,
                             ),
                             onSelected: (value) => onAdminAction(admin, value),
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'demote',
-                                child: Text('Remove Admin'),
-                              ),
-                              const PopupMenuItem(
-                                value: 'remove',
-                                child: Text(
-                                  'Remove from group',
-                                  style: TextStyle(color: Colors.redAccent),
-                                ),
-                              ),
-                            ],
+                            itemBuilder:
+                                (context) => [
+                                  const PopupMenuItem(
+                                    value: 'demote',
+                                    child: Text('Remove Admin'),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'remove',
+                                    child: Text(
+                                      'Remove from group',
+                                      style: TextStyle(color: Colors.redAccent),
+                                    ),
+                                  ),
+                                ],
                           ),
                         ],
                       ],

@@ -322,11 +322,12 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
         // identity == Supabase user id per the token function's contract,
         // but tolerate tokens minted with the display name as identity.
         final column = CallIdentity.looksLikeUserId(identity) ? 'id' : 'name';
-        final data = await SupabaseProvider.client
-            .from('users')
-            .select('image_url')
-            .eq(column, identity)
-            .maybeSingle();
+        final data =
+            await SupabaseProvider.client
+                .from('users')
+                .select('image_url')
+                .eq(column, identity)
+                .maybeSingle();
         return data?['image_url'] as String?;
       } catch (_) {
         return null;
@@ -368,9 +369,8 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
     if (localVideoTrack == null) return;
 
     _isSwitchingCamera = true;
-    final nextPosition = _isFrontCamera
-        ? CameraPosition.back
-        : CameraPosition.front;
+    final nextPosition =
+        _isFrontCamera ? CameraPosition.back : CameraPosition.front;
 
     try {
       await localVideoTrack.setCameraPosition(nextPosition);
@@ -422,17 +422,19 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
     await CallTerminationService.endActiveCall(
       pipCubit: _pipCubit,
       sessionCubit: _sessionCubit,
-      signalEnd: () => GroupCallLeaveOrEndResolver.signal(
-        remainingAfterLeave: remainingAfterLeave,
-        signaling: _signaling,
-        callId: widget.call.callId,
-        durationIfEnding: duration,
-      ),
+      signalEnd:
+          () => GroupCallLeaveOrEndResolver.signal(
+            remainingAfterLeave: remainingAfterLeave,
+            signaling: _signaling,
+            callId: widget.call.callId,
+            durationIfEnding: duration,
+          ),
       // Instant hang-up for whoever is left. Only when the call really ends:
       // leaving a 3+ person call must not close the others' screens.
-      endMessage: endForEveryone
-          ? CallControlMessage.groupEnded(widget.call.callId)
-          : null,
+      endMessage:
+          endForEveryone
+              ? CallControlMessage.groupEnded(widget.call.callId)
+              : null,
     );
     if (mounted) CallTerminationService.popRouteIfActive(context);
   }
@@ -466,8 +468,8 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
                 const Text('The call could not be initiated.'),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: () =>
-                      CallTerminationService.popRouteIfActive(context),
+                  onPressed:
+                      () => CallTerminationService.popRouteIfActive(context),
                   child: const Text('Back'),
                 ),
               ],
@@ -568,8 +570,8 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () =>
-                      GroupCallMembersSheet.show(context, widget.call),
+                  onPressed:
+                      () => GroupCallMembersSheet.show(context, widget.call),
                   icon: const Icon(Icons.groups_rounded, color: Colors.white),
                 ),
               ],
@@ -621,21 +623,24 @@ class _LiveKitGroupCallViewState extends State<LiveKitGroupCallView> {
         CallControlButton(
           icon: _micEnabled ? Icons.mic_rounded : Icons.mic_off_rounded,
           label: _micEnabled ? 'Mute' : 'Unmute',
-          variant: _micEnabled
-              ? CallControlVariant.neutral
-              : CallControlVariant.warning,
+          variant:
+              _micEnabled
+                  ? CallControlVariant.neutral
+                  : CallControlVariant.warning,
           size: buttonSize,
           onTap: _toggleMic,
         ),
         if (_isVideo)
           CallControlButton(
-            icon: _cameraEnabled
-                ? Icons.videocam_rounded
-                : Icons.videocam_off_rounded,
+            icon:
+                _cameraEnabled
+                    ? Icons.videocam_rounded
+                    : Icons.videocam_off_rounded,
             label: _cameraEnabled ? 'Camera' : 'Off',
-            variant: _cameraEnabled
-                ? CallControlVariant.neutral
-                : CallControlVariant.warning,
+            variant:
+                _cameraEnabled
+                    ? CallControlVariant.neutral
+                    : CallControlVariant.warning,
             size: buttonSize,
             onTap: _toggleCamera,
           ),
@@ -709,9 +714,10 @@ class _ParticipantTile extends StatelessWidget {
             color: Colors.black45,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSpeaking
-                  ? Colors.greenAccent
-                  : Colors.white.withValues(alpha: 0.12),
+              color:
+                  isSpeaking
+                      ? Colors.greenAccent
+                      : Colors.white.withValues(alpha: 0.12),
               width: isSpeaking ? 2.4 : 1,
             ),
           ),
@@ -721,19 +727,20 @@ class _ParticipantTile extends StatelessWidget {
               _videoTrack != null
                   ? VideoTrackRenderer(_videoTrack!)
                   : Center(
-                      child: FutureBuilder<String?>(
-                        future: avatarFuture,
-                        builder: (context, snapshot) {
-                          return CallAvatarImage(
-                            imageUrl: snapshot.data,
-                            fallbackLabel: participant.name.isNotEmpty
-                                ? participant.name
-                                : participant.identity,
-                            diameter: 64,
-                          );
-                        },
-                      ),
+                    child: FutureBuilder<String?>(
+                      future: avatarFuture,
+                      builder: (context, snapshot) {
+                        return CallAvatarImage(
+                          imageUrl: snapshot.data,
+                          fallbackLabel:
+                              participant.name.isNotEmpty
+                                  ? participant.name
+                                  : participant.identity,
+                          diameter: 64,
+                        );
+                      },
                     ),
+                  ),
               Positioned(
                 left: 8,
                 bottom: 6,
@@ -763,8 +770,8 @@ class _ParticipantTile extends StatelessWidget {
                           isMe
                               ? 'You'
                               : (participant.name.isNotEmpty
-                                    ? participant.name
-                                    : participant.identity),
+                                  ? participant.name
+                                  : participant.identity),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,

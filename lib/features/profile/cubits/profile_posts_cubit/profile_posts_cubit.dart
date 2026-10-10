@@ -324,9 +324,10 @@ class ProfilePostsCubit extends Cubit<ProfilePostsState>
     return newest == null || t.isAfter(newest);
   }
 
-  String _errorMessage(Object e) => e.toString().contains('no-internet')
-      ? 'No internet connection. Please check your network.'
-      : 'Failed to load posts.';
+  String _errorMessage(Object e) =>
+      e.toString().contains('no-internet')
+          ? 'No internet connection. Please check your network.'
+          : 'Failed to load posts.';
 
   @override
   Future<void> close() {

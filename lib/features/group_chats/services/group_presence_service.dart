@@ -54,11 +54,12 @@ class GroupPresenceService {
 
         if (!userCache.containsKey(userId)) {
           try {
-            final data = await _supabase
-                .from('users')
-                .select('name, image_url')
-                .eq('id', userId)
-                .maybeSingle();
+            final data =
+                await _supabase
+                    .from('users')
+                    .select('name, image_url')
+                    .eq('id', userId)
+                    .maybeSingle();
             userCache[userId] = {
               'name': data?['name'] as String? ?? 'Someone',
               'avatar': data?['image_url'] as String?,
@@ -109,8 +110,8 @@ class GroupPresenceService {
             latestRows = rows;
             emit();
           },
-          onError: (e) =>
-              debugPrint('[watchAllGroupsPresence] stream error: $e'),
+          onError:
+              (e) => debugPrint('[watchAllGroupsPresence] stream error: $e'),
         );
 
     final watchdog = Timer.periodic(
@@ -139,9 +140,8 @@ class GroupPresenceService {
           GroupTypingColumns.groupId: groupId,
           GroupTypingColumns.userId: currentUserId,
           'action_type': actionType.value,
-          GroupTypingColumns.updatedAt: DateTime.now()
-              .toUtc()
-              .toIso8601String(),
+          GroupTypingColumns.updatedAt:
+              DateTime.now().toUtc().toIso8601String(),
         },
         onConflict:
             '${GroupTypingColumns.groupId},${GroupTypingColumns.userId}',
@@ -187,11 +187,12 @@ class GroupPresenceService {
 
         if (!userCache.containsKey(userId)) {
           try {
-            final data = await _supabase
-                .from('users')
-                .select('name, image_url')
-                .eq('id', userId)
-                .maybeSingle();
+            final data =
+                await _supabase
+                    .from('users')
+                    .select('name, image_url')
+                    .eq('id', userId)
+                    .maybeSingle();
             userCache[userId] = {
               'name': data?['name'] as String? ?? 'Someone',
               'avatar': data?['image_url'] as String?,

@@ -63,9 +63,10 @@ class AuthCubit extends Cubit<AuthState> with SafeEmitMixin<AuthState> {
     }
 
     final message = AuthExceptionHandler.handle(e);
-    final displayMessage = message == 'no-internet'
-        ? 'No internet connection. Please check your network.'
-        : message;
+    final displayMessage =
+        message == 'no-internet'
+            ? 'No internet connection. Please check your network.'
+            : message;
 
     if (displayMessage.isEmpty) {
       emit(AuthInitial());

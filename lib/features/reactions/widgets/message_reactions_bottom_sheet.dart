@@ -82,9 +82,10 @@ class _MessageReactionsSheetBodyState
   void didUpdateWidget(covariant _MessageReactionsSheetBody oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final newUserIds = widget.reactions.keys
-        .where((id) => !_profiles.containsKey(id))
-        .toList();
+    final newUserIds =
+        widget.reactions.keys
+            .where((id) => !_profiles.containsKey(id))
+            .toList();
     if (newUserIds.isNotEmpty) {
       _resolveMissingProfiles(newUserIds);
     }
@@ -173,14 +174,16 @@ class _MessageReactionsSheetBodyState
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 1),
         decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color:
+              isSelected
+                  ? theme.primaryColor.withValues(alpha: 0.1)
+                  : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: isSelected
-                ? theme.primaryColor
-                : Colors.grey.withValues(alpha: 0.3),
+            color:
+                isSelected
+                    ? theme.primaryColor
+                    : Colors.grey.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -191,9 +194,10 @@ class _MessageReactionsSheetBodyState
               filterKey == 'All' ? 'All' : '$count',
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected
-                    ? theme.primaryColor
-                    : theme.textTheme.bodyMedium?.color,
+                color:
+                    isSelected
+                        ? theme.primaryColor
+                        : theme.textTheme.bodyMedium?.color,
                 fontSize: 12,
               ),
             ),
@@ -218,13 +222,15 @@ class _MessageReactionsSheetBodyState
     for (final live in widget.reactions.values) {
       emojiCounts[live.emoji] = (emojiCounts[live.emoji] ?? 0) + 1;
     }
-    final sortedEmojis = emojiCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final sortedEmojis =
+        emojiCounts.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
 
     final allEntries = _entries;
-    final displayed = _selectedFilter == 'All'
-        ? allEntries
-        : allEntries.where((r) => r.emoji == _selectedFilter).toList();
+    final displayed =
+        _selectedFilter == 'All'
+            ? allEntries
+            : allEntries.where((r) => r.emoji == _selectedFilter).toList();
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -288,96 +294,104 @@ class _MessageReactionsSheetBodyState
                     const SizedBox(height: 8),
                   ],
                   Expanded(
-                    child: _isResolvingInitial
-                        ? const ReactionsBottomSheetSkeleton()
-                        : displayed.isEmpty
-                        ? const Center(child: Text('No reactions yet.'))
-                        : ListView.builder(
-                            physics: const ClampingScrollPhysics(),
-                            controller: scrollController,
-                            padding: const EdgeInsets.only(bottom: 24, top: 8),
-                            itemCount: displayed.length,
-                            itemBuilder: (context, index) {
-                              final r = displayed[index];
-                              final isMe = r.userId == widget.currentUserId;
+                    child:
+                        _isResolvingInitial
+                            ? const ReactionsBottomSheetSkeleton()
+                            : displayed.isEmpty
+                            ? const Center(child: Text('No reactions yet.'))
+                            : ListView.builder(
+                              physics: const ClampingScrollPhysics(),
+                              controller: scrollController,
+                              padding: const EdgeInsets.only(
+                                bottom: 24,
+                                top: 8,
+                              ),
+                              itemCount: displayed.length,
+                              itemBuilder: (context, index) {
+                                final r = displayed[index];
+                                final isMe = r.userId == widget.currentUserId;
 
-                              void handleTap() {
-                                HapticFeedback.lightImpact();
-                                if (isMe) {
-                                  widget.onRemoveReaction(r.emoji);
-                                  if (widget.reactions.length == 1) {
-                                    Navigator.of(context).pop();
+                                void handleTap() {
+                                  HapticFeedback.lightImpact();
+                                  if (isMe) {
+                                    widget.onRemoveReaction(r.emoji);
+                                    if (widget.reactions.length == 1) {
+                                      Navigator.of(context).pop();
+                                    }
+                                  } else {
+                                    widget.onOpenProfile(r.userId);
                                   }
-                                } else {
-                                  widget.onOpenProfile(r.userId);
                                 }
-                              }
 
-                              return ListTile(
-                                onTap: handleTap,
-                                leading: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    PresenceAvatarWidget(
-                                      userId: r.userId,
-                                      avatarSize: 44,
-                                      showDot: false,
-                                      showBorder: true,
+                                return ListTile(
+                                  onTap: handleTap,
+                                  leading: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      PresenceAvatarWidget(
+                                        userId: r.userId,
+                                        avatarSize: 44,
+                                        showDot: false,
+                                        showBorder: true,
 
-                                      child: AppAvatar(
-                                        imageUrl: r.userImageUrl,
-                                        size: 44,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: -4,
-                                      right: -4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          color: theme.scaffoldBackgroundColor,
-                                          shape: BoxShape.circle,
+                                        child: AppAvatar(
+                                          imageUrl: r.userImageUrl,
+                                          size: 44,
                                         ),
-                                        child: Text(
-                                          r.emoji,
-                                          style: TextStyle(
-                                            inherit: false,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.normal,
-                                            fontFamilyFallback:
-                                                AppTypography.emojiFontFallback,
+                                      ),
+                                      Positioned(
+                                        bottom: -4,
+                                        right: -4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                theme.scaffoldBackgroundColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            r.emoji,
+                                            style: TextStyle(
+                                              inherit: false,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                              fontFamilyFallback:
+                                                  AppTypography
+                                                      .emojiFontFallback,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                title: Text(
-                                  isMe ? 'You' : r.userName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                    ],
                                   ),
-                                ),
-                                subtitle: isMe
-                                    ? Text(
-                                        'Tap to remove',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(color: Colors.grey),
-                                      )
-                                    : null,
-                                trailing: r.createdAt != null
-                                    ? Text(
-                                        FormattedDate.getFormattedDate(
-                                          r.createdAt!,
-                                          isShort: true,
-                                        ),
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(color: Colors.grey),
-                                      )
-                                    : null,
-                              );
-                            },
-                          ),
+                                  title: Text(
+                                    isMe ? 'You' : r.userName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  subtitle:
+                                      isMe
+                                          ? Text(
+                                            'Tap to remove',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(color: Colors.grey),
+                                          )
+                                          : null,
+                                  trailing:
+                                      r.createdAt != null
+                                          ? Text(
+                                            FormattedDate.getFormattedDate(
+                                              r.createdAt!,
+                                              isShort: true,
+                                            ),
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(color: Colors.grey),
+                                          )
+                                          : null,
+                                );
+                              },
+                            ),
                   ),
                 ],
               ),

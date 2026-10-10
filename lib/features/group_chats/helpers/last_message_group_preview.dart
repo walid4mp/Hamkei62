@@ -45,11 +45,12 @@ String buildGroupLastMessagePreview({
     return eventText;
   }
 
-  final senderName = isMe
-      ? 'You'
-      : (senderNameFromData?.trim().isNotEmpty == true
-            ? senderNameFromData!
-            : 'Someone');
+  final senderName =
+      isMe
+          ? 'You'
+          : (senderNameFromData?.trim().isNotEmpty == true
+              ? senderNameFromData!
+              : 'Someone');
 
   switch (type) {
     case 'message_react':
@@ -70,10 +71,10 @@ String buildGroupLastMessagePreview({
     case 'file':
       final fileName =
           (group.lastMessage != null &&
-              group.lastMessage!.trim().isNotEmpty &&
-              group.lastMessage!.toLowerCase() != 'file')
-          ? group.lastMessage!.trim()
-          : 'File';
+                  group.lastMessage!.trim().isNotEmpty &&
+                  group.lastMessage!.toLowerCase() != 'file')
+              ? group.lastMessage!.trim()
+              : 'File';
       return '$senderName: 📄 $fileName';
     case 'text':
     default:

@@ -21,36 +21,47 @@ class SharedImagesGrid extends StatelessWidget {
         final isMe = item.senderId == SupabaseProvider.id;
 
         return GestureDetector(
-          onTap: () =>
-              MediaActionHelper.openFullScreenMedia(context, items, item),
-          onLongPressStart: (details) => showSharedMediaActionMenu(
-            context: context,
-            globalPosition: details.globalPosition,
-            isMe: isMe,
-            onShowInChat: () =>
-                MediaActionHelper.handleShowInChat(context, item, onShowInChat),
+          onTap:
+              () => MediaActionHelper.openFullScreenMedia(context, items, item),
+          onLongPressStart:
+              (details) => showSharedMediaActionMenu(
+                context: context,
+                globalPosition: details.globalPosition,
+                isMe: isMe,
+                onShowInChat:
+                    () => MediaActionHelper.handleShowInChat(
+                      context,
+                      item,
+                      onShowInChat,
+                    ),
 
-            onConfirmedDelete: () => MediaActionHelper.handleDelete(
-              context,
-              item,
-              forEveryone: isMe,
-            ),
-            onOpen: () =>
-                MediaActionHelper.openFullScreenMedia(context, items, item),
-            openLabel: 'View photo',
-            openIcon: Icons.image_outlined,
-          ),
+                onConfirmedDelete:
+                    () => MediaActionHelper.handleDelete(
+                      context,
+                      item,
+                      forEveryone: isMe,
+                    ),
+                onOpen:
+                    () => MediaActionHelper.openFullScreenMedia(
+                      context,
+                      items,
+                      item,
+                    ),
+                openLabel: 'View photo',
+                openIcon: Icons.image_outlined,
+              ),
           child: CachedNetworkImage(
             imageUrl: item.imageUrl ?? '',
             fit: BoxFit.cover,
-            errorWidget: (context, url, error) => Container(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Icon(
-                Icons.broken_image_rounded,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                size: 28,
-              ),
-            ),
+            errorWidget:
+                (context, url, error) => Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    Icons.broken_image_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    size: 28,
+                  ),
+                ),
           ),
         );
       },

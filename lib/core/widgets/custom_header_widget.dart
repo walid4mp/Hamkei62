@@ -23,8 +23,10 @@ class CustomHeader extends StatelessWidget {
             title,
             style:
                 style ??
-                Theme.of(context).textTheme.titleLarge!
-                    .copyWith(fontWeight: FontWeight.w400, fontSize: 22),
+                Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 22,
+                ),
           ),
           const Spacer(),
           actions,

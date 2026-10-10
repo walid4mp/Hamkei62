@@ -38,16 +38,16 @@ class StoryImagePickerSheet extends StatelessWidget {
                 icon: Icons.photo_library,
                 color: Theme.of(context).primaryColor,
                 title: 'Photo from Gallery',
-                onTap: () =>
-                    onSelected(ImageSource.gallery, StoryPickType.image),
+                onTap:
+                    () => onSelected(ImageSource.gallery, StoryPickType.image),
               ),
               _buildOption(
                 context,
                 icon: Icons.camera_alt,
                 color: Colors.green,
                 title: 'Take a Photo',
-                onTap: () =>
-                    onSelected(ImageSource.camera, StoryPickType.image),
+                onTap:
+                    () => onSelected(ImageSource.camera, StoryPickType.image),
               ),
               _buildOption(
                 context,
@@ -55,8 +55,8 @@ class StoryImagePickerSheet extends StatelessWidget {
                 color: Colors.deepOrange,
                 title: 'Video from Gallery',
                 subtitle: 'Max 60 seconds',
-                onTap: () =>
-                    onSelected(ImageSource.gallery, StoryPickType.video),
+                onTap:
+                    () => onSelected(ImageSource.gallery, StoryPickType.video),
               ),
               _buildOption(
                 context,
@@ -64,8 +64,8 @@ class StoryImagePickerSheet extends StatelessWidget {
                 color: Colors.red,
                 title: 'Record a Video',
                 subtitle: 'Max 60 seconds',
-                onTap: () =>
-                    onSelected(ImageSource.camera, StoryPickType.video),
+                onTap:
+                    () => onSelected(ImageSource.camera, StoryPickType.video),
               ),
             ],
           ),
@@ -86,13 +86,15 @@ Widget _buildOption(
   return ListTile(
     leading: Icon(icon, color: color),
     title: Text(title),
-    subtitle: subtitle != null
-        ? Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: Colors.grey),
-          )
-        : null,
+    subtitle:
+        subtitle != null
+            ? Text(
+              subtitle,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+            )
+            : null,
     onTap: onTap,
   );
 }

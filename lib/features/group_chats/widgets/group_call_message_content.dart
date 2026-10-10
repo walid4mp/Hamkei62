@@ -89,9 +89,8 @@ class GroupCallMessageContent extends StatelessWidget {
     final callType = callData['call_type'] as String? ?? 'audio';
 
     final rawDuration = callData['duration'];
-    final duration = (rawDuration is String && rawDuration.isNotEmpty)
-        ? rawDuration
-        : '';
+    final duration =
+        (rawDuration is String && rawDuration.isNotEmpty) ? rawDuration : '';
 
     final callId = callData['call_id'] as String? ?? '';
     final groupId = callData[GroupMemberColumns.groupId] as String? ?? '';
@@ -111,32 +110,33 @@ class GroupCallMessageContent extends StatelessWidget {
 
     final showAsMissed = neverConnected && !isMe;
 
-    final bubbleBg = isMe
-        ? primary
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.09)
-              : primary.withValues(alpha: 0.08));
+    final bubbleBg =
+        isMe
+            ? primary
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.09)
+                : primary.withValues(alpha: 0.08));
 
-    final labelColor = isMe
-        ? Colors.white
-        : (isDark ? Colors.white70 : Colors.black87);
-    final subColor = isMe
-        ? Colors.white70
-        : (isDark ? Colors.white54 : Colors.black45);
+    final labelColor =
+        isMe ? Colors.white : (isDark ? Colors.white70 : Colors.black87);
+    final subColor =
+        isMe ? Colors.white70 : (isDark ? Colors.white54 : Colors.black45);
     final missedTint = Colors.redAccent.shade100;
     final iconColor = showAsMissed ? missedTint : Colors.greenAccent;
 
-    final IconData callIcon = showAsMissed
-        ? (isAudio
-              ? Icons.call_missed_rounded
-              : Icons.missed_video_call_rounded)
-        : (isAudio ? Icons.call_rounded : Icons.videocam_rounded);
+    final IconData callIcon =
+        showAsMissed
+            ? (isAudio
+                ? Icons.call_missed_rounded
+                : Icons.missed_video_call_rounded)
+            : (isAudio ? Icons.call_rounded : Icons.videocam_rounded);
 
     final String callLabel;
     if (neverConnected) {
-      callLabel = showAsMissed
-          ? (isAudio ? 'Missed voice call' : 'Missed video call')
-          : 'Ended call';
+      callLabel =
+          showAsMissed
+              ? (isAudio ? 'Missed voice call' : 'Missed video call')
+              : 'Ended call';
     } else if (isEndedConnected) {
       callLabel = 'Ended call';
     } else {
@@ -153,12 +153,13 @@ class GroupCallMessageContent extends StatelessWidget {
           bottomLeft: Radius.circular(isMe ? 18 : 4),
           bottomRight: Radius.circular(isMe ? 4 : 18),
         ),
-        border: !isMe
-            ? Border.all(
-                color: primary.withValues(alpha: isDark ? 0.2 : 0.12),
-                width: 1,
-              )
-            : null,
+        border:
+            !isMe
+                ? Border.all(
+                  color: primary.withValues(alpha: isDark ? 0.2 : 0.12),
+                  width: 1,
+                )
+                : null,
       ),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
       child: Column(
@@ -300,17 +301,19 @@ class GroupCallMessageContent extends StatelessWidget {
             ),
           ),
           child: ClipOval(
-            child: hasAvatar
-                ? CachedCloudinaryImage(
-                    secureUrl: avatarUrl,
-                    width: size,
-                    height: size,
-                    fit: BoxFit.cover,
+            child:
+                hasAvatar
+                    ? CachedCloudinaryImage(
+                      secureUrl: avatarUrl,
+                      width: size,
+                      height: size,
+                      fit: BoxFit.cover,
 
-                    isAvatar: true,
-                    errorWidget: (_, __) => _groupAvatarFallback(primary, size),
-                  )
-                : _groupAvatarFallback(primary, size),
+                      isAvatar: true,
+                      errorWidget:
+                          (_, __) => _groupAvatarFallback(primary, size),
+                    )
+                    : _groupAvatarFallback(primary, size),
           ),
         );
       },
@@ -340,9 +343,8 @@ class GroupCallMessageContent extends StatelessWidget {
     return Text(
       '$hourStr:$minuteStr $period',
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-        color: isMe
-            ? AppColors.white70
-            : Theme.of(context).colorScheme.onSurface,
+        color:
+            isMe ? AppColors.white70 : Theme.of(context).colorScheme.onSurface,
         fontSize: 9,
       ),
     );

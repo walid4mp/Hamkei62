@@ -45,13 +45,13 @@ class ReplyBubblePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String senderName = message.replyToSenderId == currentUserId
-        ? 'You'
-        : receiverName;
+    final String senderName =
+        message.replyToSenderId == currentUserId ? 'You' : receiverName;
 
-    final String displayText = (replyText != null && replyText!.isNotEmpty)
-        ? replyText!
-        : _fallbackLabel();
+    final String displayText =
+        (replyText != null && replyText!.isNotEmpty)
+            ? replyText!
+            : _fallbackLabel();
 
     if (displayText.isEmpty && message.replyToMediaUrl == null) {
       return const SizedBox.shrink();
@@ -85,10 +85,12 @@ class ReplyBubblePreview extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isMe
-                        ? Colors.white.withValues(alpha: 0.2)
-                        : Theme.of(context).primaryColor
-                              .withValues(alpha: 0.08),
+                    color:
+                        isMe
+                            ? Colors.white.withValues(alpha: 0.2)
+                            : Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.08),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,9 +105,10 @@ class ReplyBubblePreview extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: isMe
-                                    ? Colors.white.withValues(alpha: 0.9)
-                                    : Theme.of(context).primaryColor,
+                                color:
+                                    isMe
+                                        ? Colors.white.withValues(alpha: 0.9)
+                                        : Theme.of(context).primaryColor,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -115,12 +118,13 @@ class ReplyBubblePreview extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isMe
-                                    ? Color.alphaBlend(
-                                        Colors.white70,
-                                        Theme.of(context).primaryColor,
-                                      )
-                                    : AppColors.greyColor,
+                                color:
+                                    isMe
+                                        ? Color.alphaBlend(
+                                          Colors.white70,
+                                          Theme.of(context).primaryColor,
+                                        )
+                                        : AppColors.greyColor,
                               ),
                             ),
                           ],

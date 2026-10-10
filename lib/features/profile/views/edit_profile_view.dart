@@ -87,27 +87,29 @@ class _EditProfileViewState extends State<EditProfileView> {
   }
 
   void showImagePickerOptions(context, bool isProfile) {
-    final hasCustomPhoto = isProfile
-        ? (selectedProfileImage != null || _effectiveAvatarUrl != null)
-        : (selectedBackgroundImage != null || _effectiveCoverUrl != null);
+    final hasCustomPhoto =
+        isProfile
+            ? (selectedProfileImage != null || _effectiveAvatarUrl != null)
+            : (selectedBackgroundImage != null || _effectiveCoverUrl != null);
 
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => ImagePickerBottomSheet(
-        title: isProfile ? 'Edit Profile Picture' : 'Edit Cover Photo',
-        showRemoveOption: hasCustomPhoto,
-        onImageSelected: (source) {
-          Navigator.pop(context);
-          _handleImageSelection(isProfile, source);
-        },
-        onRemoveImage: () {
-          Navigator.pop(context);
-          _handleImageRemoval(isProfile);
-        },
-      ),
+      builder:
+          (context) => ImagePickerBottomSheet(
+            title: isProfile ? 'Edit Profile Picture' : 'Edit Cover Photo',
+            showRemoveOption: hasCustomPhoto,
+            onImageSelected: (source) {
+              Navigator.pop(context);
+              _handleImageSelection(isProfile, source);
+            },
+            onRemoveImage: () {
+              Navigator.pop(context);
+              _handleImageRemoval(isProfile);
+            },
+          ),
     );
   }
 
@@ -184,9 +186,11 @@ class _EditProfileViewState extends State<EditProfileView> {
     const double bottomOverlap = expandedAvatarSize * 0.5;
 
     return BlocListener<EditProfileCubit, EditProfileState>(
-      listenWhen: (previous, current) =>
-          (previous is! EditProfileSuccess && current is EditProfileSuccess) ||
-          current is EditProfileError,
+      listenWhen:
+          (previous, current) =>
+              (previous is! EditProfileSuccess &&
+                  current is EditProfileSuccess) ||
+              current is EditProfileError,
       listener: (context, state) async {
         if (state is EditProfileSuccess) {
           final updated = state.updatedUser;
@@ -325,16 +329,17 @@ class _EditProfileViewState extends State<EditProfileView> {
 
     final shouldDiscard = await showDialog<bool>(
       context: context,
-      builder: (context) => CustomConfirmationDialog(
-        title: 'You have unsaved changes. Do you want to discard them?',
-        textAlign: TextAlign.center,
-        img: AppImages.alertAnimationLot,
-        confirmBtnText: 'Discard',
-        cancelBtnText: 'Cancel',
-        onConfirm: () {
-          Navigator.of(context, rootNavigator: true).pop(true);
-        },
-      ),
+      builder:
+          (context) => CustomConfirmationDialog(
+            title: 'You have unsaved changes. Do you want to discard them?',
+            textAlign: TextAlign.center,
+            img: AppImages.alertAnimationLot,
+            confirmBtnText: 'Discard',
+            cancelBtnText: 'Cancel',
+            onConfirm: () {
+              Navigator.of(context, rootNavigator: true).pop(true);
+            },
+          ),
     );
 
     if (shouldDiscard == true && mounted) {

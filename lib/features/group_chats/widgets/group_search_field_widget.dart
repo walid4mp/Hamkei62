@@ -29,9 +29,10 @@ class GroupSearchField extends StatelessWidget {
             size: 20,
           ),
           filled: true,
-          fillColor: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey.shade100,
+          fillColor:
+              isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.grey.shade100,
           contentPadding: const EdgeInsets.symmetric(vertical: 0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

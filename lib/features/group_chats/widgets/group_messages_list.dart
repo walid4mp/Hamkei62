@@ -94,11 +94,12 @@ class _GroupMessagesListState extends State<GroupMessagesList> {
         Expanded(
           child: BlocConsumer<GroupDetailsCubit, GroupDetailsState>(
             listener: _handleNewMessages,
-            buildWhen: (prev, curr) =>
-                curr is GroupDetailsLoaded ||
-                curr is GroupDetailsLoading ||
-                curr is GroupDetailsInitial ||
-                curr is GroupDetailsError,
+            buildWhen:
+                (prev, curr) =>
+                    curr is GroupDetailsLoaded ||
+                    curr is GroupDetailsLoading ||
+                    curr is GroupDetailsInitial ||
+                    curr is GroupDetailsError,
             builder: (context, state) {
               final cubit = context.read<GroupDetailsCubit>();
               final bool hasCachedData = cubit.cachedMessages.isNotEmpty;
@@ -116,13 +117,13 @@ class _GroupMessagesListState extends State<GroupMessagesList> {
                 return const ChatLoadingSkeleton();
               }
 
-              final messages = state is GroupDetailsLoaded
-                  ? state.messages
-                  : cubit.cachedMessages;
+              final messages =
+                  state is GroupDetailsLoaded
+                      ? state.messages
+                      : cubit.cachedMessages;
 
-              final isMember = state is GroupDetailsLoaded
-                  ? state.isMember
-                  : cubit.isMember;
+              final isMember =
+                  state is GroupDetailsLoaded ? state.isMember : cubit.isMember;
 
               if (messages.isEmpty) {
                 if (!cubit.hasConfirmedInitialLoad) {
@@ -142,12 +143,13 @@ class _GroupMessagesListState extends State<GroupMessagesList> {
                       vertical: 8,
                     ),
                     itemCount: messages.length,
-                    itemBuilder: (_, index) => GroupMessageItemBuilder(
-                      index: index,
-                      messages: messages,
-                      itemScrollController: widget.scrollController,
-                      isMember: isMember,
-                    ),
+                    itemBuilder:
+                        (_, index) => GroupMessageItemBuilder(
+                          index: index,
+                          messages: messages,
+                          itemScrollController: widget.scrollController,
+                          isMember: isMember,
+                        ),
                     separatorBuilder: (_, __) => const Gap(4),
                   ),
 
@@ -221,67 +223,68 @@ class _ScrollToBottomButton extends StatelessWidget {
             final visible = showButton || count > 0;
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: visible
-                  ? GestureDetector(
-                      key: const ValueKey('btn'),
-                      onTap: onTap,
-                      child: ValueListenableBuilder<int>(
-                        valueListenable: countNotifier,
-                        builder: (context, count, _) {
-                          return Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Material(
-                                elevation: 4,
-                                shape: const CircleBorder(),
-                                color: primary,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                              if (count > 0)
-                                Positioned(
-                                  top: -6,
-                                  left: -4,
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minWidth: 18,
-                                      minHeight: 18,
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 1,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      count > 99 ? '99+' : '$count',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
+              child:
+                  visible
+                      ? GestureDetector(
+                        key: const ValueKey('btn'),
+                        onTap: onTap,
+                        child: ValueListenableBuilder<int>(
+                          valueListenable: countNotifier,
+                          builder: (context, count, _) {
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Material(
+                                  elevation: 4,
+                                  shape: const CircleBorder(),
+                                  color: primary,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(6),
+                                    child: Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.white,
+                                      size: 22,
                                     ),
                                   ),
                                 ),
-                            ],
-                          );
-                        },
-                      ),
-                    )
-                  : const SizedBox.shrink(key: ValueKey('empty')),
+                                if (count > 0)
+                                  Positioned(
+                                    top: -6,
+                                    left: -4,
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 18,
+                                        minHeight: 18,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        count > 99 ? '99+' : '$count',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                      )
+                      : const SizedBox.shrink(key: ValueKey('empty')),
             );
           },
         );

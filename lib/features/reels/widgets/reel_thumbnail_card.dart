@@ -24,18 +24,22 @@ class ReelThumbnailCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: reel.thumbnailUrl,
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.5),
-                  child: Center(
-                    child: Icon(
-                      Icons.image_not_supported_rounded,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant
+                errorWidget:
+                    (context, url, error) => Container(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
                           .withValues(alpha: 0.5),
-                      size: 32,
+                      child: Center(
+                        child: Icon(
+                          Icons.image_not_supported_rounded,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                          size: 32,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ),
               const Positioned(
                 top: 4,

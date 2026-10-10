@@ -43,12 +43,13 @@ class GroupCallSignalingService {
     required String currentUserName,
     required GroupCallType type,
   }) async {
-    final existing = await _supabase
-        .from('group_calls')
-        .select()
-        .eq(GroupMemberColumns.groupId, groupId)
-        .inFilter('status', ['ringing', 'accepted', 'ongoing'])
-        .maybeSingle();
+    final existing =
+        await _supabase
+            .from('group_calls')
+            .select()
+            .eq(GroupMemberColumns.groupId, groupId)
+            .inFilter('status', ['ringing', 'accepted', 'ongoing'])
+            .maybeSingle();
 
     if (existing != null && !await _healIfStale(existing)) {
       return GroupCallModel.fromMap(existing);
@@ -75,11 +76,12 @@ class GroupCallSignalingService {
     );
     await _supabase.from('group_calls').insert(model.toMap());
 
-    final initiatorProfile = await _supabase
-        .from('users')
-        .select('image_url')
-        .eq('id', currentUserId)
-        .maybeSingle();
+    final initiatorProfile =
+        await _supabase
+            .from('users')
+            .select('image_url')
+            .eq('id', currentUserId)
+            .maybeSingle();
     final initiatorAvatar = initiatorProfile?['image_url'] as String? ?? '';
 
     await _supabase.from(SupabaseConstants.groupMessages).insert({
@@ -118,11 +120,12 @@ class GroupCallSignalingService {
   }
 
   Future<GroupCallModel> acceptCall(String callId) async {
-    final existing = await _supabase
-        .from('group_calls')
-        .select()
-        .eq('call_id', callId)
-        .single();
+    final existing =
+        await _supabase
+            .from('group_calls')
+            .select()
+            .eq('call_id', callId)
+            .single();
 
     final call = GroupCallModel.fromMap(existing);
     final nowIso = DateTime.now().toUtc().toIso8601String();
@@ -196,11 +199,12 @@ class GroupCallSignalingService {
   }
 
   Future<void> leaveCall(String callId) async {
-    final existing = await _supabase
-        .from('group_calls')
-        .select('participant_count, status')
-        .eq('call_id', callId)
-        .maybeSingle();
+    final existing =
+        await _supabase
+            .from('group_calls')
+            .select('participant_count, status')
+            .eq('call_id', callId)
+            .maybeSingle();
     if (existing == null) return;
 
     final status = existing['status'] as String;
@@ -240,19 +244,20 @@ class GroupCallSignalingService {
         .eq('call_id', callId);
 
     try {
-      final existing = await _supabase
-          .from(SupabaseConstants.groupMessages)
-          .select('id, message_text')
-          .eq('message_type', 'call')
-          .ilike('message_text', '%$callId%')
-          .maybeSingle();
+      final existing =
+          await _supabase
+              .from(SupabaseConstants.groupMessages)
+              .select('id, message_text')
+              .eq('message_type', 'call')
+              .ilike('message_text', '%$callId%')
+              .maybeSingle();
 
       if (existing != null) {
         Map<String, dynamic> callData = {};
         try {
-          callData = jsonDecode(
-            existing['message_text'] as String,
-          ) as Map<String, dynamic>;
+          callData =
+              jsonDecode(existing['message_text'] as String)
+                  as Map<String, dynamic>;
         } catch (e) {
           debugPrint(
             '[GroupCallSignaling] failed to decode existing call payload: $e',
@@ -272,33 +277,35 @@ class GroupCallSignalingService {
   }
 
   Future<void> markAsMissed(String callId) async {
-    final updated = await _supabase
-        .from('group_calls')
-        .update({
-          'status': GroupCallStatus.missed.name,
-          'ended_at': DateTime.now().toIso8601String(),
-        })
-        .eq('call_id', callId)
-        .eq('status', GroupCallStatus.ringing.name)
-        .select();
+    final updated =
+        await _supabase
+            .from('group_calls')
+            .update({
+              'status': GroupCallStatus.missed.name,
+              'ended_at': DateTime.now().toIso8601String(),
+            })
+            .eq('call_id', callId)
+            .eq('status', GroupCallStatus.ringing.name)
+            .select();
 
     final rows = updated as List;
     final wasRinging = rows.isNotEmpty;
 
     try {
-      final existing = await _supabase
-          .from(SupabaseConstants.groupMessages)
-          .select('id, message_text')
-          .eq('message_type', 'call')
-          .ilike('message_text', '%$callId%')
-          .maybeSingle();
+      final existing =
+          await _supabase
+              .from(SupabaseConstants.groupMessages)
+              .select('id, message_text')
+              .eq('message_type', 'call')
+              .ilike('message_text', '%$callId%')
+              .maybeSingle();
 
       if (existing != null) {
         Map<String, dynamic> callData = {};
         try {
-          callData = jsonDecode(
-            existing['message_text'] as String,
-          ) as Map<String, dynamic>;
+          callData =
+              jsonDecode(existing['message_text'] as String)
+                  as Map<String, dynamic>;
         } catch (e) {
           debugPrint(
             '[GroupCallSignaling] failed to decode call payload for update: $e',
@@ -364,11 +371,16 @@ class GroupCallSignalingService {
         .stream(primaryKey: ['call_id'])
         .eq(GroupMemberColumns.groupId, groupId)
         .map((list) {
-          final active = list
-              .where(
-                (m) => ['ringing', 'accepted', 'ongoing'].contains(m['status']),
-              )
-              .toList();
+          final active =
+              list
+                  .where(
+                    (m) => [
+                      'ringing',
+                      'accepted',
+                      'ongoing',
+                    ].contains(m['status']),
+                  )
+                  .toList();
           if (active.isNotEmpty) {
             return _CallSnapshot.active(GroupCallModel.fromMap(active.first));
           }
@@ -496,8 +508,8 @@ class GroupCallSignalingService {
 
                 final startedStr = m['started_at'];
                 if (startedStr != null) {
-                  final started = DateTime.tryParse(startedStr.toString())
-                      ?.toUtc();
+                  final started =
+                      DateTime.tryParse(startedStr.toString())?.toUtc();
                   if (started != null && started.isBefore(cutoff)) return false;
                 }
                 return true;
@@ -508,12 +520,13 @@ class GroupCallSignalingService {
   }
 
   Future<GroupCallModel?> getActiveCall(String groupId) async {
-    final result = await _supabase
-        .from('group_calls')
-        .select()
-        .eq(GroupMemberColumns.groupId, groupId)
-        .inFilter('status', ['ringing', 'accepted', 'ongoing'])
-        .maybeSingle();
+    final result =
+        await _supabase
+            .from('group_calls')
+            .select()
+            .eq(GroupMemberColumns.groupId, groupId)
+            .inFilter('status', ['ringing', 'accepted', 'ongoing'])
+            .maybeSingle();
 
     if (result == null) return null;
     if (await _healIfStale(result)) return null;
@@ -525,12 +538,13 @@ class GroupCallSignalingService {
     required String userId,
   }) async {
     try {
-      final row = await _supabase
-          .from(SupabaseConstants.groupMembers)
-          .select(GroupMemberColumns.membershipStatus)
-          .eq(GroupMemberColumns.groupId, groupId)
-          .eq(GroupMemberColumns.userId, userId)
-          .maybeSingle();
+      final row =
+          await _supabase
+              .from(SupabaseConstants.groupMembers)
+              .select(GroupMemberColumns.membershipStatus)
+              .eq(GroupMemberColumns.groupId, groupId)
+              .eq(GroupMemberColumns.userId, userId)
+              .maybeSingle();
 
       return row != null &&
           row[GroupMemberColumns.membershipStatus] == 'active';

@@ -44,26 +44,29 @@ class AboutUsFeatureGrid extends StatelessWidget {
               tween: Tween(begin: 0.0, end: 1.0),
               duration: Duration(milliseconds: 400 + i * 60),
               curve: Curves.easeOut,
-              builder: (context, v, child) => Opacity(
-                opacity: v,
-                child: Transform.translate(
-                  offset: Offset(0, 12 * (1 - v)),
-                  child: child,
-                ),
-              ),
+              builder:
+                  (context, v, child) => Opacity(
+                    opacity: v,
+                    child: Transform.translate(
+                      offset: Offset(0, 12 * (1 - v)),
+                      child: child,
+                    ),
+                  ),
               child: SizedBox(
                 width: itemWidth,
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.04)
-                        : Colors.grey.shade50,
+                    color:
+                        isDark
+                            ? Colors.white.withValues(alpha: 0.04)
+                            : Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.07)
-                          : Colors.grey.shade200,
+                      color:
+                          isDark
+                              ? Colors.white.withValues(alpha: 0.07)
+                              : Colors.grey.shade200,
                       width: 0.8,
                     ),
                   ),

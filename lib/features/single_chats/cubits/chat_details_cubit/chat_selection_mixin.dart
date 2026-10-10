@@ -14,9 +14,10 @@ mixin ChatSelectionMixin on Cubit<ChatDetailsState> {
 
   bool get isInSelectionMode => selectedMessageIds.value.isNotEmpty;
 
-  List<MessageModel> get selectedMessages => cachedMessages
-      .where((m) => selectedMessageIds.value.contains(m.id))
-      .toList();
+  List<MessageModel> get selectedMessages =>
+      cachedMessages
+          .where((m) => selectedMessageIds.value.contains(m.id))
+          .toList();
 
   bool get canDeleteSelectedForEveryone =>
       selectedMessages.isNotEmpty &&
@@ -79,21 +80,16 @@ mixin ChatSelectionMixin on Cubit<ChatDetailsState> {
     if (ids.isEmpty) return;
 
     final selectedSet = ids.toSet();
-    final selected = cachedMessages
-        .where((m) => selectedSet.contains(m.id))
-        .toList();
+    final selected =
+        cachedMessages.where((m) => selectedSet.contains(m.id)).toList();
 
     bool isStillSending(MessageModel m) =>
         m.clientMessageId != null && m.id == m.clientMessageId;
 
-    final stillSendingIds = selected
-        .where(isStillSending)
-        .map((m) => m.id)
-        .toList();
-    final realIds = selected
-        .where((m) => !isStillSending(m))
-        .map((m) => m.id)
-        .toList();
+    final stillSendingIds =
+        selected.where(isStillSending).map((m) => m.id).toList();
+    final realIds =
+        selected.where((m) => !isStillSending(m)).map((m) => m.id).toList();
 
     var updated = cachedMessages;
     for (final m in selected) {

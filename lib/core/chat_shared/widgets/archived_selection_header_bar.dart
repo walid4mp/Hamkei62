@@ -38,9 +38,12 @@ class ArchivedSelectionHeaderBar extends StatelessWidget {
     final isMixed = flagState == SelectionFlagState.mixed;
     final isOn = flagState == SelectionFlagState.allOn;
     return PremiumSelectionActionIcon(
-      state: isMixed
-          ? PremiumActionVisualState.mixed
-          : (isOn ? PremiumActionVisualState.on : PremiumActionVisualState.off),
+      state:
+          isMixed
+              ? PremiumActionVisualState.mixed
+              : (isOn
+                  ? PremiumActionVisualState.on
+                  : PremiumActionVisualState.off),
       onIcon: onIcon,
       offIcon: offIcon,
       onLabel: onLabel,
@@ -95,10 +98,11 @@ class ArchivedSelectionHeaderBar extends StatelessWidget {
               offIcon: Icons.unarchive_rounded,
               onLabel: 'Unarchive',
               offLabel: 'Unarchive',
-              onTap: () => _runAndClose(
-                context,
-                () => cubit.bulkSetArchived(selectedRefs, false),
-              ),
+              onTap:
+                  () => _runAndClose(
+                    context,
+                    () => cubit.bulkSetArchived(selectedRefs, false),
+                  ),
             ),
 
             PremiumSelectionActionIcon(

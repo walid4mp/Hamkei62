@@ -64,12 +64,12 @@ class _AccountsTabViewState extends State<AccountsTabView>
               return _buildErrorState(context, theme, state.message, query);
             }
 
-            final users = state is DiscoverPeopleSuccess
-                ? state.users
-                : const <DiscoverPersonModel>[];
-            final hasReachedMax = state is DiscoverPeopleSuccess
-                ? state.hasReachedMax
-                : true;
+            final users =
+                state is DiscoverPeopleSuccess
+                    ? state.users
+                    : const <DiscoverPersonModel>[];
+            final hasReachedMax =
+                state is DiscoverPeopleSuccess ? state.hasReachedMax : true;
 
             if (users.isEmpty) {
               return _buildEmptyState(theme, query);
@@ -88,9 +88,10 @@ class _AccountsTabViewState extends State<AccountsTabView>
                 return false;
               },
               child: CustomPullToRefresh(
-                onRefresh: () => context
-                    .read<DiscoverPeopleCubit>()
-                    .getDiscoverPeople(isRefresh: true),
+                onRefresh:
+                    () => context.read<DiscoverPeopleCubit>().getDiscoverPeople(
+                      isRefresh: true,
+                    ),
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: ClampingScrollPhysics(),
@@ -114,11 +115,12 @@ class _AccountsTabViewState extends State<AccountsTabView>
                             key: ValueKey(person.user.id),
                             personData: person,
                             highlightQuery: query.isEmpty ? null : query,
-                            onDismiss: query.isEmpty
-                                ? () => context
-                                      .read<DiscoverPeopleCubit>()
-                                      .dismissSuggestion(person.user.id)
-                                : null,
+                            onDismiss:
+                                query.isEmpty
+                                    ? () => context
+                                        .read<DiscoverPeopleCubit>()
+                                        .dismissSuggestion(person.user.id)
+                                    : null,
                           );
                         },
                       ),
@@ -180,8 +182,10 @@ class _AccountsTabViewState extends State<AccountsTabView>
     String query,
   ) => ErrorSearchState(
     message: message,
-    onRetry: () => query.isEmpty
-        ? context.read<DiscoverPeopleCubit>().getDiscoverPeople()
-        : context.read<DiscoverPeopleCubit>().searchPeople(query),
+    onRetry:
+        () =>
+            query.isEmpty
+                ? context.read<DiscoverPeopleCubit>().getDiscoverPeople()
+                : context.read<DiscoverPeopleCubit>().searchPeople(query),
   );
 }

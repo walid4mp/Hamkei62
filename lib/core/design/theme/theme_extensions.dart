@@ -29,12 +29,14 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       success: palette.success,
       warning: palette.warning,
       glassBlurSigma: AppDimensions.glassBlurSigma,
-      glassSurfaceOpacity: isDark
-          ? AppDimensions.glassSurfaceOpacityDark
-          : AppDimensions.glassSurfaceOpacityLight,
-      glassBorderOpacity: isDark
-          ? AppDimensions.glassBorderOpacityDark
-          : AppDimensions.glassBorderOpacityLight,
+      glassSurfaceOpacity:
+          isDark
+              ? AppDimensions.glassSurfaceOpacityDark
+              : AppDimensions.glassSurfaceOpacityLight,
+      glassBorderOpacity:
+          isDark
+              ? AppDimensions.glassBorderOpacityDark
+              : AppDimensions.glassBorderOpacityLight,
     );
   }
 
@@ -76,10 +78,10 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
           (glassBlurSigma + (other.glassBlurSigma - glassBlurSigma) * t),
       glassSurfaceOpacity:
           (glassSurfaceOpacity +
-          (other.glassSurfaceOpacity - glassSurfaceOpacity) * t),
+              (other.glassSurfaceOpacity - glassSurfaceOpacity) * t),
       glassBorderOpacity:
           (glassBorderOpacity +
-          (other.glassBorderOpacity - glassBorderOpacity) * t),
+              (other.glassBorderOpacity - glassBorderOpacity) * t),
     );
   }
 }

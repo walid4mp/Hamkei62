@@ -76,9 +76,10 @@ class _UserPreviewDialogState extends State<UserPreviewDialog> {
                 Navigator.of(context, rootNavigator: true).pushNamed(
                   AppRoutes.fullScreenImageViewRoute,
                   arguments: {
-                    'url': (user.imageUrl != null && user.imageUrl!.isNotEmpty)
-                        ? user.imageUrl!
-                        : AppImages.defaultUserImg,
+                    'url':
+                        (user.imageUrl != null && user.imageUrl!.isNotEmpty)
+                            ? user.imageUrl!
+                            : AppImages.defaultUserImg,
                     'tag': 'preview_dialog_${user.id}',
                     'isAsset': user.imageUrl == null || user.imageUrl!.isEmpty,
                   },
@@ -93,29 +94,31 @@ class _UserPreviewDialogState extends State<UserPreviewDialog> {
                     ClipRRect(
                       child:
                           (user.imageUrl != null && user.imageUrl!.isNotEmpty)
-                          ? CachedCloudinaryImage(
-                              secureUrl: user.imageUrl!,
-                              fit: BoxFit.cover,
-                              height: imageHeight,
-                              width: double.infinity,
-                              isAvatar: true,
-                              placeholder: (context) => SizedBox(
+                              ? CachedCloudinaryImage(
+                                secureUrl: user.imageUrl!,
+                                fit: BoxFit.cover,
                                 height: imageHeight,
-                                child: const Center(
-                                  child: CustomLoadingIndicator(),
-                                ),
-                              ),
-                              errorWidget: (context, error) => Image.asset(
+                                width: double.infinity,
+                                isAvatar: true,
+                                placeholder:
+                                    (context) => SizedBox(
+                                      height: imageHeight,
+                                      child: const Center(
+                                        child: CustomLoadingIndicator(),
+                                      ),
+                                    ),
+                                errorWidget:
+                                    (context, error) => Image.asset(
+                                      AppImages.defaultUserImg,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                              )
+                              : Image.asset(
                                 AppImages.defaultUserImg,
                                 fit: BoxFit.fitWidth,
+                                height: imageHeight,
+                                width: double.infinity,
                               ),
-                            )
-                          : Image.asset(
-                              AppImages.defaultUserImg,
-                              fit: BoxFit.fitWidth,
-                              height: imageHeight,
-                              width: double.infinity,
-                            ),
                     ),
                     Positioned(
                       top: 0,

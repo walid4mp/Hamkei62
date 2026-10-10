@@ -105,17 +105,18 @@ class AiLanguagePickerSheet extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: _options.entries.map((entry) {
-                      final language = entry.key;
-                      final (subtitle, icon) = entry.value;
-                      return AiSettingOptionCard<AiAutoCompleteLanguage>(
-                        value: language,
-                        currentValue: selected,
-                        title: language.displayLabel,
-                        subtitle: subtitle,
-                        icon: icon,
-                      );
-                    }).toList(),
+                    children:
+                        _options.entries.map((entry) {
+                          final language = entry.key;
+                          final (subtitle, icon) = entry.value;
+                          return AiSettingOptionCard<AiAutoCompleteLanguage>(
+                            value: language,
+                            currentValue: selected,
+                            title: language.displayLabel,
+                            subtitle: subtitle,
+                            icon: icon,
+                          );
+                        }).toList(),
                   ),
                 ),
               ),

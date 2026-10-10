@@ -13,8 +13,9 @@ class AiChatSessionsCubit extends Cubit<AiChatSessionsState>
   AiChatSessionsCubit(this._repository) : super(AiChatSessionsLoading()) {
     _subscription = _repository.watchSessions().listen(
       (sessions) => emit(AiChatSessionsLoaded(sessions)),
-      onError: (Object e, StackTrace _) =>
-          emit(AiChatSessionsError(SupabaseErrorMapper.toUserMessage(e))),
+      onError:
+          (Object e, StackTrace _) =>
+              emit(AiChatSessionsError(SupabaseErrorMapper.toUserMessage(e))),
     );
   }
 

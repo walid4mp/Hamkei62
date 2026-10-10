@@ -48,18 +48,20 @@ void main() {
       'success: emits UserDataLoading then UserDataLoaded, and pushes the '
       'user into PostsCubit so posts/likes reflect the right author',
       build: buildCubit,
-      setUp: () =>
-          when(() => userService.fetchCurrentUser('user-1'))
-              .thenAnswer((_) async => testUser()),
+      setUp:
+          () => when(
+            () => userService.fetchCurrentUser('user-1'),
+          ).thenAnswer((_) async => testUser()),
       act: (cubit) => cubit.getCurrentUserData(),
-      expect: () => [
-        isA<UserDataLoading>(),
-        isA<UserDataLoaded>().having(
-          (s) => s.userData.id,
-          'userData.id',
-          'user-1',
-        ),
-      ],
+      expect:
+          () => [
+            isA<UserDataLoading>(),
+            isA<UserDataLoaded>().having(
+              (s) => s.userData.id,
+              'userData.id',
+              'user-1',
+            ),
+          ],
       verify: (cubit) {
         verify(() => postsCubit.setCurrentUser(any())).called(1);
         expect(cubit.currentUserData?.id, 'user-1');
@@ -70,9 +72,10 @@ void main() {
       'isRefresh: true skips the loading state — a pull-to-refresh should '
       'not flash a full-screen loading UI over already-visible content',
       build: buildCubit,
-      setUp: () =>
-          when(() => userService.fetchCurrentUser('user-1'))
-              .thenAnswer((_) async => testUser()),
+      setUp:
+          () => when(
+            () => userService.fetchCurrentUser('user-1'),
+          ).thenAnswer((_) async => testUser()),
       act: (cubit) => cubit.getCurrentUserData(isRefresh: true),
       expect: () => [], // no UserDataLoading, and no UserDataLoaded either
       // (isRefresh also skips the UserDataLoaded emit — see source)
@@ -86,18 +89,20 @@ void main() {
       'is uninitialized in tests, so it always misses here) surfaces as '
       'UserDataLoadError with a mapped message',
       build: buildCubit,
-      setUp: () =>
-          when(() => userService.fetchCurrentUser('user-1'))
-              .thenThrow(Exception('SocketException: fail')),
+      setUp:
+          () => when(
+            () => userService.fetchCurrentUser('user-1'),
+          ).thenThrow(Exception('SocketException: fail')),
       act: (cubit) => cubit.getCurrentUserData(),
-      expect: () => [
-        isA<UserDataLoading>(),
-        isA<UserDataLoadError>().having(
-          (s) => s.message,
-          'message',
-          'no-internet',
-        ),
-      ],
+      expect:
+          () => [
+            isA<UserDataLoading>(),
+            isA<UserDataLoadError>().having(
+              (s) => s.message,
+              'message',
+              'no-internet',
+            ),
+          ],
     );
 
     blocTest<HomeCubit, HomeState>(
@@ -107,23 +112,25 @@ void main() {
       build: buildCubit,
       setUp: () {
         var callCount = 0;
-        when(() => userService.fetchCurrentUser('user-1'))
-            .thenAnswer((_) async {
-              callCount++;
-              if (callCount == 1) return testUser();
-              throw Exception('network blip');
-            });
+        when(() => userService.fetchCurrentUser('user-1')).thenAnswer((
+          _,
+        ) async {
+          callCount++;
+          if (callCount == 1) return testUser();
+          throw Exception('network blip');
+        });
       },
       act: (cubit) async {
         await cubit.getCurrentUserData(); // succeeds, populates currentUserData
         await cubit.getCurrentUserData(isRefresh: true); // fails silently
       },
-      expect: () => [
-        isA<UserDataLoading>(),
-        isA<UserDataLoaded>(),
-        // no further state — the second call's failure is caught and
-        // dropped because currentUserData is already non-null.
-      ],
+      expect:
+          () => [
+            isA<UserDataLoading>(),
+            isA<UserDataLoaded>(),
+            // no further state — the second call's failure is caught and
+            // dropped because currentUserData is already non-null.
+          ],
     );
   });
 
@@ -141,18 +148,20 @@ void main() {
       'if resolving the user id itself throws with "no-internet" in the '
       'message, the connectivity banner fires and (with no cached user '
       'yet) UserDataLoadError shows the offline copy',
-      build: () => buildCubit(
-        currentUserIdProvider: () => throw Exception('no-internet'),
-      ),
+      build:
+          () => buildCubit(
+            currentUserIdProvider: () => throw Exception('no-internet'),
+          ),
       act: (cubit) => cubit.refreshUserData(),
-      expect: () => [
-        isA<UserDataLoading>(),
-        isA<UserDataLoadError>().having(
-          (s) => s.message,
-          'message',
-          'No internet connection. Please check your network.',
-        ),
-      ],
+      expect:
+          () => [
+            isA<UserDataLoading>(),
+            isA<UserDataLoadError>().having(
+              (s) => s.message,
+              'message',
+              'No internet connection. Please check your network.',
+            ),
+          ],
     );
   });
 
@@ -161,19 +170,21 @@ void main() {
       'clears the cached user and returns to HomeInitial — used on sign-out '
       'so the next sign-in never shows a flash of the previous user',
       build: buildCubit,
-      setUp: () =>
-          when(() => userService.fetchCurrentUser('user-1'))
-              .thenAnswer((_) async => testUser()),
+      setUp:
+          () => when(
+            () => userService.fetchCurrentUser('user-1'),
+          ).thenAnswer((_) async => testUser()),
       act: (cubit) async {
         await cubit
             .getCurrentUserData(); // genuinely populate currentUserData first
         cubit.resetSession();
       },
-      expect: () => [
-        isA<UserDataLoading>(),
-        isA<UserDataLoaded>(),
-        isA<HomeInitial>(),
-      ],
+      expect:
+          () => [
+            isA<UserDataLoading>(),
+            isA<UserDataLoaded>(),
+            isA<HomeInitial>(),
+          ],
       verify: (cubit) {
         expect(cubit.currentUserData, isNull);
       },

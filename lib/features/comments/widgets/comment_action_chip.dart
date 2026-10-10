@@ -39,9 +39,10 @@ class CommentActionChip extends StatelessWidget {
       );
     }
 
-    final color = isActive
-        ? (activeColor ?? Theme.of(context).primaryColor)
-        : AppColors.grey6;
+    final color =
+        isActive
+            ? (activeColor ?? Theme.of(context).primaryColor)
+            : AppColors.grey6;
 
     return GestureDetector(
       onTap: onTap,

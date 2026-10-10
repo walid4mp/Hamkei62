@@ -25,9 +25,10 @@ class ModernCircularProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
-    final bgCircleColor = theme.brightness == Brightness.light
-        ? Colors.grey[300]!
-        : Colors.grey[800]!;
+    final bgCircleColor =
+        theme.brightness == Brightness.light
+            ? Colors.grey[300]!
+            : Colors.grey[800]!;
     final isCompleted = progress >= 0.99;
 
     return TweenAnimationBuilder<double>(
@@ -65,55 +66,61 @@ class ModernCircularProgress extends StatelessWidget {
                   child: ScaleTransition(scale: animation, child: child),
                 );
               },
-              child: (isCompleted && showCheckmark)
-                  ? TweenAnimationBuilder<double>(
-                      key: const ValueKey('check'),
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeInOutBack,
-                      builder: (context, checkVal, _) {
-                        return CustomPaint(
-                          size: Size(size, size),
-                          painter: AnimatedCheckPainter(
-                            progress: checkVal,
-                            color: primaryColor,
-                            strokeWidth: size * 0.12,
-                          ),
-                        );
-                      },
-                    )
-                  : Column(
-                      key: const ValueKey('text'),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          label ?? "${(progress * 100).toInt()}%",
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: theme.brightness == Brightness.light
-                                ? Theme.of(context).primaryColor
-                                      .withValues(alpha: 0.7)
-                                : Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: label != null ? size * 0.18 : size * 0.28,
-                          ),
-                        ),
-                        if (sizeLabel != null && sizeLabel!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 3),
-                            child: Text(
-                              sizeLabel!,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.brightness == Brightness.light
-                                    ? Theme.of(context).primaryColor
-                                          .withValues(alpha: 0.5)
-                                    : Colors.white.withValues(alpha: 0.6),
-                                fontWeight: FontWeight.w500,
-                                fontSize: size * 0.09,
-                              ),
+              child:
+                  (isCompleted && showCheckmark)
+                      ? TweenAnimationBuilder<double>(
+                        key: const ValueKey('check'),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 1000),
+                        curve: Curves.easeInOutBack,
+                        builder: (context, checkVal, _) {
+                          return CustomPaint(
+                            size: Size(size, size),
+                            painter: AnimatedCheckPainter(
+                              progress: checkVal,
+                              color: primaryColor,
+                              strokeWidth: size * 0.12,
+                            ),
+                          );
+                        },
+                      )
+                      : Column(
+                        key: const ValueKey('text'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            label ?? "${(progress * 100).toInt()}%",
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color:
+                                  theme.brightness == Brightness.light
+                                      ? Theme.of(
+                                        context,
+                                      ).primaryColor.withValues(alpha: 0.7)
+                                      : Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize:
+                                  label != null ? size * 0.18 : size * 0.28,
                             ),
                           ),
-                      ],
-                    ),
+                          if (sizeLabel != null && sizeLabel!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Text(
+                                sizeLabel!,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color:
+                                      theme.brightness == Brightness.light
+                                          ? Theme.of(
+                                            context,
+                                          ).primaryColor.withValues(alpha: 0.5)
+                                          : Colors.white.withValues(alpha: 0.6),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: size * 0.09,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
             ),
           ],
         );

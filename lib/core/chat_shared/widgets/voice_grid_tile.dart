@@ -16,9 +16,8 @@ class VoiceGridTile extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.primaryColor;
     final isMe = item.senderId == SupabaseProvider.id;
-    final avatarUrl = isMe
-        ? (currentUserAvatar ?? item.senderAvatar)
-        : item.senderAvatar;
+    final avatarUrl =
+        isMe ? (currentUserAvatar ?? item.senderAvatar) : item.senderAvatar;
     final hasAvatar = (avatarUrl ?? '').isNotEmpty;
 
     return Container(
@@ -35,17 +34,17 @@ class VoiceGridTile extends StatelessWidget {
               CircleAvatar(
                 radius: 20,
                 backgroundColor: primary.withValues(alpha: 0.15),
-                backgroundImage: hasAvatar
-                    ? CachedNetworkImageProvider(avatarUrl!)
-                    : null,
-                child: !hasAvatar
-                    ? Text(
-                        item.senderName.isNotEmpty
-                            ? item.senderName[0].toUpperCase()
-                            : '?',
-                        style: TextStyle(color: primary, fontSize: 14),
-                      )
-                    : null,
+                backgroundImage:
+                    hasAvatar ? CachedNetworkImageProvider(avatarUrl!) : null,
+                child:
+                    !hasAvatar
+                        ? Text(
+                          item.senderName.isNotEmpty
+                              ? item.senderName[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(color: primary, fontSize: 14),
+                        )
+                        : null,
               ),
               Positioned(
                 bottom: -2,

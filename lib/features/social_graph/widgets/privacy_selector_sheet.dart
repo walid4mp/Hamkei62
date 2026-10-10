@@ -56,8 +56,8 @@ Future<ContentPrivacy?> showPrivacySelectorSheet(
               isPack
                   ? 'Choose your audience for this sticker pack'
                   : (isStory
-                        ? 'Choose your audience for this story'
-                        : 'Choose your audience for this post'),
+                      ? 'Choose your audience for this story'
+                      : 'Choose your audience for this post'),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey.shade600,
                 fontWeight: FontWeight.w500,

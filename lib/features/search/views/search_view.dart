@@ -22,18 +22,20 @@ class SearchView extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => DiscoverPeopleCubit(
-            context.read<DiscoverPeopleServices>(),
-            friendshipServices: context.read<FriendshipServices>(),
-            followServices: context.read<FollowServices>(),
-            homeCubit: context.read<HomeCubit>(),
-          )..getDiscoverPeople(),
+          create:
+              (context) => DiscoverPeopleCubit(
+                context.read<DiscoverPeopleServices>(),
+                friendshipServices: context.read<FriendshipServices>(),
+                followServices: context.read<FollowServices>(),
+                homeCubit: context.read<HomeCubit>(),
+              )..getDiscoverPeople(),
         ),
         BlocProvider(
-          create: (context) => FriendsListCubit(
-            context.read<FriendshipServices>(),
-            userId: SupabaseProvider.id,
-          )..loadFriends(),
+          create:
+              (context) => FriendsListCubit(
+                context.read<FriendshipServices>(),
+                userId: SupabaseProvider.id,
+              )..loadFriends(),
         ),
         BlocProvider(create: (context) => SearchReelsCubit()..getReels()),
         BlocProvider(create: (context) => SearchPostsCubit()),

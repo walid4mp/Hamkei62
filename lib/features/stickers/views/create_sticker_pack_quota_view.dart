@@ -33,19 +33,21 @@ class CreateStickerPackQuotaView extends StatelessWidget {
                 child: ListTile(
                   title: Text(pack.title),
                   subtitle: Text('${pack.stickerCount} stickers'),
-                  trailing: state.isDeleting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded),
-                          color: Theme.of(context).colorScheme.error,
-                          onPressed: () => context
-                              .read<CreateStickerPackCubit>()
-                              .deleteAndRetry(pack.id),
-                        ),
+                  trailing:
+                      state.isDeleting
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded),
+                            color: Theme.of(context).colorScheme.error,
+                            onPressed:
+                                () => context
+                                    .read<CreateStickerPackCubit>()
+                                    .deleteAndRetry(pack.id),
+                          ),
                 ),
               );
             },

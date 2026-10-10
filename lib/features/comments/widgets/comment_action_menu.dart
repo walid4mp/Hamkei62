@@ -16,9 +16,10 @@ class CommentActionMenu extends StatelessWidget {
         width: 190,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: theme.brightness == Brightness.dark
-              ? theme.colorScheme.surface
-              : Colors.white,
+          color:
+              theme.brightness == Brightness.dark
+                  ? theme.colorScheme.surface
+                  : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(

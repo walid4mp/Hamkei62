@@ -42,9 +42,8 @@ class DeepLinkService {
     if (uri.host == shareFunctionHost) {
       final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
       final shareIndex = segments.indexOf('share');
-      final rest = shareIndex == -1
-          ? segments
-          : segments.sublist(shareIndex + 1);
+      final rest =
+          shareIndex == -1 ? segments : segments.sublist(shareIndex + 1);
       return rest.length >= 2 ? (rest[0], rest[1]) : null;
     }
 

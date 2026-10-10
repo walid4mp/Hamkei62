@@ -54,15 +54,16 @@ class StickerPacksCubit extends Cubit<StickerPacksState>
       final fileProgress = <String, double>{};
 
       void report() {
-        final overall = totalWeight > 0
-            ? stickers.fold<double>(0, (sum, s) {
-                return sum +
-                    (s.sizeBytes / totalWeight) *
-                        (fileProgress[s.imageUrl] ?? 0);
-              })
-            : (fileProgress.values.isEmpty
-                  ? 0.0
-                  : fileProgress.values.fold<double>(0, (a, b) => a + b) /
+        final overall =
+            totalWeight > 0
+                ? stickers.fold<double>(0, (sum, s) {
+                  return sum +
+                      (s.sizeBytes / totalWeight) *
+                          (fileProgress[s.imageUrl] ?? 0);
+                })
+                : (fileProgress.values.isEmpty
+                    ? 0.0
+                    : fileProgress.values.fold<double>(0, (a, b) => a + b) /
                         stickers.length);
 
         final latest = state;

@@ -17,9 +17,8 @@ mixin ChatPresenceActionMixin on Cubit<ChatDetailsState> {
   );
 
   void _recomputeListVisibleAction() {
-    listVisibleAction.value = isAtBottomNotifier.value
-        ? receiverAction.value
-        : ChatActionType.none;
+    listVisibleAction.value =
+        isAtBottomNotifier.value ? receiverAction.value : ChatActionType.none;
   }
 
   String getChatId(String u1, String u2) {

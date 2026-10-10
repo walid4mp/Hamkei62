@@ -25,15 +25,17 @@ class GroupInviteService {
       _inviteStateCache[groupId];
 
   Future<GroupInviteState?> getGroupInviteState(String groupId) async {
-    final row = await _supabase
-        .from(SupabaseConstants.groups)
-        .select('invite_hash, invite_expires_at, invite_join_count')
-        .eq('id', groupId)
-        .maybeSingle();
+    final row =
+        await _supabase
+            .from(SupabaseConstants.groups)
+            .select('invite_hash, invite_expires_at, invite_join_count')
+            .eq('id', groupId)
+            .maybeSingle();
 
-    final state = (row == null || row['invite_hash'] == null)
-        ? null
-        : GroupInviteState.fromMap(row);
+    final state =
+        (row == null || row['invite_hash'] == null)
+            ? null
+            : GroupInviteState.fromMap(row);
 
     _inviteStateCache[groupId] = state;
     return state;
@@ -44,15 +46,16 @@ class GroupInviteService {
     Duration? expiresIn,
   }) async {
     try {
-      final row = await _supabase
-          .rpc(
-            'generate_group_invite_link',
-            params: {
-              'p_group_id': groupId,
-              'p_expires_in_hours': expiresIn?.inHours,
-            },
-          )
-          .single();
+      final row =
+          await _supabase
+              .rpc(
+                'generate_group_invite_link',
+                params: {
+                  'p_group_id': groupId,
+                  'p_expires_in_hours': expiresIn?.inHours,
+                },
+              )
+              .single();
       final state = GroupInviteState.fromMap(row);
       _inviteStateCache[groupId] = state;
       return state;
@@ -71,16 +74,21 @@ class GroupInviteService {
   }
 
   Future<GroupInvitePreview> getGroupInvitePreview(String inviteHash) async {
-    final row = await _supabase
-        .rpc('get_group_invite_preview', params: {'p_invite_hash': inviteHash})
-        .single();
+    final row =
+        await _supabase
+            .rpc(
+              'get_group_invite_preview',
+              params: {'p_invite_hash': inviteHash},
+            )
+            .single();
     return GroupInvitePreview.fromMap(row);
   }
 
   Future<GroupModel> joinGroupViaInvite(String inviteHash) async {
-    final row = await _supabase
-        .rpc('join_group_via_invite', params: {'p_invite_hash': inviteHash})
-        .single();
+    final row =
+        await _supabase
+            .rpc('join_group_via_invite', params: {'p_invite_hash': inviteHash})
+            .single();
     final group = GroupModel.fromMap(row);
 
     final names = await _membershipService.fetchUserNames([currentUserId]);

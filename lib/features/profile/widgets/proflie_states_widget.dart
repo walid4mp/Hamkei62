@@ -34,11 +34,14 @@ class ProfileStatsWidget extends StatelessWidget {
           for (var i = 0; i < items.length; i++)
             Expanded(
               child: Container(
-                decoration: i == 0
-                    ? null
-                    : BoxDecoration(
-                        border: Border(left: BorderSide(color: tokens.outline)),
-                      ),
+                decoration:
+                    i == 0
+                        ? null
+                        : BoxDecoration(
+                          border: Border(
+                            left: BorderSide(color: tokens.outline),
+                          ),
+                        ),
                 child: StatItemWidget(
                   label: items[i].label,
                   value: items[i].value,

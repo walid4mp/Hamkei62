@@ -22,8 +22,10 @@ class PostThemesView extends StatelessWidget {
           ),
           title: Text(
             'Background Color',
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w500, fontSize: 18),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+            ),
           ),
         ),
         body: const SizedBox.expand(),

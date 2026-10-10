@@ -51,8 +51,9 @@ class NetworkStatusService {
   Future<bool> _dnsReachable() async {
     for (final host in _dnsProbeHosts) {
       try {
-        final result = await InternetAddress.lookup(host)
-            .timeout(_lookupTimeout);
+        final result = await InternetAddress.lookup(
+          host,
+        ).timeout(_lookupTimeout);
         if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
           return true;
         }

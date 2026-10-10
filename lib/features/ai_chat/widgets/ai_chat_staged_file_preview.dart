@@ -55,23 +55,25 @@ class AiChatStagedFilePreview extends StatelessWidget {
             onTap: onTapLeading,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: imageFile != null
-                  ? Image.file(
-                      imageFile!,
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      width: 36,
-                      height: 36,
-                      color: Theme.of(context).primaryColor
-                          .withValues(alpha: 0.12),
+              child:
+                  imageFile != null
+                      ? Image.file(
+                        imageFile!,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.cover,
+                      )
+                      : Container(
+                        width: 36,
+                        height: 36,
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.12),
 
-                      child: Center(
-                        child: FaIcon(fileIcon, color: iconAccent, size: 25),
+                        child: Center(
+                          child: FaIcon(fileIcon, color: iconAccent, size: 25),
+                        ),
                       ),
-                    ),
             ),
           ),
           const Gap(10),

@@ -95,9 +95,10 @@ class _ForwardedHeaderState extends State<ForwardedHeader> {
   }
 
   void _openMyAvatar() {
-    final url = widget.avatarUrl?.isNotEmpty == true
-        ? widget.avatarUrl!
-        : AppImages.defaultUserImg;
+    final url =
+        widget.avatarUrl?.isNotEmpty == true
+            ? widget.avatarUrl!
+            : AppImages.defaultUserImg;
 
     Navigator.of(context, rootNavigator: true).pushNamed(
       AppRoutes.fullScreenImageViewRoute,
@@ -130,11 +131,12 @@ class _ForwardedHeaderState extends State<ForwardedHeader> {
         ThemeData.estimateBrightnessForColor(theme.primaryColor) ==
         Brightness.dark;
 
-    final labelColor = widget.onColoredBubble
-        ? (bubbleIsDark
-              ? Colors.white.withValues(alpha: 0.9)
-              : Colors.black.withValues(alpha: 0.75))
-        : theme.primaryColor;
+    final labelColor =
+        widget.onColoredBubble
+            ? (bubbleIsDark
+                ? Colors.white.withValues(alpha: 0.9)
+                : Colors.black.withValues(alpha: 0.75))
+            : theme.primaryColor;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4, top: 1),
@@ -163,20 +165,21 @@ class _ForwardedHeaderState extends State<ForwardedHeader> {
               alignment: PlaceholderAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: _isAi
-                    ? GestureDetector(
-                        onTap: _openAiChat,
-                        behavior: HitTestBehavior.opaque,
-                        child: _AiAvatar(
-                          modelName: widget.name,
-                          onColoredBubble: widget.onColoredBubble,
+                child:
+                    _isAi
+                        ? GestureDetector(
+                          onTap: _openAiChat,
+                          behavior: HitTestBehavior.opaque,
+                          child: _AiAvatar(
+                            modelName: widget.name,
+                            onColoredBubble: widget.onColoredBubble,
+                          ),
+                        )
+                        : AppAvatar(
+                          imageUrl: widget.avatarUrl,
+                          size: 15,
+                          onTap: _onAvatarTap,
                         ),
-                      )
-                    : AppAvatar(
-                        imageUrl: widget.avatarUrl,
-                        size: 15,
-                        onTap: _onAvatarTap,
-                      ),
               ),
             ),
             TextSpan(
@@ -200,11 +203,12 @@ class _AiAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nameLower = (modelName ?? '').toLowerCase();
-    final brand = nameLower.contains('llama') || nameLower.contains('groq')
-        ? AiModelBrand.groq
-        : (nameLower.contains('openrouter')
-              ? AiModelBrand.openRouter
-              : AiModelBrand.gemini);
+    final brand =
+        nameLower.contains('llama') || nameLower.contains('groq')
+            ? AiModelBrand.groq
+            : (nameLower.contains('openrouter')
+                ? AiModelBrand.openRouter
+                : AiModelBrand.gemini);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -217,11 +221,12 @@ class _AiAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         color: Colors.white,
         border: Border.all(
-          color: onColoredBubble
-              ? Colors.white.withValues(alpha: 0.65)
-              : (isDark
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : Colors.black.withValues(alpha: 0.08)),
+          color:
+              onColoredBubble
+                  ? Colors.white.withValues(alpha: 0.65)
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.black.withValues(alpha: 0.08)),
           width: 0.8,
         ),
         boxShadow: [

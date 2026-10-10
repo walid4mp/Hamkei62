@@ -143,14 +143,14 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
     if (_pickedFile == null && _remoteMediaUrl == null) return;
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (_) => FullScreenMediaView(
-          imageUrl: _pickedType == 'image'
-              ? _pickedFile!.path
-              : _remoteMediaUrl,
-          videoUrl: _pickedType == 'video' ? _pickedFile!.path : null,
-          isLocal: _pickedFile != null,
-          showActions: false,
-        ),
+        builder:
+            (_) => FullScreenMediaView(
+              imageUrl:
+                  _pickedType == 'image' ? _pickedFile!.path : _remoteMediaUrl,
+              videoUrl: _pickedType == 'video' ? _pickedFile!.path : null,
+              isLocal: _pickedFile != null,
+              showActions: false,
+            ),
       ),
     );
   }
@@ -238,19 +238,21 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
                   const Gap(8),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, animation) =>
-                        ScaleTransition(scale: animation, child: child),
-                    child: _hasContent
-                        ? _buildSendButton(isSending)
-                        : StoryReactionButton(
-                            key: const ValueKey('react_button'),
-                            onOpen: widget.onComposingStart,
-                            onClose: () {
-                              if (!_hasContent && !_focusNode.hasFocus) {
-                                widget.onComposingEnd();
-                              }
-                            },
-                          ),
+                    transitionBuilder:
+                        (child, animation) =>
+                            ScaleTransition(scale: animation, child: child),
+                    child:
+                        _hasContent
+                            ? _buildSendButton(isSending)
+                            : StoryReactionButton(
+                              key: const ValueKey('react_button'),
+                              onOpen: widget.onComposingStart,
+                              onClose: () {
+                                if (!_hasContent && !_focusNode.hasFocus) {
+                                  widget.onComposingEnd();
+                                }
+                              },
+                            ),
                   ),
                 ],
               ),
@@ -328,42 +330,44 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
                   duration: const Duration(milliseconds: 200),
                   child:
                       (widget.story.storyType != StoryType.video &&
-                          (_focusNode.hasFocus || _isAiGenerating))
-                      ? AiActionIcon(
-                          key: const ValueKey('story_ai_icon'),
-                          controller: _controller,
-                          surface: AiSurfaceType.story,
-                          generationAction: AiActionType.replySuggestion,
-                          actionContext: AiActionContext.storyReply,
-                          hasReplyContext: true,
-                          targetText: widget.story.storyType == StoryType.text
-                              ? widget.story.contentText
-                              : null,
-                          mediaCaption: widget.story.storyType == StoryType.text
-                              ? null
-                              : widget.story.caption,
-                          targetMediaType: switch (widget.story.storyType) {
-                            StoryType.text => AiTargetMediaType.text,
-                            StoryType.image => AiTargetMediaType.image,
-                            StoryType.video => AiTargetMediaType.video,
-                          },
-                          targetUserName: widget.story.authorName,
-                          targetImageBytesProvider:
-                              widget.story.storyType == StoryType.image &&
-                                  widget.story.imageUrl != null
-                              ? () => RemoteMediaFetcher.fetchBytes(
-                                  widget.story.imageUrl!,
-                                )
-                              : null,
-                          onGeneratingChanged: (generating) {
-                            if (mounted) {
-                              setState(() => _isAiGenerating = generating);
-                            }
-                          },
-                        )
-                      : const SizedBox.shrink(
-                          key: ValueKey('story_ai_icon_hidden'),
-                        ),
+                              (_focusNode.hasFocus || _isAiGenerating))
+                          ? AiActionIcon(
+                            key: const ValueKey('story_ai_icon'),
+                            controller: _controller,
+                            surface: AiSurfaceType.story,
+                            generationAction: AiActionType.replySuggestion,
+                            actionContext: AiActionContext.storyReply,
+                            hasReplyContext: true,
+                            targetText:
+                                widget.story.storyType == StoryType.text
+                                    ? widget.story.contentText
+                                    : null,
+                            mediaCaption:
+                                widget.story.storyType == StoryType.text
+                                    ? null
+                                    : widget.story.caption,
+                            targetMediaType: switch (widget.story.storyType) {
+                              StoryType.text => AiTargetMediaType.text,
+                              StoryType.image => AiTargetMediaType.image,
+                              StoryType.video => AiTargetMediaType.video,
+                            },
+                            targetUserName: widget.story.authorName,
+                            targetImageBytesProvider:
+                                widget.story.storyType == StoryType.image &&
+                                        widget.story.imageUrl != null
+                                    ? () => RemoteMediaFetcher.fetchBytes(
+                                      widget.story.imageUrl!,
+                                    )
+                                    : null,
+                            onGeneratingChanged: (generating) {
+                              if (mounted) {
+                                setState(() => _isAiGenerating = generating);
+                              }
+                            },
+                          )
+                          : const SizedBox.shrink(
+                            key: ValueKey('story_ai_icon_hidden'),
+                          ),
                 ),
               ),
             ),
@@ -378,23 +382,23 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
     return CircleAvatar(
       key: const ValueKey('send_button'),
       radius: 22, // 22 radius = 44 diameter matching input field exactly
-      backgroundColor: canSend
-          ? Theme.of(context).primaryColor
-          : Colors.white24,
-      child: isSending
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CustomLoadingIndicator(color: Colors.white),
-            )
-          : IconButton(
-              icon: const Icon(
-                Icons.send_rounded,
-                color: Colors.white,
-                size: 20,
+      backgroundColor:
+          canSend ? Theme.of(context).primaryColor : Colors.white24,
+      child:
+          isSending
+              ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CustomLoadingIndicator(color: Colors.white),
+              )
+              : IconButton(
+                icon: const Icon(
+                  Icons.send_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: canSend ? _send : null,
               ),
-              onPressed: canSend ? _send : null,
-            ),
     );
   }
 
@@ -403,15 +407,16 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
     final isVideo = _pickedType == 'video';
     final ext = _fileExtension;
     final size = _formatFileSize(_pickedFileSizeBytes);
-    final subtitle = _pickedType == 'gif'
-        ? 'GIF Animation'
-        : _pickedType == 'sticker'
-        ? 'Sticker'
-        : (ext.isNotEmpty && size.isNotEmpty)
-        ? '$ext · $size'
-        : size.isNotEmpty
-        ? size
-        : (isVideo ? 'Video' : 'Photo');
+    final subtitle =
+        _pickedType == 'gif'
+            ? 'GIF Animation'
+            : _pickedType == 'sticker'
+            ? 'Sticker'
+            : (ext.isNotEmpty && size.isNotEmpty)
+            ? '$ext · $size'
+            : size.isNotEmpty
+            ? size
+            : (isVideo ? 'Video' : 'Photo');
 
     return Container(
       width: double.infinity,
@@ -435,21 +440,23 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
               child: SizedBox(
                 width: 40,
                 height: 40,
-                child: isRemote
-                    ? Image.network(
-                        _remoteMediaUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: Colors.grey.shade800,
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: Colors.white70,
-                            size: 20,
-                          ),
-                        ),
-                      )
-                    : (isVideo
-                          ? Container(
+                child:
+                    isRemote
+                        ? Image.network(
+                          _remoteMediaUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (_, __, ___) => Container(
+                                color: Colors.grey.shade800,
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white70,
+                                  size: 20,
+                                ),
+                              ),
+                        )
+                        : (isVideo
+                            ? Container(
                               color: Colors.grey.shade800,
                               child: const Icon(
                                 Icons.videocam,
@@ -457,7 +464,7 @@ class _StoryReplyInputBarState extends State<StoryReplyInputBar> {
                                 size: 22,
                               ),
                             )
-                          : Image.file(_pickedFile!, fit: BoxFit.cover)),
+                            : Image.file(_pickedFile!, fit: BoxFit.cover)),
               ),
             ),
           ),

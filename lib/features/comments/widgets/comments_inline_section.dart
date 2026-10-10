@@ -62,9 +62,10 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
     final position = _ancestorPosition;
     if (position == null || !mounted) return;
     final cubit = context.read<CommentsCubit>();
-    final bool nearEdge = cubit.currentSort == CommentSortOption.oldest
-        ? position.pixels >= position.maxScrollExtent - 150
-        : position.pixels <= 150;
+    final bool nearEdge =
+        cubit.currentSort == CommentSortOption.oldest
+            ? position.pixels >= position.maxScrollExtent - 150
+            : position.pixels <= 150;
     cubit.setNearEdge(nearEdge);
   }
 
@@ -154,11 +155,12 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           BlocBuilder<CommentsCubit, CommentsState>(
-            buildWhen: (previous, current) =>
-                current is CommentsListLoading ||
-                current is CommentsListLoaded ||
-                current is CommentOptimisticAdded ||
-                current is CommentTempIdResolved,
+            buildWhen:
+                (previous, current) =>
+                    current is CommentsListLoading ||
+                    current is CommentsListLoaded ||
+                    current is CommentOptimisticAdded ||
+                    current is CommentTempIdResolved,
             builder: (context, state) {
               final cubit = context.read<CommentsCubit>();
               final commentsCount = countAllComments(cubit.comments);
@@ -168,47 +170,49 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
                 children: [
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: cubit.isLoadingComments
-                        ? Shimmer.fromColors(
-                            key: const ValueKey('badge_shimmer'),
-                            baseColor: isDark
-                                ? Colors.grey[800]!
-                                : Colors.grey[200]!,
-                            highlightColor: isDark
-                                ? Colors.grey[700]!
-                                : Colors.white,
-                            child: Container(
-                              width: 28,
-                              height: 24,
+                    child:
+                        cubit.isLoadingComments
+                            ? Shimmer.fromColors(
+                              key: const ValueKey('badge_shimmer'),
+                              baseColor:
+                                  isDark
+                                      ? Colors.grey[800]!
+                                      : Colors.grey[200]!,
+                              highlightColor:
+                                  isDark ? Colors.grey[700]! : Colors.white,
+                              child: Container(
+                                width: 28,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            )
+                            : (commentsCount > 0)
+                            ? Container(
+                              key: const ValueKey('badge_real'),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color:
+                                    isDark
+                                        ? colorScheme.surfaceContainerHighest
+                                        : Colors.grey[200],
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                            ),
-                          )
-                        : (commentsCount > 0)
-                        ? Container(
-                            key: const ValueKey('badge_real'),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? colorScheme.surfaceContainerHighest
-                                  : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '$commentsCount',
-                              style: TextStyle(
-                                color: colorScheme.onSurface,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                              child: Text(
+                                '$commentsCount',
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
                               ),
-                            ),
-                          )
-                        : SizedBox.shrink(),
+                            )
+                            : SizedBox.shrink(),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -232,8 +236,10 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
-                                builder: (context) =>
-                                    PostReactionsBottomSheet(postId: post.id),
+                                builder:
+                                    (context) => PostReactionsBottomSheet(
+                                      postId: post.id,
+                                    ),
                               );
                             },
                             child: CommentsReactionAvatarStack(
@@ -269,40 +275,42 @@ class CommentsInlineSectionState extends State<CommentsInlineSection> {
           const SizedBox(height: 3),
           // ----------------------------------------
           BlocBuilder<CommentsCubit, CommentsState>(
-            buildWhen: (previous, current) =>
-                current is CommentsListLoading ||
-                current is CommentsListLoaded ||
-                current is CommentOptimisticAdded ||
-                current is CommentTempIdResolved ||
-                current is CommentsUiChanged,
+            buildWhen:
+                (previous, current) =>
+                    current is CommentsListLoading ||
+                    current is CommentsListLoaded ||
+                    current is CommentOptimisticAdded ||
+                    current is CommentTempIdResolved ||
+                    current is CommentsUiChanged,
             builder: (context, state) {
               final cubit = context.read<CommentsCubit>();
               return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 220),
-                child: cubit.isLoadingComments
-                    ? const Padding(
-                        key: ValueKey('inline_comments_loading'),
-                        padding: EdgeInsets.zero,
-                        child: CommentsShimmerSkeleton(),
-                      )
-                    : CustomScrollView(
-                        key: ValueKey(
-                          'inline_comments_${cubit.currentSort.name}',
-                        ),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        slivers: [
-                          CommentsSection(
-                            postId: post.id,
-                            postAuthorId: post.authorId,
-                            comments: cubit.comments,
-                            onReplyTap: widget.onReplyTap,
-                            onEditTap: widget.onEditTap,
-                            highlightCommentId: _highlightCommentId,
-                            highlightKey: _highlightKey,
+                child:
+                    cubit.isLoadingComments
+                        ? const Padding(
+                          key: ValueKey('inline_comments_loading'),
+                          padding: EdgeInsets.zero,
+                          child: CommentsShimmerSkeleton(),
+                        )
+                        : CustomScrollView(
+                          key: ValueKey(
+                            'inline_comments_${cubit.currentSort.name}',
                           ),
-                        ],
-                      ),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          slivers: [
+                            CommentsSection(
+                              postId: post.id,
+                              postAuthorId: post.authorId,
+                              comments: cubit.comments,
+                              onReplyTap: widget.onReplyTap,
+                              onEditTap: widget.onEditTap,
+                              highlightCommentId: _highlightCommentId,
+                              highlightKey: _highlightKey,
+                            ),
+                          ],
+                        ),
               );
             },
           ),

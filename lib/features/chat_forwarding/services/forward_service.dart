@@ -93,10 +93,11 @@ class ForwardService {
     final sent = await _chatServices.sendMessage(
       senderId: currentUserId,
       receiverId: receiverId,
-      text: message.messageType == 'file'
-          ? (message.fileName ??
-                (message.text.isNotEmpty ? message.text : 'File'))
-          : message.text,
+      text:
+          message.messageType == 'file'
+              ? (message.fileName ??
+                  (message.text.isNotEmpty ? message.text : 'File'))
+              : message.text,
       clientMessageId: clientMessageId,
       messageType: message.messageType,
       imageUrl: message.imageUrl,
@@ -131,10 +132,11 @@ class ForwardService {
       groupId: groupId,
       clientMessageId: const Uuid().v4(),
       groupName: groupName,
-      text: message.messageType == 'file'
-          ? (message.fileName ??
-                (message.text.isNotEmpty ? message.text : 'File'))
-          : message.text,
+      text:
+          message.messageType == 'file'
+              ? (message.fileName ??
+                  (message.text.isNotEmpty ? message.text : 'File'))
+              : message.text,
       messageType: message.messageType,
       imageUrl: message.imageUrl,
       videoUrl: message.videoUrl,

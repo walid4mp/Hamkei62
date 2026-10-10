@@ -55,19 +55,22 @@ class LinkPreviewCard extends StatelessWidget {
       children: [
         AspectRatio(
           aspectRatio: 1.91 / 1,
-          child: isAsset
-              ? Image.asset(imageUrl, fit: BoxFit.cover)
-              : CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  httpHeaders: const {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                    'Accept':
-                        'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-                  },
-                  errorWidget: (context, url, error) =>
-                      _buildElegantFallback(theme, useLightContent),
-                ),
+          child:
+              isAsset
+                  ? Image.asset(imageUrl, fit: BoxFit.cover)
+                  : CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    httpHeaders: const {
+                      'User-Agent':
+                          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                      'Accept':
+                          'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                    },
+                    errorWidget:
+                        (context, url, error) =>
+                            _buildElegantFallback(theme, useLightContent),
+                  ),
         ),
         if (_looksLikeVideo)
           Container(
@@ -97,18 +100,19 @@ class LinkPreviewCard extends StatelessWidget {
         ThemeData.estimateBrightnessForColor(bubbleColor) == Brightness.dark;
     final useLightContent = onColoredBubble && bubbleIsDark;
 
-    final borderColor = useLightContent
-        ? Colors.white.withValues(alpha: 0.15)
-        : theme.dividerColor.withValues(alpha: 0.08);
+    final borderColor =
+        useLightContent
+            ? Colors.white.withValues(alpha: 0.15)
+            : theme.dividerColor.withValues(alpha: 0.08);
 
-    final bgColor = useLightContent
-        ? Colors.white.withValues(alpha: 0.08)
-        : (isDark ? Colors.grey.shade900 : Colors.grey.shade50);
+    final bgColor =
+        useLightContent
+            ? Colors.white.withValues(alpha: 0.08)
+            : (isDark ? Colors.grey.shade900 : Colors.grey.shade50);
 
     final fg = useLightContent ? Colors.white : theme.colorScheme.onSurface;
-    final domainColor = useLightContent
-        ? Colors.white70
-        : theme.colorScheme.primary;
+    final domainColor =
+        useLightContent ? Colors.white70 : theme.colorScheme.primary;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -156,9 +160,10 @@ class LinkPreviewCard extends StatelessWidget {
                         data.description!,
                       ),
                       style: TextStyle(
-                        color: useLightContent
-                            ? Colors.white60
-                            : theme.colorScheme.onSurfaceVariant,
+                        color:
+                            useLightContent
+                                ? Colors.white60
+                                : theme.colorScheme.onSurfaceVariant,
                         fontSize: 12,
                         height: 1.3,
                       ),
@@ -209,26 +214,33 @@ class LinkPreviewCard extends StatelessWidget {
 
   Widget _buildElegantFallback(ThemeData theme, bool useLightContent) {
     return Container(
-      color: useLightContent
-          ? Colors.white.withValues(alpha: 0.1)
-          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      color:
+          useLightContent
+              ? Colors.white.withValues(alpha: 0.1)
+              : theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.4,
+              ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.public_rounded,
-            color: useLightContent
-                ? Colors.white54
-                : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            color:
+                useLightContent
+                    ? Colors.white54
+                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             size: 32,
           ),
           const SizedBox(height: 8),
           Text(
             'Preview not available',
             style: TextStyle(
-              color: useLightContent
-                  ? Colors.white54
-                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+              color:
+                  useLightContent
+                      ? Colors.white54
+                      : theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),

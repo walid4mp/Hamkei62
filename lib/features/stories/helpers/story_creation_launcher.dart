@@ -20,31 +20,33 @@ class StoryCreationLauncher {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (sheetContext) => BlocProvider.value(
-        value: storiesCubit,
-        child: StoryImagePickerSheet(
-          onSelected: (source, type) {
-            Navigator.pop(sheetContext);
-            switch (type) {
-              case StoryPickType.text:
-                Navigator.of(context, rootNavigator: true).pushNamed(
-                  AppRoutes.createTextStoryViewRoute,
-                  arguments: {
-                    'storiesCubit': storiesCubit,
-                    'currentUser': context.read<HomeCubit>().currentUserData,
-                  },
-                );
-                break;
-              case StoryPickType.image:
-                storiesCubit.pickAndAddStory(source: source!);
-                break;
-              case StoryPickType.video:
-                storiesCubit.pickAndPreviewVideoStory(source: source!);
-                break;
-            }
-          },
-        ),
-      ),
+      builder:
+          (sheetContext) => BlocProvider.value(
+            value: storiesCubit,
+            child: StoryImagePickerSheet(
+              onSelected: (source, type) {
+                Navigator.pop(sheetContext);
+                switch (type) {
+                  case StoryPickType.text:
+                    Navigator.of(context, rootNavigator: true).pushNamed(
+                      AppRoutes.createTextStoryViewRoute,
+                      arguments: {
+                        'storiesCubit': storiesCubit,
+                        'currentUser':
+                            context.read<HomeCubit>().currentUserData,
+                      },
+                    );
+                    break;
+                  case StoryPickType.image:
+                    storiesCubit.pickAndAddStory(source: source!);
+                    break;
+                  case StoryPickType.video:
+                    storiesCubit.pickAndPreviewVideoStory(source: source!);
+                    break;
+                }
+              },
+            ),
+          ),
     );
   }
 

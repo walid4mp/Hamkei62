@@ -18,10 +18,11 @@ class StickerPackDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => StickerPackDetailCubit(
-        packId: pack.id,
-        mediaCacheRepository: context.read<MediaCacheRepository>(),
-      ),
+      create:
+          (_) => StickerPackDetailCubit(
+            packId: pack.id,
+            mediaCacheRepository: context.read<MediaCacheRepository>(),
+          ),
       child: _StickerPackDetailSheetBody(pack: pack),
     );
   }

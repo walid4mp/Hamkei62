@@ -62,11 +62,12 @@ class _CreateGroupViewState extends State<CreateGroupView> {
   void _filterUsers() {
     final q = _searchController.text.toLowerCase();
     setState(() {
-      _filteredUsers = q.isEmpty
-          ? _allUsers
-          : _allUsers
-                .where((u) => (u['name'] as String).toLowerCase().contains(q))
-                .toList();
+      _filteredUsers =
+          q.isEmpty
+              ? _allUsers
+              : _allUsers
+                  .where((u) => (u['name'] as String).toLowerCase().contains(q))
+                  .toList();
     });
   }
 
@@ -196,9 +197,8 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                 child: InkWell(
                   onTap: () {
                     Navigator.of(context).popUntil((route) => route.isFirst);
-                    final navController = context
-                        .read<HomeCubit>()
-                        .navController;
+                    final navController =
+                        context.read<HomeCubit>().navController;
                     if (navController != null) {
                       navController.jumpToTab(1);
                     }
@@ -212,27 +212,30 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.03)
-                          : Colors.white,
+                      color:
+                          isDark
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.white,
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.05),
+                        color:
+                            isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.05),
                         width: 1,
                       ),
-                      boxShadow: isDark
-                          ? null
-                          : [
-                              BoxShadow(
-                                color: theme.primaryColor.withValues(
-                                  alpha: 0.08,
+                      boxShadow:
+                          isDark
+                              ? null
+                              : [
+                                BoxShadow(
+                                  color: theme.primaryColor.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 8),
                                 ),
-                                blurRadius: 24,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
+                              ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -344,8 +347,8 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                   selectedUserIds: _selectedUserIds,
                   allUsers: _allUsers,
                   primary: primary,
-                  onRemove: (uid) =>
-                      setState(() => _selectedUserIds.remove(uid)),
+                  onRemove:
+                      (uid) => setState(() => _selectedUserIds.remove(uid)),
                 ),
               ),
             ),
@@ -424,55 +427,60 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: isKeyboardOpen || _allUsers.isEmpty
-            ? null
-            : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  width: double.infinity,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      if (_canCreate)
-                        BoxShadow(
-                          color: primary.withValues(alpha: 0.35),
-                          blurRadius: 6,
-                          offset: const Offset(0, 4),
-                        ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: _canCreate && !_isCreating ? _createGroup : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: isDark
-                          ? Colors.grey.shade800
-                          : Colors.grey.shade300,
-                      disabledForegroundColor: isDark
-                          ? Colors.white54
-                          : Colors.black38,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                    ),
-                    child: _isCreating
-                        ? const CustomLoadingIndicator(color: Colors.white)
-                        : Text(
-                            _selectedUserIds.isEmpty
-                                ? 'Create Group'
-                                : 'Create Group (${_selectedUserIds.length})',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
+        floatingActionButton:
+            isKeyboardOpen || _allUsers.isEmpty
+                ? null
+                : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        if (_canCreate)
+                          BoxShadow(
+                            color: primary.withValues(alpha: 0.35),
+                            blurRadius: 6,
+                            offset: const Offset(0, 4),
                           ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed:
+                          _canCreate && !_isCreating ? _createGroup : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                            isDark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade300,
+                        disabledForegroundColor:
+                            isDark ? Colors.white54 : Colors.black38,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      child:
+                          _isCreating
+                              ? const CustomLoadingIndicator(
+                                color: Colors.white,
+                              )
+                              : Text(
+                                _selectedUserIds.isEmpty
+                                    ? 'Create Group'
+                                    : 'Create Group (${_selectedUserIds.length})',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                    ),
                   ),
                 ),
-              ),
       ),
     );
   }
