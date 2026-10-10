@@ -26,9 +26,6 @@ jobs:
     name: Build signed artifacts
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # Create a GitHub Environment named `production` and add a required
-    # reviewer. That is what stops an accidental tag push from shipping.
-    # environment: production
     permissions:
       contents: write
     steps:
@@ -45,6 +42,13 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Restore pub cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+
       - run: flutter pub get
 
       # Re-run the gates. A tag can point at any commit, including one that
@@ -58,18 +62,25 @@ jobs:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
           FIREBASE_OPTIONS_DART_BASE64: ${{ secrets.FIREBASE_OPTIONS_DART_BASE64 }}
         run: |
+          if [ -z "$GOOGLE_SERVICES_JSON_BASE64" ] || [ -z "$FIREBASE_OPTIONS_DART_BASE64" ]; then
+            echo "::error::Firebase secrets are missing. Configure GOOGLE_SERVICES_JSON_BASE64 and FIREBASE_OPTIONS_DART_BASE64 in repository Actions secrets."
+            exit 1
+          fi
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
           echo "$FIREBASE_OPTIONS_DART_BASE64" | base64 -d > lib/firebase_options.dart
 
       - name: Restore dart-define file
         env:
           DART_DEFINE_ENV_BASE64: ${{ secrets.DART_DEFINE_ENV_PROD_BASE64 }}
-        run: echo "$DART_DEFINE_ENV_BASE64" | base64 -d > ci.env
+        run: |
+          if [ -z "$DART_DEFINE_ENV_BASE64" ]; then
+            echo "::error::DART_DEFINE_ENV_PROD_BASE64 is not set. See docs/ci-cd.md."
+            exit 1
+          fi
+          echo "$DART_DEFINE_ENV_BASE64" | base64 -d > ci.env
 
-      # ⚠️ `android/app/build.gradle(.kts)` was NOT in the repomix, so I
-      # cannot confirm your signingConfig reads these property names. Open
-      # it and check before enabling this step. The standard Flutter layout
-      # expects a `key.properties` with exactly these four keys.
+      # android/app/build.gradle.kts reads `key.properties` with exactly
+      # these four keys (verified against the checked-in Gradle script).
       - name: Restore signing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -77,6 +88,10 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 (and the password/alias secrets) are not set. Release signing cannot proceed."
+            exit 1
+          fi
           echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
           cat > android/key.properties <<EOF
           storePassword=$STORE_PASSWORD
@@ -117,6 +132,16 @@ jobs:
           rm -f ci.env android/key.properties android/app/upload-keystore.jks
           rm -f android/app/google-services.json lib/firebase_options.dart
 
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.run_number }}
+          path: |
+            build/app/outputs/bundle/release/*.aab
+            build/app/outputs/flutter-apk/*.apk
+          retention-days: 30
+
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -127,8 +152,5 @@ jobs:
             build/app/outputs/flutter-apk/*.apk
 
       # NOT IMPLEMENTED ON PURPOSE — Play Store upload.
-      # It needs a service-account JSON with Play Developer API access. I
-      # have no evidence that account exists, and inventing the step would
-      # produce a workflow that fails on its first real run. Add Fastlane's
-      # `supply` action here once the account is provisioned; see
-      # docs/ci-cd.md for why Fastlane is NOT recommended before that point.
+      # It needs a service-account JSON with Play Developer API access.
+      # Add Fastlane's `supply` action here once the account is provisioned.
