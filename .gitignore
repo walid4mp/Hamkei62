@@ -1,0 +1,78 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+.vscode/
+/docs/
+!assets/docs/
+
+# Security & Signing Files
+**/key.properties
+**/*.jks
+**/*.jks.old
+.env
+.env.*
+!.env.example
+
+scripts/
+
+.repomix/
+master_code.txt
+merge_code.ps1
+repomix-output.xml
+repomix-output.md
+social_media_v6_enterprise_audit_fix_issuse_and add CI CD
+export_groups_calls.ps1
+group_calls_ai_dump.md
+
+
+
+
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Ignore sensitive credentials
+# lib/core/secrets/app_secrets.dart
+mute_test_log.txt
+supabase/.temp/linked-project.json
+
+coverage/
+!scripts/local_ci.ps1

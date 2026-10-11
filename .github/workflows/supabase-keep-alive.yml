@@ -1,0 +1,42 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: '0 6 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate Supabase anon key
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Add SUPABASE_ANON_KEY in repository Actions secrets."
+            exit 1
+          fi
+
+      - name: Ping keep-alive Edge Function
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          url="https://exwvavqkjrnprbyknoih.supabase.co/functions/v1/keep-alive"
+          response=$(curl --silent --show-error --output /tmp/keep-alive-response.txt \
+            --write-out "%{http_code}" --max-time 20 \
+            --request POST "$url" \
+            --header "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            --header "apikey: $SUPABASE_ANON_KEY" \
+            --header "Content-Type: application/json" \
+            --data '{}') || {
+              echo "::error::Request failed before receiving an HTTP response."
+              exit 1
+            }
+          echo "HTTP status: $response"
+          if [ "$response" -lt 200 ] || [ "$response" -ge 300 ]; then
+            echo "::error::Keep-alive endpoint returned HTTP $response. Confirm that the keep-alive Edge Function is deployed."
+            cat /tmp/keep-alive-response.txt
+            exit 1
+          fi

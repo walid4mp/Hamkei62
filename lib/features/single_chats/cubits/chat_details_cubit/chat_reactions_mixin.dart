@@ -1,0 +1,187 @@
+part of 'chat_details_cubit.dart';
+
+mixin ChatReactionsMixin on Cubit<ChatDetailsState> {
+  String get currentUserId;
+  ChatServices get _chatServices;
+  ChatsCubit? get chatsCubit;
+  List<MessageModel> get cachedMessages;
+  set cachedMessages(List<MessageModel> val);
+  String? get _messagesSnapshotKey;
+  void _persistMessagesSnapshot(String key, List<MessageModel> messages);
+  void clearSelection();
+  StreamSubscription? _reactionsSubscription;
+  Map<String, Map<String, String>> _reactionsCache = {};
+  // ignore: prefer_final_fields
+  Map<String, Map<String, String>> _reactionsCreatedAtCache = {};
+
+  void _listenReactions(String conversationId) {
+    _reactionsSubscription?.cancel();
+    _reactionsSubscription = _chatServices
+        .getMessageReactionsStream(conversationId)
+        .listen((reactionsList) {
+          _reactionsCache = {};
+
+          for (final r in reactionsList) {
+            final msgId = r[MessageReactionColumns.messageId] as String?;
+            final userId = r[MessageReactionColumns.userId] as String?;
+            final emoji = r[MessageReactionColumns.reaction] as String?;
+            final createdAt = r[MessageReactionColumns.createdAt] as String?;
+            if (msgId != null && userId != null && emoji != null) {
+              _reactionsCache[msgId] ??= {};
+              _reactionsCache[msgId]![userId] = emoji;
+              if (createdAt != null) {
+                _reactionsCreatedAtCache[msgId] ??= {};
+                _reactionsCreatedAtCache[msgId]![userId] = createdAt;
+              }
+            }
+          }
+
+          cachedMessages = ChatDetailsCubit._reconciler.applyFieldUpdate(
+            cachedMessages,
+            (m) => m.copyWith(
+              reactions: _reactionsCache[m.id] ?? {},
+              reactionsCreatedAt: _reactionsCreatedAtCache[m.id],
+            ),
+          );
+
+          if (!isClosed) emit(MessagesSuccessLoaded(messages: cachedMessages));
+
+          if (_messagesSnapshotKey != null && cachedMessages.isNotEmpty) {
+            _persistMessagesSnapshot(_messagesSnapshotKey!, cachedMessages);
+          }
+        });
+  }
+
+  Future<void> toggleReaction({
+    required String messageId,
+    required String receiverId,
+    required String emoji,
+  }) async {
+    clearSelection();
+
+    final isOffline = await ConnectivityBannerController.notifyIfOffline();
+    if (isOffline) return;
+
+    final ids = [currentUserId, receiverId];
+    ids.sort();
+    final conversationId = ids.join('_');
+
+    final existingMsg = cachedMessages.firstWhereOrNull(
+      (m) => m.id == messageId,
+    );
+    final currentEmoji =
+        _reactionsCache[messageId]?[currentUserId] ??
+        existingMsg?.reactions[currentUserId];
+    final isRemoving = currentEmoji == emoji;
+    final now = DateTime.now();
+
+    _reactionsCache[messageId] ??= {};
+    if (isRemoving) {
+      _reactionsCache[messageId]!.remove(currentUserId);
+      _reactionsCreatedAtCache[messageId]?.remove(currentUserId);
+    } else {
+      _reactionsCache[messageId]![currentUserId] = emoji;
+      _reactionsCreatedAtCache[messageId] ??= {};
+      _reactionsCreatedAtCache[messageId]![currentUserId] =
+          now.toIso8601String();
+    }
+    _applyReactionsCacheToMessages();
+
+    if (_messagesSnapshotKey != null && cachedMessages.isNotEmpty) {
+      _persistMessagesSnapshot(_messagesSnapshotKey!, cachedMessages);
+    }
+
+    if (!isRemoving) {
+      final reactedMsg = cachedMessages.firstWhereOrNull(
+        (m) => m.id == messageId,
+      );
+      final previewText = MessageReactionPreviewHelper.formatReactionPreview(
+        isMe: true,
+        reactorName: 'You',
+        reactionType: emoji,
+        messageType: reactedMsg?.messageType,
+        messageText: reactedMsg?.text,
+        fileName: reactedMsg?.fileName,
+        caption: reactedMsg?.caption,
+      );
+      chatsCubit?.updateChatLastMessagePreview(
+        otherUserId: receiverId,
+        lastMessage: previewText,
+        lastMessageType: 'message_react',
+        lastMessageTime: now,
+        lastMessageIsMe: true,
+      );
+    } else {
+      _revertChatPreviewToLatestMessage(receiverId);
+    }
+
+    try {
+      await _chatServices.toggleReaction(
+        messageId: messageId,
+        conversationId: conversationId,
+        emoji: emoji,
+      );
+
+      unawaited(chatsCubit?.getChats(isRefresh: true, silent: true));
+
+      if (!isRemoving) {
+        unawaited(
+          FcmService.instance.notifyMessageReact(
+            messageId: messageId,
+            isGroup: false,
+            reactionType: emoji,
+          ),
+        );
+      }
+    } catch (e) {
+      if (isRemoving && currentEmoji != null) {
+        _reactionsCache[messageId]![currentUserId] = currentEmoji;
+        _reactionsCreatedAtCache[messageId] ??= {};
+        _reactionsCreatedAtCache[messageId]![currentUserId] =
+            DateTime.now().toIso8601String();
+      } else {
+        _reactionsCache[messageId]!.remove(currentUserId);
+        _reactionsCreatedAtCache[messageId]?.remove(currentUserId);
+      }
+      if (!isClosed) {
+        _applyReactionsCacheToMessages();
+      }
+      unawaited(chatsCubit?.getChats(isRefresh: true, silent: true));
+      debugPrint('error toggling reaction: $e');
+    }
+  }
+
+  void _revertChatPreviewToLatestMessage(String receiverId) {
+    if (cachedMessages.isEmpty) return;
+    final latest = cachedMessages.first;
+    final rawText =
+        (latest.messageType == 'file' || latest.messageType == 'document')
+            ? (latest.fileName ?? latest.text)
+            : latest.text;
+
+    chatsCubit?.updateChatLastMessagePreview(
+      otherUserId: receiverId,
+      lastMessage: rawText,
+      lastMessageType: latest.messageType,
+      lastMessageTime: latest.createdAt,
+      lastMessageIsMe: latest.senderId == currentUserId,
+    );
+  }
+
+  void _applyReactionsCacheToMessages() {
+    cachedMessages = ChatDetailsCubit._reconciler.applyFieldUpdate(
+      cachedMessages,
+      (m) => m.copyWith(
+        reactions: Map<String, String>.from(_reactionsCache[m.id] ?? {}),
+        reactionsCreatedAt: _reactionsCreatedAtCache[m.id],
+      ),
+    );
+    if (!isClosed) emit(MessagesSuccessLoaded(messages: cachedMessages));
+  }
+
+  @override
+  Future<void> close() {
+    _reactionsSubscription?.cancel();
+    return super.close();
+  }
+}
