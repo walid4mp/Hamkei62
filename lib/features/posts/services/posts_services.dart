@@ -26,12 +26,10 @@ class PostsServices {
   PostsServices({NetworkStatusService? networkStatus})
     : _networkStatus = networkStatus ?? NetworkStatusService.instance;
 
-  static const String _postFields = ''' 
+  
+static const String _postFields = ''' 
   *,
-  saved_count,
-  is_post_saved,
-  shares_count,
-  is_post_shared,
+  
   post_mentions(${PostMentionColumns.mentionedUserId},${PostMentionColumns.startIndex},${PostMentionColumns.endIndex}),
   ${SupabaseConstants.users}!posts_author_id_fkey (${UserColumns.name}, ${UserColumns.imageUrl}, ${UserColumns.lastSeen}),
   ${SupabaseConstants.reelsCache}!posts_shared_reel_id_fkey (
