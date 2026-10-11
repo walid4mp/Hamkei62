@@ -27,8 +27,18 @@ class PostsServices {
     : _networkStatus = networkStatus ?? NetworkStatusService.instance;
 
   
-static const String _postFields = ''' 
+static const String _postFields = '''
   *,
+  post_mentions(
+    mentioned_user_id,
+    start_index,
+    end_index
+  ),
+  users!posts_author_id_fkey (
+    name,
+    image_url,
+    last_seen
+  ),
   
   post_mentions(${PostMentionColumns.mentionedUserId},${PostMentionColumns.startIndex},${PostMentionColumns.endIndex}),
   ${SupabaseConstants.users}!posts_author_id_fkey (${UserColumns.name}, ${UserColumns.imageUrl}, ${UserColumns.lastSeen}),
