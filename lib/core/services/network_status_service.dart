@@ -42,6 +42,9 @@ class NetworkStatusService {
   /// Public API kept identical to before — every existing caller
   /// (PostsServices, UserService, ChatServices, ...) needs zero changes.
   Future<bool> isConnected() async {
+    // dart:io DNS/TCP probes throw UnsupportedError on Flutter web, which used
+    // to make a perfectly online browser session report "No internet".
+    if (kIsWeb) return backendReachable();
     if (await _dnsReachable()) return true;
     if (await _socketReachable()) return true;
     if (await backendReachable()) return true;
@@ -82,8 +85,8 @@ class NetworkStatusService {
   @visibleForTesting
   Future<bool> backendReachable() async {
     try {
-      final response = await _dio.head(
-        AppSecrets.supabaseUrl,
+      final response = await _dio.get(
+        '${AppSecrets.supabaseUrl}/auth/v1/health',
         options: Options(
           validateStatus: (_) => true,
           followRedirects: true,

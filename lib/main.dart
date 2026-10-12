@@ -111,6 +111,9 @@ void _notifyUserOfUncaughtError(Object error) {
   _lastGlobalErrorToastAt = now;
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Raw diagnostics must never reach end users: the toast is a debug-only
+    // aid. All errors are still reported through Observability/Crashlytics.
+    if (!kDebugMode) return;
     AppToast.error('Debug Error: ${error.toString().split('\n').first}');
   });
 }
