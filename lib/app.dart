@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,10 +32,7 @@ Widget buildApp(String savedTheme) {
     child: MultiBlocProvider(
       providers: CubitProviders.primary,
 
-      child: DevicePreview(
-        enabled: kDebugMode,
-        builder: (_) => MyApp(savedTheme: savedTheme),
-      ),
+      child: MyApp(savedTheme: savedTheme),
     ),
   );
 }
@@ -56,9 +52,8 @@ class MyApp extends StatelessWidget {
           return MultiBlocProvider(
             providers: CubitProviders.themeScoped,
             child: MaterialApp(
-              locale: DevicePreview.locale(context),
               builder: (ctx, child) {
-                Widget activeChild = DevicePreview.appBuilder(ctx, child);
+                Widget activeChild = child ?? const SizedBox.shrink();
 
                 return AppLockGate(
                   child: GlobalGroupCallListener(

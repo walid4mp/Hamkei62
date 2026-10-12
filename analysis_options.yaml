@@ -6,6 +6,12 @@ analyzer:
     - "**/*.freezed.dart"
     - "build/**"
     - "social_media_v6_enterprise_audit_fix_issuse_and add CI CD/**"
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     # عدم إيقاف البناء بسبب دوال أو بارامترات غير مستخدمة في كود قديم
     unused_element: info
