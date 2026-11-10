@@ -1,0 +1,122 @@
+name: SocialPlus Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Unique versionCode per build
+        run: |
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n "versionCode" android/app/build.gradle
+
+      - name: Pre-install NDK (يمنع فشل تثبيت NDK داخل Gradle)
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$SDKM" ] || SDKM="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -1)"
+          echo "sdkmanager: $SDKM"
+          yes | "$SDKM" --install "ndk;27.1.12297006" > /dev/null
+
+      - name: Build signed release APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease -Pandroid.enableMinifyInReleaseBuilds=false
+
+      - name: Rename APK
+        run: |
+          mkdir -p out
+          VER=$(node -p "require('./app.json').expo.version")
+          cp android/app/build/outputs/apk/release/app-release.apk out/SocialPlus-v$VER.apk
+          ls -lh out
+
+      - name: Verify APK signature
+        run: |
+          BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          "$ANDROID_HOME/build-tools/$BT/apksigner" verify --print-certs out/SocialPlus-v*.apk
+
+      - name: Enable KVM for emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm-dev"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Launch smoke test on real emulator (يفشل البناء لو التطبيق انهار)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          script: |
+            adb install -r out/SocialPlus-v*.apk
+            adb logcat -c
+            adb shell am start -W -n com.socialplus.app/.MainActivity
+            sleep 30
+            echo "=== resumed activity ==="
+            adb shell dumpsys activity activities | grep -iE "ResumedActivity" | head -3 || true
+            echo "=== crash check ==="
+            if adb logcat -d | grep -q "FATAL EXCEPTION"; then echo "APP CRASHED:"; adb logcat -d | grep -A 60 "FATAL EXCEPTION" | head -150; exit 1; fi
+            adb shell dumpsys activity activities | grep -i "ResumedActivity" | grep -q "com.socialplus.app/.MainActivity" && echo "FOREGROUND_OK: app alive in foreground after 30s" || { echo "APP NOT IN FOREGROUND"; exit 1; }
+            echo "LAUNCH_OK"
+            adb exec-out screencap -p > out/launch-screenshot.png || true
+            ls -lh out
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SocialPlus-Android-APK
+          path: out/SocialPlus-v*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload launch screenshot + logcat
+        uses: actions/upload-artifact@v4
+        with:
+          name: Launch-Proof
+          path: |
+            out/launch-screenshot.png
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Publish to GitHub Releases (تنزيل مباشر بدون ZIP)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.1.${{ github.run_number }}
+          name: SocialPlus Android v1.1.${{ github.run_number }}
+          body: |
+            ## 📱 SocialPlus APK — تثبيت مباشر
+            حمّل ملف **SocialPlus-v1.1.1.apk** مباشرة (بدون ضغط ZIP).
+            ✅ تم اختبار الإقلاع فعلياً على محاكي Android 14 داخل CI قبل النشر.
+            - يتطلب Android 7.0 (API 24) أو أحدث
+            - احذف النسخة القديمة قبل التثبيت
+          files: out/SocialPlus-v*.apk
+          makeLatest: true
